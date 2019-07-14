@@ -4,8 +4,8 @@ Standards
 Naming
 ------
 
-**File Naming**
+**Folder Naming**
 
-1. File names should use lowercase letters.
-2. File names should use dashes to separate words.
-3. File names should not use underscores to separate words.
+1. Folder names should use lowercase letters.
+2. Folder names should use dashes to separate words.
+3. Folder names should not use underscores to separate words.
