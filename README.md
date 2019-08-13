@@ -195,3 +195,11 @@ Dev Dependencies (needed for storybook build)
 `typescript`
 `@types/jest`
 `@types/webpack-env`
+`@storybook/addons`
+`@storybook/addon-actions`
+`@storybook/addon-links`
+`@storybook/cli`
+`@storybook/react`
+`storybook-addon-root-attribute`
+`storybook-dark-mode`
+`awesome-typescript-loader`
