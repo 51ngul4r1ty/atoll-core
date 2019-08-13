@@ -186,3 +186,12 @@ Dev Dependencies (needed for start)
 `webpack-dev-middleware`
 `webpack-hot-middleware`
 `write-file-webpack-plugin`
+
+
+Dev Dependencies (needed for storybook build)
+---------------------------------------------
+
+`cpx`
+`typescript`
+`@types/jest`
+`@types/webpack-env`
