@@ -88,8 +88,11 @@
     "style-loader": "1.0.0",
     "url-loader": "2.1.0",
     "webpack": "4.39.1",
+    "webpack-dev-middleware": "3.7.0",
+    "webpack-hot-middleware": "2.25.0",
     "webpack-manifest-plugin": "2.0.4",
     "webpack-node-externals": "1.7.2",
+    "write-file-webpack-plugin": "4.5.1",
     "yarn-or-npm": "3.0.0"
   }
 }

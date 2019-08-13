@@ -105,8 +105,8 @@ NPM Packages
 We'll try to keep this list up-to-date but there's a good chance we'll miss at least some of the dependencies.
 If you encounter a missing entry please be a good citizen and update the docs!
 
-Dev Dependencies
-----------------
+Dev Dependencies (needed for build)
+-----------------------------------
 
 *Build Scripts/Tools*
 `yarn-or-npm` - our npm scripts use this tool to support whichever you prefer!
@@ -177,3 +177,12 @@ Dev Dependencies
 `regenerator-runtime` - runtime for Regenerator-compiled generator and async functions
 `@csstools/normalize.css` - CSS library that provides consistent, cross-browser default styling of HTML elements
 `dotenv` - Loads environment variables from .env file
+
+
+Dev Dependencies (needed for start)
+-----------------------------------
+
+*Webpack Related*
+`webpack-dev-middleware`
+`webpack-hot-middleware`
+`write-file-webpack-plugin`
