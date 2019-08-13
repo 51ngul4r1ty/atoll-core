@@ -49,8 +49,7 @@ module.exports = ({ config, mode }) => {
         test: regexSassTestValue,
         use: [
             {
-                loader: "style-loader",
-                options: { sourceMap: true }
+                loader: "style-loader"
             },
             {
                 loader: "css-loader",
@@ -75,8 +74,7 @@ module.exports = ({ config, mode }) => {
         test: regexCssTestValue,
         use: [
             {
-                loader: "style-loader",
-                options: { sourceMap: true }
+                loader: "style-loader"
             },
             {
                 loader: "css-loader",
