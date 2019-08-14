@@ -105,6 +105,21 @@ NPM Packages
 We'll try to keep this list up-to-date but there's a good chance we'll miss at least some of the dependencies.
 If you encounter a missing entry please be a good citizen and update the docs!
 
+Dependencies
+------------
+
+*Libraries*
+`body-parser` - node.js body parsing middleware
+`chalk` - terminal string styling
+`cors` - node.js CORS middleware
+`dotenv` - Loads environment variables from .env file
+`express` - fast, unopinionated, minimalist web framework
+`express-manifest-helpers` - View helpers to use with an asset manifest
+`history` - easily manage session history
+`i18next` - I18next internationalization framework
+`immer` - allows you to work with immutable state in a more convenient way
+
+
 Dev Dependencies (needed for build)
 -----------------------------------
 
@@ -152,12 +167,6 @@ Dev Dependencies (needed for build)
 
 *Libraries*
 `core-js` - standard library that includes many polyfills
-`body-parser` - node.js body parsing middleware
-`cors` - node.js CORS middleware
-`history` - easily manage session history
-`express` - fast, unopinionated, minimalist web framework
-`i18next` - I18next internationalization framework
-`express-manifest-helpers` - View helpers to use with an asset manifest
 `reselect` - More efficient selectors for Redux
 
 *React Related*
@@ -171,10 +180,8 @@ Dev Dependencies (needed for build)
 `redux-thunk`
 
 *Miscellaneous*
-`chalk` - terminal string styling
 `regenerator-runtime` - runtime for Regenerator-compiled generator and async functions
 `@csstools/normalize.css` - CSS library that provides consistent, cross-browser default styling of HTML elements
-`dotenv` - Loads environment variables from .env file
 
 
 Dev Dependencies (needed for start)
