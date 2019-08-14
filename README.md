@@ -231,3 +231,12 @@ Dev Dependencies (needed for testing)
 
 `jest`
 `jest-cli`
+
+
+References Used to Set this Project Up
+======================================
+
+Debug Browser Code in VSCode
+----------------------------
+
+https://vcfvct.wordpress.com/2019/01/11/debug-browser-code-in-vscode/
