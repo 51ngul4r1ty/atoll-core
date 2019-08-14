@@ -124,7 +124,6 @@ Dev Dependencies (needed for build)
 `file-loader` - webpack loader to copy files (e.g. images) to bundle folder and reference using url
 `url-loader` - webpack loader to transform files into base64 URIs
 `webpack-manifest-plugin` - webpack plugin for generating an asset manifest ("manifest.json")
-`sass-loader` - attempt to get sass + css modules working - TODO: REMOVE THIS
 `postcss-loader` - may not be using this - TODO: REMOVE THIS
 `case-sensitive-paths-webpack-plugin` - enforces module path case sensitivity in webpack
 `html-webpack-plugin` - simplifies creation of HTML files to serve your webpack bundles
@@ -153,7 +152,6 @@ Dev Dependencies (needed for build)
 
 *Libraries*
 `core-js` - standard library that includes many polyfills
-`node-sass` - wrapper around libsass
 `body-parser` - node.js body parsing middleware
 `cors` - node.js CORS middleware
 `history` - easily manage session history
@@ -203,3 +201,17 @@ Dev Dependencies (needed for storybook build)
 `storybook-addon-root-attribute`
 `storybook-dark-mode`
 `awesome-typescript-loader`
+
+Dev Dependencies (needed for analysis)
+--------------------------------------
+
+`webpack-bundle-analyzer` - used for "npm run analyzer"
+`webpack-cli`
+`dependency-cruiser` - used for "npm run depgraph"
+`open-cli` - to open dependency-cruiser's generated svg file
+
+Dev Dependencies (needed for i18n)
+----------------------------------
+
+`@babel/cli` - used for "npm run i18n:scan"
+`i18next-scanner` - used for "npm run i18n:scan"
