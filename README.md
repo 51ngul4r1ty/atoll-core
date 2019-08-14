@@ -83,6 +83,7 @@ Configuration
 `config/webpack.config.js`
   - folder containing the individual webpack config components for the app itself
 
+
 Build Scripts
 =============
 
@@ -96,7 +97,11 @@ Build Scripts
     make sure it is executing correctly
 
 
+NPM Scripts
+===========
 
+`test` - runs tests and enters watch mode
+`test:ci` - for running tests without entering watch mode
 
 
 NPM Packages
@@ -222,3 +227,9 @@ Dev Dependencies (needed for i18n)
 
 `@babel/cli` - used for "npm run i18n:scan"
 `i18next-scanner` - used for "npm run i18n:scan"
+
+Dev Dependencies (needed for testing)
+-------------------------------------
+
+`jest`
+`jest-cli`
