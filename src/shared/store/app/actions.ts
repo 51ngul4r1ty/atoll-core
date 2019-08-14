@@ -1,7 +1,7 @@
-import { Locale } from './types';
+import { Locale } from "./types";
 
 export const ActionTypes = {
-    SETLOCALE: 'app/set-locale',
+    SETLOCALE: "app/set-locale",
 };
 
 export const setLocale = (locale: Locale) => ({

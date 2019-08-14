@@ -1,33 +1,33 @@
-import React, { useEffect } from 'react';
-import i18next from 'i18next';
-import { withRouter } from 'react-router-dom';
-import { I18nextProvider } from 'react-i18next';
-import { connect } from 'react-redux';
-import { getLocale } from '../store/app/selectors';
+import React, { useEffect } from "react";
+import i18next from "i18next";
+import { withRouter } from "react-router-dom";
+import { I18nextProvider } from "react-i18next";
+import { connect } from "react-redux";
+import { getLocale } from "../store/app/selectors";
 
-import deDE from './locales/de_DE/translation.json';
-import enUS from './locales/en_US/translation.json';
+import deDE from "./locales/de_DE/translation.json";
+import enUS from "./locales/en_US/translation.json";
 
 i18next.init({
-    fallbackLng: 'en_US',
-    fallbackNS: ['translation'],
+    fallbackLng: "en_US",
+    fallbackNS: ["translation"],
     resources: {
         de_DE: { translation: deDE },
         en_US: { translation: enUS },
     },
     parseMissingKeyHandler: (missing) => {
-        if (process.env.NODE_ENV === 'development') {
-            console.warn('MISSING TRANSLATION:', missing);
+        if (process.env.NODE_ENV === "development") {
+            console.warn("MISSING TRANSLATION:", missing);
         }
         return missing;
     },
 });
 
-i18next.languages = ['de_DE', 'en_US'];
+i18next.languages = ["de_DE", "en_US"];
 
 type Props = {
     children: React.ReactNode;
-    locale: 'en_US' | 'de_DE';
+    locale: "en_US" | "de_DE";
 };
 
 const I18N = ({ children, locale }: Props) => {

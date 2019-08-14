@@ -21,6 +21,9 @@ module.exports = {
         'import/no-unassigned-import': 0,
         'import/no-named-as-default-member': 0,
         'prettier/prettier': 'error',
+        'linebreak-style': ['warn', 'unix'],
+        'quotes': [2, "double"],
+        'react/prop-types': 0
     },
     // overrides: [{ files: ['*.tsx'], rules: { 'import/named': 0 } }],
 };

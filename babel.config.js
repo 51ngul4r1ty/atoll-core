@@ -7,26 +7,26 @@ module.exports = {
                 modules: false,
                 targets: {
                     node: 'current',
-                },
-            },
+                }
+            }
         ],
-        '@babel/react',
-        '@babel/typescript',
+        "@babel/react",
+        "@babel/typescript"
     ],
     plugins: [
-        '@babel/proposal-object-rest-spread',
-        '@babel/proposal-class-properties',
-        '@babel/proposal-optional-chaining',
-        '@babel/syntax-dynamic-import',
-        'macros',
+        "@babel/proposal-object-rest-spread",
+        "@babel/proposal-class-properties",
+        "@babel/proposal-optional-chaining",
+        "@babel/syntax-dynamic-import",
+        "macros"
     ],
     env: {
         test: {
             plugins: [
-                '@babel/transform-modules-commonjs',
-                '@babel/syntax-dynamic-import',
-                '@babel/plugin-transform-runtime',
-            ],
-        },
-    },
+                "@babel/transform-modules-commonjs",
+                "@babel/syntax-dynamic-import",
+                "@babel/plugin-transform-runtime"
+            ]
+        }
+    }
 };

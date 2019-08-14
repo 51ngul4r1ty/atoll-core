@@ -6,22 +6,22 @@
         padding: 4px 0;
 
         &:before {
-            content: '✅';
+            content: "✅";
             display: inline-block;
             min-width: 28px;
             text-align: center;
         }
 
         &.hot:before {
-            content: '🔥';
+            content: "🔥";
         }
 
         &.react:before {
-            content: '⚛';
+            content: "⚛";
         }
 
         &.webpack:before {
-            content: '📦';
+            content: "📦";
         }
     }
 }

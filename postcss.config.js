@@ -1,19 +1,19 @@
-const paths = require('./config/paths');
+const paths = require("./config/paths");
 
 module.exports = {
     plugins: [
-        require('postcss-import')({
+        require("postcss-import")({
             path: [paths.srcShared, `${__dirname}/node_modules`],
         }),
-        require('postcss-nested')(),
-        require('postcss-flexbugs-fixes')(),
-        require('autoprefixer')(),
-        require('postcss-custom-properties')(),
-        require('postcss-assets')({
-            basePath: './assets',
+        require("postcss-nested")(),
+        require("postcss-flexbugs-fixes")(),
+        require("autoprefixer")(),
+        require("postcss-custom-properties")(),
+        require("postcss-assets")({
+            basePath: "./assets",
         }),
         // This is broken.
-        // require('postcss-normalize')(),
+        // require("postcss-normalize")(),
     ],
     sourceMap: true,
 };

@@ -1,12 +1,12 @@
-import React, { useCallback } from 'react';
-import Helmet from 'react-helmet';
-import { connect } from 'react-redux';
-import { withTranslation } from 'react-i18next';
-import { Features } from '../shared/components/features/Features';
-import favicon from '../shared/assets/favicon.png';
-import { setLocale } from './store/app/actions';
-import { ReactComponent as ReactLogo } from './assets/react.svg';
-import css from './App.module.css';
+import React, { useCallback } from "react";
+import Helmet from "react-helmet";
+import { connect } from "react-redux";
+import { withTranslation } from "react-i18next";
+import { Features } from "../shared/components/features/Features";
+import favicon from "../shared/assets/favicon.png";
+import { setLocale } from "./store/app/actions";
+import { ReactComponent as ReactLogo } from "./assets/react.svg";
+import css from "./App.module.css";
 
 type Props = {
     setLocale: (locale: string) => void;
@@ -26,14 +26,13 @@ const App = ({ setLocale, t }: Props) => {
             <Helmet
                 defaultTitle="React SSR Starter – TypeScript Edition"
                 titleTemplate="%s – React SSR Starter – TypeScript Edition"
-                link={[{ rel: 'icon', type: 'image/png', href: favicon }]}
+                link={[{ rel: "icon", type: "image/png", href: favicon }]}
             />
             <h1>
-                <ReactLogo className={css.reactLogo} /> React + Express – SSR Starter – TypeScript
-                Edition
+                <ReactLogo className={css.reactLogo} /> React + Express – SSR Starter – TypeScript Edition
             </h1>
             <Features />
-            <h2>{t('i18n-example')}</h2>
+            <h2>{t("i18n-example")}</h2>
             <p>
                 <button value="de_DE" onClick={handleLocaleChange}>
                     Deutsch

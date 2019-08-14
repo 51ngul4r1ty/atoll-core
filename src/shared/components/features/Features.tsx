@@ -1,10 +1,10 @@
-import React from 'react';
-import { withTranslation, WithTranslation } from 'react-i18next';
-import css from './features.module.css';
+import React from "react";
+import { withTranslation, WithTranslation } from "react-i18next";
+import css from "./features.module.css";
 
 const RawFeatures = ({ t }: WithTranslation) => (
     <React.Fragment>
-        <h2>{t('features')}</h2>
+        <h2>{t("features")}</h2>
         <ul className={css.wrapper}>
             <li className={css.react}>React 16.x (latest)</li>
             <li className={css.webpack}>Webpack 4</li>
@@ -19,7 +19,7 @@ const RawFeatures = ({ t }: WithTranslation) => (
             <li>Reselect</li>
             <li>React Helmet</li>
             <li>Express Webserver + Server Side Rerendering</li>
-            <li>{t('i18n-support')}</li>
+            <li>{t("i18n-support")}</li>
             <li>CSS Modules</li>
             <li>PostCSS</li>
             <li>Prettier (incl. precommit-hook via lint-staged + husky)</li>

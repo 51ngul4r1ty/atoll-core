@@ -1,4 +1,4 @@
-declare module '@storybook/react/demo' {
+declare module "@storybook/react/demo" {
     export const Button;
     export const Welcome;
 }

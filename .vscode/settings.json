@@ -8,5 +8,8 @@
         "build": true,
         "coverage": true,
         "node_modules": true,
-    }
+    },
+    "bookmarks.navigateThroughAllFiles": true,
+    "bookmarks.backgroundLineColor": "#102030",
+    "editor.formatOnSave": true
 }

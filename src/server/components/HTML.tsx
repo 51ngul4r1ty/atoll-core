@@ -1,5 +1,5 @@
-import React from 'react';
-import Helmet from 'react-helmet';
+import React from "react";
+import Helmet from "react-helmet";
 
 type Props = {
     children: any;
@@ -8,7 +8,7 @@ type Props = {
     state: string;
 };
 
-const HTML = ({ children, css = [], scripts = [], state = '{}' }: Props) => {
+const HTML = ({ children, css = [], scripts = [], state = "{}" }: Props) => {
     const head = Helmet.renderStatic();
     return (
         <html lang="">

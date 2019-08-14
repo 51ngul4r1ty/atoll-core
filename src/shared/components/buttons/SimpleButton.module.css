@@ -1,15 +1,15 @@
 .button {
+    align-items: center;
     background-color: var(--primary-background-color, white);
     border: 0.125rem solid var(--primary-line-color, black);
-    padding: 0.3rem 0.4rem 0.3rem 0.8rem;
-    display: inline-flex;
-    align-items: center;
     cursor: pointer;
+    display: inline-flex;
+    padding: 0.3rem 0.4rem 0.3rem 0.8rem;
     user-select: none;
 }
 
 .button:focus {
-    background-color: var(--primary-focus-background-color, '#eee');
+    background-color: var(--primary-focus-background-color, "#eee");
     outline: 0;
 }
 
@@ -18,14 +18,14 @@
 }
 
 .button:active {
-    background-color: var(--primary-active-background-color, '#ddd');
+    background-color: var(--primary-active-background-color, "#ddd");
 }
 
 .buttonCaption {
-    text-transform: uppercase;
-    font-weight: var(--primary-bold-font-weight, 700);
-    font-size: var(--primary-font-size, 0.95rem);
     color: var(--primary-font-color);
+    font-size: var(--primary-font-size, 0.95rem);
+    font-weight: var(--primary-bold-font-weight, 700);
+    text-transform: uppercase;
 }
 
 .buttonCaption + .buttonIcon {
@@ -37,8 +37,8 @@
 }
 
 .buttonIcon > * {
-    width: 1.9rem;
     height: 1.9rem;
+    width: 1.9rem;
 }
 
 .buttonIcon * {
