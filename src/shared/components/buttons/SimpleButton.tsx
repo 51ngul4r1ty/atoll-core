@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import scss from './SimpleButton.module.scss';
+import scss from './SimpleButton.module.css';
 
 export interface SimpleButtonAttributeProps {
     icon?: any; // TODO: Define type

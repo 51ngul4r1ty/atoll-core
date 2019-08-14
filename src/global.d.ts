@@ -54,16 +54,6 @@ declare module '*.css' {
     export default src;
 }
 
-declare module '*.module.scss' {
-    const scss: { [key: string]: string };
-    export default scss;
-}
-
-declare module '*.scss' {
-    const src: string;
-    export default src;
-}
-
 declare module '*.json' {
     const src: string;
     export default src;

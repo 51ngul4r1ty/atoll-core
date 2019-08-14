@@ -1,6 +1,6 @@
 import React from 'react';
 import { withTranslation, WithTranslation } from 'react-i18next';
-import css from './features.module.scss';
+import css from './features.module.css';
 
 const RawFeatures = ({ t }: WithTranslation) => (
     <React.Fragment>

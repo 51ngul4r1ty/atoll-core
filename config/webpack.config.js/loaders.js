@@ -2,9 +2,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const generateSourceMap = process.env.OMIT_SOURCEMAP === 'true' ? false : true;
 const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent');
 
-const sassRegex = /\.scss$/;
-const sassModuleRegex = /\.module\.scss$/;
-
 const cssRegex = /\.css$/;
 const cssModuleRegex = /\.module\.css$/;
 
@@ -40,36 +37,6 @@ const babelLoader = {
     },
 };
 
-const sassModuleLoaderClient = {
-    test: sassModuleRegex,
-    use: [
-        MiniCssExtractPlugin.loader,
-        {
-            loader: require.resolve('css-loader'),
-            options: {
-                localsConvention: 'camelCase',
-                modules: {
-                    getLocalIdent: getLocalIdentWorkaround,
-                },
-                importLoaders: 1,
-                sourceMap: generateSourceMap
-            }
-        },
-        // {
-        //     loader: require.resolve('postcss-loader'),
-        //     options: {
-        //         sourceMap: generateSourceMap,
-        //     },
-        // },
-        {
-            loader: require.resolve('sass-loader'),
-            options: {
-                sourceMap: generateSourceMap
-            }
-        }
-    ],
-};
-
 const cssModuleLoaderClient = {
     test: cssModuleRegex,
     use: [
@@ -95,26 +62,6 @@ const cssModuleLoaderClient = {
     ],
 };
 
-const sassLoaderClient = {
-    test: sassRegex,
-    exclude: sassModuleRegex,
-    use: [
-        MiniCssExtractPlugin.loader,
-        {
-            loader: require.resolve('style-loader')
-        },
-        {
-            loader: require.resolve('css-loader')
-        },
-        {
-            loader: require.resolve('sass-loader'),
-            options: {
-                sourceMap: generateSourceMap
-            }
-        }
-    ],
-};
-
 const cssLoaderClient = {
     test: cssRegex,
     exclude: cssModuleRegex,
@@ -129,51 +76,6 @@ const cssLoaderClient = {
             },
         },
     ],
-};
-
-const sassModuleLoaderServer = {
-    test: sassModuleRegex,
-    use: [
-        {
-            loader: require.resolve('css-loader'),
-            options: {
-                onlyLocals: true,
-                localsConvention: 'camelCase',
-                importLoaders: 1,
-                modules: {
-                    getLocalIdent: getLocalIdentWorkaround
-                }
-            }
-        },
-        // {
-        //     loader: require.resolve('postcss-loader'),
-        //     options: {
-        //         sourceMap: generateSourceMap,
-        //     },
-        // },
-        {
-            loader: require.resolve('sass-loader'),
-            options: {
-                onlyLocals: true,
-                localsConvention: 'camelCase',
-                importLoaders: 1,
-                modules: {
-                    getLocalIdent: getLocalIdentWorkaround,
-                }
-            }
-        }
-    ]
-};
-
-const sassLoaderServer = {
-    test: sassRegex,
-    exclude: sassModuleRegex,
-    use: [
-        MiniCssExtractPlugin.loader,
-        require.resolve('style-loader'),
-        require.resolve('css-loader'),
-        require.resolve('sass-loader')
-    ]
 };
 
 const cssModuleLoaderServer = {
@@ -254,8 +156,6 @@ const client = [
     {
         oneOf: [
             babelLoader,
-            sassModuleLoaderClient,
-            sassLoaderClient,
             cssModuleLoaderClient,
             cssLoaderClient,
             urlLoaderClient,
@@ -267,8 +167,6 @@ const server = [
     {
         oneOf: [
             babelLoader,
-            sassModuleLoaderServer,
-            sassLoaderServer,
             cssModuleLoaderServer,
             cssLoaderServer,
             urlLoaderServer,

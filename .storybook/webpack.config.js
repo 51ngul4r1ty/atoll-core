@@ -18,7 +18,6 @@ module.exports = ({ config, mode }) => {
     });
 
     const regexCssTestValue = /\.css$/;
-    const regexSassTestValue = /\.scss$/;
     const regexSvgTestValue = /\.svg$/;
     const newRulesList = [];
     config.module.rules.forEach(
@@ -27,7 +26,7 @@ module.exports = ({ config, mode }) => {
             if (item.test.test('.css') /* regexStr === regexToStringOrOtherToNull(regexCssTestValue) */) {
                 console.log('INFO: removing CSS module rule so we can replace it with our own');
             }
-            if (item.test.test('.svg') /* regexStr.indexOf('svg') >= 0 */) {
+            else if (item.test.test('.svg') /* regexStr.indexOf('svg') >= 0 */) {
                 if (regexStr !== "/\.(svg|ico|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|cur|ani)(\?.*)?$/") {
                     console.log('INFO: modifying SVG related module rule to exclude SVG because it will be handled separately');
                     item.test = /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|cur|ani)(\?.*)?$/;
@@ -40,36 +39,12 @@ module.exports = ({ config, mode }) => {
                 }
             }
             else {
+                console.log(`INFO: not removing module rule - ${regexStr}`);
                 newRulesList.push(item);
             }
         }
     );
     config.module.rules = newRulesList;
-    config.module.rules.push({
-        test: regexSassTestValue,
-        use: [
-            {
-                loader: "style-loader"
-            },
-            {
-                loader: "css-loader",
-                options: {
-                    importLoaders: 1,
-                    sourceMap: false,
-                    modules: {
-                        localIdentName: "[name]__[local]__[hash:base64:5]"
-                    }
-                },
-            },
-            {
-                loader: require.resolve('sass-loader'),
-                options: {
-                    sourceMap: false
-                }
-            }
-        ],
-        include: path.resolve(__dirname, "../")
-    });
     config.module.rules.push({
         test: regexCssTestValue,
         use: [
