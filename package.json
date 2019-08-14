@@ -12,7 +12,8 @@
     "build": "cross-env NODE_ENV=production node scripts/build.js",
     "depgraph": "yarn-or-npm run build:depgraph && open-cli dependency-graph.svg",
     "build:depgraph": "depcruise -c .dependency-cruiser.js --exclude '^node_modules' --output-type dot src | dot -T svg > dependency-graph.svg",
-    "clean": "rimraf build/transpiled",
+    "clean": "yarn-or-npm run clean:transpiled",
+    "clean:transpiled": "rimraf build/transpiled",
     "i18n:scan": "cross-env NODE_ENV=i18n yarn-or-npm run transpile && i18next-scanner './build/transpiled/**/*.js' && yarn-or-npm run clean:transpiled",
     "lint": "concurrently \"yarn-or-npm run lint:js\" \"yarn-or-npm run lint:css\"",
     "lint:deps": "depcruise -c .dependency-cruiser.js src/",
@@ -44,6 +45,7 @@
     "reselect": "4.0.0"
   },
   "devDependencies": {
+    "@babel/cli": "7.5.5",
     "@babel/core": "7.5.5",
     "@babel/plugin-proposal-class-properties": "7.5.5",
     "@babel/plugin-proposal-object-rest-spread": "7.5.5",
@@ -83,6 +85,7 @@
     "history": "4.9.0",
     "html-webpack-plugin": "3.2.0",
     "i18next": "17.0.10",
+    "i18next-scanner": "2.10.2",
     "mini-css-extract-plugin": "0.8.0",
     "nodemon": "1.19.1",
     "open-cli": "5.0.0",
