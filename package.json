@@ -21,7 +21,7 @@
     "storybook": "yarn-or-npm run storybook-serve",
     "test": "node scripts/test.js --env=jsdom",
     "test:ci": "cross-env CI=true node scripts/test.js --env=jsdom",
-    "test:update": "yarn-or-npm test --updateSnapshot",
+    "test:update": "cross-env CI=true yarn-or-npm test --updateSnapshot",
     "start:analyzer": "webpack-bundle-analyzer build/client/static/bundle-stats.json",
     "transpile": "babel -d build/transpiled ./src --extensions .es6,.js,.es,.jsx,.mjs,.ts,.tsx --ignore **/*.d.ts",
     "lint:js": "eslint src/**/*.{js,jsx,ts,tsx}",
