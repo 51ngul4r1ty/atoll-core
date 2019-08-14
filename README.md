@@ -203,8 +203,6 @@ Dev Dependencies (needed for storybook build)
 
 `cpx`
 `typescript`
-`@types/jest`
-`@types/webpack-env`
 `@storybook/addons`
 `@storybook/addon-actions`
 `@storybook/addon-links`
