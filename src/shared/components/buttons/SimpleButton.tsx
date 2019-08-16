@@ -6,11 +6,11 @@ export interface SimpleButtonAttributeProps {
     icon?: any; // TODO: Define type
 }
 
-export interface SimpleButtonDispatchProps {
+export interface SimpleButtonEventProps {
     onClick: { () };
 }
 
-export type SimpleButtonProps = SimpleButtonAttributeProps & SimpleButtonDispatchProps;
+export type SimpleButtonProps = SimpleButtonAttributeProps & SimpleButtonEventProps;
 
 export const SimpleButton: React.FC<SimpleButtonProps> = (props) => {
     const icon = props.icon && <div className={scss.buttonIcon}>{props.icon}</div>;

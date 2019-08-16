@@ -8,7 +8,9 @@ import { withRootAttribute } from "storybook-addon-root-attribute";
 import { Welcome } from "@storybook/react/demo";
 
 import { SimpleButton } from "../src/shared/components/buttons/SimpleButton";
+import { HomeButton } from "../src/shared/components/buttons/HomeButton";
 import { HamburgerIcon } from "../src/shared/components/images/HamburgerIcon";
+import { AppIcon } from "../src/shared/components/images/AppIcon";
 
 addDecorator(withRootAttribute);
 addParameters({
@@ -30,8 +32,10 @@ addParameters({
 
 storiesOf("Welcome", module).add("to Storybook", () => <Welcome showApp={linkTo("Button")} />);
 
-storiesOf("Buttons", module).add("SimpleButton", () => (
-    <SimpleButton icon={<HamburgerIcon />} onClick={action("clicked")}>
-        Menu
-    </SimpleButton>
-));
+storiesOf("Buttons", module)
+    .add("HomeButton", () => <HomeButton invertColors onClick={action("clicked")} />)
+    .add("SimpleButton", () => (
+        <SimpleButton icon={<HamburgerIcon />} onClick={action("clicked")}>
+            Menu
+        </SimpleButton>
+    ));
