@@ -1,6 +1,10 @@
+// externals
 import * as React from "react";
 
+// style
 import scss from "./HamburgerIcon.module.css";
+
+/* exported components */
 
 export const HamburgerIcon: React.FC<{}> = () => (
     <svg

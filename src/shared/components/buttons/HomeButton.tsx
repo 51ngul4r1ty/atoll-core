@@ -15,7 +15,7 @@ import scss from "./HomeButton.module.css";
 export interface HomeButtonAttributeProps {}
 
 export interface HomeButtonEventProps {
-    onClick: { () };
+    onClick?: { () };
 }
 
 export type HomeButtonProps = HomeButtonAttributeProps & HomeButtonEventProps;
@@ -24,7 +24,15 @@ export type HomeButtonProps = HomeButtonAttributeProps & HomeButtonEventProps;
 
 export const HomeButton: React.FC<HomeButtonProps> = (props) => {
     return (
-        <div className={scss.button} tabIndex={0} onClick={props.onClick}>
+        <div
+            className={scss.button}
+            tabIndex={0}
+            onClick={() => {
+                if (props.onClick) {
+                    props.onClick();
+                }
+            }}
+        >
             <div className={scss.buttonIcon}>
                 <AppIcon invertColors={true} />
             </div>

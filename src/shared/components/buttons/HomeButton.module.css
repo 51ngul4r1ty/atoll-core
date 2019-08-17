@@ -8,20 +8,21 @@
 }
 
 .button:focus {
-    background-color: var(--primary-focus-background-color, "#eee");
+    background-color: var(--primary-focus-background-color, #eee);
     outline: 0;
 }
 
 .button:hover {
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0) inset, 0 0 var(--primary-hover-shadow-size) var(--primary-hover-shadow);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0) inset,
+        0 0 var(--primary-hover-shadow-size, 0.6rem) var(--primary-hover-shadow, rgba(0, 0, 0, 0.4));
 }
 
 .button:active {
-    background-color: var(--primary-active-background-color, "#ddd");
+    background-color: var(--primary-active-background-color, #ddd);
 }
 
 .buttonCaption {
-    color: var(--primary-background-color);
+    color: var(--primary-background-color, white);
     font-size: var(--menu-panel-font-size, 1.05rem);
     font-weight: var(--primary-bold-font-weight, 700);
 }
