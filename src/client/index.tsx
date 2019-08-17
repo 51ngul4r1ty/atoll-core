@@ -24,7 +24,6 @@ hydrate(
                 <Switch>
                     <Route path="/" exact component={App} />
                 </Switch>
-                {/* <App /> */}
             </IntlProvider>
         </Router>
     </Provider>,
