@@ -46,10 +46,10 @@ const cssModuleLoaderClient = {
             loader: require.resolve("css-loader"),
             options: {
                 localsConvention: "camelCase",
+                importLoaders: 1,
                 modules: {
                     getLocalIdent: getLocalIdentWorkaround
                 },
-                importLoaders: 1,
                 sourceMap: generateSourceMap
             }
         },
