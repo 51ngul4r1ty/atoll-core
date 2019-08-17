@@ -5,7 +5,7 @@ import { StaticRouter as Router } from "react-router-dom";
 import { Store } from "redux";
 import { Provider } from "react-redux";
 import IntlProvider from "../../shared/i18n/IntlProvider";
-import App from "../../shared/App";
+import { App } from "../../shared/App";
 import Html from "../components/HTML";
 
 const serverRenderer: any = () => (req: express.Request & { store: Store }, res: express.Response) => {
