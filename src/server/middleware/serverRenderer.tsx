@@ -7,13 +7,16 @@ import { Provider } from "react-redux";
 import IntlProvider from "../../shared/i18n/IntlProvider";
 import { App } from "../../shared/App";
 import Html from "../components/HTML";
+import { MainLayout } from "../../shared/layouts/MainLayout";
 
 const serverRenderer: any = () => (req: express.Request & { store: Store }, res: express.Response) => {
     const content = renderToString(
         <Provider store={res.locals.store}>
             <Router location={req.url} context={{}}>
                 <IntlProvider>
-                    <App />
+                    <MainLayout>
+                        <App />
+                    </MainLayout>
                 </IntlProvider>
             </Router>
         </Provider>

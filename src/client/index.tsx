@@ -6,6 +6,7 @@ import { configureStore } from "../shared/store";
 import { App } from "../shared/App";
 import IntlProvider from "../shared/i18n/IntlProvider";
 import createHistory from "../shared/store/history";
+import { MainLayout } from "layouts/MainLayout";
 
 const history = createHistory();
 
@@ -21,9 +22,11 @@ hydrate(
     <Provider store={store}>
         <Router history={history}>
             <IntlProvider>
-                <Switch>
-                    <Route path="/" exact component={App} />
-                </Switch>
+                <MainLayout>
+                    <Switch>
+                        <Route path="/" exact component={App} />
+                    </Switch>
+                </MainLayout>
             </IntlProvider>
         </Router>
     </Provider>,
