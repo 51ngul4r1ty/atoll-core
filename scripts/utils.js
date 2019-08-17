@@ -1,14 +1,7 @@
-const chalk = require('chalk');
+const chalk = require("chalk");
 
-const logMessage = (message, level = 'info') => {
-    const color =
-        level === 'error'
-            ? 'red'
-            : level === 'warning'
-            ? 'yellow'
-            : level === 'info'
-            ? 'blue'
-            : 'white';
+const logMessage = (message, level = "info") => {
+    const color = level === "error" ? "red" : level === "warning" ? "yellow" : level === "info" ? "blue" : "white";
     console.log(`[${new Date().toISOString()}]`, chalk[color](message));
 };
 
@@ -28,11 +21,11 @@ const compilerPromise = (name, compiler) => {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const clientOnly = () => process.argv.includes('--client-only');
+const clientOnly = () => process.argv.includes("--client-only");
 
 module.exports = {
     clientOnly,
     compilerPromise,
     logMessage,
-    sleep,
+    sleep
 };

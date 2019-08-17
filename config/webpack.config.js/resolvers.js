@@ -1,6 +1,6 @@
-const paths = require('../paths');
+const paths = require("../paths");
 
 module.exports = {
-    extensions: ['.js', '.mjs', '.json', '.jsx', '.ts', '.tsx', '.css'],
-    modules: paths.resolveModules,
+    extensions: [".js", ".mjs", ".json", ".jsx", ".ts", ".tsx", ".css"],
+    modules: paths.resolveModules
 };

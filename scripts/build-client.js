@@ -1,9 +1,9 @@
-const webpack = require('webpack');
-const rimraf = require('rimraf');
-const chalk = require('chalk');
-const webpackConfig = require('../config/webpack.config.js')(process.env.NODE_ENV || 'production');
-const paths = require('../config/paths');
-const { logMessage, compilerPromise } = require('./utils');
+const webpack = require("webpack");
+const rimraf = require("rimraf");
+const chalk = require("chalk");
+const webpackConfig = require("../config/webpack.config.js")(process.env.NODE_ENV || "production");
+const paths = require("../config/paths");
+const { logMessage, compilerPromise } = require("./utils");
 
 const build = async () => {
     rimraf.sync(paths.clientBuild);
@@ -12,8 +12,8 @@ const build = async () => {
     const [clientConfig] = webpackConfig;
     const webpackCompiler = webpack([clientConfig]);
 
-    const clientCompiler = webpackCompiler.compilers.find((compiler) => compiler.name === 'client');
-    const clientPromise = compilerPromise('client', clientCompiler);
+    const clientCompiler = webpackCompiler.compilers.find((compiler) => compiler.name === "client");
+    const clientPromise = compilerPromise("client", clientCompiler);
 
     clientCompiler.watch({}, (error, stats) => {
         if (!error && !stats.hasErrors()) {
@@ -26,10 +26,10 @@ const build = async () => {
     // wait until client and server is compiled
     try {
         await clientPromise;
-        logMessage('Done!', 'info');
+        logMessage("Done!", "info");
         process.exit();
     } catch (error) {
-        logMessage(error, 'error');
+        logMessage(error, "error");
     }
 };
 
