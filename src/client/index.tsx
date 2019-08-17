@@ -3,7 +3,7 @@ import { hydrate } from "react-dom";
 import { Provider } from "react-redux";
 import { Router, Switch, Route } from "react-router-dom";
 import { configureStore } from "../shared/store";
-import App from "../shared/App";
+import { App } from "../shared/App";
 import IntlProvider from "../shared/i18n/IntlProvider";
 import createHistory from "../shared/store/history";
 
@@ -14,7 +14,7 @@ const history = createHistory();
 const store =
     window.store ||
     configureStore({
-        initialState: window.__PRELOADED_STATE__,
+        initialState: window.__PRELOADED_STATE__
     });
 
 hydrate(

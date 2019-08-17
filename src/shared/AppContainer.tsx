@@ -6,7 +6,7 @@ import { withTranslation } from "react-i18next";
 import { setLocale } from "./store/app/actions";
 
 // components
-import App from "App";
+import { App } from "./App";
 
 const mapDispatchToProps = {
     setLocale

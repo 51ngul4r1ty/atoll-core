@@ -2,7 +2,7 @@
 import * as React from "react";
 
 // components
-import { HomeButton } from "components/buttons/HomeButton";
+import { HomeButton } from "../buttons/HomeButton";
 
 /* exported components */
 

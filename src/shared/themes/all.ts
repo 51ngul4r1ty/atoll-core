@@ -19,7 +19,7 @@ export const defaultTheme: Theme = {
     "--primary-hover-shadow-size": "0.6rem",
     "--primary-active-background-color": "#ddd",
     "--primary-focus-background-color": "#eee",
-    "--menu-panel-font-size": "1.05rem"
+    "--menu-panel-font-size": "1.3rem"
 };
 
 export const darkTheme: Theme = {
@@ -31,7 +31,7 @@ export const darkTheme: Theme = {
     "--primary-hover-shadow-size": "1.0rem",
     "--primary-active-background-color": "#444",
     "--primary-focus-background-color": "#333",
-    "--menu-panel-font-size": "1.05rem"
+    "--menu-panel-font-size": "1.3rem"
 };
 
 export interface ThemeListItem {

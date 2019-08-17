@@ -23,7 +23,7 @@
 
 .buttonCaption {
     color: var(--primary-background-color, white);
-    font-size: var(--menu-panel-font-size, 1.05rem);
+    font-size: var(--menu-panel-font-size, 1.3rem);
     font-weight: var(--primary-bold-font-weight, 700);
 }
 
