@@ -5,8 +5,6 @@ import { connect } from "react-redux";
 import { withTranslation } from "react-i18next";
 
 // components
-import { Features } from "./components/features/Features";
-import { HamburgerIcon } from "./components/images/HamburgerIcon";
 import { TopMenuPanel } from "./components/panels/TopMenuPanel";
 
 // actions
@@ -37,21 +35,8 @@ const App = ({ setLocale, t }: Props) => {
 
     return (
         <div className={css.wrapper}>
-            <Helmet
-                defaultTitle="React SSR Starter – TypeScript Edition"
-                titleTemplate="%s – React SSR Starter – TypeScript Edition"
-                link={[{ rel: "icon", type: "image/png", href: favicon }]}
-            />
+            <Helmet defaultTitle="Atoll" titleTemplate="Atoll – %s" link={[{ rel: "icon", type: "image/png", href: favicon }]} />
             <TopMenuPanel />
-            <h2>{t("i18n-example")}</h2>
-            <p>
-                <button value="de_DE" onClick={handleLocaleChange}>
-                    Deutsch
-                </button>
-                <button value="en_US" onClick={handleLocaleChange}>
-                    English
-                </button>
-            </p>
         </div>
     );
 };
