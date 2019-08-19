@@ -1,0 +1,95 @@
+<link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+<style>
+    html {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 12px;
+    }
+    body {
+        background-color: var(--primary-background-color, white);
+    }
+</style>
+<script>
+    function getThemeAttribute() {
+        const prefix = 'theme-';
+        let result = null;
+        let html = document.querySelector('html');
+        html.classList.forEach(item => {
+            console.log('item: ' + item);
+            if (item.indexOf(prefix) === 0) {
+                console.log('item match: ' + item);
+                const themeName = item.substr(prefix.length);
+                result = themeName;
+            }
+        });
+        console.log('RESULT: ' + result);
+        if (!result) {
+            console.log('no result, setting default');
+            result = 'default';
+        }
+        return result;
+    }
+    var themeList = [
+        /* ***INSERT_THEME_LIST_HERE*** */
+    ];
+    function getTheme(themeName) {
+        var items = themeList.filter(item => item.name === themeName);
+        if (items.length) {
+            return items[0] && items[0].theme;
+        }
+        else {
+            return null;
+        }
+    }
+    function addBodyStylesForTheme(themeName) {
+        var bodyStyles = document.body.style;
+        var theme = getTheme(themeName);
+        for (var propName in theme) {
+            var propValue = theme[propName];
+            bodyStyles.setProperty(propName, propValue);
+        }
+    }
+    function setThemeVars(themeName) {
+        var bodyStyles = document.body.style;
+        switch (themeName) {
+            case 'default':
+            case 'dark': {
+                addBodyStylesForTheme(themeName);
+                console.log(themeName + ' theme vars set');
+                break;
+            }
+            default: {
+                console.log(themeName + ' theme vars NOT set');
+                break;
+            }
+        }
+    }
+    function setDefaultThemeVars() {
+        const themeName = getThemeAttribute();
+        setThemeVars('default');
+    }
+    function setDarkThemeVars() {
+        setThemeVars('dark');
+    }
+    function checkForThemeChange() {
+        const themeName = getThemeAttribute();
+        if (themeName !== lastThemeName) {
+            console.log('THEME CHANGE DETECTED');
+            setThemeVars(themeName);
+            storeLastThemeName(themeName);
+        }
+        setupNextCheck();
+    }
+    function setupNextCheck() {
+        setTimeout(checkForThemeChange, 500);
+    }
+    let lastThemeName = null;
+    function storeLastThemeName(themeName) {
+        lastThemeName = themeName;
+    }
+    function themeEngineSetup() {
+        const themeName = getThemeAttribute();
+        setThemeVars(themeName);
+        setupNextCheck();
+    }
+    window.addEventListener('load', themeEngineSetup);
+</script>

@@ -1,0 +1,15 @@
+.fill {
+    fill: var(--primary-line-color, black);
+}
+
+.fillInverted {
+    fill: var(--primary-background-color, white);
+}
+
+.strokeInverted {
+    stroke: var(--primary-background-color, white);
+}
+
+.stroke {
+    stroke: var(--primary-line-color, black);
+}

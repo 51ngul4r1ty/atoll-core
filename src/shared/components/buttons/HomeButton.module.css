@@ -1,0 +1,45 @@
+.button {
+    align-items: center;
+    background-color: var(--primary-line-color, black);
+    cursor: pointer;
+    display: inline-flex;
+    padding: 0.5rem 0.85rem 0.5rem 0.7rem;
+    user-select: none;
+}
+
+.button:focus {
+    background-color: var(--primary-focus-background-color, #eee);
+    outline: 0;
+}
+
+.button:hover {
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0) inset,
+        0 0 var(--primary-hover-shadow-size, 0.6rem) var(--primary-hover-shadow, rgba(0, 0, 0, 0.4));
+}
+
+.button:active {
+    background-color: var(--primary-active-background-color, #ddd);
+}
+
+.buttonCaption {
+    color: var(--primary-background-color, white);
+    font-size: var(--menu-panel-font-size, 1.3rem);
+    font-weight: var(--primary-bold-font-weight, 700);
+}
+
+.buttonIcon + .buttonCaption {
+    padding-left: 0.5rem;
+}
+
+.buttonIcon {
+    display: inline-flex;
+}
+
+.buttonIcon > * {
+    height: 1.9rem;
+    width: 1.9rem;
+}
+
+.buttonIcon * {
+    font-size: 1px;
+}

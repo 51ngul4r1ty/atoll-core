@@ -1,0 +1,44 @@
+{
+    "compilerOptions": {
+        "outDir": "build/storybook",
+        "module": "commonjs",
+        "target": "es5",
+        "lib": [
+            "dom",
+            "es5",
+            "es6",
+            "es7",
+            "es2017"
+        ],
+        "sourceMap": true,
+        "allowJs": true,
+        "jsx": "react",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "rootDirs": [
+            "src",
+            "stories"
+        ],
+        "baseUrl": "src",
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noImplicitAny": false,
+        "strictNullChecks": false,
+        "suppressImplicitAnyIndexErrors": true,
+        "noUnusedLocals": true,
+        "declaration": false,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "build",
+        "scripts",
+        "src/server"
+    ]
+}
