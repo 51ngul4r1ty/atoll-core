@@ -8,6 +8,7 @@
     font-size: var(--font-size-base);
     margin: 0;
     padding: 0;
+    background-color: var(--primary-background-color, white);
 }
 
 .app {
