@@ -15,7 +15,7 @@ import favicon from "../shared/assets/favicon.png";
 
 export const App = () => {
     return (
-        <div className={css.wrapper}>
+        <div className={css.app}>
             <Helmet defaultTitle="Atoll" titleTemplate="Atoll – %s" link={[{ rel: "icon", type: "image/png", href: favicon }]} />
             <TopMenuPanel />
         </div>

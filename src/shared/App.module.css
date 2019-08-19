@@ -10,18 +10,6 @@
     padding: 0;
 }
 
-.wrapper {
-    margin: auto;
-    max-width: 100%;
-    width: 768px;
-
-    h1 {
-        font-size: var(--font-size-h1);
-    }
-}
-
-.reactLogo {
-    height: 48px;
-    vertical-align: middle;
-    width: 48px;
+.app {
+    /* add top-level style for app here */
 }
