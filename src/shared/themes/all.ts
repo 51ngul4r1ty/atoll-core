@@ -60,7 +60,6 @@
     (4) Large - `large-`
     (5) Extra Large - xlarge-`
 
-
 */
 
 export interface Theme {
