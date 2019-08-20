@@ -6,7 +6,7 @@
     "configurations": [
         {
             "type": "chrome",
-            "name": "Browser",
+            "name": "App",
             "request": "launch",
             "url": "http://localhost:8500",
             "webRoot": "${workspaceRoot}",
@@ -17,6 +17,17 @@
                 "webpack:///./~/*": "${webRoot}/node_modules/*"
             },
             "preLaunchTask": "Start App"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Storybook",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "storybook"
+            ],
+            "noDebug": true
         }
     ]
 }

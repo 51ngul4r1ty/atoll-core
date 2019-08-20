@@ -1,7 +1,7 @@
 .fill {
-    fill: var(--primary-line-color, black);
+    fill: var(--normal-pen-color, black);
 }
 
 .stroke {
-    stroke: var(--primary-line-color, black);
+    stroke: var(--normal-pen-color, black);
 }

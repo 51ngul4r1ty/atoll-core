@@ -27,10 +27,17 @@
                     "background": {
                         "activeOnStart": true,
                         "beginsPattern": ".",
-                        "endsPattern": "Version: webpack.+",
+                        "endsPattern": "Version: webpack.+"
                     }
                 }
-            ],
+            ]
+        },
+        {
+            "label": "Storybook",
+            "type": "npm",
+            "script": "storybook",
+            "isBackground": true,
+            "problemMatcher": []
         }
     ]
 }

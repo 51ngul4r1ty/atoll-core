@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import scss from "./AppIcon.module.css";
+import css from "./AppIcon.module.css";
 
 interface AppIconProps {
     className?: string;
@@ -8,8 +8,8 @@ interface AppIconProps {
 }
 
 export const AppIcon: React.FC<AppIconProps> = (props) => {
-    const fillClass = props.invertColors ? scss.fillInverted : scss.fill;
-    const strokeClass = props.invertColors ? scss.strokeInverted : scss.stroke;
+    const fillClass = props.invertColors ? css.fillInverted : css.fill;
+    const strokeClass = props.invertColors ? css.strokeInverted : css.stroke;
     return (
         <svg
             className={props.className}

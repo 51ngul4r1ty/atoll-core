@@ -5,7 +5,7 @@
         font-size: 12px;
     }
     body {
-        background-color: var(--primary-background-color, white);
+        background-color: var(--normal-page-color, white);
     }
 </style>
 <script>
@@ -32,29 +32,31 @@
         {
             name: 'default',
             theme: {
-                '--primary-background-color': 'white',
-                '--primary-line-color': 'black',
-                '--primary-font-color': 'black',
-                '--primary-font-size': '0.95rem',
-                '--primary-hover-shadow': 'rgba(0, 0, 0, 0.4)',
-                '--primary-hover-shadow-size': '0.6rem',
-                '--primary-active-background-color': '#ddd',
-                '--primary-focus-background-color': '#eee',
-                '--menu-panel-font-size': '1.3rem',
+                '--normal-page-color': 'white',
+                '--normal-pen-color': 'black',
+                '--normal-active-page-color': '#ddd',
+                '--normal-focus-page-color': '#eee',
+                '--normal-hover-shadow': 'rgba(0, 0, 0, 0.4)',
+                '--normal-hover-shadow-size': '0.6rem',
+                '--inverted-page-color': 'black',
+                '--inverted-pen-color': 'white',
+                '--medium-font-size': '1.0rem',
+                '--large-font-size': '1.25rem',
             }
         },
         {
             name: 'dark',
             theme: {
-                '--primary-background-color': 'black',
-                '--primary-line-color': 'white',
-                '--primary-font-color': 'white',
-                '--primary-font-size': '0.95rem',
-                '--primary-hover-shadow': 'rgba(255, 255, 255, 1.0)',
-                '--primary-hover-shadow-size': '1.0rem',
-                '--primary-active-background-color': '#444',
-                '--primary-focus-background-color': '#333',
-                '--menu-panel-font-size': '1.3rem',
+                '--normal-page-color': 'black',
+                '--normal-pen-color': 'white',
+                '--normal-active-page-color': '#444',
+                '--normal-focus-page-color': '#333',
+                '--normal-hover-shadow': 'rgba(255, 255, 255, 1.0)',
+                '--normal-hover-shadow-size': '1.0rem',
+                '--inverted-page-color': 'white',
+                '--inverted-pen-color': 'black',
+                '--medium-font-size': '1.0rem',
+                '--large-font-size': '1.25rem',
             }
         },
     ];

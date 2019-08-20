@@ -2,7 +2,7 @@
 import * as React from "react";
 
 // style
-import scss from "./HamburgerIcon.module.css";
+import css from "./HamburgerIcon.module.css";
 
 /* exported components */
 
@@ -20,12 +20,12 @@ export const HamburgerIcon: React.FC<{}> = () => (
         viewBox="0 0 75 75"
     >
         <defs />
-        <g id="Document" className={scss.stroke} fill="none" stroke="black" transform="scale(1 -1)">
+        <g id="Document" className={css.stroke} fill="none" stroke="black" transform="scale(1 -1)">
             <g id="Spread" transform="translate(0 -75)">
                 <g id="Layer 1">
                     <g
                         id="Group"
-                        className={scss.fill}
+                        className={css.fill}
                         fill="#006aa2"
                         strokeLinejoin="miter"
                         strokeLinecap="round"
@@ -46,7 +46,7 @@ export const HamburgerIcon: React.FC<{}> = () => (
                         />
                         <path
                             d="M 21.092,34.2 C 20.234,34.2 19.524,34.618 19.524,35.137 L 19.524,39.872 C 19.524,40.378 20.234,40.8 21.092,40.8 L 53.925,40.8 C 54.775,40.8 55.476,40.378 55.476,39.872 L 55.476,35.137 C 55.476,34.618 54.775,34.2 53.925,34.2 L 21.092,34.2 Z"
-                            className={scss.stroke}
+                            className={css.stroke}
                             stroke="#006aa2"
                             markerStart="none"
                             markerEnd="none"

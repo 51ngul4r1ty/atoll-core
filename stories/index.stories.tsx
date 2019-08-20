@@ -5,12 +5,10 @@ import { action } from "@storybook/addon-actions";
 import { linkTo } from "@storybook/addon-links";
 import { withRootAttribute } from "storybook-addon-root-attribute";
 
-import { Welcome } from "@storybook/react/demo";
-
 import { SimpleButton } from "../src/shared/components/buttons/SimpleButton";
+import { SimpleText } from "../src/shared/components/text/SimpleText";
 import { HomeButton } from "../src/shared/components/buttons/HomeButton";
 import { HamburgerIcon } from "../src/shared/components/images/HamburgerIcon";
-import { AppIcon } from "../src/shared/components/images/AppIcon";
 
 addDecorator(withRootAttribute);
 addParameters({
@@ -19,21 +17,42 @@ addParameters({
         attribute: "class",
         defaultState: {
             name: "Default",
-            value: "theme-default",
+            value: "theme-default"
         },
         states: [
             {
                 name: "Dark",
-                value: "theme-dark",
-            },
-        ],
-    },
+                value: "theme-dark"
+            }
+        ]
+    }
 });
 
-storiesOf("Welcome", module).add("to Storybook", () => <Welcome showApp={linkTo("Button")} />);
+storiesOf("General", module).add("Font Sizes", () => (
+    <div>
+        <h1>Font Sizes</h1>
+        <ul>
+            <li>
+                <SimpleText size="xsmall">Extra Small</SimpleText>
+            </li>
+            <li>
+                <SimpleText size="small">Small</SimpleText>
+            </li>
+            <li>
+                <SimpleText size="medium">Medium</SimpleText>
+            </li>
+            <li>
+                <SimpleText size="large">Large</SimpleText>
+            </li>
+            <li>
+                <SimpleText size="xlarge">Extra Large</SimpleText>
+            </li>
+        </ul>
+    </div>
+));
 
 storiesOf("Buttons", module)
-    .add("HomeButton", () => <HomeButton invertColors onClick={action("clicked")} />)
+    .add("HomeButton", () => <HomeButton onClick={action("clicked")} />)
     .add("SimpleButton", () => (
         <SimpleButton icon={<HamburgerIcon />} onClick={action("clicked")}>
             Menu

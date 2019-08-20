@@ -6,7 +6,7 @@ import { configureStore } from "../shared/store";
 import { App } from "../shared/App";
 import IntlProvider from "../shared/i18n/IntlProvider";
 import createHistory from "../shared/store/history";
-import { MainLayout } from "layouts/MainLayout";
+import { MainLayout } from "../shared/layouts/MainLayout";
 
 const history = createHistory();
 
