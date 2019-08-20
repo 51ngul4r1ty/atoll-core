@@ -51,10 +51,14 @@ storiesOf("General", module).add("Font Sizes", () => (
     </div>
 ));
 
-storiesOf("Buttons", module)
-    .add("HomeButton", () => <HomeButton onClick={action("clicked")} />)
-    .add("SimpleButton", () => (
-        <SimpleButton icon={<HamburgerIcon />} onClick={action("clicked")}>
-            Menu
-        </SimpleButton>
-    ));
+storiesOf("Buttons/HomeButton", module)
+    .add("HomeButton (default)", () => <HomeButton onClick={action("clicked")} />)
+    .add("HomeButton (hover)", () => <HomeButton forceStateHover onClick={action("clicked")} />)
+    .add("HomeButton (active)", () => <HomeButton forceStateActive onClick={action("clicked")} />)
+    .add("HomeButton (focus)", () => <HomeButton forceStateFocus onClick={action("clicked")} />);
+
+storiesOf("Buttons/SimpleButton", module).add("SimpleButton", () => (
+    <SimpleButton icon={<HamburgerIcon />} onClick={action("clicked")}>
+        Menu
+    </SimpleButton>
+));

@@ -7,17 +7,20 @@
     user-select: none;
 }
 
-.button:focus {
+.button:focus,
+.buttonFocus {
     background-color: var(--normal-focus-page-color, #eee);
     outline: 0;
 }
 
-.button:hover {
+.button:hover,
+.buttonHover {
     box-shadow: 0 0 0 rgba(0, 0, 0, 0) inset,
         0 0 var(--normal-hover-shadow-size, 0.6rem) var(--normal-hover-shadow, rgba(0, 0, 0, 0.4));
 }
 
-.button:active {
+.button:active,
+.buttonActive {
     background-color: var(--normal-active-page-color, #ddd);
 }
 

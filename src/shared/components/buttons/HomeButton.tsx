@@ -15,6 +15,9 @@ import css from "./HomeButton.module.css";
 export interface HomeButtonAttributeProps {}
 
 export interface HomeButtonEventProps {
+    forceStateActive?: boolean;
+    forceStateFocus?: boolean;
+    forceStateHover?: boolean;
     onClick?: { () };
 }
 
@@ -23,9 +26,19 @@ export type HomeButtonProps = HomeButtonAttributeProps & HomeButtonEventProps;
 /* exported components */
 
 export const HomeButton: React.FC<HomeButtonProps> = (props) => {
+    let className = css.button;
+    if (props.forceStateActive) {
+        className += ` ${css.buttonActive}`;
+    }
+    if (props.forceStateFocus) {
+        className += ` ${css.buttonFocus}`;
+    }
+    if (props.forceStateHover) {
+        className += ` ${css.buttonHover}`;
+    }
     return (
         <div
-            className={css.button}
+            className={className}
             tabIndex={0}
             onClick={() => {
                 if (props.onClick) {
