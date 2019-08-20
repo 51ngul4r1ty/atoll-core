@@ -71,6 +71,8 @@ export interface Theme {
     "--normal-hover-shadow-size": string;
     "--inverted-page-color": string;
     "--inverted-pen-color": string;
+    "--inverted-active-page-color": string;
+    "--inverted-focus-page-color": string;
     "--medium-font-size": string;
     "--large-font-size": string;
 }
@@ -84,6 +86,8 @@ export const defaultTheme: Theme = {
     "--normal-hover-shadow-size": "0.6rem",
     "--inverted-page-color": "black",
     "--inverted-pen-color": "white",
+    "--inverted-active-page-color": "#555",
+    "--inverted-focus-page-color": "#444",
     "--medium-font-size": "1.0rem",
     "--large-font-size": "1.25rem"
 };
@@ -91,12 +95,14 @@ export const defaultTheme: Theme = {
 export const darkTheme: Theme = {
     "--normal-page-color": "black",
     "--normal-pen-color": "white",
-    "--normal-active-page-color": "#444",
-    "--normal-focus-page-color": "#333",
+    "--normal-active-page-color": "#555",
+    "--normal-focus-page-color": "#444",
     "--normal-hover-shadow": "rgba(255, 255, 255, 1.0)",
     "--normal-hover-shadow-size": "1.0rem",
     "--inverted-page-color": "white",
     "--inverted-pen-color": "black",
+    "--inverted-active-page-color": "#ddd",
+    "--inverted-focus-page-color": "#eee",
     "--medium-font-size": "1.0rem",
     "--large-font-size": "1.25rem"
 };

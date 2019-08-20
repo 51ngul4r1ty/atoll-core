@@ -9,7 +9,7 @@
 
 .button:focus,
 .buttonFocus {
-    background-color: var(--normal-focus-page-color, #eee);
+    background-color: var(--inverted-focus-page-color, #444);
     outline: 0;
 }
 
@@ -21,7 +21,7 @@
 
 .button:active,
 .buttonActive {
-    background-color: var(--normal-active-page-color, #ddd);
+    background-color: var(--inverted-active-page-color, #555);
 }
 
 .buttonCaption {
