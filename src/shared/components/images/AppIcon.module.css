@@ -1,15 +1,15 @@
 .fill {
-    fill: var(--primary-line-color, black);
+    fill: var(--normal-pen-color, black);
 }
 
 .fillInverted {
-    fill: var(--primary-background-color, white);
+    fill: var(--normal-page-color, white);
 }
 
 .strokeInverted {
-    stroke: var(--primary-background-color, white);
+    stroke: var(--normal-page-color, white);
 }
 
 .stroke {
-    stroke: var(--primary-line-color, black);
+    stroke: var(--normal-pen-color, black);
 }

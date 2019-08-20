@@ -1,7 +1,7 @@
 .button {
     align-items: center;
-    background-color: var(--primary-background-color, white);
-    border: 0.125rem solid var(--primary-line-color, black);
+    background-color: var(--normal-page-color, white);
+    border: 0.125rem solid var(--normal-pen-color, black);
     cursor: pointer;
     display: inline-flex;
     padding: 0.3rem 0.4rem 0.3rem 0.8rem;
@@ -9,21 +9,21 @@
 }
 
 .button:focus {
-    background-color: var(--primary-focus-background-color, "#eee");
+    background-color: var(--normal-focus-page-color, "#eee");
     outline: 0;
 }
 
 .button:hover {
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0) inset, 0 0 var(--primary-hover-shadow-size) var(--primary-hover-shadow);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0) inset, 0 0 var(--normal-hover-shadow-size) var(--normal-hover-shadow);
 }
 
 .button:active {
-    background-color: var(--primary-active-background-color, "#ddd");
+    background-color: var(--normal-active-page-color, "#ddd");
 }
 
 .buttonCaption {
-    color: var(--primary-font-color);
-    font-size: var(--primary-font-size, 0.95rem);
+    color: var(--normal-pen-color);
+    font-size: var(--standard-font-size, 0.95rem);
     font-weight: var(--primary-bold-font-weight, 700);
     text-transform: uppercase;
 }

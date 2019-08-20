@@ -4,9 +4,11 @@
         font-family: 'Open Sans', sans-serif;
         font-size: 12px;
     }
+
     body {
-        background-color: var(--primary-background-color, white);
+        background-color: var(--normal-page-color, white);
     }
+
 </style>
 <script>
     function getThemeAttribute() {
@@ -28,45 +30,45 @@
         }
         return result;
     }
-    var themeList = [
-        {
+    var themeList = [{
             name: 'default',
             theme: {
-                '--primary-background-color': 'white',
-                '--primary-line-color': 'black',
-                '--primary-font-color': 'black',
-                '--primary-font-size': '0.95rem',
-                '--primary-hover-shadow': 'rgba(0, 0, 0, 0.4)',
-                '--primary-hover-shadow-size': '0.6rem',
-                '--primary-active-background-color': '#ddd',
-                '--primary-focus-background-color': '#eee',
+                '--normal-page-color': 'white',
+                '--normal-pen-color': 'black',
+                '--normal-pen-color': 'black',
+                '--standard-font-size': '0.95rem',
+                '--normal-hover-shadow': 'rgba(0, 0, 0, 0.4)',
+                '--normal-hover-shadow-size': '0.6rem',
+                '--normal-active-page-color': '#ddd',
+                '--normal-focus-page-color': '#eee',
                 '--menu-panel-font-size': '1.3rem',
             }
         },
         {
             name: 'dark',
             theme: {
-                '--primary-background-color': 'black',
-                '--primary-line-color': 'white',
-                '--primary-font-color': 'white',
-                '--primary-font-size': '0.95rem',
-                '--primary-hover-shadow': 'rgba(255, 255, 255, 1.0)',
-                '--primary-hover-shadow-size': '1.0rem',
-                '--primary-active-background-color': '#444',
-                '--primary-focus-background-color': '#333',
+                '--normal-page-color': 'black',
+                '--normal-pen-color': 'white',
+                '--normal-pen-color': 'white',
+                '--standard-font-size': '0.95rem',
+                '--normal-hover-shadow': 'rgba(255, 255, 255, 1.0)',
+                '--normal-hover-shadow-size': '1.0rem',
+                '--normal-active-page-color': '#444',
+                '--normal-focus-page-color': '#333',
                 '--menu-panel-font-size': '1.3rem',
             }
         },
     ];
+
     function getTheme(themeName) {
         var items = themeList.filter(item => item.name === themeName);
         if (items.length) {
             return items[0] && items[0].theme;
-        }
-        else {
+        } else {
             return null;
         }
     }
+
     function addBodyStylesForTheme(themeName) {
         var bodyStyles = document.body.style;
         var theme = getTheme(themeName);
@@ -75,6 +77,7 @@
             bodyStyles.setProperty(propName, propValue);
         }
     }
+
     function setThemeVars(themeName) {
         var bodyStyles = document.body.style;
         switch (themeName) {
@@ -90,13 +93,16 @@
             }
         }
     }
+
     function setDefaultThemeVars() {
         const themeName = getThemeAttribute();
         setThemeVars('default');
     }
+
     function setDarkThemeVars() {
         setThemeVars('dark');
     }
+
     function checkForThemeChange() {
         const themeName = getThemeAttribute();
         if (themeName !== lastThemeName) {
@@ -106,17 +112,21 @@
         }
         setupNextCheck();
     }
+
     function setupNextCheck() {
         setTimeout(checkForThemeChange, 500);
     }
     let lastThemeName = null;
+
     function storeLastThemeName(themeName) {
         lastThemeName = themeName;
     }
+
     function themeEngineSetup() {
         const themeName = getThemeAttribute();
         setThemeVars(themeName);
         setupNextCheck();
     }
     window.addEventListener('load', themeEngineSetup);
+
 </script>
