@@ -1,7 +1,7 @@
 /*
 
-  Color Naming
-  ============
+  Theme Variable Naming
+  =====================
 
   Overview
   --------
@@ -49,6 +49,18 @@
   Hovering works a little differently because a shadow is often used for this style:
     (4) normal-hover-shadow, normal-hover-shadow-size
 
+
+  Font Sizes
+  ----------
+
+  Sizing is generally done using T-shirt sizing so we'll use that convention:
+    (1) Extra Small - `xsmall-`
+    (2) Small - `small-`
+    (3) Medium - `medium-`
+    (4) Large - `large-`
+    (5) Extra Large - xlarge-`
+
+
 */
 
 export interface Theme {
@@ -60,8 +72,8 @@ export interface Theme {
     "--normal-hover-shadow-size": string;
     "--inverted-page-color": string;
     "--inverted-pen-color": string;
-    "--standard-font-size": string;
-    "--menu-panel-font-size": string;
+    "--medium-font-size": string;
+    "--large-font-size": string;
 }
 
 export const defaultTheme: Theme = {
@@ -73,8 +85,8 @@ export const defaultTheme: Theme = {
     "--normal-hover-shadow-size": "0.6rem",
     "--inverted-page-color": "black",
     "--inverted-pen-color": "white",
-    "--standard-font-size": "0.95rem",
-    "--menu-panel-font-size": "1.3rem"
+    "--medium-font-size": "1.0rem",
+    "--large-font-size": "1.25rem"
 };
 
 export const darkTheme: Theme = {
@@ -86,8 +98,8 @@ export const darkTheme: Theme = {
     "--normal-hover-shadow-size": "1.0rem",
     "--inverted-page-color": "white",
     "--inverted-pen-color": "black",
-    "--standard-font-size": "0.95rem",
-    "--menu-panel-font-size": "1.3rem"
+    "--medium-font-size": "1.0rem",
+    "--large-font-size": "1.25rem"
 };
 
 export interface ThemeListItem {

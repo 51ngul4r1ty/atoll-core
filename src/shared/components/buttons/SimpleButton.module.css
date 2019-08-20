@@ -23,7 +23,7 @@
 
 .buttonCaption {
     color: var(--normal-pen-color);
-    font-size: var(--standard-font-size, 0.95rem);
+    font-size: var(--medium-font-size, 0.95rem);
     font-weight: var(--primary-bold-font-weight, 700);
     text-transform: uppercase;
 }
