@@ -8,7 +8,7 @@ import { AppIcon } from "../images/AppIcon";
 import { APP_NAME } from "../../constants";
 
 // style
-import scss from "./HomeButton.module.css";
+import css from "./HomeButton.module.css";
 
 /* exported interfaces/types */
 
@@ -25,7 +25,7 @@ export type HomeButtonProps = HomeButtonAttributeProps & HomeButtonEventProps;
 export const HomeButton: React.FC<HomeButtonProps> = (props) => {
     return (
         <div
-            className={scss.button}
+            className={css.button}
             tabIndex={0}
             onClick={() => {
                 if (props.onClick) {
@@ -33,10 +33,10 @@ export const HomeButton: React.FC<HomeButtonProps> = (props) => {
                 }
             }}
         >
-            <div className={scss.buttonIcon}>
+            <div className={css.buttonIcon}>
                 <AppIcon invertColors={true} />
             </div>
-            <div className={scss.buttonCaption}>{APP_NAME}</div>
+            <div className={css.buttonCaption}>{APP_NAME}</div>
         </div>
     );
 };
