@@ -41,6 +41,6 @@ README.md                                   - this document is intended as the i
 [CODE_STANDARDS.md](docs/CODE_STANDARDS.md) - read this!  
 [CONVENTIONS.md](docs/CONVENTIONS.md)       - important naming conventions information.  
 [HOWTO.md](docs/HOWTO.md)                   - contains details for how to implement things.  
-[DEPENDENCIES.d](docs/DEPENDENCIES.md)      - detailed information about the npm packages used.  
-[SCRIPTS.d](docs/SCRIPTS.md)                - detailed information about the build & npm scripts.  
-[HISTORY.d](docs/HISTORY.md)                - the past history of this project.  
+[DEPENDENCIES.md](docs/DEPENDENCIES.md)     - detailed information about the npm packages used.  
+[SCRIPTS.md](docs/SCRIPTS.md)               - detailed information about the build & npm scripts.  
+[HISTORY.md](docs/HISTORY.md)               - the past history of this project.  
