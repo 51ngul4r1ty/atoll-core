@@ -23,8 +23,10 @@ require("jest-cli/build/cli");
 const jest = require("jest");
 const argv = process.argv.slice(2);
 
-// Watch unless on CI or in coverage mode
-if (!process.env.CI && argv.indexOf("--coverage") < 0) {
+// Watch unless on CI /* or in coverage mode */
+// NOTE: Commented out coverage mode check because we want tests to re-run automatically and update coverage data
+//       for coverage gutters extension
+if (!process.env.CI /* && argv.indexOf("--coverage") < 0 */) {
     argv.push("--watchAll");
 }
 

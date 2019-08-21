@@ -11,5 +11,12 @@
     },
     "bookmarks.navigateThroughAllFiles": true,
     "bookmarks.backgroundLineColor": "#102030",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "coverage-gutters.showGutterCoverage": true,
+    "coverage-gutters.coverageFileNames": [
+        "lcov.info"
+    ],
+    "coverage-gutters.lcovname": "lcov.info",
+    "coverage-gutters.coverageReportFileName": "coverage/**/index.html",
+    "coverage-gutters.showLineCoverage": false
 }
