@@ -2,7 +2,7 @@ import { getLocale } from "./selectors";
 import { initialState } from "./reducer";
 
 const state = {
-    app: initialState,
+    app: initialState
 };
 
 describe("App Selectors", () => {
