@@ -7,7 +7,7 @@
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
   },
   "description": "Atoll desktop app",
-  "main": "build/desktop/main.js",
+  "main": "build/main.js",
   "engines": {
     "node": ">=10.15.3",
     "npm": ">=6.10.1"
