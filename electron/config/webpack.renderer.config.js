@@ -621,8 +621,9 @@ const resolveApp = (relativePath) => path.resolve(appDirectory, relativePath);
 
 const paths = {
     appHtml: resolveApp("config/template.html"),
-    clientBuild: resolveApp("build/client"),
-    serverBuild: resolveApp("build/server"),
+    build: resolveApp("build"),
+    //    clientBuild: resolveApp("build/client"),
+    //    serverBuild: resolveApp("build/server"),
     dotenv: resolveApp(".env"),
     src: resolveApp("src"),
     rendererEntryPath: resolveApp("src/renderer"),
@@ -642,10 +643,10 @@ const resolvers = {
     modules: paths.resolveModules
 };
 
-const clientOnly = () => process.argv.includes("--client-only");
+// const clientOnly = () => process.argv.includes("--client-only");
 
 const htmlWebpackPlugin = new HtmlWebpackPlugin({
-    filename: path.join(paths.clientBuild, "index.html"),
+    filename: path.join(paths.build, "index.html"),
     inject: true,
     template: paths.appHtml
 });
@@ -698,7 +699,7 @@ const baseConfig = {
         ]
     },
     output: {
-        path: path.join(paths.clientBuild, paths.publicPath),
+        path: path.join(paths.build, paths.publicPath),
         filename: "bundle.js",
         publicPath: paths.publicPath,
         chunkFilename: "[name].[chunkhash:8].chunk.js"
