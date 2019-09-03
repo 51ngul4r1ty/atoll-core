@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const nodeExternals = require("webpack-node-externals");
 const webpack = require("webpack");
-const CopyPlugin = require("copy-webpack-plugin");
+// const CopyPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const WriteFileWebpackPlugin = require("write-file-webpack-plugin");
 const getCSSModuleLocalIdent = require("react-dev-utils/getCSSModuleLocalIdent");
@@ -176,7 +176,7 @@ module.exports = {
             filename: process.env.NODE_ENV === "development" ? "[name].css" : "[name].[contenthash].css",
             chunkFilename: process.env.NODE_ENV === "development" ? "[id].css" : "[id].[contenthash].css"
         }),
-        new CopyPlugin([{ from: "static", to: "." }]),
+        //        new CopyPlugin([{ from: "static", to: "." }]),
 
         /* desktop */
         new webpack.DefinePlugin({
