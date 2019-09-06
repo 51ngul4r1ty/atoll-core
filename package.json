@@ -1,7 +1,10 @@
 {
   "name": "atoll",
   "version": "0.1.0-alpha.1",
-  "author": "Kevin Berry (https://github.com/51ngul4r1ty)",
+  "author": {
+    "name": "Kevin Berry",
+    "email": "41717340+51ngul4r1ty@users.noreply.github.com"
+  },
   "license": "MIT",
   "engines": {
     "node": ">=10.15.3",
