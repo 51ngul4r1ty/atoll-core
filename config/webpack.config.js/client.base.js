@@ -4,6 +4,7 @@ const paths = require("../paths");
 const { client: clientLoaders } = require("./loaders");
 const resolvers = require("./resolvers");
 const plugins = require("./plugins");
+
 const generateSourceMap = process.env.OMIT_SOURCEMAP === "true" ? false : true;
 
 module.exports = {

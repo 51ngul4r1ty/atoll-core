@@ -1,1 +1,1 @@
-module.exports = ['js', 'jsx', 'ts', 'tsx', 'mjs'];
+module.exports = ["js", "jsx", "ts", "tsx", "mjs"];

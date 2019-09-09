@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const paths = require("../paths");
+
 const { clientOnly } = require("../../scripts/utils");
 
 const env = require("../env")();
@@ -16,13 +17,14 @@ const shared = [
     })
 ];
 
+const htmlWebpackPlugin = new HtmlWebpackPlugin({
+    filename: path.join(paths.clientBuild, "index.html"),
+    inject: true,
+    template: paths.appHtml
+});
+
 const client = [
-    clientOnly() &&
-    new HtmlWebpackPlugin({
-        filename: path.join(paths.clientBuild, "index.html"),
-        inject: true,
-        template: paths.appHtml
-    }),
+    clientOnly() && htmlWebpackPlugin,
     // new webpack.ProgressPlugin(), // make this optional e.g. via `--progress` flag
     new CaseSensitivePathsPlugin(),
     new webpack.DefinePlugin(env.stringified),
