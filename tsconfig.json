@@ -24,7 +24,6 @@
         "noUnusedParameters": true,
         "paths": {
             "*": [
-                "shared/*",
                 "client/*",
                 "server/*",
                 "*"

@@ -6,7 +6,7 @@ import chalk from "chalk";
 import manifestHelpers from "express-manifest-helpers";
 import bodyParser from "body-parser";
 import paths from "../../config/paths";
-import { configureStore } from "../shared/store";
+import { configureStore } from "@atoll/shared";
 import errorHandler from "./middleware/errorHandler";
 import serverRenderer from "./middleware/serverRenderer";
 
@@ -39,7 +39,7 @@ const manifestPath = path.join(paths.clientBuild, paths.publicPath);
 
 app.use(
     manifestHelpers({
-        manifestPath: `${manifestPath}/manifest.json`,
+        manifestPath: `${manifestPath}/manifest.json`
     })
 );
 

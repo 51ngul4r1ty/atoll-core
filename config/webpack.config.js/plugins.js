@@ -3,6 +3,7 @@ const webpack = require("webpack");
 const ManifestPlugin = require("webpack-manifest-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const paths = require("../paths");
 
@@ -33,7 +34,8 @@ const client = [
         __BROWSER__: "true"
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new ManifestPlugin({ fileName: "manifest.json" })
+    new ManifestPlugin({ fileName: "manifest.json" }),
+    new CopyWebpackPlugin([{ from: "./node_modules/@atoll/shared/dist/index.es.css", to: "shared-bundle.css" }])
 ].filter(Boolean);
 
 const server = [
