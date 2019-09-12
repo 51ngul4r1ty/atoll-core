@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const { themeList } = require("../build/storybook/shared/themes/all");
+const { themeList } = require("@atoll/shared");
 
 const PLACE_HOLDER = "/* ***INSERT_THEME_LIST_HERE*** */";
 

@@ -1,5 +1,6 @@
 const path = require('path');
-const autoprefixer = require('autoprefixer');
+// const autoprefixer = require('autoprefixer');
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 // const { jsonRegexStringify } = require('./configWriter');
 const { isRegex, regexToString } = require('./configWriter');
@@ -9,6 +10,7 @@ const regexToStringOrOtherToNull = (val) => {
 };
 
 module.exports = ({ config, mode }) => {
+    // #region modules
     config.module.rules.push({
         test: /\.(ts|tsx)$/,
         loader: require.resolve('babel-loader'),
@@ -79,8 +81,27 @@ module.exports = ({ config, mode }) => {
             'url-loader'
         ]
     });
+    // #endregion
 
+    // #region resolve
     config.resolve.extensions.push('.ts', '.tsx');
+    // #endregion
+
+    // #region plugins
+    config.plugins.push(
+        new CopyWebpackPlugin(
+            [
+                {
+                    from: "./node_modules/@atoll/shared/dist/index.es.css",
+                    to: "shared-bundle.css"
+                }
+            ]
+            // ,
+            // {
+            //     logLevel: 'debug'
+            // }
+        )
+    );
 
     return config;
 };
