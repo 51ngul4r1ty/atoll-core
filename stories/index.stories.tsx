@@ -5,10 +5,10 @@ import { action } from "@storybook/addon-actions";
 import { linkTo } from "@storybook/addon-links";
 import { withRootAttribute } from "storybook-addon-root-attribute";
 
-import { SimpleButton } from "../src/shared/components/buttons/SimpleButton";
-import { SimpleText } from "../src/shared/components/text/SimpleText";
-import { HomeButton } from "../src/shared/components/buttons/HomeButton";
-import { HamburgerIcon } from "../src/shared/components/images/HamburgerIcon";
+import { SimpleButton } from "@atoll/shared";
+import { SimpleText } from "@atoll/shared";
+import { HomeButton } from "@atoll/shared";
+import { HamburgerIcon } from "@atoll/shared";
 
 addDecorator(withRootAttribute);
 addParameters({

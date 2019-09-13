@@ -4,20 +4,22 @@ import { renderToString } from "react-dom/server";
 import { StaticRouter as Router } from "react-router-dom";
 import { Store } from "redux";
 import { Provider } from "react-redux";
-import IntlProvider from "../../shared/i18n/IntlProvider";
-import { App } from "../../shared/App";
+// import { IntlProvider } from "@atoll/shared";
+import { App } from "@atoll/shared";
 import Html from "../components/HTML";
-import { MainLayout } from "../../shared/layouts/MainLayout";
+import { layouts } from "@atoll/shared";
+
+const { MainLayout } = layouts;
 
 const serverRenderer: any = () => (req: express.Request & { store: Store }, res: express.Response) => {
     const content = renderToString(
         <Provider store={res.locals.store}>
             <Router location={req.url} context={{}}>
-                <IntlProvider>
-                    <MainLayout>
-                        <App />
-                    </MainLayout>
-                </IntlProvider>
+                {/* <IntlProvider> */}
+                <MainLayout>
+                    <App />
+                </MainLayout>
+                {/* </IntlProvider> */}
             </Router>
         </Provider>
     );
@@ -28,7 +30,11 @@ const serverRenderer: any = () => (req: express.Request & { store: Store }, res:
         "<!doctype html>" +
             renderToString(
                 <Html
-                    css={[res.locals.assetPath("bundle.css"), res.locals.assetPath("vendor.css")]}
+                    css={[
+                        res.locals.assetPath("shared-bundle.css"),
+                        res.locals.assetPath("bundle.css"),
+                        res.locals.assetPath("vendor.css")
+                    ]}
                     scripts={[res.locals.assetPath("bundle.js"), res.locals.assetPath("vendor.js")]}
                     state={state}
                 >

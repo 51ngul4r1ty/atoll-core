@@ -2,11 +2,13 @@ import React from "react";
 import { hydrate } from "react-dom";
 import { Provider } from "react-redux";
 import { Router, Switch, Route } from "react-router-dom";
-import { configureStore } from "../shared/store";
-import { App } from "../shared/App";
-import IntlProvider from "../shared/i18n/IntlProvider";
-import createHistory from "../shared/store/history";
-import { MainLayout } from "../shared/layouts/MainLayout";
+import { configureStore } from "@atoll/shared";
+import { App } from "@atoll/shared";
+//import { IntlProvider } from "@atoll/shared";
+import { createHistory } from "@atoll/shared";
+import { layouts } from "@atoll/shared";
+
+const { MainLayout } = layouts;
 
 const history = createHistory();
 
@@ -21,13 +23,13 @@ const store =
 hydrate(
     <Provider store={store}>
         <Router history={history}>
-            <IntlProvider>
-                <MainLayout>
-                    <Switch>
-                        <Route path="/" exact component={App} />
-                    </Switch>
-                </MainLayout>
-            </IntlProvider>
+            {/* <IntlProvider> */}
+            <MainLayout>
+                <Switch>
+                    <Route path="/" exact component={App} />
+                </Switch>
+            </MainLayout>
+            {/* </IntlProvider> */}
         </Router>
     </Provider>,
     document.getElementById("app")

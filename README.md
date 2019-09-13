@@ -22,12 +22,14 @@ Steps after Cloning Repo
 ------------------------
 
 1. `npm ci`
-2. `npm run build` (if this succeeds you have all dependencies correct)
-3. Use VS Code's debugger to launch "App" and/or "Storybook"
+2. Clone `atoll-shared` repo and follow instructions in its README.md to get it building correctly.
+3. `npm link` in `atoll-shared` root folder, `npm link @atoll/shared` in this repo's root folder.
+4. `npm run build` (if this succeeds you have all dependencies correct)
+5. Use VS Code's debugger to launch "App" and/or "Storybook"
   - If you prefer to use npm scripts you can use `npm start` and/or `npm run storybook`
     but you won't be able to set breakpoints in the app if you use `npm start` so we
     recommend the former approach.
-4. Use `npm test` while editing code to ensure that the tests keep passing while you
+6. Use `npm test` while editing code to ensure that the tests keep passing while you
    perform TDD coding iterations.  This will cause the tests to run every time code
    changes are saved and coverage gutters will be updated automatically (use "Watch"
    in the VS Code tray area).
@@ -38,6 +40,7 @@ Other Docs
 
 README.md                                   - this document is intended as the index document to find
                                               out where to go next.  
+[IMPORTANT.md](docs/IMPORTANT.md)           - important things to remember - must read!
 [CODE_STANDARDS.md](docs/CODE_STANDARDS.md) - read this!  
 [CONVENTIONS.md](docs/CONVENTIONS.md)       - important naming conventions information.  
 [HOWTO.md](docs/HOWTO.md)                   - contains details for how to implement things.  

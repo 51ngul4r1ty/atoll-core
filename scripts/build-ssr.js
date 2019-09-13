@@ -51,22 +51,41 @@ const build = async () => {
     rimraf.sync(paths.clientBuild);
     rimraf.sync(paths.serverBuild);
 
-    const [clientConfig, serverConfig] = webpackConfig;
-    const multiCompiler = webpack([clientConfig, serverConfig]);
+    const includesServer = webpackConfig.length > 1;
+
+    let clientConfig;
+    let serverConfig;
+    let multiCompiler;
+
+    if (includesServer) {
+        [clientConfig, serverConfig] = webpackConfig;
+        multiCompiler = webpack([clientConfig, serverConfig]);
+    } else {
+        [clientConfig] = webpackConfig;
+        multiCompiler = webpack([clientConfig]);
+    }
 
     const clientCompiler = multiCompiler.compilers.find((compiler) => compiler.name === "client");
-    const serverCompiler = multiCompiler.compilers.find((compiler) => compiler.name === "server");
+    let serverCompiler;
+    if (includesServer) {
+        serverCompiler = multiCompiler.compilers.find((compiler) => compiler.name === "server");
+    }
 
     const clientPromise = compilerPromise("client", clientCompiler);
-    const serverPromise = compilerPromise("server", serverCompiler);
+    let serverPromise;
+    if (includesServer) {
+        serverPromise = compilerPromise("server", serverCompiler);
+    }
 
-    serverCompiler.watch({}, (error, stats) => {
-        if (!error && !stats.hasErrors()) {
-            console.log(stats.toString(serverConfig.stats));
-            return;
-        }
-        console.error(chalk.red(stats.compilation.errors));
-    });
+    if (includesServer) {
+        serverCompiler.watch({}, (error, stats) => {
+            if (!error && !stats.hasErrors()) {
+                console.log(stats.toString(serverConfig.stats));
+                return;
+            }
+            console.error(chalk.red(stats.compilation.errors));
+        });
+    }
 
     clientCompiler.watch({}, (error, stats) => {
         if (!error && !stats.hasErrors()) {
@@ -78,9 +97,13 @@ const build = async () => {
 
     // wait until client and server is compiled
     try {
-        await serverPromise;
+        if (includesServer) {
+            await serverPromise;
+        }
         await clientPromise;
-        await generateStaticHTML();
+        if (includesServer) {
+            await generateStaticHTML();
+        }
         logMessage("Done!", "info");
     } catch (error) {
         logMessage(error, "error");
