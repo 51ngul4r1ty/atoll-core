@@ -1,6 +1,6 @@
 import React from "react";
 
-import { addDecorator, addParameters, storiesOf } from "@storybook/react";
+import { addDecorator, addParameters, storiesOf, forceReRender } from "@storybook/react";
 import { action } from "@storybook/addon-actions";
 import { linkTo } from "@storybook/addon-links";
 import { withRootAttribute } from "storybook-addon-root-attribute";
@@ -9,6 +9,7 @@ import { SimpleButton } from "@atoll/shared";
 import { SimpleText } from "@atoll/shared";
 import { HomeButton } from "@atoll/shared";
 import { HamburgerIcon } from "@atoll/shared";
+import { TabStrip } from "@atoll/shared";
 
 addDecorator(withRootAttribute);
 addParameters({
@@ -61,4 +62,20 @@ storiesOf("Buttons/SimpleButton", module).add("SimpleButton", () => (
     <SimpleButton icon={<HamburgerIcon />} onClick={action("clicked")}>
         Menu
     </SimpleButton>
+));
+
+let activeTabId = "plan";
+
+storiesOf("Tabs/TabStrip", module).add("TabStrip", () => (
+    <div>
+        <TabStrip
+            activeTab={activeTabId}
+            tabs={[{ id: "plan", caption: "Plan" }, { id: "sprint", caption: "Sprint" }, { id: "review", caption: "Review" }]}
+            onChange={(tabId) => {
+                activeTabId = tabId;
+                console.log(`TAB CHANGE TO ${tabId}`);
+                forceReRender();
+            }}
+        />
+    </div>
 ));
