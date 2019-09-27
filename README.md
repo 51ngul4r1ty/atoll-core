@@ -17,6 +17,7 @@ Tools Used
 1. At time of writing, Node v10.15.3 was used with NPM v6.10.1.
 2. VS Code is the editor of choice for this project (v1.37.0 or newer).
   - Make sure you install the recommended workspace extensions.
+3. NPM Link Check (npm-link-check) to check active npm links.
 
 Steps after Cloning Repo
 ------------------------
