@@ -9,7 +9,7 @@
 -   `{task description}` should be formatted as lowercase letters with dashes instead of spaces
 
 **Bugs**
-`bug/{number}/{task description}`
+`issue/{number}/{task description}`
 
 -   same as enhancement format
 
