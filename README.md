@@ -26,11 +26,13 @@ Steps after Cloning Repo
 2. Clone `atoll-shared` repo and follow instructions in its README.md to get it building correctly.
 3. `npm link` in `atoll-shared` root folder, `npm link @atoll/shared` in this repo's root folder.
 4. `npm run build` (if this succeeds you have all dependencies correct)
-5. Use VS Code's debugger to launch "App" and/or "Storybook"
+5. Use VS Code to open `atoll-core-main.code-workspace` - this will ensure that you see `atoll-core`
+   and `atoll-shared` folders in the editor.
+6. Use VS Code's debugger to launch "App" and/or "Storybook"
   - If you prefer to use npm scripts you can use `npm start` and/or `npm run storybook`
     but you won't be able to set breakpoints in the app if you use `npm start` so we
     recommend the former approach.
-6. Use `npm test` while editing code to ensure that the tests keep passing while you
+7. Use `npm test` while editing code to ensure that the tests keep passing while you
    perform TDD coding iterations.  This will cause the tests to run every time code
    changes are saved and coverage gutters will be updated automatically (use "Watch"
    in the VS Code tray area).
