@@ -16,3 +16,5 @@ yarn-error.log
 tmp
 bundle-stats.json
 /dependency-graph.svg
+.yalc
+yalc.lock

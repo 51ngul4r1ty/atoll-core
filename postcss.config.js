@@ -3,7 +3,7 @@ const paths = require("./config/paths");
 module.exports = {
     plugins: [
         require("postcss-import")({
-            path: [paths.srcShared, `${__dirname}/node_modules`],
+            path: [`${__dirname}/node_modules`],
         }),
         require("postcss-nested")(),
         require("postcss-flexbugs-fixes")(),
