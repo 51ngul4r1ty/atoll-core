@@ -6,7 +6,8 @@
     "alefragnani.bookmarks",
     "esbenp.prettier-vscode",
     "ryanluker.vscode-coverage-gutters",
-    "msjsdiag.debugger-for-chrome"
+    "msjsdiag.debugger-for-chrome",
+    "gruntfuggly.todo-tree"
   ],
   // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
   "unwantedRecommendations": []
