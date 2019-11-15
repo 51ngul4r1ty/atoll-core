@@ -19,12 +19,11 @@ const paths = {
     src: resolveApp("src"),
     srcClient: resolveApp("src/client"),
     srcServer: resolveApp("src/server"),
-    srcShared: resolveApp("src/shared"),
     types: resolveApp("node_modules/@types"),
     i18n: resolveApp("src/shared/i18n"),
     publicPath: "/static/"
 };
 
-paths.resolveModules = [paths.srcClient, paths.srcServer, paths.srcShared, paths.src, "node_modules"];
+paths.resolveModules = [paths.srcClient, paths.srcServer, paths.src, "node_modules"];
 
 module.exports = paths;
