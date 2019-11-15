@@ -1,6 +1,8 @@
-# Conventions
+Conventions
+===========
 
-## Branch Naming
+Branch Naming
+-------------
 
 **Enhancements**
 `story/{number}/{task description}`

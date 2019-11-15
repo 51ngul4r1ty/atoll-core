@@ -16,3 +16,4 @@ NPM Scripts
 
 `test` - runs tests and enters watch mode
 `test:ci` - for running tests without entering watch mode
+`sync` - builds and publishes shared library code and links to it
