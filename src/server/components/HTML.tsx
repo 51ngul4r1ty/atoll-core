@@ -28,7 +28,7 @@ const HTML = ({ children, css = [], scripts = [], state = "{}" }: Props) => {
                     dangerouslySetInnerHTML={{
                         // TODO: Add jsesc/stringify here
                         // see: https://twitter.com/HenrikJoreteg/status/1143953338284703744
-                        __html: `window.__PRELOADED_STATE__ = ${state}`,
+                        __html: `window.__PRELOADED_STATE__ = ${state}`
                     }}
                 />
             </head>

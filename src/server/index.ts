@@ -9,6 +9,8 @@ import paths from "../../config/paths";
 import { configureStore } from "@atoll/shared";
 import errorHandler from "./middleware/errorHandler";
 import serverRenderer from "./middleware/serverRenderer";
+import { createServerHistory } from "@atoll/shared";
+import { routerMiddleware } from "connected-react-router";
 
 require("dotenv").config();
 
@@ -25,8 +27,10 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const history = createServerHistory({ initialEntries: ["/"] }); // TODO: Check what initial entries should be
+
 const addStore = (_req: express.Request, res: express.Response, next: express.NextFunction | undefined): void => {
-    res.locals.store = configureStore({});
+    res.locals.store = configureStore({ history, middleware: [] });
     if (typeof next !== "function") {
         throw new Error("Next handler is missing");
     }

@@ -1,26 +1,26 @@
 import * as React from "react";
 import * as express from "express";
 import { renderToString } from "react-dom/server";
-import { StaticRouter as Router } from "react-router-dom";
+import { StaticRouter } from "react-router-dom";
 import { Store } from "redux";
 import { Provider } from "react-redux";
 // import { IntlProvider } from "@atoll/shared";
 import { App } from "@atoll/shared";
 import Html from "../components/HTML";
-import { layouts } from "@atoll/shared";
+// import { layouts } from "@atoll/shared";
 
-const { MainLayout } = layouts;
+// const { MainLayout } = layouts;
 
 const serverRenderer: any = () => (req: express.Request & { store: Store }, res: express.Response) => {
     const content = renderToString(
         <Provider store={res.locals.store}>
-            <Router location={req.url} context={{}}>
+            <StaticRouter location={req.url} context={{}}>
                 {/* <IntlProvider> */}
-                <MainLayout>
+                    {/* <MainLayout> */}
                     <App />
-                </MainLayout>
+                    {/* </MainLayout> */}
                 {/* </IntlProvider> */}
-            </Router>
+            </StaticRouter>
         </Provider>
     );
 
