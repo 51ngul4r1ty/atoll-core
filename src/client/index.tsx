@@ -5,7 +5,7 @@ import { Route, Switch } from "react-router-dom";
 import { ConnectedRouter } from "connected-react-router";
 import { configureStore } from "@atoll/shared";
 import { App } from "@atoll/shared";
-// import { IntlProvider } from "@atoll/shared";
+import { IntlProvider } from "@atoll/shared";
 import { createClientHistory } from "@atoll/shared";
 import { layouts } from "@atoll/shared";
 
@@ -26,13 +26,13 @@ const store =
 hydrate(
     <Provider store={store}>
         <ConnectedRouter history={history}>
-            {/* <IntlProvider> */}
-            <MainLayout>
-                <Switch>
-                    <Route path="/" exact component={App} />
-                </Switch>
-            </MainLayout>
-            {/* </IntlProvider> */}
+            <IntlProvider>
+                <MainLayout>
+                    <Switch>
+                        <Route path="/" exact component={App} />
+                    </Switch>
+                </MainLayout>
+            </IntlProvider>
         </ConnectedRouter>
     </Provider>,
     document.getElementById("app")

@@ -4,7 +4,7 @@ import { renderToString } from "react-dom/server";
 import { StaticRouter } from "react-router-dom";
 import { Store } from "redux";
 import { Provider } from "react-redux";
-// import { IntlProvider } from "@atoll/shared";
+import { IntlProvider } from "@atoll/shared";
 import { App } from "@atoll/shared";
 import Html from "../components/HTML";
 import { layouts } from "@atoll/shared";
@@ -15,11 +15,11 @@ const serverRenderer: any = () => (req: express.Request & { store: Store }, res:
     const content = renderToString(
         <Provider store={res.locals.store}>
             <StaticRouter location={req.url} context={{}}>
-                {/* <IntlProvider> */}
-                <MainLayout>
-                    <App />
-                </MainLayout>
-                {/* </IntlProvider> */}
+                <IntlProvider>
+                    <MainLayout>
+                        <App />
+                    </MainLayout>
+                </IntlProvider>
             </StaticRouter>
         </Provider>
     );
