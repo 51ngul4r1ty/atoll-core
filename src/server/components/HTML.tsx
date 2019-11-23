@@ -4,11 +4,12 @@ import Helmet from "react-helmet";
 type Props = {
     children: any;
     css: string[];
+    language: string;
     scripts: string[];
     state: string;
 };
 
-const HTML = ({ children, css = [], scripts = [], state = "{}" }: Props) => {
+const HTML = ({ children, css = [], scripts = [], state = "{}", language = "" }: Props) => {
     const head = Helmet.renderStatic();
     return (
         <html lang="">
