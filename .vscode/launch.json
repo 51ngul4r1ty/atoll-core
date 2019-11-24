@@ -43,6 +43,7 @@
         "storybook"
       ],
       "noDebug": true
+    },
     {
       "type": "node",
       "request": "launch",
