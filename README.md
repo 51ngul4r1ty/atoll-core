@@ -22,7 +22,8 @@ Tools Used
 Steps after Cloning Repo
 ------------------------
 
-1. `npm ci`
+1. `npm ci` (if you see errors about removing node_modules then remove package-lock.json and use
+   `npm i` instead)
 2. Clone `atoll-shared` repo and follow instructions in its README.md to get it building correctly.
 3. `npm run sync` in `atoll-core` repo to get it to use the latest version of the shared repo code.
 4. `npm run build` (if this succeeds you have all dependencies correct)
