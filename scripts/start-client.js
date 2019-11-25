@@ -9,14 +9,14 @@ const { logMessage, compilerPromise } = require("./utils");
 
 const app = express();
 
-const PORT = process.env.PORT || 8500;
+const CLIENTONLY_PORT = process.env.CLIENTONLY_PORT || 8502;
 
 const DEVSERVER_HOST = process.env.DEVSERVER_HOST || "http://localhost";
 
 const start = async () => {
     const [clientConfig] = webpackConfig;
     clientConfig.entry.bundle = [
-        `webpack-hot-middleware/client?path=${DEVSERVER_HOST}:${PORT}/__webpack_hmr`,
+        `webpack-hot-middleware/client?path=${DEVSERVER_HOST}:${CLIENTONLY_PORT}/__webpack_hmr`,
         ...clientConfig.entry.bundle
     ];
 
@@ -52,10 +52,10 @@ const start = async () => {
     try {
         await clientPromise;
 
-        app.listen(PORT, () => {
+        app.listen(CLIENTONLY_PORT, () => {
             console.log(
                 `[${new Date().toISOString()}]`,
-                chalk.blue(`App is running: 🌎 ${process.env.HOST || "http://localhost"}:${process.env.PORT || 8500}`)
+                chalk.blue(`App is running: ${process.env.HOST || "http://localhost"}:${CLIENTONLY_PORT}`)
             );
         });
     } catch (error) {

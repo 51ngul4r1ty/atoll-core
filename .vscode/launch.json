@@ -36,6 +36,16 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Server",
+      "program": "${workspaceFolder}/src/server/index.ts",
+      "outFiles": [
+        "${workspaceFolder}/build/server/server.js"
+      ],
+      "sourceMaps": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Storybook",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
@@ -43,12 +53,6 @@
         "storybook"
       ],
       "noDebug": true
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "App (server js)",
-      "program": "${workspaceFolder}/build/server/server.js"
     }
   ]
 }

@@ -38,6 +38,12 @@ Steps after Cloning Repo
    changes are saved and coverage gutters will be updated automatically (use "Watch"
    in the VS Code tray area).
 
+Debugging Server
+----------------
+
+1. `npm run build:dev`
+2. `npm run start:clent`
+3. Use VS Code's debugger to launch "Server"
 
 Other Docs
 ==========
