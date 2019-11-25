@@ -1,16 +1,20 @@
-// import React from 'react';
-import path from "path";
+// externals
 import * as express from "express";
+import bodyParser from "body-parser";
 import cors from "cors";
 import chalk from "chalk";
 import manifestHelpers from "express-manifest-helpers";
-import bodyParser from "body-parser";
+import path from "path";
+
+// libraries
+import { configureStore, createServerHistory } from "@atoll/shared";
+
+// config
 import paths from "../../config/paths";
-import { configureStore } from "@atoll/shared";
+
+// utils
 import errorHandler from "./middleware/errorHandler";
 import serverRenderer from "./middleware/serverRenderer";
-import { createServerHistory } from "@atoll/shared";
-import { routerMiddleware } from "connected-react-router";
 
 require("dotenv").config();
 
@@ -46,6 +50,13 @@ app.use(
         manifestPath: `${manifestPath}/manifest.json`
     })
 );
+
+const router = express.Router();
+router.get("/", function(req, res) {
+    res.json({ message: "hooray! welcome to our api!" });
+});
+
+app.use("/api/v1", router);
 
 app.use(serverRenderer());
 
