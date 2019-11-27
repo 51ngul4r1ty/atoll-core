@@ -53,7 +53,206 @@ app.use(
 
 const router = express.Router();
 router.get("/", function(req, res) {
-    res.json({ message: "hooray! welcome to our api!" });
+    res.json({
+        status: 200,
+        data: {
+            items: [
+                {
+                    name: "Sprints",
+                    displayIndex: 0,
+                    links: [
+                        {
+                            type: "application/json",
+                            verb: "GET",
+                            rel: "self",
+                            uri: "/api/v1/sprints"
+                        }
+                    ]
+                },
+                {
+                    name: "Backlog Items",
+                    displayIndex: 1,
+                    links: [
+                        {
+                            type: "application/json",
+                            verb: "GET",
+                            rel: "self",
+                            uri: "/api/v1/backlog-items"
+                        }
+                    ]
+                }
+            ]
+        }
+    });
+});
+router.get("/sprints", function(req, res) {
+    res.json({
+        status: 200,
+        data: {
+            items: [
+                {
+                    name: "Sprint 1",
+                    displayIndex: 0,
+                    startDate: new Date(2019, 0, 1),
+                    endDate: new Date(2019, 0, 14),
+                    links: [
+                        {
+                            type: "application/json",
+                            verb: "GET",
+                            rel: "this",
+                            uri: "/api/v1/sprints/1"
+                        }
+                    ]
+                },
+                {
+                    name: "Sprint 2",
+                    displayIndex: 1,
+                    startDate: new Date(2019, 0, 15),
+                    endDate: new Date(2019, 0, 29),
+                    links: [
+                        {
+                            type: "application/json",
+                            verb: "GET",
+                            rel: "self",
+                            uri: "/api/v1/sprints/2"
+                        }
+                    ]
+                }
+            ],
+            links: [
+                {
+                    type: "application/json",
+                    verb: "GET",
+                    rel: "current",
+                    uri: "/api/v1/sprints/8"
+                }
+            ]
+        }
+    });
+});
+router.get("/backlog-items", function(req, res) {
+    res.json({
+        status: 200,
+        data: {
+            items: [
+                {
+                    id: 531,
+                    rolePhrase: "as a developer",
+                    storyPhrase: "use the v3 api to get/update current user data",
+                    reasonPhrase: null,
+                    estimate: 3,
+                    type: "story",
+                    displayIndex: 0,
+                    tags: [],
+                    creationDateTime: new Date(2019, 5, 9, 10, 22, 1),
+                    links: [
+                        {
+                            type: "application/json",
+                            verb: "GET",
+                            rel: "self",
+                            uri: "/api/v1/backlog-items/531"
+                        }
+                    ]
+                },
+                {
+                    id: 530,
+                    rolePhrase: "as a developer",
+                    storyPhrase: "use the v3 api to get/update filter criteria",
+                    reasonPhrase: null,
+                    estimate: 5,
+                    type: "story",
+                    displayIndex: 1,
+                    tags: [],
+                    creationDateTime: new Date(2019, 5, 8, 13, 59, 17),
+                    links: [
+                        {
+                            type: "application/json",
+                            verb: "GET",
+                            rel: "self",
+                            uri: "/api/v1/backlog-items/530"
+                        }
+                    ]
+                },
+                {
+                    id: 529,
+                    rolePhrase: "as a developer",
+                    storyPhrase: "use the v3 api to update filters",
+                    reasonPhrase: null,
+                    estimate: 5,
+                    type: "story",
+                    displayIndex: 2,
+                    tags: [],
+                    creationDateTime: new Date(2019, 5, 8, 11, 26, 0),
+                    links: [
+                        {
+                            type: "application/json",
+                            verb: "GET",
+                            rel: "self",
+                            uri: "/api/v1/backlog-items/529"
+                        }
+                    ]
+                },
+                {
+                    id: 528,
+                    rolePhrase: "as a developer",
+                    storyPhrase: "use the v3 api to retrieve & add custom tags",
+                    reasonPhrase: null,
+                    estimate: 5,
+                    type: "story",
+                    displayIndex: 3,
+                    tags: [],
+                    creationDateTime: new Date(2019, 5, 5, 19, 1, 32),
+                    links: [
+                        {
+                            type: "application/json",
+                            verb: "GET",
+                            rel: "self",
+                            uri: "/api/v1/backlog-items/528"
+                        }
+                    ]
+                },
+                {
+                    id: 527,
+                    rolePhrase: "as a developer",
+                    storyPhrase: "use the v3 api to sign up a user",
+                    reasonPhrase: null,
+                    estimate: 5,
+                    type: "story",
+                    displayIndex: 4,
+                    tags: [],
+                    creationDateTime: new Date(2019, 5, 5, 19, 1, 32),
+                    links: [
+                        {
+                            type: "application/json",
+                            verb: "GET",
+                            rel: "self",
+                            uri: "/api/v1/backlog-items/527"
+                        }
+                    ]
+                },
+                {
+                    id: 526,
+                    rolePhrase: "as a developer",
+                    storyPhrase: "use the v3 api to send messages",
+                    reasonPhrase: null,
+                    estimate: 2,
+                    type: "story",
+                    displayIndex: 5,
+                    tags: [],
+                    creationDateTime: new Date(2019, 5, 5, 18, 58, 0),
+                    links: [
+                        {
+                            type: "application/json",
+                            verb: "GET",
+                            rel: "self",
+                            uri: "/api/v1/backlog-items/526"
+                        }
+                    ]
+                }
+            ],
+            links: []
+        }
+    });
 });
 
 app.use("/api/v1", router);
