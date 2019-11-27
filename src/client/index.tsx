@@ -18,7 +18,7 @@ const history = createClientHistory();
 const store =
     window.store ||
     configureStore({
-        initialState: window.__PRELOADED_STATE__, // {}, // TODO: Bring this back for SSR: window.__PRELOADED_STATE__,
+        initialState: window.__PRELOADED_STATE__,
         history,
         middleware: []
     });

@@ -63,7 +63,7 @@ router.get("/", function(req, res) {
                     links: [
                         {
                             type: "application/json",
-                            verb: "GET",
+                            method: "GET",
                             rel: "self",
                             uri: "/api/v1/sprints"
                         }
@@ -75,7 +75,7 @@ router.get("/", function(req, res) {
                     links: [
                         {
                             type: "application/json",
-                            verb: "GET",
+                            method: "GET",
                             rel: "self",
                             uri: "/api/v1/backlog-items"
                         }
@@ -98,7 +98,7 @@ router.get("/sprints", function(req, res) {
                     links: [
                         {
                             type: "application/json",
-                            verb: "GET",
+                            method: "GET",
                             rel: "this",
                             uri: "/api/v1/sprints/1"
                         }
@@ -112,7 +112,7 @@ router.get("/sprints", function(req, res) {
                     links: [
                         {
                             type: "application/json",
-                            verb: "GET",
+                            method: "GET",
                             rel: "self",
                             uri: "/api/v1/sprints/2"
                         }
@@ -122,7 +122,7 @@ router.get("/sprints", function(req, res) {
             links: [
                 {
                     type: "application/json",
-                    verb: "GET",
+                    method: "GET",
                     rel: "current",
                     uri: "/api/v1/sprints/8"
                 }
@@ -148,7 +148,7 @@ router.get("/backlog-items", function(req, res) {
                     links: [
                         {
                             type: "application/json",
-                            verb: "GET",
+                            method: "GET",
                             rel: "self",
                             uri: "/api/v1/backlog-items/531"
                         }
@@ -167,7 +167,7 @@ router.get("/backlog-items", function(req, res) {
                     links: [
                         {
                             type: "application/json",
-                            verb: "GET",
+                            method: "GET",
                             rel: "self",
                             uri: "/api/v1/backlog-items/530"
                         }
@@ -186,7 +186,7 @@ router.get("/backlog-items", function(req, res) {
                     links: [
                         {
                             type: "application/json",
-                            verb: "GET",
+                            method: "GET",
                             rel: "self",
                             uri: "/api/v1/backlog-items/529"
                         }
@@ -205,7 +205,7 @@ router.get("/backlog-items", function(req, res) {
                     links: [
                         {
                             type: "application/json",
-                            verb: "GET",
+                            method: "GET",
                             rel: "self",
                             uri: "/api/v1/backlog-items/528"
                         }
@@ -224,7 +224,7 @@ router.get("/backlog-items", function(req, res) {
                     links: [
                         {
                             type: "application/json",
-                            verb: "GET",
+                            method: "GET",
                             rel: "self",
                             uri: "/api/v1/backlog-items/527"
                         }
@@ -243,7 +243,7 @@ router.get("/backlog-items", function(req, res) {
                     links: [
                         {
                             type: "application/json",
-                            verb: "GET",
+                            method: "GET",
                             rel: "self",
                             uri: "/api/v1/backlog-items/526"
                         }
