@@ -41,9 +41,8 @@ Steps after Cloning Repo
 Debugging Server
 ----------------
 
-1. `npm run build:dev`
-2. `npm run start:clent`
-3. Use VS Code's debugger to launch "Server"
+1. `start:client-only` (which runs `npm run build:dev` and then `npm run start:clent`)
+2. Use VS Code's debugger to launch "Server"
 
 Other Docs
 ==========

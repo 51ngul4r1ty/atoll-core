@@ -16,6 +16,9 @@ import paths from "../../config/paths";
 import errorHandler from "./middleware/errorHandler";
 import serverRenderer from "./middleware/serverRenderer";
 
+// data access
+import { Sprint } from "./dataaccess/sequelize";
+
 require("dotenv").config();
 
 const app = express.default();
@@ -85,51 +88,28 @@ router.get("/", function(req, res) {
         }
     });
 });
+
 router.get("/sprints", function(req, res) {
-    res.json({
-        status: 200,
-        data: {
-            items: [
-                {
-                    name: "Sprint 1",
-                    displayIndex: 0,
-                    startDate: new Date(2019, 0, 1),
-                    endDate: new Date(2019, 0, 14),
-                    links: [
-                        {
-                            type: "application/json",
-                            method: "GET",
-                            rel: "this",
-                            uri: "/api/v1/sprints/1"
-                        }
-                    ]
-                },
-                {
-                    name: "Sprint 2",
-                    displayIndex: 1,
-                    startDate: new Date(2019, 0, 15),
-                    endDate: new Date(2019, 0, 29),
-                    links: [
-                        {
-                            type: "application/json",
-                            method: "GET",
-                            rel: "self",
-                            uri: "/api/v1/sprints/2"
-                        }
-                    ]
+    Sprint.findAll()
+        .then((sprints) => {
+            res.json({
+                status: 200,
+                data: {
+                    items: sprints
                 }
-            ],
-            links: [
-                {
-                    type: "application/json",
-                    method: "GET",
-                    rel: "current",
-                    uri: "/api/v1/sprints/8"
+            });
+        })
+        .catch((error) => {
+            res.json({
+                status: 500,
+                error: {
+                    msg: error
                 }
-            ]
-        }
-    });
+            });
+            console.log(`unable to fetch sprints: ${error}`);
+        });
 });
+
 router.get("/backlog-items", function(req, res) {
     res.json({
         status: 200,
