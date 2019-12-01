@@ -17,7 +17,7 @@ import errorHandler from "./middleware/errorHandler";
 import serverRenderer from "./middleware/serverRenderer";
 
 // data access
-import { Sprint } from "./dataaccess/sequelize";
+import { BacklogItem, Sprint } from "./dataaccess/sequelize";
 
 require("dotenv").config();
 
@@ -110,129 +110,46 @@ router.get("/sprints", function(req, res) {
         });
 });
 
+const bigIntToNumber = (val: any) => {
+    return parseInt(`${val}`);
+};
+
+const mapToBacklogItem = (item: any) => ({
+    ...item.dataValues,
+    estimate: bigIntToNumber(item.dataValues.estimate),
+    displayIndex: bigIntToNumber(item.dataValues.displayIndex)
+});
+
 router.get("/backlog-items", function(req, res) {
-    res.json({
-        status: 200,
-        data: {
-            items: [
-                {
-                    id: 531,
-                    rolePhrase: "as a developer",
-                    storyPhrase: "use the v3 api to get/update current user data",
-                    reasonPhrase: null,
-                    estimate: 3,
-                    type: "story",
-                    displayIndex: 0,
-                    tags: [],
-                    creationDateTime: new Date(2019, 5, 9, 10, 22, 1),
-                    links: [
-                        {
-                            type: "application/json",
-                            method: "GET",
-                            rel: "self",
-                            uri: "/api/v1/backlog-items/531"
-                        }
-                    ]
-                },
-                {
-                    id: 530,
-                    rolePhrase: "as a developer",
-                    storyPhrase: "use the v3 api to get/update filter criteria",
-                    reasonPhrase: null,
-                    estimate: 5,
-                    type: "story",
-                    displayIndex: 1,
-                    tags: [],
-                    creationDateTime: new Date(2019, 5, 8, 13, 59, 17),
-                    links: [
-                        {
-                            type: "application/json",
-                            method: "GET",
-                            rel: "self",
-                            uri: "/api/v1/backlog-items/530"
-                        }
-                    ]
-                },
-                {
-                    id: 529,
-                    rolePhrase: "as a developer",
-                    storyPhrase: "use the v3 api to update filters",
-                    reasonPhrase: null,
-                    estimate: 5,
-                    type: "story",
-                    displayIndex: 2,
-                    tags: [],
-                    creationDateTime: new Date(2019, 5, 8, 11, 26, 0),
-                    links: [
-                        {
-                            type: "application/json",
-                            method: "GET",
-                            rel: "self",
-                            uri: "/api/v1/backlog-items/529"
-                        }
-                    ]
-                },
-                {
-                    id: 528,
-                    rolePhrase: "as a developer",
-                    storyPhrase: "use the v3 api to retrieve & add custom tags",
-                    reasonPhrase: null,
-                    estimate: 5,
-                    type: "story",
-                    displayIndex: 3,
-                    tags: [],
-                    creationDateTime: new Date(2019, 5, 5, 19, 1, 32),
-                    links: [
-                        {
-                            type: "application/json",
-                            method: "GET",
-                            rel: "self",
-                            uri: "/api/v1/backlog-items/528"
-                        }
-                    ]
-                },
-                {
-                    id: 527,
-                    rolePhrase: "as a developer",
-                    storyPhrase: "use the v3 api to sign up a user",
-                    reasonPhrase: null,
-                    estimate: 5,
-                    type: "story",
-                    displayIndex: 4,
-                    tags: [],
-                    creationDateTime: new Date(2019, 5, 5, 19, 1, 32),
-                    links: [
-                        {
-                            type: "application/json",
-                            method: "GET",
-                            rel: "self",
-                            uri: "/api/v1/backlog-items/527"
-                        }
-                    ]
-                },
-                {
-                    id: 526,
-                    rolePhrase: "as a developer",
-                    storyPhrase: "use the v3 api to send messages",
-                    reasonPhrase: null,
-                    estimate: 2,
-                    type: "story",
-                    displayIndex: 5,
-                    tags: [],
-                    creationDateTime: new Date(2019, 5, 5, 18, 58, 0),
-                    links: [
-                        {
-                            type: "application/json",
-                            method: "GET",
-                            rel: "self",
-                            uri: "/api/v1/backlog-items/526"
-                        }
-                    ]
+    BacklogItem.findAll()
+        .then((backlogItems) => {
+            const items = backlogItems.map((item) => ({
+                ...mapToBacklogItem(item),
+                links: [
+                    {
+                        type: "application/json",
+                        method: "GET",
+                        rel: "self",
+                        uri: `/api/v1/backlog-items/${(item as any).dataValues.id}`
+                    }
+                ]
+            }));
+            res.json({
+                status: 200,
+                data: {
+                    items
                 }
-            ],
-            links: []
-        }
-    });
+            });
+        })
+        .catch((error) => {
+            res.json({
+                status: 500,
+                error: {
+                    msg: error
+                }
+            });
+            console.log(`unable to fetch backlog items: ${error}`);
+        });
 });
 
 app.use("/api/v1", router);
