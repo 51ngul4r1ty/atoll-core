@@ -17,10 +17,10 @@ export class Sprint extends Model {}
 Sprint.init(
     {
         id: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(32),
             primaryKey: true
         },
-        name: DataTypes.STRING,
+        name: DataTypes.STRING(50),
         displayindex: DataTypes.BIGINT,
         startdate: DataTypes.DATE,
         finishdate: DataTypes.DATE
@@ -35,15 +35,78 @@ Sprint.init(
     }
 );
 
+export class BacklogItem extends Model {}
+
+BacklogItem.init(
+    {
+        id: {
+            type: DataTypes.STRING(32),
+            primaryKey: true
+        },
+        externalId: {
+            type: DataTypes.STRING(30),
+            allowNull: true
+        },
+        rolePhrase: {
+            type: DataTypes.STRING(80),
+            allowNull: true
+        },
+        storyPhrase: DataTypes.STRING(80),
+        reasonPhrase: {
+            type: DataTypes.STRING(80),
+            allowNull: true
+        },
+        estimate: {
+            type: DataTypes.BIGINT,
+            allowNull: true
+        },
+        type: DataTypes.STRING(50),
+        displayIndex: DataTypes.BIGINT
+    },
+    {
+        modelName: "backlogitem",
+        freezeTableName: true,
+        paranoid: false,
+        timestamps: true,
+        version: true,
+        sequelize
+    }
+);
+
+export class BacklogItemTag extends Model {}
+
+BacklogItemTag.init(
+    {
+        id: {
+            type: DataTypes.STRING(32),
+            primaryKey: true
+        },
+        label: DataTypes.STRING(50)
+    },
+    {
+        modelName: "backlogitemtag",
+        freezeTableName: true,
+        paranoid: false,
+        timestamps: false,
+        version: false,
+        sequelize
+    }
+);
+
 // export const Sprint = SprintModel(sequelize, Sequelize);
 // // BlogTag will be our way of tracking relationship between Blog and Tag models
 // // each Blog can have multiple tags and each Tag can have multiple blogs
 // const BlogTag = sequelize.define("blog_tag", {});
 
-// Blog.belongsToMany(Tag, { through: BlogTag, unique: false });
+// BacklogItem.belongsToMany(BacklogItemTag, { through: BacklogItemTag, unique: false });
 // Tag.belongsToMany(Blog, { through: BlogTag, unique: false });
-// Blog.belongsTo(User);
+BacklogItemTag.belongsTo(BacklogItem);
 
-sequelize.sync({ force: true }).then(() => {
-    console.log(`Database & tables created!`);
-});
+sequelize
+    .sync({ force: false })
+    .then(() => {
+        console.log(`Database & tables created!`);
+    })
+    .catch((err) => {
+        console.log(`An error occurred: ${err}`);
+    });
