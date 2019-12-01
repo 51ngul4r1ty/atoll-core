@@ -15,9 +15,15 @@ import paths from "../../config/paths";
 // utils
 import errorHandler from "./middleware/errorHandler";
 import serverRenderer from "./middleware/serverRenderer";
+import { buildSelfLink } from "./utils/linkBuilder";
+
+// interfaces/types
+import { BacklogItem, Sprint } from "./dataaccess/types";
 
 // data access
-import { BacklogItem, Sprint } from "./dataaccess/sequelize";
+import { init, mapToBacklogItem, mapToSprint, BacklogItemModel, SprintModel } from "./dataaccess";
+
+init();
 
 require("dotenv").config();
 
@@ -90,12 +96,20 @@ router.get("/", function(req, res) {
 });
 
 router.get("/sprints", function(req, res) {
-    Sprint.findAll()
+    SprintModel.findAll()
         .then((sprints) => {
+            const items = sprints.map((item) => {
+                const sprint = mapToSprint(item);
+                const result: Sprint = {
+                    ...sprint,
+                    links: [buildSelfLink(sprint, "/api/v1/sprints/")]
+                };
+                return result;
+            });
             res.json({
                 status: 200,
                 data: {
-                    items: sprints
+                    items
                 }
             });
         })
@@ -110,30 +124,17 @@ router.get("/sprints", function(req, res) {
         });
 });
 
-const bigIntToNumber = (val: any) => {
-    return parseInt(`${val}`);
-};
-
-const mapToBacklogItem = (item: any) => ({
-    ...item.dataValues,
-    estimate: bigIntToNumber(item.dataValues.estimate),
-    displayIndex: bigIntToNumber(item.dataValues.displayIndex)
-});
-
 router.get("/backlog-items", function(req, res) {
-    BacklogItem.findAll()
+    BacklogItemModel.findAll()
         .then((backlogItems) => {
-            const items = backlogItems.map((item) => ({
-                ...mapToBacklogItem(item),
-                links: [
-                    {
-                        type: "application/json",
-                        method: "GET",
-                        rel: "self",
-                        uri: `/api/v1/backlog-items/${(item as any).dataValues.id}`
-                    }
-                ]
-            }));
+            const items = backlogItems.map((item) => {
+                const backlogItem = mapToBacklogItem(item);
+                const result: BacklogItem = {
+                    ...backlogItem,
+                    links: [buildSelfLink(backlogItem, "/api/v1/backlog-items/")]
+                };
+                return result;
+            });
             res.json({
                 status: 200,
                 data: {
