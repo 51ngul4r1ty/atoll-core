@@ -22,3 +22,8 @@ quite similar to redux-api-middleware that was SSR compatible.  Note: there is a
 but we weren't able to get it to work, and the effor involved to "roll our own" wasn't significant.
 
 https://blog.logrocket.com/data-fetching-in-redux-apps-a-100-correct-approach-4d26e21750fc/
+
+How to use Sequelize with Node and Express
+------------------------------------------
+
+https://www.codementor.io/mirko0/how-to-use-sequelize-with-node-and-express-i24l67cuz

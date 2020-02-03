@@ -10,6 +10,7 @@ import { SimpleText } from "@atoll/shared";
 import { HomeButton } from "@atoll/shared";
 import { HamburgerIcon } from "@atoll/shared";
 import { TabStrip } from "@atoll/shared";
+import { BacklogItemCard, BacklogItemTypeEnum } from "@atoll/shared";
 
 addDecorator(withRootAttribute);
 addParameters({
@@ -70,7 +71,11 @@ storiesOf("Tabs/TabStrip", module).add("TabStrip", () => (
     <div>
         <TabStrip
             activeTab={activeTabId}
-            tabs={[{ id: "plan", caption: "Plan" }, { id: "sprint", caption: "Sprint" }, { id: "review", caption: "Review" }]}
+            tabs={[
+                { id: "plan", caption: "Plan" },
+                { id: "sprint", caption: "Sprint" },
+                { id: "review", caption: "Review" }
+            ]}
             onChange={(tabId) => {
                 activeTabId = tabId;
                 console.log(`TAB CHANGE TO ${tabId}`);
@@ -79,3 +84,15 @@ storiesOf("Tabs/TabStrip", module).add("TabStrip", () => (
         />
     </div>
 ));
+
+storiesOf("Cards/BacklogItemCard", module)
+    .add("BacklogItemCard (story)", () => (
+        <div>
+            <BacklogItemCard itemId="123" itemType={BacklogItemTypeEnum.Story} titleText="Example story" />
+        </div>
+    ))
+    .add("BacklogItemCard (bug)", () => (
+        <div>
+            <BacklogItemCard itemId="456" itemType={BacklogItemTypeEnum.Bug} titleText="Example bug" />
+        </div>
+    ));
