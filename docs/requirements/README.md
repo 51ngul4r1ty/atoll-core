@@ -53,3 +53,11 @@ Standup View
 * Focus on providing all the necessary data for an efficient standup:
   - show list of people who are in standup and selecting each person
     will highlight work they did in the last day (since previous standup)
+
+Reporting View
+--------------
+
+There should be a way to look at things from a high level - this should be very easy to do.  For example, if I want to see what
+the mix of tech debt vs feature work in a range of time (e.g. the last quarter) I should be able to do that easily.  I should be
+able to roll up the hierarchy of items (Epic / Feature / Story / Task) and see how many sprints each one spanned and how many total
+points were spent.  This should be viewable as a timeline as well as pie charts etc.

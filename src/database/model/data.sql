@@ -14,3 +14,9 @@ insert into backlogitem (id, "externalId", "rolePhrase", "storyPhrase", "reasonP
 	values ('7a7b9fe004034a4a9532464a10e5a0ad', '528', 'as a developer', 'use the v3 api to retrieve & add custom tags', null, 5, 'story', 3, now(), now(), 1);
 insert into backlogitem (id, "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "displayIndex", "createdAt", "updatedAt", "version")
 	values ('d434aab2e71e4c8bbd24dae22941d06f', '527', 'as a developer', 'use the v3 api to sign up a user', null, 5, 'story', 4, now(), now(), 1);
+
+insert into backlogitem
+	("id", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "displayIndex", "createdAt", "updatedAt", "version", "externalId")
+values
+	('920581ae222e4fa2ab24117664cda3fb', null, 'Filter seems to be taking longer & longer (investigate)',
+	null, null, 'issue', 5, '2020-02-03 11:21:01', '2020-02-03 11:21:01', 1, 'B1000032')
