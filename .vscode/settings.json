@@ -1,4 +1,7 @@
 {
+    "editor.rulers": [
+        132
+    ],
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
@@ -8,6 +11,7 @@
         "build": true,
         "coverage": true,
         "node_modules": true,
+        ".yalc": true
     },
     "bookmarks.navigateThroughAllFiles": true,
     "bookmarks.backgroundLineColor": "#102030",

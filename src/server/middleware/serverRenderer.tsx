@@ -37,43 +37,47 @@ const mapAcceptLanguageToLocale = (acceptLanguage: string): Locale => {
     }
 };
 
-const serverRenderer: any = () => (req: express.Request & { store: Store }, res: express.Response) => {
-    const content = renderToString(
-        <Provider store={res.locals.store}>
-            <StaticRouter location={req.url} context={{}}>
-                <IntlProvider>
-                    <MainLayout>
-                        <App />
-                    </MainLayout>
-                </IntlProvider>
-            </StaticRouter>
-        </Provider>
-    );
+const serverRenderer: any = () => (req: express.Request & { store: Store }, res: express.Response, next: express.NextFunction) => {
+    if (req.path.startsWith("/api/")) {
+        next();
+    } else {
+        const content = renderToString(
+            <Provider store={res.locals.store}>
+                <StaticRouter location={req.url} context={{}}>
+                    <IntlProvider>
+                        <MainLayout>
+                            <App />
+                        </MainLayout>
+                    </IntlProvider>
+                </StaticRouter>
+            </Provider>
+        );
 
-    const oldState = res.locals.store.getState();
-    const locale = mapAcceptLanguageToLocale(req.headers["accept-language"]); // res.locals.language;
-    console.log("locale: " + locale);
-    const newApp = { ...oldState.app, locale };
-    const newState = { ...oldState, app: newApp };
-    const state = JSON.stringify(newState);
+        const oldState = res.locals.store.getState();
+        const locale = mapAcceptLanguageToLocale(req.headers["accept-language"]); // res.locals.language;
+        console.log("locale: " + locale);
+        const newApp = { ...oldState.app, locale };
+        const newState = { ...oldState, app: newApp };
+        const state = JSON.stringify(newState);
 
-    return res.send(
-        "<!doctype html>" +
-            renderToString(
-                <Html
-                    css={[
-                        res.locals.assetPath("shared-bundle.css"),
-                        res.locals.assetPath("bundle.css"),
-                        res.locals.assetPath("vendor.css")
-                    ]}
-                    scripts={[res.locals.assetPath("bundle.js"), res.locals.assetPath("vendor.js")]}
-                    state={state}
-                    language={locale}
-                >
-                    {content}
-                </Html>
-            )
-    );
+        return res.send(
+            "<!doctype html>" +
+                renderToString(
+                    <Html
+                        css={[
+                            res.locals.assetPath("shared-bundle.css"),
+                            res.locals.assetPath("bundle.css"),
+                            res.locals.assetPath("vendor.css")
+                        ]}
+                        scripts={[res.locals.assetPath("bundle.js"), res.locals.assetPath("vendor.js")]}
+                        state={state}
+                        language={locale}
+                    >
+                        {content}
+                    </Html>
+                )
+        );
+    }
 };
 
 export default serverRenderer;

@@ -11,6 +11,8 @@ If you're interested in getting a detailed explanation of the various parts of t
 want to start with the "Other Docs" section below.  If not, and you just want to get going as quickly
 as possible then you're in the right section.
 
+Everyone contributing to this repo should read this document: [IMPORTANT.md](docs/IMPORTANT.md)
+
 Tools Used
 ----------
 
@@ -41,16 +43,14 @@ Steps after Cloning Repo
 Debugging Server
 ----------------
 
-1. `npm run build:dev`
-2. `npm run start:clent`
-3. Use VS Code's debugger to launch "Server"
+1. `start:client-only` (which runs `npm run build:dev` and then `npm run start:clent`)
+2. Use VS Code's debugger to launch "Server"
 
 Other Docs
 ==========
 
 README.md                                   - this document is intended as the index document to find
                                               out where to go next.  
-[IMPORTANT.md](docs/IMPORTANT.md)           - important things to remember - must read!  
 [CODE_STANDARDS.md](docs/CODE_STANDARDS.md) - read this!  
 [CONVENTIONS.md](docs/CONVENTIONS.md)       - important naming conventions information.  
 [HOWTO.md](docs/HOWTO.md)                   - contains details for how to implement things.  

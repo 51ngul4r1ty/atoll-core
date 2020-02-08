@@ -1,16 +1,29 @@
-// import React from 'react';
-import path from "path";
+// externals
 import * as express from "express";
+import bodyParser from "body-parser";
 import cors from "cors";
 import chalk from "chalk";
 import manifestHelpers from "express-manifest-helpers";
-import bodyParser from "body-parser";
+import path from "path";
+
+// libraries
+import { configureStore, createServerHistory } from "@atoll/shared";
+
+// config
 import paths from "../../config/paths";
-import { configureStore } from "@atoll/shared";
+
+// utils
 import errorHandler from "./middleware/errorHandler";
 import serverRenderer from "./middleware/serverRenderer";
-import { createServerHistory } from "@atoll/shared";
-import { routerMiddleware } from "connected-react-router";
+import { buildSelfLink } from "./utils/linkBuilder";
+
+// interfaces/types
+import { BacklogItem, Sprint } from "./dataaccess/types";
+
+// data access
+import { init, mapToBacklogItem, mapToSprint, BacklogItemModel, SprintModel } from "./dataaccess";
+
+init();
 
 require("dotenv").config();
 
@@ -46,6 +59,101 @@ app.use(
         manifestPath: `${manifestPath}/manifest.json`
     })
 );
+
+const router = express.Router();
+router.get("/", function(req, res) {
+    res.json({
+        status: 200,
+        data: {
+            items: [
+                {
+                    name: "Sprints",
+                    displayIndex: 0,
+                    links: [
+                        {
+                            type: "application/json",
+                            method: "GET",
+                            rel: "self",
+                            uri: "/api/v1/sprints"
+                        }
+                    ]
+                },
+                {
+                    name: "Backlog Items",
+                    displayIndex: 1,
+                    links: [
+                        {
+                            type: "application/json",
+                            method: "GET",
+                            rel: "self",
+                            uri: "/api/v1/backlog-items"
+                        }
+                    ]
+                }
+            ]
+        }
+    });
+});
+
+router.get("/sprints", function(req, res) {
+    SprintModel.findAll()
+        .then((sprints) => {
+            const items = sprints.map((item) => {
+                const sprint = mapToSprint(item);
+                const result: Sprint = {
+                    ...sprint,
+                    links: [buildSelfLink(sprint, "/api/v1/sprints/")]
+                };
+                return result;
+            });
+            res.json({
+                status: 200,
+                data: {
+                    items
+                }
+            });
+        })
+        .catch((error) => {
+            res.json({
+                status: 500,
+                error: {
+                    msg: error
+                }
+            });
+            console.log(`unable to fetch sprints: ${error}`);
+        });
+});
+
+router.get("/backlog-items", function(req, res) {
+    BacklogItemModel.findAll()
+        .then((backlogItems) => {
+            const items = backlogItems.map((item) => {
+                const backlogItem = mapToBacklogItem(item);
+                const result: BacklogItem = {
+                    ...backlogItem,
+                    links: [buildSelfLink(backlogItem, "/api/v1/backlog-items/")]
+                };
+                return result;
+            });
+            res.json({
+                status: 200,
+                data: {
+                    items
+                }
+            });
+        })
+        .catch((error) => {
+            res.json({
+                status: 500,
+                error: {
+                    msg: error
+                }
+            });
+            console.log(`unable to fetch backlog items: ${error}`);
+        });
+});
+
+app.use("/api/v1", router);
 
 app.use(serverRenderer());
 
