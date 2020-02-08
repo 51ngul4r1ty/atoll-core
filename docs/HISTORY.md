@@ -27,3 +27,9 @@ How to use Sequelize with Node and Express
 ------------------------------------------
 
 https://www.codementor.io/mirko0/how-to-use-sequelize-with-node-and-express-i24l67cuz
+
+Atomic Design
+-------------
+
+A quick overview of Atomic Design terminology:
+https://www.youtube.com/watch?v=aMtnGeiWTyU

@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "incremental": false,
         "module": "esnext",
         "target": "es5",
         "lib": [
