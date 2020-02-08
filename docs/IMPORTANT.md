@@ -1,7 +1,8 @@
 Important Considerations
 ========================
 
-* Always choose other tools that work well with GUI tools (see examples later in this doc).
+When choosing new tooling or processes that will have to be used by everyone who contributes to this project:
+* Only choose tools that work well with GUI tools (see examples later in this doc).
 * Always choose processes that support GUI tools (as well as command line options).
 
 Examples of Interfering with GUI Tools 
