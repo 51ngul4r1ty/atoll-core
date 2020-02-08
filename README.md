@@ -11,6 +11,8 @@ If you're interested in getting a detailed explanation of the various parts of t
 want to start with the "Other Docs" section below.  If not, and you just want to get going as quickly
 as possible then you're in the right section.
 
+Everyone contributing to this repo should read this document: [IMPORTANT.md](docs/IMPORTANT.md)
+
 Tools Used
 ----------
 
@@ -49,7 +51,6 @@ Other Docs
 
 README.md                                   - this document is intended as the index document to find
                                               out where to go next.  
-[IMPORTANT.md](docs/IMPORTANT.md)           - important things to remember - must read!  
 [CODE_STANDARDS.md](docs/CODE_STANDARDS.md) - read this!  
 [CONVENTIONS.md](docs/CONVENTIONS.md)       - important naming conventions information.  
 [HOWTO.md](docs/HOWTO.md)                   - contains details for how to implement things.  
