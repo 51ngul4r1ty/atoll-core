@@ -5,6 +5,7 @@ import { action } from "@storybook/addon-actions";
 import { linkTo } from "@storybook/addon-links";
 import { withRootAttribute } from "storybook-addon-root-attribute";
 
+import { EditIcon } from "@atoll/shared";
 import { SimpleButton } from "@atoll/shared";
 import { SimpleText } from "@atoll/shared";
 import { HomeButton } from "@atoll/shared";
@@ -59,11 +60,19 @@ storiesOf("Buttons/HomeButton", module)
     .add("HomeButton (active)", () => <HomeButton forceStateActive onClick={action("clicked")} />)
     .add("HomeButton (focus)", () => <HomeButton forceStateFocus onClick={action("clicked")} />);
 
-storiesOf("Buttons/SimpleButton", module).add("SimpleButton", () => (
-    <SimpleButton icon={<HamburgerIcon />} onClick={action("clicked")}>
-        Menu
-    </SimpleButton>
-));
+storiesOf("Buttons/SimpleButton", module)
+    .add("SimpleButton (Menu w/o caption)", () => <SimpleButton icon={<HamburgerIcon />} onClick={action("clicked menu")} />)
+    .add("SimpleButton (Menu with caption)", () => (
+        <SimpleButton icon={<HamburgerIcon />} onClick={action("clicked menu")}>
+            Menu
+        </SimpleButton>
+    ))
+    .add("SimpleButton (Edit w/o caption)", () => <SimpleButton iconOnLeft icon={<EditIcon />} onClick={action("clicked menu")} />)
+    .add("SimpleButton (Edit)", () => (
+        <SimpleButton iconOnLeft icon={<EditIcon />} onClick={action("clicked edit")}>
+            Edit
+        </SimpleButton>
+    ));
 
 let activeTabId = "plan";
 
