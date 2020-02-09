@@ -7,7 +7,7 @@ import manifestHelpers from "express-manifest-helpers";
 import path from "path";
 
 // libraries
-import { configureStore, createServerHistory } from "@atoll/shared";
+import { configureStore, createServerHistory, storeHistoryInstance } from "@atoll/shared";
 
 // config
 import paths from "../../config/paths";
@@ -41,6 +41,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const history = createServerHistory({ initialEntries: ["/"] }); // TODO: Check what initial entries should be
+storeHistoryInstance(history);
 
 const addStore = (_req: express.Request, res: express.Response, next: express.NextFunction | undefined): void => {
     res.locals.store = configureStore({ history, middleware: [] });

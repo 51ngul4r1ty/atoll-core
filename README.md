@@ -58,3 +58,4 @@ README.md                                   - this document is intended as the i
 [SCRIPTS.md](docs/SCRIPTS.md)               - detailed information about the build & npm scripts.  
 [HISTORY.md](docs/HISTORY.md)               - the past history of this project.  
 [POLICIES.md](docs/POLICIES.md)             - github branch policies etc.
+[GLOSSARY.md](docs/GLOSSARY.md)             - glossary specific to this project.
