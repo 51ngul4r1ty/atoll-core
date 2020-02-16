@@ -16,16 +16,16 @@ Use `React.FC<ComponentNameProps>` as the default component definition where
 `ComponentName` will be your actual component name, e.g. `MyButton`.
 
 `ComponentNameProps` should be split into 2 interfaces:
-- `ComponentNameAttributeProps` and `ComponentNameEventProps`
+- `ComponentNameStateProps` and `ComponentNameDispatchProps`
 
-`ComponentNameAttributeProps` will contain the typical properties.
-`ComponentNameEventProps` will contain event handler related properties.
+`ComponentNameStateProps` will contain the typical properties.
+`ComponentNameDispatchProps` will contain event handler related properties.
 
 To combine the these two interfaces use:
-`type ComponentNameProps = ComponentNameAttributeProps & ComponentNameEventProps`
+`type ComponentNameProps = ComponentNameStateProps & ComponentNameDispatchProps`
 
-`ComponentNameAttributeProps` can be used for `mapStateToProps`
-`ComponentNameEventProps` can be used for `mapDispatchToProps`
+`ComponentNameStateProps` can be used for `mapStateToProps`
+`ComponentNameDispatchProps` can be used for `mapDispatchToProps`
 
 
 Switch Statements

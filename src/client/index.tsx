@@ -5,13 +5,16 @@ import { Route, Switch } from "react-router-dom";
 import { ConnectedRouter } from "connected-react-router";
 import { configureStore } from "@atoll/shared";
 import { App } from "@atoll/shared";
+import { SprintViewContainer } from "@atoll/shared";
 import { IntlProvider } from "@atoll/shared";
 import { createClientHistory } from "@atoll/shared";
 import { layouts } from "@atoll/shared";
+import { storeHistoryInstance } from "@atoll/shared";
 
 const { MainLayout } = layouts;
 
 const history = createClientHistory();
+storeHistoryInstance(history);
 
 // Create/use the store
 // history MUST be passed here if you want syncing between server on initial route
@@ -30,6 +33,7 @@ hydrate(
                 <MainLayout>
                     <Switch>
                         <Route path="/" exact component={App} />
+                        <Route path="/sprint" exact component={SprintViewContainer} />
                     </Switch>
                 </MainLayout>
             </IntlProvider>
