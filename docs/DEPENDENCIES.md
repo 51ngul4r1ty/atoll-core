@@ -69,14 +69,15 @@ Dev Dependencies (needed for build)
 `reselect` - More efficient selectors for Redux
 
 *React Related*
-`react`
+`connected-react-router` - A way to connect routing and redux in a clean way (the replacement for react-router-redux)
 `react-dom`
 `react-helmet` - A document head manager for React
 `react-i18next` - Internationalization for React done right
 `react-redux`
 `react-router-dom`
-`redux`
+`react`
 `redux-thunk`
+`redux`
 
 *Miscellaneous*
 `regenerator-runtime` - runtime for Regenerator-compiled generator and async functions
