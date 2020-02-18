@@ -27,7 +27,6 @@ Dev Dependencies (needed for build)
 `cross-env` - to support Mac OS X and Windows users (and maybe Linux?)
 `react-dev-utils` - Create React App related utilities
 `nodemon` - Simple monitor script for use during development of a node.js app
-`puppeteer` - High-level API to control headless Chrome over the DevTools protocol
 
 *Webpack & Related*
 `webpack` - the defacto standard!

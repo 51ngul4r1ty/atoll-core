@@ -7,7 +7,7 @@ import manifestHelpers from "express-manifest-helpers";
 import path from "path";
 
 // libraries
-import { configureStore, createServerHistory, storeHistoryInstance } from "@atoll/shared";
+import { configureStore, createServerHistory, storeHistoryInstance, getHistoryInstance } from "@atoll/shared";
 
 // config
 import paths from "../../config/paths";
@@ -40,10 +40,21 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const history = createServerHistory({ initialEntries: ["/"] }); // TODO: Check what initial entries should be
-storeHistoryInstance(history);
+const EXCLUDED_URLS: string[] = ["/favicon.ico"];
+
+const isApiUrl = (url: string) => url.startsWith("/api");
+const includeUrl = (url: string) => !EXCLUDED_URLS.includes(url) && !isApiUrl(url);
 
 const addStore = (_req: express.Request, res: express.Response, next: express.NextFunction | undefined): void => {
+    let history: any;
+    if (includeUrl(_req.url)) {
+        console.log(`ADDING HISTORY WITH INITIAL ENTRY: ${_req.url}`);
+        history = createServerHistory({ initialEntries: [_req.url] });
+        storeHistoryInstance(history);
+    } else {
+        history = getHistoryInstance();
+    }
+
     res.locals.store = configureStore({ history, middleware: [] });
     if (typeof next !== "function") {
         throw new Error("Next handler is missing");
