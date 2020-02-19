@@ -1,23 +1,34 @@
+/* STEP 1:
+
+1. Set up the "atoll" role
+
+CREATE ROLE atoll WITH
+	LOGIN
+	SUPERUSER
+	CREATEDB
+	CREATEROLE
+	INHERIT
+	NOREPLICATION
+	CONNECTION LIMIT -1;
+
+ALTER ROLE atoll
+	PASSWORD 'l1m3atoll';
+
+2. Set up the "atoll" database
+
+CREATE DATABASE atoll
+    WITH
+    OWNER = atoll
+    ENCODING = 'UTF8'
+    CONNECTION LIMIT = -1;
+
+/* STEP 2:
+
+In the "atoll" database perform the following */
+
 /* General set up */
+
 CREATE EXTENSION "uuid-ossp";
-
-/* 1. sprint */
-
-CREATE TABLE public.sprint
-(
-    id character(32) NOT NULL,
-    name character varying(50),
-    displayindex bigint NOT NULL,
-    startdate date,
-    finishdate date,
-    PRIMARY KEY (id)
-)
-WITH (
-    OIDS = FALSE
-);
-
-ALTER TABLE public.sprint
-    OWNER to postgres;
 
 /* Functions */
 
@@ -27,7 +38,7 @@ CREATE OR REPLACE FUNCTION public.newuuid(
     LANGUAGE 'plpgsql'
 
     COST 100
-    VOLATILE 
+    VOLATILE
 AS $BODY$
 DECLARE
     newid uuid = uuid_generate_v4();
@@ -41,4 +52,4 @@ END;
 $BODY$;
 
 ALTER FUNCTION public.newuuid()
-    OWNER TO postgres;
+    OWNER TO atoll;

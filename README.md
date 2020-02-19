@@ -20,6 +20,8 @@ Tools Used
 2. VS Code is the editor of choice for this project (v1.37.0 or newer).
   - Make sure you install the recommended workspace extensions.
 3. Yalc (`yalc`) to locally "publish" npm modules for easier development.
+4. PostgreSQL 12.2 for storing data:
+   `https://www.enterprisedb.com/downloads/postgres-postgresql-downloads`
 
 Steps after Cloning Repo
 ------------------------

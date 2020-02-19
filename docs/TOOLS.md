@@ -28,6 +28,16 @@ Why It Was Chosen
   using it.  See [ISSUES_RESOLVED.md]() for more information.
 
 
+PostgreSQL
+==========
+
+`PostgreSQL` is a good general-purpose SQL database.  It is very capable and
+can even handle document data so you get the best of both worlds (NoSQL and
+SQL).
+
+See "Getting Started" in README.md for more information about the version to
+use.
+
 **DEPRECATED TOOLS**
 ====================
 
