@@ -6,11 +6,17 @@ import { StaticRouter } from "react-router-dom";
 import { Store } from "redux";
 import { Provider } from "react-redux";
 
+// libraries
+import { FeatureTogglesState, StateTree } from "@atoll/shared";
+
 // components
 import Html from "../components/HTML";
 
 // utils
 import { buildRoutes } from "../../common/routeBuilder";
+
+// consts/enums
+import { FEATURE_TOGGLE_LIST } from "../api/data/featureToggles";
 
 type Locale = "en_US" | "de_DE" | "default";
 
@@ -53,8 +59,11 @@ const serverRenderer: any = () => (req: express.Request & { store: Store }, res:
         const oldState = res.locals.store.getState();
         const locale = mapAcceptLanguageToLocale(req.headers["accept-language"]); // res.locals.language;
         console.log("locale: " + locale);
+        const featureToggles: FeatureTogglesState = {
+            toggles: FEATURE_TOGGLE_LIST
+        };
         const newApp = { ...oldState.app, locale };
-        const newState = { ...oldState, app: newApp };
+        const newState: StateTree = { ...oldState, app: newApp, featureToggles };
         const state = JSON.stringify(newState);
 
         return res.send(
