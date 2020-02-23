@@ -7,9 +7,7 @@ import { Store } from "redux";
 import { Provider } from "react-redux";
 
 // libraries
-import { IntlProvider, SprintViewContainer } from "@atoll/shared";
-import { App } from "@atoll/shared";
-import { layouts } from "@atoll/shared";
+import { IntlProvider, PlanViewContainer, SprintViewContainer, ReviewViewContainer, layouts } from "@atoll/shared";
 
 // components
 import Html from "../components/HTML";
@@ -52,9 +50,10 @@ const serverRenderer: any = () => (req: express.Request & { store: Store }, res:
                     <IntlProvider>
                         <MainLayout>
                             <Switch>
-                                <Route path="/" exact component={App} />
-                                <Route path="/plan" exact component={App} />
+                                <Route path="/" exact component={PlanViewContainer} />
+                                <Route path="/plan" exact component={PlanViewContainer} />
                                 <Route path="/sprint" exact component={SprintViewContainer} />
+                                <Route path="/review" exact component={ReviewViewContainer} />
                             </Switch>
                         </MainLayout>
                     </IntlProvider>
