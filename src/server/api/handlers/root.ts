@@ -1,3 +1,5 @@
+import { APPLICATION_JSON } from "@atoll/shared";
+
 export const rootHandler = function(req, res) {
     res.json({
         status: 200,
@@ -8,7 +10,7 @@ export const rootHandler = function(req, res) {
                     displayIndex: 0,
                     links: [
                         {
-                            type: "application/json",
+                            type: APPLICATION_JSON,
                             method: "GET",
                             rel: "self",
                             uri: "/api/v1/users/{self}/preferences"
@@ -20,7 +22,7 @@ export const rootHandler = function(req, res) {
                     displayIndex: 0,
                     links: [
                         {
-                            type: "application/json",
+                            type: APPLICATION_JSON,
                             method: "GET",
                             rel: "self",
                             uri: "/api/v1/sprints"
@@ -32,7 +34,7 @@ export const rootHandler = function(req, res) {
                     displayIndex: 1,
                     links: [
                         {
-                            type: "application/json",
+                            type: APPLICATION_JSON,
                             method: "GET",
                             rel: "self",
                             uri: "/api/v1/backlog-items"
