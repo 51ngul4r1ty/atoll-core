@@ -1,3 +1,32 @@
+General
+=======
+
+* Handling version of all entities (preserve all old versions).
+* Support undo and redo.
+
+Versioning
+----------
+
+**Why**: to allow audit trail, tracking changes over time, etc.
+
+**How**:
+* Keep all versions of entity in each collection, have one item as the "current" entity and all others as "not current"
+  ("current" field will be included on all tables and well as date & time stamp and a version number - 1, 2, 3, etc.)
+* Each entity will have an "original id" along with "id" so that it is easy to retrieve the history of changes for a
+  specific "original id"
+
+Undo/Redo
+---------
+
+**Why**: so UI can support undo and redo, also support revert for entities (which is a type of undo that's more specific)
+
+**How**:
+* Using the "Versioning" approach above all we need to do in addition to this provide an "audit trail" collection that tracks
+  all the changes - which entity, which version (ID), which previous version (ID), what operation type (add/remove/update), whether
+  it was "done"/"undone" (undo/redo use).
+* Undo will work as expected, redo will "replay" anything that was undone (i.e. it will need to use the "done"/"undone" flag in the
+  "audit trail") and will only work if no other changes were "done" in the meantime.
+
 Backlog Items
 =============
 
@@ -31,3 +60,9 @@ A story may not be completed in a sprint so it can be continued.  Also, if the t
 parts then it can be split.  These are not the same thing and should be treated differently:
 - any part of a story (i.e. a task) can be allocated to a sprint individually (2+ sprints containing same story)
 - multiple stories can relate to an originating story (there's an inherent hierachy)
+
+Tags
+====
+
+This is mainly intended for backlog items, but follow the a similar approach as github... except that atoll's tags will be "smarter"
+and you will be able to limit tags to specific "targets" when they extend to other types besides beyond backlog items.

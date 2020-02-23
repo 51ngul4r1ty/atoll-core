@@ -2,19 +2,15 @@
 import * as React from "react";
 import * as express from "express";
 import { renderToString } from "react-dom/server";
-import { StaticRouter, Switch, Route } from "react-router-dom";
+import { StaticRouter } from "react-router-dom";
 import { Store } from "redux";
 import { Provider } from "react-redux";
-
-// libraries
-import { IntlProvider, SprintViewContainer } from "@atoll/shared";
-import { App } from "@atoll/shared";
-import { layouts } from "@atoll/shared";
 
 // components
 import Html from "../components/HTML";
 
-const { MainLayout } = layouts;
+// utils
+import { buildRoutes } from "../../common/routeBuilder";
 
 type Locale = "en_US" | "de_DE" | "default";
 
@@ -49,15 +45,7 @@ const serverRenderer: any = () => (req: express.Request & { store: Store }, res:
         const content = renderToString(
             <Provider store={res.locals.store}>
                 <StaticRouter location={req.url} context={{}}>
-                    <IntlProvider>
-                        <MainLayout>
-                            <Switch>
-                                <Route path="/" exact component={App} />
-                                <Route path="/plan" exact component={App} />
-                                <Route path="/sprint" exact component={SprintViewContainer} />
-                            </Switch>
-                        </MainLayout>
-                    </IntlProvider>
+                    {buildRoutes()}
                 </StaticRouter>
             </Provider>
         );

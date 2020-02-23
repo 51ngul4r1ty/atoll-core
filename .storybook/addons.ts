@@ -8,8 +8,11 @@ import "storybook-addon-root-attribute/register";
 // import 'storybook-addon-root-attribute/registerToolbar';
 
 /* other addons */
-import '@storybook/addon-actions/register';
-import '@storybook/addon-links/register';
+import "@storybook/addon-actions/register";
+import "@storybook/addon-links/register";
 
 /* set up dark mode theme for storybook */
-import 'storybook-dark-mode/register';
+import "storybook-dark-mode/register";
+
+/* allow tweaking of settings with knobs */
+import "@storybook/addon-knobs/register";

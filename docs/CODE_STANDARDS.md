@@ -52,3 +52,52 @@ For example:
         }
     }
 ```
+
+Import Statements
+-----------------
+
+Import statments should be grouped into the following commented sections (try
+to stick to this order as well):
+
+| Section          |                                              |
+|------------------|----------------------------------------------|
+| externals        | any third party module, e.g. React           |
+| libraries        | anything imported from @atoll/* repos        |
+| config           | any project related configuration consts     |
+| utils            | any project related utility functions        |
+| routes           | any project related routing config/functions |
+| data access      | any project related data access functions    |
+| actions          | any project related action creators          |
+| components       | any project related JSX components used      |
+| state            | any project related state                    |
+| consts/enums     | any project related constants and enums      |
+| interfaces/types | any project related interface or types       |
+| style            | any project related css module references    |
+
+This helps to identify inconsistencies in naming because it becomes obvious
+when you group by category.  This also helps to make it obvious when a module
+could be going beyond its single responsibility (and thereby violating SOLID
+principles).
+
+For example:
+```
+// externals
+import React from "react";
+import { hydrate } from "react-dom";
+import { Provider } from "react-redux";
+import { Route, Switch } from "react-router-dom";
+import { ConnectedRouter } from "connected-react-router";
+
+// utils
+import { configureStore } from "@atoll/shared";
+import { createClientHistory } from "@atoll/shared";
+import { storeHistoryInstance } from "@atoll/shared";
+
+// components
+import { App } from "@atoll/shared";
+import { ReviewViewContainer, SprintViewContainer } from "@atoll/shared";
+import { IntlProvider } from "@atoll/shared";
+
+// layouts
+import { layouts } from "@atoll/shared";
+```

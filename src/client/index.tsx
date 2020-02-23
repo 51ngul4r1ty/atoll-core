@@ -1,17 +1,14 @@
+// externals
 import React from "react";
 import { hydrate } from "react-dom";
 import { Provider } from "react-redux";
-import { Route, Switch } from "react-router-dom";
 import { ConnectedRouter } from "connected-react-router";
-import { configureStore } from "@atoll/shared";
-import { App } from "@atoll/shared";
-import { ReviewViewContainer, SprintViewContainer } from "@atoll/shared";
-import { IntlProvider } from "@atoll/shared";
-import { createClientHistory } from "@atoll/shared";
-import { layouts } from "@atoll/shared";
-import { storeHistoryInstance } from "@atoll/shared";
 
-const { MainLayout } = layouts;
+// libraries
+import { configureStore, createClientHistory, storeHistoryInstance } from "@atoll/shared";
+
+// utils
+import { buildRoutes } from "../common/routeBuilder";
 
 const history = createClientHistory();
 storeHistoryInstance(history);
@@ -28,18 +25,7 @@ const store =
 
 hydrate(
     <Provider store={store}>
-        <ConnectedRouter history={history}>
-            <IntlProvider>
-                <MainLayout>
-                    <Switch>
-                        <Route path="/" exact component={App} />
-                        <Route path="/plan" exact component={App} />
-                        <Route path="/sprint" exact component={SprintViewContainer} />
-                        <Route path="/review" exact component={ReviewViewContainer} />
-                    </Switch>
-                </MainLayout>
-            </IntlProvider>
-        </ConnectedRouter>
+        <ConnectedRouter history={history}>{buildRoutes()}</ConnectedRouter>
     </Provider>,
     document.getElementById("app")
 );
