@@ -2,9 +2,7 @@
 import React from "react";
 import { Switch, Route } from "react-router-dom";
 import { ConfigureFlopFlip } from "@flopflip/react-broadcast";
-
-// libraries
-import { flopFlipAdapter } from "@atoll/shared";
+import adapter from "@flopflip/memory-adapter";
 
 // components
 import { IntlProvider, AppContainer, PlanViewContainer, SprintViewContainer, ReviewViewContainer, layouts } from "@atoll/shared";
@@ -33,7 +31,7 @@ const getDefaultFlags = (windowObj: any, forSsr: boolean) => {
 export const buildRoutes = (windowObj: any, forSsr: boolean) => (
     <IntlProvider>
         <ConfigureFlopFlip
-            adapter={flopFlipAdapter}
+            adapter={adapter}
             adapterArgs={{ clientSideId: null, user: null }}
             defaultFlags={getDefaultFlags(windowObj, forSsr)}
         >
