@@ -1,7 +1,7 @@
 // externals
 import React from "react";
 import { Switch, Route } from "react-router-dom";
-import { ConfigureFlopFlip } from "@flopflip/react-redux";
+import { ConfigureFlopFlip } from "@flopflip/react-broadcast";
 
 // libraries
 import { flopFlipAdapter } from "@atoll/shared";
@@ -22,10 +22,26 @@ const appRoutes = (
     </layouts.MainLayout>
 );
 
-export const buildRoutes = () => (
+const getDefaultFlags = (windowObj: any, forSsr: boolean) => {
+    if (forSsr) {
+        return { showEditButton: false };
+    } else {
+        return (windowObj as any).__TOGGLES__;
+    }
+};
+
+export const buildRoutes = (windowObj: any, forSsr: boolean) => (
     <IntlProvider>
-        <ConfigureFlopFlip adapter={flopFlipAdapter} adapterArgs={{ clientSideId: null, user: null }}>
+        <ConfigureFlopFlip
+            adapter={flopFlipAdapter}
+            adapterArgs={{ clientSideId: null, user: null }}
+            defaultFlags={getDefaultFlags(windowObj, forSsr)}
+        >
             {({ isAdapterReady }) => (isAdapterReady ? appRoutes : <div>LOADING...</div>)}
         </ConfigureFlopFlip>
     </IntlProvider>
 );
+
+export const buildRoutesForServer = () => buildRoutes({}, true);
+
+export const buildRoutesForClient = (windowObj: any) => buildRoutes(windowObj, false);
