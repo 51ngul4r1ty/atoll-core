@@ -18,8 +18,20 @@ export const rootHandler = function(req, res) {
                     ]
                 },
                 {
+                    name: "Current User's Feature Toggles",
+                    displayIndex: 1,
+                    links: [
+                        {
+                            type: APPLICATION_JSON,
+                            method: "GET",
+                            rel: "self",
+                            uri: "/api/v1/users/{self}/feature-toggles"
+                        }
+                    ]
+                },
+                {
                     name: "Sprints",
-                    displayIndex: 0,
+                    displayIndex: 2,
                     links: [
                         {
                             type: APPLICATION_JSON,
@@ -31,7 +43,7 @@ export const rootHandler = function(req, res) {
                 },
                 {
                     name: "Backlog Items",
-                    displayIndex: 1,
+                    displayIndex: 3,
                     links: [
                         {
                             type: APPLICATION_JSON,

@@ -8,7 +8,7 @@ import { ConnectedRouter } from "connected-react-router";
 import { configureStore, createClientHistory, storeHistoryInstance } from "@atoll/shared";
 
 // utils
-import { buildRoutes } from "../common/routeBuilder";
+import { buildRoutesForClient } from "../common/routeBuilder";
 
 const history = createClientHistory();
 storeHistoryInstance(history);
@@ -25,7 +25,7 @@ const store =
 
 hydrate(
     <Provider store={store}>
-        <ConnectedRouter history={history}>{buildRoutes()}</ConnectedRouter>
+        <ConnectedRouter history={history}>{buildRoutesForClient(window)}</ConnectedRouter>
     </Provider>,
     document.getElementById("app")
 );

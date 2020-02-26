@@ -1,5 +1,9 @@
+// externals
 import React from "react";
 import Helmet from "react-helmet";
+
+// interfaces/types
+import { FeatureTogglesState } from "@atoll/shared";
 
 type Props = {
     children: any;
@@ -7,9 +11,10 @@ type Props = {
     language: string;
     scripts: string[];
     state: string;
+    toggles: { [key: string]: boolean };
 };
 
-const HTML = ({ children, css = [], scripts = [], state = "{}", language = "" }: Props) => {
+const HTML = ({ children, css = [], scripts = [], state = "{}", language = "", toggles = {} }: Props) => {
     const head = Helmet.renderStatic();
     return (
         <html lang="">
@@ -29,7 +34,7 @@ const HTML = ({ children, css = [], scripts = [], state = "{}", language = "" }:
                     dangerouslySetInnerHTML={{
                         // TODO: Add jsesc/stringify here
                         // see: https://twitter.com/HenrikJoreteg/status/1143953338284703744
-                        __html: `window.__PRELOADED_STATE__ = ${state}`
+                        __html: `window.__PRELOADED_STATE__ = ${state}; window.__TOGGLES__ = ${JSON.stringify(toggles)};`
                     }}
                 />
             </head>
