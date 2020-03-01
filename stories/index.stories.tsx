@@ -15,6 +15,7 @@ import { HamburgerIcon } from "@atoll/shared";
 import { TabStrip } from "@atoll/shared";
 import { BacklogItemCard, BacklogItemTypeEnum } from "@atoll/shared";
 import { EditMode } from "@atoll/shared";
+import { UserStoryDetailForm } from "@atoll/shared";
 
 addDecorator(withRootAttribute);
 addDecorator(withKnobs);
@@ -177,3 +178,9 @@ storiesOf("Molecules|Buttons/EditButton", module)
             />
         </div>
     ));
+
+storiesOf("Organisms|Forms/UserStoryDetailForm", module).add("UserStoryDetailForm", () => (
+    <div>
+        <UserStoryDetailForm />
+    </div>
+));
