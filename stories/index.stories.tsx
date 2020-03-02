@@ -6,8 +6,8 @@ import { withKnobs, text, boolean, select, number } from "@storybook/addon-knobs
 import { linkTo } from "@storybook/addon-links";
 import { withRootAttribute } from "storybook-addon-root-attribute";
 
-import { EditButton } from "@atoll/shared";
-import { EditIcon } from "@atoll/shared";
+import { AddButton, EditButton } from "@atoll/shared";
+import { AddIcon, EditIcon } from "@atoll/shared";
 import { SimpleButton } from "@atoll/shared";
 import { SimpleText } from "@atoll/shared";
 import { HomeButton } from "@atoll/shared";
@@ -76,6 +76,11 @@ storiesOf("Atoms|Buttons/SimpleButton", module)
     .add("SimpleButton (Edit)", () => (
         <SimpleButton iconOnLeft icon={<EditIcon />} onClick={action("clicked edit")}>
             {text("(children)", "Edit")}
+        </SimpleButton>
+    ))
+    .add("SimpleButton (Add)", () => (
+        <SimpleButton iconOnLeft icon={<AddIcon />} onClick={action("clicked add")}>
+            {text("(children)", "Add")}
         </SimpleButton>
     ));
 
@@ -174,6 +179,30 @@ storiesOf("Molecules|Buttons/EditButton", module)
                 )}
                 onClick={() => {
                     alert("clicked");
+                }}
+            />
+        </div>
+    ));
+
+storiesOf("Molecules|Buttons/AddButton", module)
+    .add("AddButton (story)", () => (
+        <div>
+            <AddButton
+                itemName="Story"
+                onClick={() => {
+                    // eslint-disable-next-line no-alert
+                    alert("add story clicked");
+                }}
+            />
+        </div>
+    ))
+    .add("AddButton (bug)", () => (
+        <div>
+            <AddButton
+                itemName="Bug"
+                onClick={() => {
+                    // eslint-disable-next-line no-alert
+                    alert("add bug clicked");
                 }}
             />
         </div>
