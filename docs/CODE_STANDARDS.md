@@ -28,10 +28,16 @@ NOTE: Do not assume that components belong in a upper level folder if they conta
 
 **Interface Types**
 
-1. Don't precede interface types with any prefix (for example, "I" for interface or "T" for type, as used in other code standards).
+1. Don't precede interface types with any prefix
+   (for example, "I" for interface or "T" for type, as used in other code standards).
 2. Use the prefix "Base" for an interface that is at the root of the type hierarchy but typically isn't used directly by objects.
 3. Use the prefix "Standard" for an interface that is a lowest common denominator for objects that will extend it. 
-4. Avoid deeply nested hierarchies and instead try to combine other interfaces (for example, StandardInvertibleComponentProps)
+4. Avoid deeply nested hierarchies and instead try to combine other interfaces
+   (for example, StandardInvertibleComponentProps)
+5. Don't use the "Standard" interfaces as replacements for component property types
+   (for example, AppIconProps is an alias for StandardInvertibleComponentProps so that AppIcon has its own props type)  
+   NOTE: This is done so that consumers of AppIcon aren't aware of StandardInvertibleComponentProps so that they can
+     evolve separately.
 
 Components
 ----------
