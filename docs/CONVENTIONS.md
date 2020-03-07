@@ -1,6 +1,9 @@
 Conventions
 ===========
 
+This is reserved for conventions used outside the code itself, for anything related to naming standards see
+[CODE_STANDARDS.md](/docs/CODE_STANDARDS.md)
+
 Branch Naming
 -------------
 
