@@ -36,8 +36,8 @@ NOTE: Do not assume that components belong in a upper level folder if they conta
    (for example, StandardInvertibleComponentProps)
 5. Don't use the "Standard" interfaces as replacements for component property types
    (for example, AppIconProps is an alias for StandardInvertibleComponentProps so that AppIcon has its own props type)  
-   NOTE: This is done so that consumers of AppIcon aren't aware of StandardInvertibleComponentProps so that they can
-     evolve separately.
+   _NOTE: This is done so that consumers of AppIcon aren't aware of StandardInvertibleComponentProps so that they can_
+     _evolve separately._
 
 Components
 ----------
