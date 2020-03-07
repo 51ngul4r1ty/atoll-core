@@ -4,12 +4,12 @@ Code Standards
 Folder Naming
 -------------
 
-**General**
+**General**  
 1. Folder names should use lowercase letters.
 2. Folder names should use dashes to separate words.
 3. Folder names should not use underscores to separate words.
 
-**Component Folders**
+**Component Folders**  
 The components are organized using Atomic Design principles, so the following base folders should be used:
 - "atoms" = basic building block components
 - "molecules" = when smaller building blocks are combined they form molecules, e.g. "backlog item card"
