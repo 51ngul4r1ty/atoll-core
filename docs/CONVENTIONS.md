@@ -27,3 +27,9 @@ Branch Naming
 NOTE: To start with we'll use Github's built-in issues but the long term goal would be to
 use "Atoll" itself to track stories + bugs. We'll essentially build it to boostrap itself
 as early as possible in the development process.
+
+UI/UX Design
+------------
+
+The UI/UX design principles are based on the concept of Atomic Design.
+See [CODE_STANDARDS.md](/docs/CODE_STANDARDS.md) for more info.
