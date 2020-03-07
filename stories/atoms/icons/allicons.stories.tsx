@@ -6,7 +6,7 @@ import React from "react";
 import { storiesOf } from "@storybook/react";
 
 // components
-import { AppIcon, CancelIcon, DragIcon, DoneIcon, EditIcon } from "@atoll/shared";
+import { AddIcon, AppIcon, CancelIcon, DragIcon, DoneIcon, EditIcon, HamburgerIcon } from "@atoll/shared";
 import { SingleIconContainer, SideBySideIconContainers } from "../../common";
 
 // common
@@ -19,12 +19,14 @@ const invertibleIcons = {
 
 const icons = {
     ...invertibleIcons,
+    AddIcon,
     CancelIcon,
     DoneIcon,
-    EditIcon
+    EditIcon,
+    HamburgerIcon
 };
 
-const iconNames = ["AppIcon", "CancelIcon", "DragIcon", "DoneIcon", "EditIcon"];
+const iconNames = ["AddIcon", "AppIcon", "CancelIcon", "DragIcon", "DoneIcon", "EditIcon", "HamburgerIcon"];
 
 const getComponent = (iconName: string, isInverted: boolean) => {
     const icon = icons[iconName];
