@@ -46,6 +46,7 @@
     "local-publish:shared": "cd .. && cd atoll-shared && npm run local-publish && cd ..",
     "local-link:shared": "npx --no-install yalc add @atoll/shared",
     "sync": "npm run local-publish:shared && npm run local-link:shared",
+    "pull:shared": "cd .. && cd atoll-shared && npm run push && cd ..",
     "start:client-only": "npm run build:dev && npm run start:client",
     "output:now": "node -e \"console.log(JSON.stringify(new Date()))\""
   },

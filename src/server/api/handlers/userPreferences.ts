@@ -14,7 +14,7 @@ export const userPreferencesHandler = function(req: Request, res: Response) {
     } else {
         respondWithOk(res, {
             /* NOTE: To test browser dark mode prefs on/off just toggle this - it will move to DB later */
-            detectBrowserDarkMode: false
+            detectBrowserDarkMode: true
         });
     }
 };

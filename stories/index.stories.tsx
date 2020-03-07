@@ -1,21 +1,29 @@
+// externals
 import React from "react";
-
 import { addDecorator, addParameters, storiesOf, forceReRender } from "@storybook/react";
+
+// storybook
 import { action } from "@storybook/addon-actions";
-import { withKnobs, text, boolean, select, number } from "@storybook/addon-knobs";
-import { linkTo } from "@storybook/addon-links";
+import { withKnobs, text, /* boolean, */ select, number } from "@storybook/addon-knobs";
+// import { linkTo } from "@storybook/addon-links";
 import { withRootAttribute } from "storybook-addon-root-attribute";
 
-import { AddButton, EditButton } from "@atoll/shared";
-import { AddIcon, EditIcon } from "@atoll/shared";
-import { SimpleButton } from "@atoll/shared";
-import { SimpleText } from "@atoll/shared";
-import { HomeButton } from "@atoll/shared";
-import { HamburgerIcon } from "@atoll/shared";
-import { TabStrip } from "@atoll/shared";
-import { BacklogItemCard, BacklogItemTypeEnum } from "@atoll/shared";
-import { EditMode } from "@atoll/shared";
-import { UserStoryDetailForm } from "@atoll/shared";
+// components
+import {
+    AddButton,
+    EditButton,
+    AddIcon,
+    EditIcon,
+    SimpleButton,
+    SimpleText,
+    HomeButton,
+    HamburgerIcon,
+    TabStrip,
+    BacklogItemCard,
+    BacklogItemTypeEnum,
+    EditMode,
+    UserStoryDetailForm
+} from "@atoll/shared";
 
 addDecorator(withRootAttribute);
 addDecorator(withKnobs);
@@ -207,9 +215,3 @@ storiesOf("Molecules|Buttons/AddButton", module)
             />
         </div>
     ));
-
-storiesOf("Organisms|Forms/UserStoryDetailForm", module).add("UserStoryDetailForm", () => (
-    <div>
-        <UserStoryDetailForm />
-    </div>
-));
