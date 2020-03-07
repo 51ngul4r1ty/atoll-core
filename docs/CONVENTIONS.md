@@ -33,3 +33,9 @@ UI/UX Design
 
 The UI/UX design principles are based on the concept of Atomic Design.
 See [CODE_STANDARDS.md](/docs/CODE_STANDARDS.md) for more info.
+
+Icon Format
+-----------
+
+All icons in Atoll are SVG icons to ensure that they can scale well to handle different resolutions.  The icons
+are turned into React components so that they can easily be styled.
