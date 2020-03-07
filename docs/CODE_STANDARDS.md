@@ -26,6 +26,12 @@ NOTE: Do not assume that components belong in a upper level folder if they conta
   this was written, it didn't use any "atoms" - but from a UI/UX perspective it does appear to have many smaller building blocks
   that could potentially be atoms.
 
+**Interface Types**
+
+1. Don't precede interface types with any prefix (for example, "I" for interface or "T" for type, as used in other code standards).
+2. Use the prefix "Base" for an interface that is at the root of the type hierarchy but typically isn't used directly by objects.
+3. Use the prefix "Standard" for an interface that is a lowest common denominator for objects that will extend it. 
+4. Avoid deeply nested hierarchies and instead try to combine other interfaces (for example, StandardInvertibleComponentProps)
 
 Components
 ----------
