@@ -86,3 +86,6 @@ The algorithm to re-order items is as follows:
 3. If an item is deleted don't re-assign displayIndex values, just leave the gap
    (for example, given a sequence like 104, 105, 106, 107, 108 and deleting displayIndex 106 will
     result in 104, 105, 107, 108)
+4. If an item is inserted above the top item, displayIndex should be `first item's displayIndex - 1` even if the
+   number is negative.
+5. If an item is inserted below the bottom item, displayIndex should be `last item's displayIndex + 1`.
