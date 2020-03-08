@@ -80,7 +80,7 @@ in between these two by assigning "1000.5".  To insert between "1000" and "1000.
 places it becomes easy to continue to insert items between other items without having to "renumber" other items.
 
 The algorithm to re-order items is as follows:
-1. If two items are swapped (for example, 932 and 1423) just update each item to use each others displayIndex.
+1. If two items are swapped (for example, 932 and 1423) just update each item to use each other's displayIndex.
 2. If an item is inserted between item 1 and item 2 then assign a new displayIndex using
    `(item 1's displayIndex 1 + item 2's displayIndex) / 2.0`.
 3. If an item is deleted don't re-assign displayIndex values, just leave the gap
