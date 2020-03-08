@@ -22,7 +22,7 @@ import {
     BacklogItemCard,
     BacklogItemTypeEnum,
     EditMode,
-    UserStoryDetailForm
+    BacklogItemDetailForm
 } from "@atoll/shared";
 
 addDecorator(withRootAttribute);

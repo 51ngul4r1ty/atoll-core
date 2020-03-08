@@ -6,14 +6,14 @@ import { storiesOf } from "@storybook/react";
 import { number, text, select } from "@storybook/addon-knobs";
 
 // components
-import { UserStoryDetailForm } from "@atoll/shared";
+import { BacklogItemDetailForm } from "@atoll/shared";
 
 const bugStoryPhrase = "Filter seems to be taking longer & longer (investigate)";
 
-storiesOf("Organisms|Forms/UserStoryDetailForm", module)
-    .add("UserStoryDetailForm (issue)", () => (
+storiesOf("Organisms|Forms/BacklogItemDetailForm", module)
+    .add("BacklogItemDetailForm (issue)", () => (
         <div>
-            <UserStoryDetailForm
+            <BacklogItemDetailForm
                 type={select("type", ["issue", "story"], "issue")}
                 estimate={number("estimate", 13)}
                 externalId={text("externalId", "B1000032")}
@@ -23,9 +23,9 @@ storiesOf("Organisms|Forms/UserStoryDetailForm", module)
             />
         </div>
     ))
-    .add("UserStoryDetailForm (story)", () => (
+    .add("BacklogItemDetailForm (story)", () => (
         <div>
-            <UserStoryDetailForm
+            <BacklogItemDetailForm
                 estimate={number("estimate", 8)}
                 externalId={text("externalId", "527")}
                 rolePhrase={text("rolePhrase", "as a developer")}
