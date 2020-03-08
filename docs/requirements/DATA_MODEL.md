@@ -89,3 +89,4 @@ The algorithm to re-order items is as follows:
 4. If an item is inserted above the top item, displayIndex should be `first item's displayIndex - 1` even if the
    number is negative.
 5. If an item is inserted below the bottom item, displayIndex should be `last item's displayIndex + 1`.
+6. If multiple items are inserted between two items then space them evenly.
