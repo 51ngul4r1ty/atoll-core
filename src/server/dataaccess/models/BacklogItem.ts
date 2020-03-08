@@ -30,7 +30,7 @@ BacklogItemModel.init(
             allowNull: true
         },
         type: DataTypes.STRING(50),
-        displayIndex: DataTypes.INTEGER
+        displayIndex: DataTypes.DECIMAL(18, 8)
     },
     {
         modelName: "backlogitem",
