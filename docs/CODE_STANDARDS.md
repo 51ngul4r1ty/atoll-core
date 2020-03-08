@@ -39,6 +39,11 @@ NOTE: Do not assume that components belong in a upper level folder if they conta
    _NOTE: This is done so that consumers of AppIcon aren't aware of StandardInvertibleComponentProps so that they can
      evolve separately._
 
+Reducers
+--------
+
+Types related to the data structure that the reducer stores in the state tree should be exported from the reducer itself.
+
 Components
 ----------
 
