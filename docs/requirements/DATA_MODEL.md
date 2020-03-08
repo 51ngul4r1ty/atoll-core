@@ -66,3 +66,23 @@ Tags
 
 This is mainly intended for backlog items, but follow the a similar approach as github... except that atoll's tags will be "smarter"
 and you will be able to limit tags to specific "targets" when they extend to other types besides beyond backlog items.
+
+Ranking
+=======
+
+In order to support a very flexible ranking of items and the best possible SQL performance for queries, a ranking column,
+named "displayIndex" is used (for example, the backlog is ranked this way).  This is different from the database's native
+ranking for SQL queries because the number will always be unique (no ties).
+
+The "displayIndex" column is a defined as `DECIMAL(18, 8)` because this is essentially an integer value with the ability
+to insert values in between.  For example, if we insert displayIndex "1000" and then displayIndex "1001" we can insert an item
+in between these two by assigning "1000.5".  To insert between "1000" and "1000.5" just use "1000.25" etc.  With 8 decimal
+places it becomes easy to continue to insert items between other items without having to "renumber" other items.
+
+The algorithm to re-order items is as follows:
+1. If two items are swapped (for example, 932 and 1423) just update each item to use each others displayIndex.
+2. If an item is inserted between item 1 and item 2 then assign a new displayIndex using
+   `(item 1's displayIndex 1 + item 2's displayIndex) / 2.0`.
+3. If an item is deleted don't re-assign displayIndex values, just leave the gap
+   (for example, given a sequence like 104, 105, 106, 107, 108 and deleting displayIndex 106 will
+    result in 104, 105, 107, 108)
