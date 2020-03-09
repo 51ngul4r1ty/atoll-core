@@ -50,7 +50,9 @@ export const backlogItemsPostHandler = function(req: Request, res: Response) {
         .then(() => {
             res.status(HttpStatus.CREATED).json({
                 status: HttpStatus.CREATED,
-                data: bodyWithId
+                data: {
+                    item: bodyWithId
+                }
             });
         })
         .catch((error) => {
