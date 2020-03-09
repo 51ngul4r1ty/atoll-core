@@ -62,4 +62,5 @@ README.md                                     - this document is intended as the
 [HISTORY.md](docs/HISTORY.md)                 - the past history of this project.  
 [POLICIES.md](docs/POLICIES.md)               - github branch policies etc.
 [GLOSSARY.md](docs/GLOSSARY.md)               - glossary specific to this project.
-[ISSUES_RESOLVED.md](docs/ISSUES_RESOLVED.md) - this may be useful if you're running into problems.
+[ISSUES_RESOLVED.md](docs/ISSUES_RESOLVED.md) - this may be useful if you're running into problems.  
+[DATA_MODEL.md](docs/dataModel/DATA_MODEL.md) - mapping the requirements to the data model.
