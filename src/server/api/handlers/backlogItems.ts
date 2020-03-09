@@ -47,18 +47,10 @@ export const backlogItemsGetHandler = function(req: Request, res: Response) {
 export const backlogItemsPostHandler = function(req: Request, res: Response) {
     const bodyWithId = addIdToBody(req.body);
     BacklogItemModel.create(bodyWithId, {} as CreateOptions)
-        .then((backlogItems) => {
-            // const items = backlogItems.map((item) => {
-            //     const backlogItem = mapToBacklogItem(item);
-            //     const result: BacklogItem = {
-            //         ...backlogItem,
-            //         links: [buildSelfLink(backlogItem, "/api/v1/backlog-items/")]
-            //     };
-            //     return result;
-            // });
+        .then(() => {
             res.status(HttpStatus.CREATED).json({
                 status: HttpStatus.CREATED,
-                data: {}
+                data: bodyWithId
             });
         })
         .catch((error) => {
