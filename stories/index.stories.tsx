@@ -4,7 +4,7 @@ import { addDecorator, addParameters, storiesOf, forceReRender } from "@storyboo
 
 // storybook
 import { action } from "@storybook/addon-actions";
-import { withKnobs, text, /* boolean, */ select, number } from "@storybook/addon-knobs";
+import { withKnobs, text, select, number } from "@storybook/addon-knobs";
 // import { linkTo } from "@storybook/addon-links";
 import { withRootAttribute } from "storybook-addon-root-attribute";
 
