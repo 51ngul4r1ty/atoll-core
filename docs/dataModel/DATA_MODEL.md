@@ -47,6 +47,9 @@ Issues
 1. In-sprint bug related to stories worked in that same sprint (or before a story has been approved for release).
 2. Production defect found after release.
 
+See [ISSUES.md](ISSUES.md) for detailed information.
+
+
 Planned vs Unplanned
 --------------------
 
