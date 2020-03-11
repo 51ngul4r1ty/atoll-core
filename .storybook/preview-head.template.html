@@ -11,6 +11,56 @@
         background-color: var(--normal-page-color, white);
     }
 
+    .side-by-side-containers {
+        display: flex;
+        flex-direction: columns;
+    }
+
+    .padded-container {
+        margin: 0.5rem;
+    }
+
+    .inverted-container .icon {
+        background-color: var(--inverted-page-color, black);
+        color: var(--inverted-pen-color, white);
+    }
+
+    .icon {
+        display: grid;
+        grid-template-rows: auto auto;
+        width: 8rem;
+        border: 0.05rem solid #888;
+        /* background-color: #bbb; */
+    }
+
+    .icon + .icon {
+        margin-top: 0.5rem;
+    }
+
+    .icon > svg {
+        width: 1.9rem;
+        height: 1.9rem;
+        grid-column: 1;
+        grid-row: 1;
+        justify-self: center;
+/*        background-color: #466;*/
+    }
+
+    .icon > .caption {
+        text-align: center;
+        /* background-color: #cfcfcf; */
+    }
+
+    .icon.x2 > svg {
+        width: 3.8rem;
+        height: 3.8rem;
+    }
+
+    .icon.x4 > svg {
+        width: 7.6rem;
+        height: 7.6rem;
+    }
+
 </style>
 <script>
     function getThemeAttribute() {

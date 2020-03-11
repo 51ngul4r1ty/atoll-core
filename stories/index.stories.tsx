@@ -1,20 +1,29 @@
+// externals
 import React from "react";
-
 import { addDecorator, addParameters, storiesOf, forceReRender } from "@storybook/react";
+
+// storybook
 import { action } from "@storybook/addon-actions";
-import { withKnobs, text, boolean, select, number } from "@storybook/addon-knobs";
-import { linkTo } from "@storybook/addon-links";
+import { withKnobs, text, select, number } from "@storybook/addon-knobs";
+// import { linkTo } from "@storybook/addon-links";
 import { withRootAttribute } from "storybook-addon-root-attribute";
 
-import { EditButton } from "@atoll/shared";
-import { EditIcon } from "@atoll/shared";
-import { SimpleButton } from "@atoll/shared";
-import { SimpleText } from "@atoll/shared";
-import { HomeButton } from "@atoll/shared";
-import { HamburgerIcon } from "@atoll/shared";
-import { TabStrip } from "@atoll/shared";
-import { BacklogItemCard, BacklogItemTypeEnum } from "@atoll/shared";
-import { EditMode } from "@atoll/shared";
+// components
+import {
+    AddButton,
+    EditButton,
+    AddIcon,
+    EditIcon,
+    SimpleButton,
+    SimpleText,
+    HomeButton,
+    HamburgerIcon,
+    TabStrip,
+    BacklogItemCard,
+    BacklogItemTypeEnum,
+    EditMode,
+    BacklogItemDetailForm
+} from "@atoll/shared";
 
 addDecorator(withRootAttribute);
 addDecorator(withKnobs);
@@ -75,6 +84,11 @@ storiesOf("Atoms|Buttons/SimpleButton", module)
     .add("SimpleButton (Edit)", () => (
         <SimpleButton iconOnLeft icon={<EditIcon />} onClick={action("clicked edit")}>
             {text("(children)", "Edit")}
+        </SimpleButton>
+    ))
+    .add("SimpleButton (Add)", () => (
+        <SimpleButton iconOnLeft icon={<AddIcon />} onClick={action("clicked add")}>
+            {text("(children)", "Add")}
         </SimpleButton>
     ));
 
@@ -173,6 +187,30 @@ storiesOf("Molecules|Buttons/EditButton", module)
                 )}
                 onClick={() => {
                     alert("clicked");
+                }}
+            />
+        </div>
+    ));
+
+storiesOf("Molecules|Buttons/AddButton", module)
+    .add("AddButton (story)", () => (
+        <div>
+            <AddButton
+                itemName="Story"
+                onClick={() => {
+                    // eslint-disable-next-line no-alert
+                    alert("add story clicked");
+                }}
+            />
+        </div>
+    ))
+    .add("AddButton (bug)", () => (
+        <div>
+            <AddButton
+                itemName="Bug"
+                onClick={() => {
+                    // eslint-disable-next-line no-alert
+                    alert("add bug clicked");
                 }}
             />
         </div>

@@ -23,9 +23,8 @@ const appRoutes = (
 const getDefaultFlags = (windowObj: any, forSsr: boolean) => {
     if (forSsr) {
         return { showEditButton: false };
-    } else {
-        return (windowObj as any).__TOGGLES__;
     }
+    return (windowObj as any).__TOGGLES__;
 };
 
 export const buildRoutes = (windowObj: any, forSsr: boolean) => (

@@ -13,12 +13,15 @@ import { buildRoutesForClient } from "../common/routeBuilder";
 const history = createClientHistory();
 storeHistoryInstance(history);
 
+const preloadedState = window.__PRELOADED_STATE__;
+const preloadedAppState = preloadedState?.app;
+
 // Create/use the store
 // history MUST be passed here if you want syncing between server on initial route
 const store =
     window.store ||
     configureStore({
-        initialState: window.__PRELOADED_STATE__,
+        initialState: { ...window.__PRELOADED_STATE__, app: { ...preloadedAppState, executingOnClient: true } },
         history,
         middleware: []
     });
