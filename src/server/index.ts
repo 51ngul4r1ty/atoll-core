@@ -1,7 +1,9 @@
 // externals
 import * as express from "express";
-// import expressWs from "express-ws";
-import * as websocket from "websocket";
+import expressWs from "express-ws";
+import * as Ws from "ws";
+import * as TextEncodingPolyfill from "text-encoding-polyfill";
+// import * as uuidv1 from "uuid/v1";
 
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -24,6 +26,14 @@ import { router } from "./api/routes";
 
 // data access
 import { init } from "./dataaccess";
+// import { Socket } from "dgram";
+
+Object.assign(global, {
+    WebSocket: Ws,
+    // Not needed in node 11
+    TextEncoder: TextEncodingPolyfill.TextEncoder,
+    TextDecoder: TextEncodingPolyfill.TextDecoder
+});
 
 init();
 
@@ -31,7 +41,21 @@ require("dotenv").config();
 
 const app = express.default();
 
-// const ws = expressWs(app);
+const ws = expressWs(app);
+
+ws.app.ws("/ws", function(ws2, req) {
+    ws2.on("message", function(msg) {
+        console.log("message received from client");
+        console.log(msg);
+        const wss = ws.getWss();
+        wss.clients.forEach((client) => {
+            if (client != ws2 && client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify({ message: "some data for everyone else!" }));
+            }
+        });
+    });
+    console.log("client connected");
+});
 
 // Use Nginx or Apache to serve static assets in production or remove the if() around the following
 // lines to use the express.static middleware to serve assets for production (not recommended!)
@@ -87,63 +111,6 @@ app.use(errorHandler);
 
 app.listen(process.env.PORT || 8500, () => {
     console.log(`[${new Date().toISOString()}]`, chalk.blue(`App is running: http://localhost:${process.env.PORT || 8500}`));
-});
-
-// ws.app.ws("/echo", function(ws, req) {
-//     ws.on("request", function(msg) {
-//         console.log("GOT A REQUEST: " + msg);
-//     });
-//     ws.on("message", function(msg) {
-//         console.log("GOT HERE: " + msg);
-//         ws.send(msg);
-//     });
-// });
-
-const webSocketsServerPort = 8515;
-const webSocketServer = require("websocket").server;
-const http = require("http");
-// Spinning the http server and the websocket server.
-const server = http.createServer();
-server.listen(webSocketsServerPort);
-const wsServer = new webSocketServer({
-    httpServer: server
-});
-
-const connections = [];
-
-wsServer.on("request", function(request) {
-    // var userID = getUniqueID();
-    console.log(new Date() + " Recieved a new connection from origin " + request.origin + ".");
-    // You can rewrite this part of the code to accept only the requests from allowed origin
-    const connection = request.accept(null, request.origin);
-    connections.push(connection);
-    // clients[userID] = connection;
-    // console.log("connected: " + userID + " in " + Object.getOwnPropertyNames(clients));
-});
-
-// setTimeout(() => {
-//     connections.forEach((connection) => {
-//         connection.send(JSON.stringify({ message: "some data for you!" }));
-//     });
-// }, 5000);
-
-const timeoutFunction = () => {
-    connections.forEach((connection) => {
-        connection.send(JSON.stringify({ message: "some data for you!" }));
-    });
-};
-
-const resetTimeout = () => {
-    setTimeout(() => {
-        timeoutFunction();
-        resetTimeout();
-    }, 5000);
-};
-
-resetTimeout();
-
-wsServer.on("message", function() {
-    console.log("got message");
 });
 
 export default app;

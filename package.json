@@ -83,6 +83,7 @@
     "redux-thunk": "2.3.0",
     "reselect": "4.0.0",
     "sequelize": "5.21.5",
+    "text-encoding-polyfill": "0.6.7",
     "uuid": "7.0.2",
     "websocket": "1.0.31",
     "ws": "7.2.3"
