@@ -55,6 +55,8 @@
     "@atoll/shared": "file:.yalc/@atoll/shared",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
+    "@types/express-ws": "3.0.0",
+    "@types/ws": "7.2.2",
     "axios": "0.19.2",
     "body-parser": "1.19.0",
     "chalk": "3.0.0",
@@ -63,6 +65,7 @@
     "dotenv": "8.2.0",
     "express": "4.17.1",
     "express-manifest-helpers": "0.6.0",
+    "express-ws": "4.0.0",
     "history": "4.9.0",
     "http-status-codes": "1.4.0",
     "i18next": "19.0.0",
@@ -80,7 +83,9 @@
     "redux-thunk": "2.3.0",
     "reselect": "4.0.0",
     "sequelize": "5.21.5",
-    "uuid": "7.0.2"
+    "uuid": "7.0.2",
+    "websocket": "1.0.31",
+    "ws": "7.2.3"
   },
   "devDependencies": {
     "@babel/cli": "7.8.4",
@@ -113,6 +118,7 @@
     "@types/sequelize": "4.28.8",
     "@types/uuid": "7.0.0",
     "@types/webpack-env": "1.15.1",
+    "@types/websocket": "1.0.0",
     "autoprefixer": "9.7.4",
     "awesome-typescript-loader": "5.2.1",
     "babel-loader": "8.0.6",

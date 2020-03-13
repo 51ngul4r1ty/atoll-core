@@ -1,5 +1,8 @@
 // externals
 import * as express from "express";
+// import expressWs from "express-ws";
+import * as websocket from "websocket";
+
 import bodyParser from "body-parser";
 import cors from "cors";
 import chalk from "chalk";
@@ -27,6 +30,8 @@ init();
 require("dotenv").config();
 
 const app = express.default();
+
+// const ws = expressWs(app);
 
 // Use Nginx or Apache to serve static assets in production or remove the if() around the following
 // lines to use the express.static middleware to serve assets for production (not recommended!)
@@ -82,6 +87,63 @@ app.use(errorHandler);
 
 app.listen(process.env.PORT || 8500, () => {
     console.log(`[${new Date().toISOString()}]`, chalk.blue(`App is running: http://localhost:${process.env.PORT || 8500}`));
+});
+
+// ws.app.ws("/echo", function(ws, req) {
+//     ws.on("request", function(msg) {
+//         console.log("GOT A REQUEST: " + msg);
+//     });
+//     ws.on("message", function(msg) {
+//         console.log("GOT HERE: " + msg);
+//         ws.send(msg);
+//     });
+// });
+
+const webSocketsServerPort = 8515;
+const webSocketServer = require("websocket").server;
+const http = require("http");
+// Spinning the http server and the websocket server.
+const server = http.createServer();
+server.listen(webSocketsServerPort);
+const wsServer = new webSocketServer({
+    httpServer: server
+});
+
+const connections = [];
+
+wsServer.on("request", function(request) {
+    // var userID = getUniqueID();
+    console.log(new Date() + " Recieved a new connection from origin " + request.origin + ".");
+    // You can rewrite this part of the code to accept only the requests from allowed origin
+    const connection = request.accept(null, request.origin);
+    connections.push(connection);
+    // clients[userID] = connection;
+    // console.log("connected: " + userID + " in " + Object.getOwnPropertyNames(clients));
+});
+
+// setTimeout(() => {
+//     connections.forEach((connection) => {
+//         connection.send(JSON.stringify({ message: "some data for you!" }));
+//     });
+// }, 5000);
+
+const timeoutFunction = () => {
+    connections.forEach((connection) => {
+        connection.send(JSON.stringify({ message: "some data for you!" }));
+    });
+};
+
+const resetTimeout = () => {
+    setTimeout(() => {
+        timeoutFunction();
+        resetTimeout();
+    }, 5000);
+};
+
+resetTimeout();
+
+wsServer.on("message", function() {
+    console.log("got message");
 });
 
 export default app;
