@@ -1,13 +1,15 @@
 // externals
 import { Request, Response } from "express";
-import { CreateOptions, FindOptions, Order, OrderItem } from "sequelize/types";
 import * as HttpStatus from "http-status-codes";
+import { CreateOptions, FindOptions, Order, Transaction } from "sequelize";
 
 // utils
 import { buildSelfLink } from "../../utils/linkBuilder";
+import { buildErrorForApiResponse } from "../utils/errorProcessor";
 
 // data access
 import { mapToBacklogItem, BacklogItemModel } from "../../dataaccess";
+import { sequelize } from "../../dataaccess/connection";
 
 // interfaces/types
 import { BacklogItem } from "../../dataaccess/types";
@@ -46,22 +48,24 @@ export const backlogItemsGetHandler = function(req: Request, res: Response) {
 
 export const backlogItemsPostHandler = function(req: Request, res: Response) {
     const bodyWithId = addIdToBody(req.body);
-    BacklogItemModel.create(bodyWithId, {} as CreateOptions)
-        .then(() => {
-            res.status(HttpStatus.CREATED).json({
-                status: HttpStatus.CREATED,
-                data: {
-                    item: bodyWithId
-                }
-            });
-        })
-        .catch((error) => {
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-                status: HttpStatus.INTERNAL_SERVER_ERROR,
-                error: {
-                    msg: error
-                }
-            });
-            console.log(`unable to add backlog item: ${error}`);
-        });
+    return sequelize.transaction(
+        { isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE },
+        async (transaction: Transaction) => {
+            try {
+                const addedBacklogItem = await BacklogItemModel.create(bodyWithId, { transaction } as CreateOptions);
+                res.status(HttpStatus.CREATED).json({
+                    status: HttpStatus.CREATED,
+                    data: {
+                        item: addedBacklogItem
+                    }
+                });
+            } catch (error) {
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                    status: HttpStatus.INTERNAL_SERVER_ERROR,
+                    error: buildErrorForApiResponse(error)
+                });
+                console.log(`unable to add backlog item: ${error}`);
+            }
+        }
+    );
 };

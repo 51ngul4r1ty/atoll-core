@@ -53,3 +53,17 @@ $BODY$;
 
 ALTER FUNCTION public.newuuid()
     OWNER TO atoll;
+
+/* STEP 3:
+
+Run the app so that it creates the database tables */
+
+/* STEP 4:
+
+In the "atoll" database modify the created tables with these SQL commands
+
+*/
+
+ALTER TABLE public.backlogitem
+    ADD CONSTRAINT uc_backlogitem_displayindex UNIQUE ("displayIndex");
+	

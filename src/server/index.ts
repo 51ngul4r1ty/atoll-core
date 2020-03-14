@@ -45,12 +45,12 @@ const ws = expressWs(app);
 
 ws.app.ws("/ws", function(ws2, req) {
     ws2.on("message", function(msg) {
-        console.log("message received from client");
+        console.log(`message received from client: ${msg}, ${JSON.stringify(msg)}`);
         console.log(msg);
         const wss = ws.getWss();
         wss.clients.forEach((client) => {
             if (client != ws2 && client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify({ message: "some data for everyone else!" }));
+                client.send(msg); // JSON.stringify({ message: "some data for everyone else!" }));
             }
         });
     });
