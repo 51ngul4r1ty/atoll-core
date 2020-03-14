@@ -46,26 +46,27 @@ export const backlogItemsGetHandler = function(req: Request, res: Response) {
         });
 };
 
-export const backlogItemsPostHandler = function(req: Request, res: Response) {
+export const backlogItemsPostHandler = async (req: Request, res: Response) => {
     const bodyWithId = addIdToBody(req.body);
-    return sequelize.transaction(
-        { isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE },
-        async (transaction: Transaction) => {
-            try {
-                const addedBacklogItem = await BacklogItemModel.create(bodyWithId, { transaction } as CreateOptions);
-                res.status(HttpStatus.CREATED).json({
-                    status: HttpStatus.CREATED,
-                    data: {
-                        item: addedBacklogItem
-                    }
-                });
-            } catch (error) {
-                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-                    status: HttpStatus.INTERNAL_SERVER_ERROR,
-                    error: buildErrorForApiResponse(error)
-                });
-                console.log(`unable to add backlog item: ${error}`);
+    let transaction: Transaction;
+    try {
+        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
+        const addedBacklogItem = await BacklogItemModel.create(bodyWithId, { transaction } as CreateOptions);
+        await transaction.commit();
+        res.status(HttpStatus.CREATED).json({
+            status: HttpStatus.CREATED,
+            data: {
+                item: addedBacklogItem
             }
+        });
+    } catch (err) {
+        if (transaction) {
+            await transaction.rollback();
         }
-    );
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            error: buildErrorForApiResponse(err)
+        });
+        console.log(`unable to add backlog item: ${err}`);
+    }
 };
