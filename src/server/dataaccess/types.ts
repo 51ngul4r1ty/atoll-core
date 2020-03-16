@@ -29,19 +29,20 @@ export interface ItemWithLinks {
 
 export interface StandardItem extends BaseItem, ItemWithId, ItemWithLinks {}
 
-export interface ReorderableItem {
-    displayIndex: number;
-}
+export interface StandardNamedItem extends StandardItem, ItemWithName {}
 
-export interface StandardNamedItem extends StandardItem, ItemWithName, ReorderableItem {}
-
-export interface BacklogItem extends StandardItem, ReorderableItem {
+export interface BacklogItem extends StandardItem {
     externalId: string | null;
     rolePhrase: string | null;
     storyPhrase: string;
     reasonPhrase: string | null;
     estimate: number | null;
     type: BacklogItemType;
+}
+
+export interface BacklogItemRank extends StandardItem {
+    backlogitemId: string | null;
+    nextbacklogitemId: string | null;
 }
 
 /* sprints */

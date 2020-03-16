@@ -29,8 +29,7 @@ BacklogItemModel.init(
             type: DataTypes.INTEGER,
             allowNull: true
         },
-        type: DataTypes.STRING(50),
-        displayIndex: DataTypes.DECIMAL(18, 8)
+        type: DataTypes.STRING(50)
     },
     {
         modelName: "backlogitem",
@@ -41,25 +40,3 @@ BacklogItemModel.init(
         sequelize
     }
 );
-
-export class BacklogItemTag extends Model {}
-
-BacklogItemTag.init(
-    {
-        id: {
-            type: DataTypes.STRING(32),
-            primaryKey: true
-        },
-        label: DataTypes.STRING(50)
-    },
-    {
-        modelName: "backlogitemtag",
-        freezeTableName: true,
-        paranoid: false,
-        timestamps: false,
-        version: false,
-        sequelize
-    }
-);
-
-BacklogItemTag.belongsTo(BacklogItemModel);
