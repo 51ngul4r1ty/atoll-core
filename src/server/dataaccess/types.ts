@@ -40,6 +40,8 @@ export interface BacklogItem extends StandardItem {
     type: BacklogItemType;
 }
 
+// TODO: Need to figure out good place for this type - it maps to the database structure, but is it really just an exact copy or
+//       could it potentially deviate from it?
 export interface BacklogItemRank extends StandardItem {
     backlogitemId: string | null;
     nextbacklogitemId: string | null;

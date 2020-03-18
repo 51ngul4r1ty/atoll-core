@@ -50,7 +50,7 @@ ws.app.ws("/ws", function(ws2, req) {
         const wss = ws.getWss();
         wss.clients.forEach((client) => {
             if (client != ws2 && client.readyState === WebSocket.OPEN) {
-                client.send(msg); // JSON.stringify({ message: "some data for everyone else!" }));
+                client.send(msg);
             }
         });
     });

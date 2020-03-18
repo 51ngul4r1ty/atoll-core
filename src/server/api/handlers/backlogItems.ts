@@ -12,68 +12,11 @@ import { mapToBacklogItem, mapToBacklogItemRank, BacklogItemModel, BacklogItemRa
 import { sequelize } from "../../dataaccess/connection";
 
 // interfaces/types
-import { BacklogItem } from "../../dataaccess/types";
+import { BacklogItem, BacklogItemRank } from "../../dataaccess/types";
 import { addIdToBody } from "../utils/uuidHelper";
 
-class LinkedListItem<T> {
-    id: string;
-    next: LinkedListItem<T> | null;
-    data: T;
-}
-
-interface ItemHashMap<T> {
-    [id: string]: LinkedListItem<T>;
-}
-
-class LinkedList<T> {
-    constructor() {
-        this.firstItem = null;
-        this.itemHashMap = {};
-    }
-    private firstItem: LinkedListItem<T>;
-    private itemHashMap: ItemHashMap<T>;
-    private addMissingItem(id: string) {
-        const newItem = new LinkedListItem<T>();
-        newItem.id = id;
-        console.log(`adding item to hash map: ${id}`);
-        this.itemHashMap[id] = newItem;
-        return newItem;
-    }
-    addLink(prevId: string, nextId: string) {
-        let next = this.itemHashMap[nextId] || null;
-        let prev = this.itemHashMap[prevId] || null;
-        if (!next && nextId !== null) {
-            next = this.addMissingItem(nextId);
-        }
-        if (!prev && prevId !== null) {
-            prev = this.addMissingItem(prevId);
-        }
-        if (prev) {
-            console.log(`linking prev item's next to current: ${prevId}.next = ${nextId}`);
-            prev.next = next;
-        }
-        if (!prevId) {
-            this.firstItem = next;
-        }
-    }
-    addItemData(id: string, data: T) {
-        const item = this.itemHashMap[id];
-        if (!item) {
-            console.log(`unable to find item with ID: ${id}`);
-        } else {
-            item.data = data;
-        }
-    }
-    toArray(): T[] {
-        const items = [];
-        let item = this.firstItem;
-        while (item) {
-            items.push(item.data);
-            item = item.next;
-        }
-        return items;
-    }
-}
+// utils
+import { LinkedList } from "../utils/linkedList";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     try {
@@ -117,6 +60,7 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
     delete bodyWithId.prevBacklogItemId;
     let transaction: Transaction;
     try {
+        let rolledBack = false;
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_backlogitemId_fkey" DEFERRED;', { transaction });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
@@ -133,14 +77,58 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
             await BacklogItemRankModel.create({ ...addIdToBody({ backlogitemId: null, nextbacklogitemId: bodyWithId.id }) }, {
                 transaction
             } as CreateOptions);
-        }
-        await transaction.commit();
-        res.status(HttpStatus.CREATED).json({
-            status: HttpStatus.CREATED,
-            data: {
-                item: addedBacklogItem
+        } else {
+            // 1. if there is a single item in database then we'll have this entry:
+            //   backlogitemId=null, nextbacklogitemId=item1
+            //   backlogitemId=item1, nextbacklogitemId=null
+            // in this example, prevBacklogItemId will be item1, so we must end up with:
+            //   backlogitemId=null, nextbacklogitemId=item1     (NO CHANGE)
+            //   backlogitemId=item1, nextbacklogitemId=NEWITEM  (UPDATE "item1" entry to have new "next")
+            //   backlogitemId=NEWITEM, nextbacklogitemId=null   (ADD "NEWITEM" entry with old "new")
+            // this means:
+            // (1) get entry (as prevBacklogItem) with backlogItemId = prevBacklogItemId
+            const prevBacklogItems = await BacklogItemRankModel.findAll({
+                where: { backlogitemId: prevBacklogItemId },
+                transaction
+            });
+            if (!prevBacklogItems.length) {
+                res.status(HttpStatus.BAD_REQUEST).json({
+                    status: HttpStatus.BAD_REQUEST,
+                    error: buildErrorForApiResponse(
+                        `Invalid previous backlog item - can't find entries with ID ${prevBacklogItemId} in database`
+                    )
+                });
+                await transaction.rollback();
+                rolledBack = true;
+            } else {
+                const prevBacklogItem = prevBacklogItems[0];
+                // (2) oldNextItemId = prevBacklogItem.nextbacklogitemId
+                const oldNextItemId = ((prevBacklogItem as unknown) as BacklogItemRank).nextbacklogitemId;
+                // (3) update existing entry with nextbacklogitemId = bodyWithId.id
+                await prevBacklogItem.update({ nextbacklogitemId: bodyWithId.id }, { transaction });
+                // (4) add new row with backlogitemId = bodyWithId.id, nextbacklogitemId = oldNextItemId
+                await BacklogItemRankModel.create(
+                    { ...addIdToBody({ backlogitemId: bodyWithId.id, nextbacklogitemId: oldNextItemId }) },
+                    {
+                        transaction
+                    } as CreateOptions
+                );
             }
-        });
+            // TODO: Write unit tests to try and mimick this and test that the logic handles it as well:
+            // 2. if there are multiple items in database then we'll have these entries:
+            // backlogitemId=null, nextbacklogitemId=item1
+            // backlogitemId=item1, nextbacklogitemId=item2
+            // backlogitemId=item2, nextbacklogitemId=null
+        }
+        if (!rolledBack) {
+            await transaction.commit();
+            res.status(HttpStatus.CREATED).json({
+                status: HttpStatus.CREATED,
+                data: {
+                    item: addedBacklogItem
+                }
+            });
+        }
     } catch (err) {
         if (transaction) {
             await transaction.rollback();
@@ -149,6 +137,5 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
             error: buildErrorForApiResponse(err)
         });
-        console.log(`unable to add backlog item: ${err}`);
     }
 };
