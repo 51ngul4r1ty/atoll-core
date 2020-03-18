@@ -121,7 +121,6 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_backlogitemId_fkey" DEFERRED;', { transaction });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
         const addedBacklogItem = await BacklogItemModel.create(bodyWithId, { transaction } as CreateOptions);
-        console.log(`KEVIN - inserted ${bodyWithId.id}`);
         if (!prevBacklogItemId) {
             // inserting first item means one of 2 scenarios:
             //   1) no items in database yet (add prev = null, next = this new item)
@@ -129,10 +128,8 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
             const firstItems = await BacklogItemRankModel.findAll({ where: { backlogitemId: null }, transaction });
             if (firstItems.length) {
                 const firstItem = firstItems[0];
-                console.log(`KEVIN - updating with backlogitemId pointing to ${bodyWithId.id} instead of null`);
                 await firstItem.update({ backlogitemId: bodyWithId.id }, { transaction });
             }
-            console.log(`KEVIN - inserting with backlogitemId null, next ${bodyWithId.id}`);
             await BacklogItemRankModel.create({ ...addIdToBody({ backlogitemId: null, nextbacklogitemId: bodyWithId.id }) }, {
                 transaction
             } as CreateOptions);
