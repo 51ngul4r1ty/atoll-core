@@ -113,10 +113,30 @@ export const backlogItemsGetHandler = async (req: Request, res: Response) => {
 
 export const backlogItemsPostHandler = async (req: Request, res: Response) => {
     const bodyWithId = { ...addIdToBody(req.body) };
+    const prevBacklogItemId = bodyWithId.prevBacklogItemId;
+    delete bodyWithId.prevBacklogItemId;
     let transaction: Transaction;
     try {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
+        await sequelize.query('SET CONSTRAINTS "backlogitemrank_backlogitemId_fkey" DEFERRED;', { transaction });
+        await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
         const addedBacklogItem = await BacklogItemModel.create(bodyWithId, { transaction } as CreateOptions);
+        console.log(`KEVIN - inserted ${bodyWithId.id}`);
+        if (!prevBacklogItemId) {
+            // inserting first item means one of 2 scenarios:
+            //   1) no items in database yet (add prev = null, next = this new item)
+            //   2) insert before first item (update item's prev to this item, add prev = null, next = this new item)
+            const firstItems = await BacklogItemRankModel.findAll({ where: { backlogitemId: null }, transaction });
+            if (firstItems.length) {
+                const firstItem = firstItems[0];
+                console.log(`KEVIN - updating with backlogitemId pointing to ${bodyWithId.id} instead of null`);
+                await firstItem.update({ backlogitemId: bodyWithId.id }, { transaction });
+            }
+            console.log(`KEVIN - inserting with backlogitemId null, next ${bodyWithId.id}`);
+            await BacklogItemRankModel.create({ ...addIdToBody({ backlogitemId: null, nextbacklogitemId: bodyWithId.id }) }, {
+                transaction
+            } as CreateOptions);
+        }
         await transaction.commit();
         res.status(HttpStatus.CREATED).json({
             status: HttpStatus.CREATED,

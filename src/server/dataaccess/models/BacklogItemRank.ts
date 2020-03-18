@@ -1,5 +1,5 @@
 // externals
-import { Model, DataTypes } from "sequelize";
+import { Model, DataTypes, Deferrable } from "sequelize";
 
 // data access
 import { sequelize } from "../connection";
@@ -12,6 +12,26 @@ BacklogItemRankModel.init(
         id: {
             type: DataTypes.STRING(32),
             primaryKey: true
+        },
+        backlogitemId: {
+            type: DataTypes.STRING(32),
+            primaryKey: false,
+            references: {
+                model: "backlogitem",
+                key: "id",
+                // TODO: Find out why it was defined this way:
+                deferrable: Deferrable.INITIALLY_DEFERRED as any
+            }
+        },
+        nextbacklogitemId: {
+            type: DataTypes.STRING(32),
+            primaryKey: false,
+            references: {
+                model: "backlogitem",
+                key: "id",
+                // TODO: Find out why it was defined this way:
+                deferrable: Deferrable.INITIALLY_DEFERRED as any
+            }
         }
     },
     {
