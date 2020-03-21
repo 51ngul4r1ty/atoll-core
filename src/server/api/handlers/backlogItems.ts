@@ -4,6 +4,7 @@ import * as HttpStatus from "http-status-codes";
 import { CreateOptions, Transaction } from "sequelize";
 
 // utils
+import { LinkedList } from "@atoll/shared";
 import { buildSelfLink } from "../../utils/linkBuilder";
 import { buildErrorForApiResponse } from "../utils/errorProcessor";
 
@@ -14,9 +15,6 @@ import { sequelize } from "../../dataaccess/connection";
 // interfaces/types
 import { BacklogItem, BacklogItemRank } from "../../dataaccess/types";
 import { addIdToBody } from "../utils/uuidHelper";
-
-// utils
-import { LinkedList } from "../utils/linkedList";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     try {
