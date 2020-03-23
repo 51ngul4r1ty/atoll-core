@@ -1,5 +1,10 @@
 // externals
 import * as express from "express";
+import expressWs from "express-ws";
+import * as Ws from "ws";
+import * as TextEncodingPolyfill from "text-encoding-polyfill";
+// import * as uuidv1 from "uuid/v1";
+
 import bodyParser from "body-parser";
 import cors from "cors";
 import chalk from "chalk";
@@ -21,12 +26,36 @@ import { router } from "./api/routes";
 
 // data access
 import { init } from "./dataaccess";
+// import { Socket } from "dgram";
+
+Object.assign(global, {
+    WebSocket: Ws,
+    // Not needed in node 11
+    TextEncoder: TextEncodingPolyfill.TextEncoder,
+    TextDecoder: TextEncodingPolyfill.TextDecoder
+});
 
 init();
 
 require("dotenv").config();
 
 const app = express.default();
+
+const ws = expressWs(app);
+
+ws.app.ws("/ws", function(ws2, req) {
+    ws2.on("message", function(msg) {
+        console.log(`message received from client: ${msg}, ${JSON.stringify(msg)}`);
+        console.log(msg);
+        const wss = ws.getWss();
+        wss.clients.forEach((client) => {
+            if (client != ws2 && client.readyState === WebSocket.OPEN) {
+                client.send(msg);
+            }
+        });
+    });
+    console.log("client connected");
+});
 
 // Use Nginx or Apache to serve static assets in production or remove the if() around the following
 // lines to use the express.static middleware to serve assets for production (not recommended!)

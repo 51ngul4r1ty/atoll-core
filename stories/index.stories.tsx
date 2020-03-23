@@ -21,8 +21,7 @@ import {
     TabStrip,
     BacklogItemCard,
     BacklogItemTypeEnum,
-    EditMode,
-    BacklogItemDetailForm
+    EditMode
 } from "@atoll/shared";
 
 addDecorator(withRootAttribute);

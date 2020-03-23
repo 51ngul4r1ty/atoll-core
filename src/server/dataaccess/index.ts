@@ -1,4 +1,6 @@
 export * from "./models/BacklogItem";
+export * from "./models/BacklogItemTag";
+export * from "./models/BacklogItemRank";
 export * from "./models/Sprint";
 export * from "./mappers";
 

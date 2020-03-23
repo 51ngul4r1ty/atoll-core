@@ -2,9 +2,6 @@
 import React from "react";
 import Helmet from "react-helmet";
 
-// interfaces/types
-import { FeatureTogglesState } from "@atoll/shared";
-
 type Props = {
     children: any;
     css: string[];

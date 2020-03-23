@@ -2,7 +2,7 @@
 
 export const FEATURE_TOGGLE_LIST = {
     showEditButton: {
-        enabled: false,
+        enabled: true,
         createdDateTime: new Date("2020-02-23T15:55:15.335Z"),
         modifiedDateTime: new Date("2020-02-23T15:55:15.335Z")
     },
