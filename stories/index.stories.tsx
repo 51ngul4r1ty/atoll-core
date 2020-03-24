@@ -14,6 +14,7 @@ import {
     EditButton,
     AddIcon,
     EditIcon,
+    RefreshIcon,
     SimpleButton,
     SimpleText,
     HomeButton,
@@ -83,6 +84,14 @@ storiesOf("Atoms|Buttons/SimpleButton", module)
     .add("SimpleButton (Edit)", () => (
         <SimpleButton iconOnLeft icon={<EditIcon />} onClick={action("clicked edit")}>
             {text("(children)", "Edit")}
+        </SimpleButton>
+    ))
+    .add("SimpleButton (Refresh w/o caption)", () => (
+        <SimpleButton iconOnLeft icon={<RefreshIcon />} onClick={action("clicked menu")} />
+    ))
+    .add("SimpleButton (Refresh)", () => (
+        <SimpleButton iconOnLeft icon={<RefreshIcon />} onClick={action("clicked Refresh")}>
+            {text("(children)", "Refresh")}
         </SimpleButton>
     ))
     .add("SimpleButton (Add)", () => (

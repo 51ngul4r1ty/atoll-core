@@ -6,7 +6,18 @@ import React from "react";
 import { storiesOf } from "@storybook/react";
 
 // components
-import { AddIcon, AppIcon, CancelIcon, DragIcon, DoneIcon, EditIcon, HamburgerIcon, IssueIcon, StoryIcon } from "@atoll/shared";
+import {
+    AddIcon,
+    AppIcon,
+    CancelIcon,
+    DragIcon,
+    DoneIcon,
+    EditIcon,
+    RefreshIcon,
+    HamburgerIcon,
+    IssueIcon,
+    StoryIcon
+} from "@atoll/shared";
 import { SingleIconContainer, SideBySideIconContainers } from "../../common";
 
 // common
@@ -25,6 +36,7 @@ const icons = {
     CancelIcon,
     DoneIcon,
     EditIcon,
+    RefreshIcon,
     HamburgerIcon
 };
 
@@ -35,6 +47,7 @@ const iconNames = [
     "DragIcon",
     "DoneIcon",
     "EditIcon",
+    "RefreshIcon",
     "HamburgerIcon",
     "IssueIcon",
     "StoryIcon"
