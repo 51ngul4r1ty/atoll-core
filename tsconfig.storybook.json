@@ -14,6 +14,7 @@
         "allowJs": false,
         "jsx": "react",
         "moduleResolution": "node",
+        "skipLibCheck": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "rootDirs": [
@@ -21,6 +22,7 @@
             "stories"
         ],
         "baseUrl": "src",
+        "strict": false,
         "forceConsistentCasingInFileNames": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
@@ -30,7 +32,14 @@
         "noUnusedLocals": true,
         "declaration": false,
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
+        "emitDecoratorMetadata": true,
+        "paths": {
+            "*": [
+                "client/*",
+                "server/*",
+                "*"
+            ]
+        }
     },
     "include": [
         "src/**/*"
