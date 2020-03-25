@@ -30,7 +30,7 @@ const getDefaultFlags = (windowObj: any, forSsr: boolean) => {
 export const buildRoutes = (windowObj: any, forSsr: boolean) => (
     <IntlProvider>
         <ConfigureFlopFlip
-            adapter={adapter}
+            adapter={adapter as any}
             adapterArgs={{ clientSideId: null, user: null }}
             defaultFlags={getDefaultFlags(windowObj, forSsr)}
         >
