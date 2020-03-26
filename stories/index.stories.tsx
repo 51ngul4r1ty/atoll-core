@@ -12,7 +12,8 @@ import { withRootAttribute } from "storybook-addon-root-attribute";
 import {
     AddButton,
     EditButton,
-    AddIcon,
+    RefreshButton,
+    AddIcons,
     EditIcon,
     RefreshIcon,
     SimpleButton,
@@ -199,6 +200,16 @@ storiesOf("Molecules|Buttons/EditButton", module)
             />
         </div>
     ));
+
+storiesOf("Molecules|Buttons/RefreshButton", module).add("RefreshButton", () => (
+    <div>
+        <RefreshButton
+            onClick={() => {
+                alert("clicked");
+            }}
+        />
+    </div>
+));
 
 storiesOf("Molecules|Buttons/AddButton", module)
     .add("AddButton (story)", () => (
