@@ -1,12 +1,26 @@
 // externals
 import React from "react";
+import { Provider } from "react-redux";
+
+// mock data
+import configureStore from "redux-mock-store";
 
 // storybook
 import { storiesOf } from "@storybook/react";
 import { number, text, select, boolean } from "@storybook/addon-knobs";
 
 // components
-import { BacklogItemDetailForm } from "@atoll/shared";
+import {
+    BacklogItemDetailForm,
+    BacklogItemPlanningPanel,
+    BacklogItemWithSource,
+    BacklogItemType,
+    BacklogItemSource,
+    EditMode
+} from "@atoll/shared";
+
+const mockStore = configureStore();
+const store = mockStore({});
 
 const bugStoryPhrase = "Filter seems to be taking longer & longer (investigate)";
 
@@ -39,3 +53,68 @@ storiesOf("Organisms|Forms/BacklogItemDetailForm", module)
             />
         </div>
     ));
+
+const allItems: BacklogItemWithSource[] = [
+    {
+        creationDateTime: undefined,
+        estimate: null,
+        externalId: "id-1",
+        id: "db-id-1",
+        reasonPhrase: null,
+        rolePhrase: "As a developer",
+        storyPhrase: "I can retrieve all backlog items",
+        type: "story",
+        saved: true,
+        source: BacklogItemSource.Loaded
+    },
+    {
+        creationDateTime: undefined,
+        estimate: null,
+        externalId: "id-2",
+        id: "db-id-2",
+        reasonPhrase: null,
+        rolePhrase: "As a developer",
+        storyPhrase: "I can add a new backlog item",
+        type: "story",
+        saved: true,
+        source: BacklogItemSource.Loaded
+    },
+    {
+        creationDateTime: undefined,
+        estimate: null,
+        externalId: "id-3",
+        id: "db-id-3",
+        reasonPhrase: null,
+        rolePhrase: "As a developer",
+        storyPhrase: "I can delete a backlog item",
+        type: "story",
+        saved: true,
+        source: BacklogItemSource.Loaded
+    },
+    {
+        creationDateTime: undefined,
+        estimate: null,
+        externalId: "id-4",
+        id: "db-id-4",
+        reasonPhrase: null,
+        rolePhrase: "As a developer",
+        storyPhrase: "I can filter the list of backlog items",
+        type: "story",
+        saved: true,
+        source: BacklogItemSource.Loaded
+    }
+];
+
+storiesOf("Organisms|Panels/BacklogItemPlanningPanel", module).add("BacklogItemPlanningPanel", () => (
+    <div>
+        <Provider store={store}>
+            <BacklogItemPlanningPanel
+                allItems={allItems}
+                editMode={EditMode.Edit}
+                onAddNewBacklogItem={() => {
+                    alert("add new backlog item");
+                }}
+            />
+        </Provider>
+    </div>
+));
