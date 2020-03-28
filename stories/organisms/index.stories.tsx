@@ -70,6 +70,18 @@ const allItems: BacklogItemWithSource[] = [
     {
         creationDateTime: undefined,
         estimate: null,
+        externalId: "p-x",
+        id: "db-pushed-id-x",
+        reasonPhrase: null,
+        rolePhrase: null,
+        storyPhrase: "Pushed item",
+        type: "story",
+        saved: true,
+        source: BacklogItemSource.Pushed
+    },
+    {
+        creationDateTime: undefined,
+        estimate: null,
         externalId: "id-2",
         id: "db-id-2",
         reasonPhrase: null,
@@ -111,6 +123,11 @@ storiesOf("Organisms|Panels/BacklogItemPlanningPanel", module).add("BacklogItemP
             <BacklogItemPlanningPanel
                 allItems={allItems}
                 editMode={EditMode.Edit}
+                // dragItem={{
+                //     dragItemId: "db-id-3",
+                //     dragOverItemId: "db-id-2",
+                //     top: "100px"
+                // }}
                 onAddNewBacklogItem={() => {
                     alert("add new backlog item");
                 }}
