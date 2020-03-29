@@ -117,6 +117,21 @@ const allItems: BacklogItemWithSource[] = [
     }
 ];
 
+for (let i = 5; i <= 50; i++) {
+    allItems.push({
+        creationDateTime: undefined,
+        estimate: null,
+        externalId: `id-${i}`,
+        id: `db-id-${i}`,
+        reasonPhrase: null,
+        rolePhrase: "As a developer",
+        storyPhrase: `I can filter the list of backlog items (${i})`,
+        type: "story",
+        saved: true,
+        source: BacklogItemSource.Loaded
+    });
+}
+
 storiesOf("Organisms|Panels/BacklogItemPlanningPanel", module).add("BacklogItemPlanningPanel", () => (
     <div>
         <Provider store={store}>
