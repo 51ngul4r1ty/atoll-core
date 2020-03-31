@@ -2,7 +2,7 @@
 import * as express from "express";
 
 // handlers
-import { backlogItemsGetHandler, backlogItemsPostHandler } from "./handlers/backlogItems";
+import { backlogItemsGetHandler, backlogItemsPostHandler, backlogItemsReorderPostHandler } from "./handlers/backlogItems";
 import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
 import { sprintsHandler } from "./handlers/sprint";
@@ -20,3 +20,5 @@ router.get("/sprints", sprintsHandler);
 
 router.get("/backlog-items", backlogItemsGetHandler);
 router.post("/backlog-items", backlogItemsPostHandler);
+
+router.post("/actions/reorder-backlog-items", backlogItemsReorderPostHandler);

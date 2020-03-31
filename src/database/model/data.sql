@@ -14,7 +14,7 @@ insert into backlogitem (id, "externalId", "rolePhrase", "storyPhrase", "reasonP
 insert into backlogitem (id, "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "createdAt", "updatedAt", "version")
 	values ('d434aab2e71e4c8bbd24dae22941d06f', '527', 'as a developer', 'use the v3 api to sign up a user', null, 5, 'story', now(), now(), 1);
 insert into backlogitem ("id", "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "createdAt", "updatedAt", "version")
-	values ('920581ae222e4fa2ab24117664cda3fb', 'B1000032', null, 'Filter seems to be taking longer & longer (investigate)', null, null, 'issue', now(), now(), 1)
+	values ('920581ae222e4fa2ab24117664cda3fb', 'B1000032', null, 'Filter seems to be taking longer & longer (investigate)', null, null, 'issue', now(), now(), 1);
 
 /* 3. backlog item rank */
 insert into backlogitemrank

@@ -137,3 +137,80 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         });
     }
 };
+
+export const backlogItemsReorderPostHandler = async (req: Request, res: Response) => {
+    const sourceItemId = req.body.sourceItemId;
+    const targetItemId = req.body.targetItemId;
+    const relativePosition = req.body.relativePosition; // before|after
+    // validation:
+    //   1. check that source item exists in database (backlogitemrank)
+    //   2. check that target item exists in database (backlogitemrank)
+    if (relativePosition === "before") {
+        let transaction: Transaction;
+        try {
+            let rolledBack = false;
+            transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
+            // moving item down:
+            //           (531)    [530]   (529)  (528)  [527]    (B..032)
+            //           (null --> 531) (531 --> 530) (530 --> B..032) (B..032 --> null)
+            //           (531)    (530)                          (B..032)
+            //    null --> A --> source --> B --> C --> target --> D --> null
+            //            |____________| (1)                                   sourceItemPrevLink   AFTER: A --> B
+            //                  |____________| (2)                             sourceItemNextLink   AFTER: source --> target
+            //                                   |____________| (3)            targetItemPrevLink   AFTER: C --> source
+            //                                         |____________| (4)      targetItemNextLink
+            // (1) = sourceItemPrevLink
+            // (2) = sourceItemNextLink
+            // (3) = targetItemPrevLink
+            // (4) = targetItemNextLink
+            //
+            //             A --> B --> C --> source --> target --> D --> null
+            //
+
+            // 1. Unlink source item from old location
+            const sourceItemPrevLink = await BacklogItemRankModel.findOne({
+                where: { nextbacklogitemId: sourceItemId }
+            });
+            const sourceItemNextLink = await BacklogItemRankModel.findOne({
+                where: { backlogitemId: sourceItemId }
+            });
+            const oldNextItemId = (sourceItemNextLink as any).dataValues.nextbacklogitemId;
+            await sourceItemPrevLink.update({ nextbacklogitemId: oldNextItemId }, { transaction });
+
+            // 2. Re-link source item in new location
+            const targetItemPrevLink = await BacklogItemRankModel.findOne({
+                where: { nextbacklogitemId: targetItemId }
+            });
+            await targetItemPrevLink.update({ nextbacklogitemId: sourceItemId }, { transaction });
+            await sourceItemNextLink.update({ nextbacklogitemId: targetItemId }, { transaction });
+
+            // After updates:  A --> B, C --> source, source --> target, target --> D
+
+            // TODO: this will have to handle beginning and end of lists
+            if (!rolledBack) {
+                await transaction.commit();
+                res.status(HttpStatus.OK).json({
+                    status: HttpStatus.OK
+                });
+            }
+        } catch (err) {
+            if (transaction) {
+                await transaction.rollback();
+            }
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                error: buildErrorForApiResponse(err)
+            });
+        }
+    } else if (relativePosition === "after") {
+        res.status(HttpStatus.NOT_IMPLEMENTED).json({
+            status: HttpStatus.NOT_IMPLEMENTED,
+            error: buildErrorForApiResponse("will be added soon")
+        });
+    } else {
+        res.status(HttpStatus.NOT_IMPLEMENTED).json({
+            status: HttpStatus.NOT_IMPLEMENTED,
+            error: buildErrorForApiResponse("only supports relativePosition values of 'before' or 'after'")
+        });
+    }
+};
