@@ -138,129 +138,51 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
     }
 };
 
-export const handleItemsReorderAfter = async (sourceItemId: string, targetItemId: string, res: Response) => {
-    let transaction: Transaction;
-    try {
-        let rolledBack = false;
-        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        // moving item up:
-        //                    531          [530]          529           528          [527]           B..032
-        //       (null --> 531) (531 --> 530) (530 --> 529) (529 --> 528) (528 --> 527) (527 --> B..032) (B..032 --> null)
-
-        //            531     [530]    529    ...     528      527    B..032
-        //    null --> A --> target --> B --> ... ---> C --> source --> D --> null
-        //            |____________| (1)                                   targetItemPrevLink   AFTER: (todo)
-        //                  |____________| (2)                             targetItemNextLink   AFTER: (530 --> 527)
-        //                                   |____________| (3)            sourceItemPrevLink   AFTER: (528 --> B..032)
-        //                                         |____________| (4)      sourceItemNextLink
-        //
-
-        // 1. Unlink source item from old location
-        const sourceItemPrevLink = await BacklogItemRankModel.findOne({
-            where: { nextbacklogitemId: sourceItemId }
-        });
-        const sourceItemNextLink = await BacklogItemRankModel.findOne({
-            where: { backlogitemId: sourceItemId }
-        });
-        const oldNextItemId = (sourceItemNextLink as any).dataValues.nextbacklogitemId;
-        await sourceItemPrevLink.update({ nextbacklogitemId: oldNextItemId }, { transaction });
-
-        // 2. Re-link source item in new location
-        const targetItemPrevLink = await BacklogItemRankModel.findOne({
-            where: { nextbacklogitemId: targetItemId }
-        });
-        await targetItemPrevLink.update({ nextbacklogitemId: sourceItemId }, { transaction });
-        await sourceItemNextLink.update({ nextbacklogitemId: targetItemId }, { transaction });
-
-        // After updates:  A --> target --> source --> B --> C --> D --> null
-
-        if (!rolledBack) {
-            await transaction.commit();
-            res.status(HttpStatus.OK).json({
-                status: HttpStatus.OK
-            });
-        }
-    } catch (err) {
-        if (transaction) {
-            await transaction.rollback();
-        }
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: buildErrorForApiResponse(err)
-        });
-    }
-};
-
-export const handleItemsReorderBefore = async (sourceItemId: string, targetItemId: string, res: Response) => {
-    let transaction: Transaction;
-    try {
-        let rolledBack = false;
-        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        // moving item down:
-        //           (531)    [530]   (529)  (528)  [527]    (B..032)
-        //           (null --> 531) (531 --> 530) (530 --> B..032) (B..032 --> null)
-        //           (531)    (530)                          (B..032)
-        //    null --> A --> source --> B --> C --> target --> D --> null
-        //            |____________| (1)                                   sourceItemPrevLink   AFTER: A --> B
-        //                  |____________| (2)                             sourceItemNextLink   AFTER: source --> target
-        //                                   |____________| (3)            targetItemPrevLink   AFTER: C --> source
-        //                                         |____________| (4)      targetItemNextLink
-        //
-        //             A --> B --> C --> source --> target --> D --> null
-        //
-
-        // 1. Unlink source item from old location
-        const sourceItemPrevLink = await BacklogItemRankModel.findOne({
-            where: { nextbacklogitemId: sourceItemId }
-        });
-        const sourceItemNextLink = await BacklogItemRankModel.findOne({
-            where: { backlogitemId: sourceItemId }
-        });
-        const oldNextItemId = (sourceItemNextLink as any).dataValues.nextbacklogitemId;
-        await sourceItemPrevLink.update({ nextbacklogitemId: oldNextItemId }, { transaction });
-
-        // 2. Re-link source item in new location
-        const targetItemPrevLink = await BacklogItemRankModel.findOne({
-            where: { nextbacklogitemId: targetItemId }
-        });
-        await targetItemPrevLink.update({ nextbacklogitemId: sourceItemId }, { transaction });
-        await sourceItemNextLink.update({ nextbacklogitemId: targetItemId }, { transaction });
-
-        // After updates:  A --> B, C --> source, source --> target, target --> D
-
-        if (!rolledBack) {
-            await transaction.commit();
-            res.status(HttpStatus.OK).json({
-                status: HttpStatus.OK
-            });
-        }
-    } catch (err) {
-        if (transaction) {
-            await transaction.rollback();
-        }
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: buildErrorForApiResponse(err)
-        });
-    }
-};
-
 export const backlogItemsReorderPostHandler = async (req: Request, res: Response) => {
     const sourceItemId = req.body.sourceItemId;
     const targetItemId = req.body.targetItemId;
-    const relativePosition = req.body.relativePosition; // before|after
-    // validation:
-    //   1. check that source item exists in database (backlogitemrank)
-    //   2. check that target item exists in database (backlogitemrank)
-    if (relativePosition === "before") {
-        await handleItemsReorderBefore(sourceItemId, targetItemId, res);
-    } else if (relativePosition === "after") {
-        await handleItemsReorderBefore(sourceItemId, targetItemId, res);
-        // await handleItemsReorderAfter(sourceItemId, targetItemId, res);
-    } else {
-        res.status(HttpStatus.NOT_IMPLEMENTED).json({
-            status: HttpStatus.NOT_IMPLEMENTED,
-            error: buildErrorForApiResponse("only supports relativePosition values of 'before' or 'after'")
+    if (!sourceItemId) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+            status: HttpStatus.BAD_REQUEST,
+            error: buildErrorForApiResponse("sourceItemId must have a value")
+        });
+        return;
+    }
+    let transaction: Transaction;
+    try {
+        let rolledBack = false;
+        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
+
+        // 1. Unlink source item from old location
+        const sourceItemPrevLink = await BacklogItemRankModel.findOne({
+            where: { nextbacklogitemId: sourceItemId }
+        });
+        const sourceItemNextLink = await BacklogItemRankModel.findOne({
+            where: { backlogitemId: sourceItemId }
+        });
+        const oldNextItemId = (sourceItemNextLink as any).dataValues.nextbacklogitemId;
+        await sourceItemPrevLink.update({ nextbacklogitemId: oldNextItemId }, { transaction });
+
+        // 2. Re-link source item in new location
+        const targetItemPrevLink = await BacklogItemRankModel.findOne({
+            where: { nextbacklogitemId: targetItemId }
+        });
+        await targetItemPrevLink.update({ nextbacklogitemId: sourceItemId }, { transaction });
+        await sourceItemNextLink.update({ nextbacklogitemId: targetItemId }, { transaction });
+
+        if (!rolledBack) {
+            await transaction.commit();
+            res.status(HttpStatus.OK).json({
+                status: HttpStatus.OK
+            });
+        }
+    } catch (err) {
+        if (transaction) {
+            await transaction.rollback();
+        }
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            error: buildErrorForApiResponse(err)
         });
     }
 };
