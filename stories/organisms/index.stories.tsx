@@ -138,13 +138,11 @@ storiesOf("Organisms|Panels/BacklogItemPlanningPanel", module).add("BacklogItemP
             <BacklogItemPlanningPanel
                 allItems={allItems}
                 editMode={EditMode.Edit}
-                // dragItem={{
-                //     dragItemId: "db-id-3",
-                //     dragOverItemId: "db-id-2",
-                //     top: "100px"
-                // }}
                 onAddNewBacklogItem={() => {
                     alert("add new backlog item");
+                }}
+                onReorderBacklogItems={() => {
+                    alert("re-order backlog items");
                 }}
             />
         </Provider>
