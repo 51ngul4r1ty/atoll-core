@@ -148,6 +148,13 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
         });
         return;
     }
+    if (sourceItemId === targetItemId) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+            status: HttpStatus.BAD_REQUEST,
+            error: buildErrorForApiResponse("sourceItemId and targetItemId must be different!")
+        });
+        return;
+    }
     let transaction: Transaction;
     try {
         let rolledBack = false;
@@ -161,13 +168,25 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
             where: { backlogitemId: sourceItemId }
         });
         const oldNextItemId = (sourceItemNextLink as any).dataValues.nextbacklogitemId;
+        const sourceItemPrevLinkId = (sourceItemPrevLink as any).dataValues.backlogitemId;
+        if (sourceItemPrevLinkId === oldNextItemId) {
+            throw new Error(`sourceItemPrevLink with ${sourceItemPrevLinkId} linked to self!`);
+        }
         await sourceItemPrevLink.update({ nextbacklogitemId: oldNextItemId }, { transaction });
 
         // 2. Re-link source item in new location
         const targetItemPrevLink = await BacklogItemRankModel.findOne({
             where: { nextbacklogitemId: targetItemId }
         });
+        const targetItemPrevLinkId = (targetItemPrevLink as any).dataValues.backlogitemId;
+        if (targetItemPrevLinkId === sourceItemId) {
+            throw new Error(`targetItemPrevLink with ${targetItemPrevLinkId} linked to self (which was source item)!`);
+        }
         await targetItemPrevLink.update({ nextbacklogitemId: sourceItemId }, { transaction });
+        const sourceItemNextLinkId = (sourceItemNextLink as any).dataValues.backlogitemId;
+        if (sourceItemNextLinkId === targetItemId) {
+            throw new Error(`sourceItemNextLink with ${sourceItemNextLinkId} linked to self (which was target item)!`);
+        }
         await sourceItemNextLink.update({ nextbacklogitemId: targetItemId }, { transaction });
 
         if (!rolledBack) {

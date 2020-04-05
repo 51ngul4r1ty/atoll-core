@@ -163,6 +163,22 @@ storiesOf("Molecules|Cards/BacklogItemCard", module)
                 isDraggable
             />
         </div>
+    ))
+    .add("BacklogItemCard Mobile (draggable)", () => (
+        <div>
+            <BacklogItemCard
+                itemId={text("itemId", "456")}
+                itemType={select(
+                    "itemType",
+                    { Story: BacklogItemTypeEnum.Story, Bug: BacklogItemTypeEnum.Bug },
+                    BacklogItemTypeEnum.Bug
+                )}
+                titleText={text("titleText", "Example bug")}
+                estimate={number("estimate", null)}
+                isDraggable
+                renderMobile
+            />
+        </div>
     ));
 
 storiesOf("Molecules|Buttons/EditButton", module)

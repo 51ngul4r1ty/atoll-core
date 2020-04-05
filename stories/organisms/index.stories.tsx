@@ -52,6 +52,21 @@ storiesOf("Organisms|Forms/BacklogItemDetailForm", module)
                 instanceId={number("instanceId", 2)}
             />
         </div>
+    ))
+    .add("BacklogItemDetailForm Mobile (story)", () => (
+        <div>
+            <BacklogItemDetailForm
+                type={select("type", ["issue", "story"], "story")}
+                estimate={number("estimate", 8)}
+                externalId={text("externalId", "527")}
+                rolePhrase={text("rolePhrase", "as a developer")}
+                storyPhrase={text("storyPhrase", "use the v3 api to sign up a user")}
+                reasonPhrase={text("reasonPhrase", "to allow for automation or a customized experience")}
+                editing={boolean("editing", false)}
+                instanceId={number("instanceId", 2)}
+                renderMobile
+            />
+        </div>
     ));
 
 const allItems: BacklogItemWithSource[] = [
