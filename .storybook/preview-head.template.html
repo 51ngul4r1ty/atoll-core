@@ -30,33 +30,30 @@
         grid-template-rows: auto auto;
         width: 8rem;
         border: 0.05rem solid #888;
-        /* background-color: #bbb; */
     }
 
-    .icon + .icon {
+    .icon+.icon {
         margin-top: 0.5rem;
     }
 
-    .icon > svg {
+    .icon>svg {
         width: 1.9rem;
         height: 1.9rem;
         grid-column: 1;
         grid-row: 1;
         justify-self: center;
-/*        background-color: #466;*/
     }
 
-    .icon > .caption {
+    .icon>.caption {
         text-align: center;
-        /* background-color: #cfcfcf; */
     }
 
-    .icon.x2 > svg {
+    .icon.x2>svg {
         width: 3.8rem;
         height: 3.8rem;
     }
 
-    .icon.x4 > svg {
+    .icon.x4>svg {
         width: 7.6rem;
         height: 7.6rem;
     }
@@ -68,16 +65,12 @@
         let result = null;
         let html = document.querySelector('html');
         html.classList.forEach(item => {
-            console.log('item: ' + item);
             if (item.indexOf(prefix) === 0) {
-                console.log('item match: ' + item);
                 const themeName = item.substr(prefix.length);
                 result = themeName;
             }
         });
-        console.log('RESULT: ' + result);
         if (!result) {
-            console.log('no result, setting default');
             result = 'default';
         }
         return result;

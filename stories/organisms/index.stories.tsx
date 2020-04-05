@@ -52,6 +52,21 @@ storiesOf("Organisms|Forms/BacklogItemDetailForm", module)
                 instanceId={number("instanceId", 2)}
             />
         </div>
+    ))
+    .add("BacklogItemDetailForm Mobile (story)", () => (
+        <div>
+            <BacklogItemDetailForm
+                type={select("type", ["issue", "story"], "story")}
+                estimate={number("estimate", 8)}
+                externalId={text("externalId", "527")}
+                rolePhrase={text("rolePhrase", "as a developer")}
+                storyPhrase={text("storyPhrase", "use the v3 api to sign up a user")}
+                reasonPhrase={text("reasonPhrase", "to allow for automation or a customized experience")}
+                editing={boolean("editing", false)}
+                instanceId={number("instanceId", 2)}
+                renderMobile
+            />
+        </div>
     ));
 
 const allItems: BacklogItemWithSource[] = [
@@ -66,6 +81,18 @@ const allItems: BacklogItemWithSource[] = [
         type: "story",
         saved: true,
         source: BacklogItemSource.Loaded
+    },
+    {
+        creationDateTime: undefined,
+        estimate: null,
+        externalId: "p-x",
+        id: "db-pushed-id-x",
+        reasonPhrase: null,
+        rolePhrase: null,
+        storyPhrase: "Pushed item",
+        type: "story",
+        saved: true,
+        source: BacklogItemSource.Pushed
     },
     {
         creationDateTime: undefined,
@@ -105,6 +132,21 @@ const allItems: BacklogItemWithSource[] = [
     }
 ];
 
+for (let i = 5; i <= 50; i++) {
+    allItems.push({
+        creationDateTime: undefined,
+        estimate: null,
+        externalId: `id-${i}`,
+        id: `db-id-${i}`,
+        reasonPhrase: null,
+        rolePhrase: "As a developer",
+        storyPhrase: `I can filter the list of backlog items (${i})`,
+        type: "story",
+        saved: true,
+        source: BacklogItemSource.Loaded
+    });
+}
+
 storiesOf("Organisms|Panels/BacklogItemPlanningPanel", module).add("BacklogItemPlanningPanel", () => (
     <div>
         <Provider store={store}>
@@ -113,6 +155,9 @@ storiesOf("Organisms|Panels/BacklogItemPlanningPanel", module).add("BacklogItemP
                 editMode={EditMode.Edit}
                 onAddNewBacklogItem={() => {
                     alert("add new backlog item");
+                }}
+                onReorderBacklogItems={() => {
+                    alert("re-order backlog items");
                 }}
             />
         </Provider>

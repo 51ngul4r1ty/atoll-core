@@ -21,6 +21,9 @@ BacklogItemRankModel.init(
                 key: "id",
                 // TODO: Find out why it was defined this way:
                 deferrable: Deferrable.INITIALLY_DEFERRED as any
+            },
+            get: function() {
+                return this.getDataValue("backlogitemId");
             }
         },
         nextbacklogitemId: {
@@ -31,6 +34,9 @@ BacklogItemRankModel.init(
                 key: "id",
                 // TODO: Find out why it was defined this way:
                 deferrable: Deferrable.INITIALLY_DEFERRED as any
+            },
+            get: function() {
+                return this.getDataValue("nextbacklogitemId");
             }
         }
     },

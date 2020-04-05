@@ -137,3 +137,71 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         });
     }
 };
+
+export const backlogItemsReorderPostHandler = async (req: Request, res: Response) => {
+    const sourceItemId = req.body.sourceItemId;
+    const targetItemId = req.body.targetItemId;
+    if (!sourceItemId) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+            status: HttpStatus.BAD_REQUEST,
+            error: buildErrorForApiResponse("sourceItemId must have a value")
+        });
+        return;
+    }
+    if (sourceItemId === targetItemId) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+            status: HttpStatus.BAD_REQUEST,
+            error: buildErrorForApiResponse("sourceItemId and targetItemId must be different!")
+        });
+        return;
+    }
+    let transaction: Transaction;
+    try {
+        let rolledBack = false;
+        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
+
+        // 1. Unlink source item from old location
+        const sourceItemPrevLink = await BacklogItemRankModel.findOne({
+            where: { nextbacklogitemId: sourceItemId }
+        });
+        const sourceItemNextLink = await BacklogItemRankModel.findOne({
+            where: { backlogitemId: sourceItemId }
+        });
+        const oldNextItemId = (sourceItemNextLink as any).dataValues.nextbacklogitemId;
+        const sourceItemPrevLinkId = (sourceItemPrevLink as any).dataValues.backlogitemId;
+        if (sourceItemPrevLinkId === oldNextItemId) {
+            throw new Error(`sourceItemPrevLink with ${sourceItemPrevLinkId} linked to self!`);
+        }
+        await sourceItemPrevLink.update({ nextbacklogitemId: oldNextItemId }, { transaction });
+
+        // 2. Re-link source item in new location
+        const targetItemPrevLink = await BacklogItemRankModel.findOne({
+            where: { nextbacklogitemId: targetItemId }
+        });
+        const targetItemPrevLinkId = (targetItemPrevLink as any).dataValues.backlogitemId;
+        if (targetItemPrevLinkId === sourceItemId) {
+            throw new Error(`targetItemPrevLink with ${targetItemPrevLinkId} linked to self (which was source item)!`);
+        }
+        await targetItemPrevLink.update({ nextbacklogitemId: sourceItemId }, { transaction });
+        const sourceItemNextLinkId = (sourceItemNextLink as any).dataValues.backlogitemId;
+        if (sourceItemNextLinkId === targetItemId) {
+            throw new Error(`sourceItemNextLink with ${sourceItemNextLinkId} linked to self (which was target item)!`);
+        }
+        await sourceItemNextLink.update({ nextbacklogitemId: targetItemId }, { transaction });
+
+        if (!rolledBack) {
+            await transaction.commit();
+            res.status(HttpStatus.OK).json({
+                status: HttpStatus.OK
+            });
+        }
+    } catch (err) {
+        if (transaction) {
+            await transaction.rollback();
+        }
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            error: buildErrorForApiResponse(err)
+        });
+    }
+};

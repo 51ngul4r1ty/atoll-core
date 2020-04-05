@@ -53,6 +53,22 @@
         "storybook"
       ],
       "noDebug": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest (shared repo)",
+      "program": "${workspaceFolder}/../atoll-shared/node_modules/.bin/jest",
+      "args": [
+        "--runInBand"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "cwd": "${workspaceFolder}/../atoll-shared/",
+      "windows": {
+        "program": "${workspaceFolder}/../atoll-shared/node_modules/jest/bin/jest",
+      }
     }
   ]
 }
