@@ -11,7 +11,8 @@ const HOST = process.env.HOST || "http://localhost";
 const generateStaticHTML = async () => {
     const nodemon = require("nodemon");
     const fs = require("fs");
-    const puppeteer = require("puppeteer");
+    // TODO: This may be needed for SSR?
+    //    const puppeteer = require("puppeteer");
     const PORT = await choosePort("localhost", 8505);
 
     process.env.PORT = PORT;
@@ -21,22 +22,23 @@ const generateStaticHTML = async () => {
         ignore: ["*"]
     });
 
-    script.on("start", async () => {
-        try {
-            // TODO: add try/wait/retry here instead of just generally waiting for 2000 ms
-            await sleep(2000);
-            const browser = await puppeteer.launch();
-            const page = await browser.newPage();
-            await page.goto(`${HOST}:${PORT}`);
-            const pageContent = await page.content();
-            fs.writeFileSync(`${paths.clientBuild}/index.html`, pageContent);
-            await browser.close();
-            script.emit("quit");
-        } catch (err) {
-            script.emit("quit");
-            console.log(err);
-        }
-    });
+    // TODO: This may be needed for SSR?
+    // script.on("start", async () => {
+    //     try {
+    //         // TODO: add try/wait/retry here instead of just generally waiting for 2000 ms
+    //         await sleep(2000);
+    //         const browser = await puppeteer.launch();
+    //         const page = await browser.newPage();
+    //         await page.goto(`${HOST}:${PORT}`);
+    //         const pageContent = await page.content();
+    //         fs.writeFileSync(`${paths.clientBuild}/index.html`, pageContent);
+    //         await browser.close();
+    //         script.emit("quit");
+    //     } catch (err) {
+    //         script.emit("quit");
+    //         console.log(err);
+    //     }
+    // });
 
     script.on("exit", (code) => {
         process.exit(code);
@@ -101,9 +103,10 @@ const build = async () => {
             await serverPromise;
         }
         await clientPromise;
-        if (includesServer) {
-            await generateStaticHTML();
-        }
+        // TODO: See if this is required for SSR or not
+        // if (includesServer) {
+        //     await generateStaticHTML();
+        // }
         logMessage("Done!", "info");
     } catch (error) {
         logMessage(error, "error");
