@@ -1,0 +1,21 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install NPM packages
+      run: npm ci
+    - name: Transpile
+      run: |
+        echo tranpiling...
+        npm run build
+    - name: Test
+      run: |
+        echo running unit tests...
+        npm run test:ci
