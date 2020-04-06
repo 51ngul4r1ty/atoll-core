@@ -101,12 +101,15 @@ const build = async () => {
             await serverPromise;
         }
         await clientPromise;
-        if (includesServer) {
-            await generateStaticHTML();
-        }
+        // TODO: See if this is required for SSR or not
+        // if (includesServer) {
+        //     await generateStaticHTML();
+        // }
         logMessage("Done!", "info");
+        process.exit(0);
     } catch (error) {
         logMessage(error, "error");
+        process.exit(1);
     }
 };
 
