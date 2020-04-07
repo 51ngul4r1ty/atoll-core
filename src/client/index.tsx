@@ -5,13 +5,15 @@ import { Provider } from "react-redux";
 import { ConnectedRouter } from "connected-react-router";
 
 // libraries
-import { configureStore, createClientHistory, storeHistoryInstance } from "@atoll/shared";
+import { configureStore, createClientHistory, storeHistoryInstance, initConfig } from "@atoll/shared";
 
 // utils
 import { buildRoutesForClient } from "../common/routeBuilder";
 
 const history = createClientHistory();
 storeHistoryInstance(history);
+
+initConfig({ getDocumentLocHref: () => document.location.href });
 
 const preloadedState = window.__PRELOADED_STATE__;
 const preloadedAppState = preloadedState?.app;
