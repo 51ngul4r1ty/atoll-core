@@ -54,7 +54,7 @@ const buildFeatureTogglesList = (featureToggles: FeatureTogglesState) => {
 };
 
 const serverRenderer: any = () => (req: express.Request & { store: Store }, res: express.Response, next: express.NextFunction) => {
-    const hostAndPort = req.headers.host; // e.g. "192.168.2.159:8500"
+    const hostAndPort = req.headers.host; // e.g. "192.168.9.1:8500"
     initConfig({ getDocumentLocHref: () => `http://${hostAndPort}${req.url}` });
     const apiBaseUrl = getApiBaseUrl();
     if (req.path.startsWith("/api/")) {
