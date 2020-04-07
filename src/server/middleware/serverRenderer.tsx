@@ -7,7 +7,7 @@ import { Store } from "redux";
 import { Provider } from "react-redux";
 
 // libraries
-import { FeatureTogglesState, StateTree } from "@atoll/shared";
+import { FeatureTogglesState, StateTree, getApiBaseUrl, remapAssetPath, initConfig } from "@atoll/shared";
 
 // components
 import Html from "../components/HTML";
@@ -54,6 +54,9 @@ const buildFeatureTogglesList = (featureToggles: FeatureTogglesState) => {
 };
 
 const serverRenderer: any = () => (req: express.Request & { store: Store }, res: express.Response, next: express.NextFunction) => {
+    const hostAndPort = req.headers.host; // e.g. "192.168.2.159:8500"
+    initConfig({ getDocumentLocHref: () => `http://${hostAndPort}${req.url}` });
+    const apiBaseUrl = getApiBaseUrl();
     if (req.path.startsWith("/api/")) {
         next();
     } else {
@@ -80,11 +83,14 @@ const serverRenderer: any = () => (req: express.Request & { store: Store }, res:
                 renderToString(
                     <Html
                         css={[
-                            res.locals.assetPath("shared-bundle.css"),
-                            res.locals.assetPath("bundle.css"),
-                            res.locals.assetPath("vendor.css")
+                            remapAssetPath(res.locals.assetPath("shared-bundle.css")),
+                            remapAssetPath(res.locals.assetPath("bundle.css")),
+                            remapAssetPath(res.locals.assetPath("vendor.css"))
                         ]}
-                        scripts={[res.locals.assetPath("bundle.js"), res.locals.assetPath("vendor.js")]}
+                        scripts={[
+                            remapAssetPath(res.locals.assetPath("bundle.js")),
+                            remapAssetPath(res.locals.assetPath("vendor.js"))
+                        ]}
                         state={state}
                         language={locale}
                         toggles={buildFeatureTogglesList(featureToggles)}
