@@ -53,6 +53,7 @@
     "output:now": "node -e \"console.log(JSON.stringify(new Date()))\""
   },
   "dependencies": {
+    "@atoll/shared": "0.3.0-alpha.3",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "@types/express-ws": "3.0.0",
@@ -90,7 +91,6 @@
     "ws": "7.2.3"
   },
   "devDependencies": {
-    "@atoll/shared": "0.3.0-alpha.3",
     "@babel/cli": "7.8.4",
     "@babel/core": "7.8.6",
     "@babel/plugin-proposal-class-properties": "7.8.3",
