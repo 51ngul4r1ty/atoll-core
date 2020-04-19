@@ -12,7 +12,7 @@ import manifestHelpers from "express-manifest-helpers";
 import path from "path";
 
 // libraries
-import { configureStore, createServerHistory, storeHistoryInstance, getHistoryInstance } from "@atoll/shared";
+import { configureStore, createServerHistory, storeHistoryInstance, getHistoryInstance, setAssetPortOverride } from "@atoll/shared";
 
 // config
 import paths from "../../config/paths";
@@ -109,7 +109,18 @@ app.use(serverRenderer());
 
 app.use(errorHandler);
 
-app.listen(process.env.PORT || 8500, () => {
+const envVarToNum = (val: any): number | null => {
+    return val ? parseInt(val) : null;
+};
+
+const assetPortValue = envVarToNum(process.env.RESOURCE_PORT);
+if (assetPortValue) {
+    setAssetPortOverride(assetPortValue);
+}
+let portValue = envVarToNum(process.env.PORT) || 8500;
+
+app.listen(portValue, () => {
+    console.log(`Environment PORT value: ${process.env.PORT}`);
     console.log(`[${new Date().toISOString()}]`, chalk.blue(`App is running: http://localhost:${process.env.PORT || 8500}`));
 });
 
