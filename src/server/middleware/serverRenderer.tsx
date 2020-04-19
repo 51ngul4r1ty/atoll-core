@@ -7,7 +7,7 @@ import { Store } from "redux";
 import { Provider } from "react-redux";
 
 // libraries
-import { FeatureTogglesState, StateTree, getApiBaseUrl, remapAssetPath, initConfig } from "@atoll/shared";
+import { FeatureTogglesState, StateTree, remapAssetPath, initConfig, getAssetPortOverride } from "@atoll/shared";
 
 // components
 import Html from "../components/HTML";
@@ -54,9 +54,14 @@ const buildFeatureTogglesList = (featureToggles: FeatureTogglesState) => {
 };
 
 const serverRenderer: any = () => (req: express.Request & { store: Store }, res: express.Response, next: express.NextFunction) => {
-    const hostAndPort = req.headers.host; // e.g. "192.168.9.1:8500"
+    const port = getAssetPortOverride();
+    let hostAndPort = req.headers.host; // e.g. "192.168.9.1:8500"
+    const lastIdx = hostAndPort.lastIndexOf(":");
+    if (lastIdx >= 0 && hostAndPort.length - lastIdx > 5 && port) {
+        hostAndPort += `:${port}`;
+    }
     initConfig({ getDocumentLocHref: () => `http://${hostAndPort}${req.url}` });
-    const apiBaseUrl = getApiBaseUrl();
+    //    const apiBaseUrl = getApiBaseUrl();
     if (req.path.startsWith("/api/")) {
         next();
     } else {
@@ -78,12 +83,15 @@ const serverRenderer: any = () => (req: express.Request & { store: Store }, res:
         const newState: StateTree = { ...oldState, app: newApp, featureToggles };
         const state = JSON.stringify(newState);
 
+        const sharedBundleCss = res.locals.assetPath("shared-bundle.css");
+        const sharedBundleCssPath = remapAssetPath(sharedBundleCss);
+
         return res.send(
             "<!doctype html>" +
                 renderToString(
                     <Html
                         css={[
-                            remapAssetPath(res.locals.assetPath("shared-bundle.css")),
+                            sharedBundleCssPath,
                             remapAssetPath(res.locals.assetPath("bundle.css")),
                             remapAssetPath(res.locals.assetPath("vendor.css"))
                         ]}
