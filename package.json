@@ -1,6 +1,6 @@
 {
   "name": "atoll",
-  "version": "0.2.0-alpha.1",
+  "version": "0.3.0",
   "author": {
     "name": "Kevin Berry",
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
@@ -53,7 +53,7 @@
     "output:now": "node -e \"console.log(JSON.stringify(new Date()))\""
   },
   "dependencies": {
-    "@atoll/shared": "0.3.2-alpha.4",
+    "@atoll/shared": "0.3.3",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.19.2",
