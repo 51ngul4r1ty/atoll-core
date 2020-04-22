@@ -1,24 +1,30 @@
 // externals
 import * as express from "express";
 
+// middleware
+import auth from "../middleware/auth";
+
 // handlers
 import { backlogItemsGetHandler, backlogItemsPostHandler, backlogItemsReorderPostHandler } from "./handlers/backlogItems";
 import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
 import { sprintsHandler } from "./handlers/sprint";
 import { userPreferencesHandler } from "./handlers/userPreferences";
+import { loginPostHandler } from "./handlers/auth";
 
 export const router = express.Router();
 
-router.get("/", rootHandler);
+router.get("/", auth, rootHandler);
 
-router.get("/users/:userId/preferences", userPreferencesHandler);
+router.get("/users/:userId/preferences", auth, userPreferencesHandler);
 
-router.get("/users/:userId/feature-toggles", featureTogglesHandler);
+router.get("/users/:userId/feature-toggles", auth, featureTogglesHandler);
 
-router.get("/sprints", sprintsHandler);
+router.get("/sprints", auth, sprintsHandler);
 
-router.get("/backlog-items", backlogItemsGetHandler);
-router.post("/backlog-items", backlogItemsPostHandler);
+router.get("/backlog-items", auth, backlogItemsGetHandler);
+router.post("/backlog-items", auth, backlogItemsPostHandler);
 
-router.post("/actions/reorder-backlog-items", backlogItemsReorderPostHandler);
+router.post("/actions/reorder-backlog-items", auth, backlogItemsReorderPostHandler);
+
+router.post("/actions/login", loginPostHandler);
