@@ -5,7 +5,7 @@ Components with Translation
 import React from "react";
 import { withTranslation, WithTranslation } from "react-i18next";
 
-const RawComponent = ({ t }: WithTranslation) => (
+const InnerComponent = ({ t }: WithTranslation) => (
     <React.Fragment>
         <h2>{t("translate-string-name")}</h2>
         <ul>
@@ -14,7 +14,7 @@ const RawComponent = ({ t }: WithTranslation) => (
     </React.Fragment>
 );
 
-export const Component = withTranslation()(RawComponent);
+export const Component = withTranslation()(InnerComponent);
 ```
 
 Adding Translation to Main App
