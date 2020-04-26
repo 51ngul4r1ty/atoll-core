@@ -11,6 +11,7 @@ import { number, text, select, boolean } from "@storybook/addon-knobs";
 
 // components
 import {
+    LoginForm,
     BacklogItemDetailForm,
     BacklogItemPlanningPanel,
     BacklogItemWithSource,
@@ -161,5 +162,20 @@ storiesOf("Organisms|Panels/BacklogItemPlanningPanel", module).add("BacklogItemP
                 }}
             />
         </Provider>
+    </div>
+));
+
+storiesOf("Organisms|Forms/LoginForm", module).add("LoginForm", () => (
+    <div>
+        <LoginForm
+            type={select("type", ["issue", "story"], "issue")}
+            estimate={number("estimate", 13)}
+            externalId={text("externalId", "B1000032")}
+            rolePhrase={text("rolePhrase", null)}
+            storyPhrase={text("storyPhrase", bugStoryPhrase)}
+            reasonPhrase={text("reasonPhrase", null)}
+            editing={boolean("editing", false)}
+            instanceId={number("instanceId", 1)}
+        />
     </div>
 ));
