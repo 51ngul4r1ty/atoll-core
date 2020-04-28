@@ -6,9 +6,16 @@ import * as HttpStatus from "http-status-codes";
 import { getAuthKey } from "@atoll/shared";
 
 export default function(req, res, next) {
-    const token = req.headers["x-auth-token"] || req.headers["authorization"];
-    if (!token) {
+    const authHeader: string = req.headers["x-auth-token"] || req.headers["authorization"];
+    if (!authHeader) {
         return res.status(HttpStatus.UNAUTHORIZED).send("Access denied. No token provided.");
+    }
+    const authHeaderPrefix = "Bearer  ";
+    let token: string;
+    if (authHeader.startsWith(authHeaderPrefix)) {
+        token = authHeader.substr(authHeaderPrefix.length);
+    } else {
+        token = "";
     }
 
     const authKey = getAuthKey();

@@ -26,8 +26,13 @@ export const loginPostHandler = async (req: Request, res: Response) => {
         try {
             const refreshTokenId = getSimpleUuid();
             res.status(HttpStatus.OK).send({
-                authToken: buildAuthToken("test-id", username, ROLE_USER),
-                refreshToken: buildRefreshToken("test-id", username, refreshTokenId)
+                status: HttpStatus.OK,
+                data: {
+                    item: {
+                        authToken: buildAuthToken("test-id", username, ROLE_USER),
+                        refreshToken: buildRefreshToken("test-id", username, refreshTokenId)
+                    }
+                }
             });
             return;
         } catch (err) {
