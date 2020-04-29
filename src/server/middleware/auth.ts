@@ -4,6 +4,7 @@ import * as HttpStatus from "http-status-codes";
 
 // libraries
 import { getAuthKey } from "@atoll/shared";
+import { AuthTokenContents } from "types";
 
 export default function(req, res, next) {
     const authHeader: string = req.headers["x-auth-token"] || req.headers["authorization"];
@@ -24,12 +25,24 @@ export default function(req, res, next) {
         return;
     }
 
+    let isInvalid = true;
+    let decoded: any;
     try {
-        const decoded = jwt.verify(token, authKey);
-        req.user = decoded;
-        next();
+        decoded = jwt.verify(token, authKey) as AuthTokenContents;
     } catch (ex) {
-        // if invalid token
-        res.status(HttpStatus.BAD_REQUEST).send("Invalid token.");
+        return res.status(HttpStatus.BAD_REQUEST).send("Invalid token.");
     }
+    let expirationDate: Date;
+    try {
+        expirationDate = new Date(decoded.expirationDate);
+    } catch (ex) {
+        return res.status(HttpStatus.BAD_REQUEST).send("Invalid expirated date in token.");
+    }
+    const now = new Date();
+    const stillValid = expirationDate.getTime() >= now.getTime();
+    if (!stillValid) {
+        return res.status(HttpStatus.BAD_REQUEST).send("Token has expired.");
+    }
+    req.user = decoded;
+    next();
 }
