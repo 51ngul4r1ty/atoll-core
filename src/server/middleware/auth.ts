@@ -25,23 +25,22 @@ export default function(req, res, next) {
         return;
     }
 
-    let isInvalid = true;
     let decoded: any;
     try {
         decoded = jwt.verify(token, authKey) as AuthTokenContents;
     } catch (ex) {
-        return res.status(HttpStatus.BAD_REQUEST).send("Invalid token.");
+        return res.status(HttpStatus.FORBIDDEN).send("Invalid token.");
     }
     let expirationDate: Date;
     try {
         expirationDate = new Date(decoded.expirationDate);
     } catch (ex) {
-        return res.status(HttpStatus.BAD_REQUEST).send("Invalid expirated date in token.");
+        return res.status(HttpStatus.FORBIDDEN).send("Invalid expirated date in token.");
     }
     const now = new Date();
     const stillValid = expirationDate.getTime() >= now.getTime();
     if (!stillValid) {
-        return res.status(HttpStatus.BAD_REQUEST).send("Token has expired.");
+        return res.status(HttpStatus.FORBIDDEN).send("Token has expired.");
     }
     req.user = decoded;
     next();
