@@ -79,10 +79,9 @@ export const refreshTokenPostHandler = async (req: Request, res: Response) => {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).send("An unknown error occurred while generating an auth token");
         return;
     }
-    // res.status(HttpStatus.UNAUTHORIZED).send("Either username or password is incorrect");
-    // return;
 };
 
+// TODO: Finish implementing this
 export const createUserPostHandler = async (req: Request, res: Response) => {
     res.status(HttpStatus.NOT_IMPLEMENTED).send("Unable to create new user - not implemented yet.");
     // validate the request body first
