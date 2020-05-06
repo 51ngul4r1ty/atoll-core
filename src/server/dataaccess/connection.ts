@@ -1,5 +1,5 @@
 // externals
-import { Sequelize } from "sequelize";
+import { Sequelize, Options } from "sequelize";
 
 // libraries
 import { getDbConfig } from "@atoll/shared";
@@ -9,7 +9,7 @@ if (!dbConfig) {
     console.error("Unable to retrieve database configuration - set ATOLL_DATABASE_URL for local development");
 }
 
-export const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
+const buildOptions = (): Options => ({
     host: dbConfig.host,
     dialect: "postgres",
     pool: {
@@ -19,3 +19,6 @@ export const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbC
         idle: 10000
     }
 });
+
+// sslmode=require
+export const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, buildOptions());

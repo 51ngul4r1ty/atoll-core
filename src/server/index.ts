@@ -57,11 +57,12 @@ ws.app.ws("/ws", function(ws2, req) {
     console.log("client connected");
 });
 
+// TODO: In future we should change this strategy, for now we'll use express to serve static assets
 // Use Nginx or Apache to serve static assets in production or remove the if() around the following
 // lines to use the express.static middleware to serve assets for production (not recommended!)
-if (process.env.NODE_ENV === "development") {
-    app.use(paths.publicPath, express.static(path.join(paths.clientBuild, paths.publicPath)));
-}
+//if (process.env.NODE_ENV === "development") {
+app.use(paths.publicPath, express.static(path.join(paths.clientBuild, paths.publicPath)));
+//}
 
 app.use(cors());
 
