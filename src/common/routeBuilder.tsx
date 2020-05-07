@@ -5,13 +5,21 @@ import { ConfigureFlopFlip } from "@flopflip/react-broadcast";
 import adapter from "@flopflip/memory-adapter";
 
 // components
-import { IntlProvider, AppContainer, PlanViewContainer, SprintViewContainer, ReviewViewContainer, layouts } from "@atoll/shared";
+import {
+    IntlProvider,
+    AppContainer,
+    LoginViewContainer,
+    PlanViewContainer,
+    SprintViewContainer,
+    ReviewViewContainer,
+    layouts
+} from "@atoll/shared";
 
 const appRoutes = (
     <layouts.MainLayout>
         <AppContainer>
             <Switch>
-                <Route path="/" exact component={PlanViewContainer} />
+                <Route path="/" exact component={LoginViewContainer} />
                 <Route path="/plan" exact component={PlanViewContainer} />
                 <Route path="/sprint" exact component={SprintViewContainer} />
                 <Route path="/review" exact component={ReviewViewContainer} />

@@ -1,6 +1,16 @@
 Code Standards
 ==============
 
+Modified Case Naming
+--------------------
+
+Typically a combination of Pascal Case and Camel Case is used in
+TypeScript projects.  Atoll uses modified versions of both.  In
+the case where Pascal Case is normally used (for example, classes
+and interface names) we allow successive capitalized letters, for
+example, "HTML" instead of "Html".  An example of this is:
+`HTMLInputElement` (from the browser "Web API").
+
 Folder Naming
 -------------
 
@@ -14,8 +24,8 @@ Folder Naming
 
 The components are organized using Atomic Design principles, so the following base folders should be used:
 - "atoms" = basic building block components
-- "molecules" = when smaller building blocks are combined they form molecules, e.g. "backlog item card"
-- "organisms" = defining sections of the applicaton, e.g. "top menu panel", "backlog item planning panel"
+- "molecules" = when smaller building blocks are combined they form molecules, for example, "backlog item card"
+- "organisms" = defining sections of the applicaton, for example, "top menu panel", "backlog item planning panel"
 - "templates"
 - "pages"
 
@@ -38,6 +48,7 @@ NOTE: Do not assume that components belong in a upper level folder if they conta
    (for example, AppIconProps is an alias for StandardInvertibleComponentProps so that AppIcon has its own props type)  
    _NOTE: This is done so that consumers of AppIcon aren't aware of StandardInvertibleComponentProps so that they can
      evolve separately._
+6. Preserve acronym case in interface names (to follow Web API standards, for example, HTMLInputElement).
 
 Reducers
 --------
@@ -47,8 +58,8 @@ Types related to the data structure that the reducer stores in the state tree sh
 Components
 ----------
 
-Use `React.FC<ComponentNameProps>` as the default component definition where
-`ComponentName` will be your actual component name, e.g. `MyButton`.
+Use `React.FC<ComponentNameProps>` as the default component definition where `ComponentName` will be your actual component name,
+e.g. `MyButton`.
 
 `ComponentNameProps` should be split into 2 interfaces:
 - `ComponentNameStateProps` and `ComponentNameDispatchProps`
