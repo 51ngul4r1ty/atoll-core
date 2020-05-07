@@ -26,7 +26,7 @@ import { router } from "./api/routes";
 
 // data access
 import { init } from "./dataaccess";
-// import { Socket } from "dgram";
+import { PushNotification, PushNotificationType } from "@atoll/shared";
 
 Object.assign(global, {
     WebSocket: Ws,
@@ -43,25 +43,66 @@ const app = express.default();
 
 const ws = expressWs(app);
 
+let keepAliveCount = 0;
+
+const aggregateKeepAlivesReceived = () => {
+    keepAliveCount++;
+};
+
+let keepaliveLogTimeout: NodeJS.Timeout = null;
+
+const plural = (singularText: string, pluralText: string, val: number) => (val === 1 ? singularText : pluralText);
+
+const setKeepaliveLogTimeout = () => {
+    keepaliveLogTimeout = setTimeout(() => {
+        setKeepaliveLogTimeout();
+        console.log(`Keep alives received from ${keepAliveCount} ${plural("client", "clients", keepAliveCount)}`);
+        keepAliveCount = 0;
+    }, 30000);
+};
+
+// set up to run at start up and the setTimeout will ensure it keeps running every 30 seconds (same as client)
+setKeepaliveLogTimeout();
+
 ws.app.ws("/ws", function(ws2, req) {
-    ws2.on("message", function(msg) {
-        console.log(`message received from client: ${msg}, ${JSON.stringify(msg)}`);
-        console.log(msg);
-        const wss = ws.getWss();
-        wss.clients.forEach((client) => {
-            if (client != ws2 && client.readyState === WebSocket.OPEN) {
-                client.send(msg);
-            }
-        });
+    ws2.on("message", function(rawMsg: any) {
+        if (typeof rawMsg !== "string") {
+            console.warn(`message was not a string`);
+            return;
+        }
+        if (rawMsg.length > 16000) {
+            // 16K is too big for this type of message, discarding it
+            console.log(`message received from client: "${rawMsg.substr(0, 1000)}..." (truncated)`);
+            console.warn(`message size exceeded threshold: ${rawMsg.length} characters in length`);
+            return;
+        }
+        const msg = JSON.parse(rawMsg) as PushNotification<any>;
+        if (!msg.type) {
+            console.log("message does not have the right structure");
+            return;
+        }
+        if (msg.type === PushNotificationType.KeepAlive) {
+            aggregateKeepAlivesReceived();
+        } else if (msg.type) {
+            console.log(`this is a relayable message - sending to other clients`);
+            console.log(`message received from client: ${rawMsg}`);
+            const wss = ws.getWss();
+            wss.clients.forEach((client) => {
+                if (client != ws2 && client.readyState === WebSocket.OPEN) {
+                    client.send(rawMsg);
+                }
+            });
+        }
     });
     console.log("client connected");
 });
 
+// TODO: In future we should change this strategy, for now we'll use express to serve static assets
 // Use Nginx or Apache to serve static assets in production or remove the if() around the following
 // lines to use the express.static middleware to serve assets for production (not recommended!)
-if (process.env.NODE_ENV === "development") {
-    app.use(paths.publicPath, express.static(path.join(paths.clientBuild, paths.publicPath)));
-}
+//if (process.env.NODE_ENV === "development") {
+app.use(paths.publicPath, express.static(path.join(paths.clientBuild, paths.publicPath)));
+//}
 
 app.use(cors());
 

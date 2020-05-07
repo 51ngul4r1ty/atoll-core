@@ -1,19 +1,22 @@
 {
   "name": "atoll",
-  "version": "0.3.0",
+  "version": "0.3.3",
   "author": {
     "name": "Kevin Berry",
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
   },
   "license": "MIT",
   "engines": {
-    "node": ">=10.15.3",
+    "node": ">=10.15.3 <13.0.0",
     "npm": ">=6.10.1"
   },
   "scripts": {
     "analyze": "npm run build:with-stats && npm run start:analyzer",
-    "build": "npx --no-install cross-env NODE_ENV=production node scripts/build.js",
-    "build:dev": "npx --no-install cross-env NODE_ENV=development node scripts/build.js",
+    "build": "npm run build-only && npm run build-deploy",
+    "build-only": "npx --no-install cross-env NODE_ENV=production node scripts/build.js",
+    "build-deploy": "node ./scripts/build-deploy.js",
+    "build:dev": "npm run build-only:dev && npm run build-deploy",
+    "build-only:dev": "npx --no-install cross-env NODE_ENV=development node scripts/build.js",
     "depgraph": "npm run build:depgraph && open-cli dependency-graph.svg",
     "build:depgraph": "depcruise -c .dependency-cruiser.js --exclude '^node_modules' --output-type dot src | dot -T svg > dependency-graph.svg",
     "clean": "npx rimraf --no-install build",
@@ -55,7 +58,7 @@
     "output:now": "node -e \"console.log(JSON.stringify(new Date()))\""
   },
   "dependencies": {
-    "@atoll/shared": "0.4.2",
+    "@atoll/shared": "0.5.1",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.19.2",
@@ -85,7 +88,7 @@
     "redux-devtools-extension": "2.13.8",
     "redux-thunk": "2.3.0",
     "reselect": "4.0.0",
-    "sequelize": "5.21.5",
+    "sequelize": "5.21.7",
     "text-encoding-polyfill": "0.6.7",
     "uuid": "7.0.2",
     "websocket": "1.0.31",
@@ -144,6 +147,7 @@
     "dependency-cruiser": "7.2.0",
     "eslint": "6.8.0",
     "file-loader": "5.1.0",
+    "fs-extra": "9.0.0",
     "html-webpack-plugin": "3.2.0",
     "i18next-scanner": "2.10.2",
     "jest": "25.5.3",
