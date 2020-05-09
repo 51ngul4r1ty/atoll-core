@@ -161,6 +161,7 @@ storiesOf("Molecules|Cards/BacklogItemCard", module)
                 titleText={text("titleText", "Example bug")}
                 estimate={number("estimate", null)}
                 isDraggable
+                hasDetails
             />
         </div>
     ))
@@ -176,6 +177,7 @@ storiesOf("Molecules|Cards/BacklogItemCard", module)
                 titleText={text("titleText", "Example bug")}
                 estimate={number("estimate", null)}
                 isDraggable
+                hasDetails
                 renderMobile
             />
         </div>
