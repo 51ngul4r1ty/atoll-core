@@ -12,6 +12,7 @@ import {
     CancelIcon,
     DragIcon,
     DoneIcon,
+    EditDetailIcon,
     EditIcon,
     RefreshIcon,
     HamburgerIcon,
@@ -26,6 +27,7 @@ import "../../storybook";
 const invertibleIcons = {
     AppIcon,
     DragIcon,
+    EditDetailIcon,
     IssueIcon,
     StoryIcon
 };
@@ -47,6 +49,7 @@ const iconNames = [
     "DragIcon",
     "DoneIcon",
     "EditIcon",
+    "EditDetailIcon",
     "RefreshIcon",
     "HamburgerIcon",
     "IssueIcon",

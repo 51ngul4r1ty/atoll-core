@@ -56,7 +56,9 @@ const plural = (singularText: string, pluralText: string, val: number) => (val =
 const setKeepaliveLogTimeout = () => {
     keepaliveLogTimeout = setTimeout(() => {
         setKeepaliveLogTimeout();
-        console.log(`Keep alives received from ${keepAliveCount} ${plural("client", "clients", keepAliveCount)}`);
+        if (keepAliveCount) {
+            console.log(`Keep alives received from ${keepAliveCount} ${plural("client", "clients", keepAliveCount)}`);
+        }
         keepAliveCount = 0;
     }, 30000);
 };
