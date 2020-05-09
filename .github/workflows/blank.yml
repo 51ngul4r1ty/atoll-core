@@ -9,9 +9,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: Checks
+      run: |
+        echo checking files...
+        npm run check
     - name: Install NPM packages
       run: npm ci
     - name: Transpile
       run: |
-        echo tranpiling...
+        echo transpiling...
         npm run build
+    

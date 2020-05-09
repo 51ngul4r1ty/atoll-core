@@ -55,7 +55,8 @@
     "start:no-sync": "npm run start-only",
     "pull:shared": "cd .. && cd atoll-shared && npm run push && cd ..",
     "start:client-only": "npm run build:dev && npm run start:client",
-    "output:now": "node -e \"console.log(JSON.stringify(new Date()))\""
+    "output:now": "node -e \"console.log(JSON.stringify(new Date()))\"",
+    "check": "node ./scripts/check-package-json.js"
   },
   "dependencies": {
     "@atoll/shared": "0.5.1",
