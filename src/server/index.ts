@@ -53,10 +53,14 @@ let keepaliveLogTimeout: NodeJS.Timeout = null;
 
 const plural = (singularText: string, pluralText: string, val: number) => (val === 1 ? singularText : pluralText);
 
+const envKeepAlives = (): string => {
+    return (process.env.LOG_KEEP_ALIVES || "").toLowerCase();
+};
+
 const setKeepaliveLogTimeout = () => {
     keepaliveLogTimeout = setTimeout(() => {
         setKeepaliveLogTimeout();
-        if (keepAliveCount) {
+        if (envKeepAlives() === "true") {
             console.log(`Keep alives received from ${keepAliveCount} ${plural("client", "clients", keepAliveCount)}`);
         }
         keepAliveCount = 0;
