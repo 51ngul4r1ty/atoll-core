@@ -11,19 +11,20 @@ import { withRootAttribute } from "storybook-addon-root-attribute";
 // components
 import {
     AddButton,
-    EditButton,
-    RefreshButton,
-    AddIcons,
-    EditIcon,
-    RefreshIcon,
-    SimpleButton,
-    SimpleText,
-    HomeButton,
-    HamburgerIcon,
-    TabStrip,
+    AddIcon,
     BacklogItemCard,
     BacklogItemTypeEnum,
-    EditMode
+    EditButton,
+    EditIcon,
+    EditMode,
+    HamburgerIcon,
+    HomeButton,
+    RefreshButton,
+    RefreshIcon,
+    RemoveButton,
+    SimpleButton,
+    SimpleText,
+    TabStrip
 } from "@atoll/shared";
 
 addDecorator(withRootAttribute);
@@ -252,3 +253,14 @@ storiesOf("Molecules|Buttons/AddButton", module)
             />
         </div>
     ));
+
+storiesOf("Molecules|Buttons/RemoveButton", module).add("RemoveButton", () => (
+    <div>
+        <RemoveButton
+            onClick={() => {
+                // eslint-disable-next-line no-alert
+                alert("remove clicked");
+            }}
+        />
+    </div>
+));
