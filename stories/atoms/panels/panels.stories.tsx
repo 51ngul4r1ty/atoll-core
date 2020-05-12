@@ -6,21 +6,37 @@ import React from "react";
 import { storiesOf } from "@storybook/react";
 
 // components
-import { ItemMenuPanel, RemoveButton } from "@atoll/shared";
+import { CaretPosition, ItemMenuPanel, RemoveButton } from "@atoll/shared";
 
 // common
 import "../../storybook";
 
-storiesOf("Atoms|Panels", module).add("ItemMenuPanel", () => (
-    <ItemMenuPanel
-        onClose={() => {
-            alert("close triggered");
-        }}
-    >
-        <RemoveButton
-            onClick={() => {
-                alert("remove clicked");
+storiesOf("Atoms|Panels", module)
+    .add("ItemMenuPanel (caret top-center)", () => (
+        <ItemMenuPanel
+            caretPosition={CaretPosition.TopCenter}
+            onClose={() => {
+                alert("close triggered");
             }}
-        />
-    </ItemMenuPanel>
-));
+        >
+            <RemoveButton
+                onClick={() => {
+                    alert("remove clicked");
+                }}
+            />
+        </ItemMenuPanel>
+    ))
+    .add("ItemMenuPanel (caret right-top)", () => (
+        <ItemMenuPanel
+            caretPosition={CaretPosition.RightTop}
+            onClose={() => {
+                alert("close triggered");
+            }}
+        >
+            <RemoveButton
+                onClick={() => {
+                    alert("remove clicked");
+                }}
+            />
+        </ItemMenuPanel>
+    ));
