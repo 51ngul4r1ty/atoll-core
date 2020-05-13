@@ -6,7 +6,7 @@ import { CreateOptions, Transaction } from "sequelize";
 // utils
 import { LinkedList } from "@atoll/shared";
 import { buildSelfLink } from "../../utils/linkBuilder";
-import { buildErrorForApiResponse } from "../utils/errorProcessor";
+import { respondWithFailedValidation, respondWithNotFound, respondWithError, respondWithOk } from "../utils/responder";
 
 // data access
 import { mapToBacklogItem, mapToBacklogItemRank, BacklogItemModel, BacklogItemRankModel } from "../../dataaccess";
@@ -52,6 +52,43 @@ export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     }
 };
 
+export const backlogItemsDeleteHandler = async (req: Request, res: Response) => {
+    // 1. check to see if it exists- 404 if it doesn't
+    // 2. remove backlog item rank entries and update links
+    // 3. remove backlog item
+    try {
+        // const backlogItemRanks = await BacklogItemRankModel.findAll({});
+        // const rankList = new LinkedList<BacklogItem>();
+        // if (backlogItemRanks.length) {
+        //     const backlogItemRanksMapped = backlogItemRanks.map((item) => mapToBacklogItemRank(item));
+        //     backlogItemRanksMapped.forEach((item) => {
+        //         rankList.addLink(item.backlogitemId, item.nextbacklogitemId);
+        //     });
+        // }
+        const id = req.params.backlogItemId;
+        if (!id) {
+            respondWithFailedValidation(res, "backlog item ID is required for DELETE");
+        }
+        const backlogItem = await BacklogItemModel.findByPk(id);
+        if (backlogItem === null) {
+            respondWithNotFound(res, `unable to find item by primary key ${id}`);
+        }
+        // backlogItems.forEach((item) => {
+        //     const backlogItem = mapToBacklogItem(item);
+        //     const result: BacklogItem = {
+        //         ...backlogItem,
+        //         links: [buildSelfLink(backlogItem, "/api/v1/backlog-items/")]
+        //     };
+        //     rankList.addItemData(result.id, result);
+        // });
+        const deletedItem = {};
+        respondWithOk(res, deletedItem);
+    } catch (error) {
+        respondWithError(res, error);
+        console.log(`unable to fetch backlog items: ${error}`);
+    }
+};
+
 export const backlogItemsPostHandler = async (req: Request, res: Response) => {
     const bodyWithId = { ...addIdToBody(req.body) };
     const prevBacklogItemId = bodyWithId.prevBacklogItemId;
@@ -90,12 +127,10 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
                 transaction
             });
             if (!prevBacklogItems.length) {
-                res.status(HttpStatus.BAD_REQUEST).json({
-                    status: HttpStatus.BAD_REQUEST,
-                    error: buildErrorForApiResponse(
-                        `Invalid previous backlog item - can't find entries with ID ${prevBacklogItemId} in database`
-                    )
-                });
+                respondWithFailedValidation(
+                    res,
+                    `Invalid previous backlog item - can't find entries with ID ${prevBacklogItemId} in database`
+                );
                 await transaction.rollback();
                 rolledBack = true;
             } else {
@@ -131,10 +166,7 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         if (transaction) {
             await transaction.rollback();
         }
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: buildErrorForApiResponse(err)
-        });
+        respondWithError(res, err);
     }
 };
 
@@ -142,17 +174,11 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
     const sourceItemId = req.body.sourceItemId;
     const targetItemId = req.body.targetItemId;
     if (!sourceItemId) {
-        res.status(HttpStatus.BAD_REQUEST).json({
-            status: HttpStatus.BAD_REQUEST,
-            error: buildErrorForApiResponse("sourceItemId must have a value")
-        });
+        respondWithFailedValidation(res, "sourceItemId must have a value");
         return;
     }
     if (sourceItemId === targetItemId) {
-        res.status(HttpStatus.BAD_REQUEST).json({
-            status: HttpStatus.BAD_REQUEST,
-            error: buildErrorForApiResponse("sourceItemId and targetItemId must be different!")
-        });
+        respondWithFailedValidation(res, "sourceItemId and targetItemId must be different!");
         return;
     }
     let transaction: Transaction;
@@ -199,9 +225,6 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
         if (transaction) {
             await transaction.rollback();
         }
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: buildErrorForApiResponse(err)
-        });
+        respondWithError(res, err);
     }
 };

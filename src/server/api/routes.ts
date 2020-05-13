@@ -5,7 +5,12 @@ import * as express from "express";
 import auth from "../middleware/auth";
 
 // handlers
-import { backlogItemsGetHandler, backlogItemsPostHandler, backlogItemsReorderPostHandler } from "./handlers/backlogItems";
+import {
+    backlogItemsDeleteHandler,
+    backlogItemsGetHandler,
+    backlogItemsPostHandler,
+    backlogItemsReorderPostHandler
+} from "./handlers/backlogItems";
 import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
 import { sprintsHandler } from "./handlers/sprint";
@@ -24,6 +29,7 @@ router.get("/sprints", auth, sprintsHandler);
 
 router.get("/backlog-items", auth, backlogItemsGetHandler);
 router.post("/backlog-items", auth, backlogItemsPostHandler);
+router.delete("/backlog-items/:backlogItemId", auth, backlogItemsDeleteHandler);
 
 router.post("/actions/reorder-backlog-items", auth, backlogItemsReorderPostHandler);
 
