@@ -53,39 +53,71 @@ export const backlogItemsGetHandler = async (req: Request, res: Response) => {
 };
 
 export const backlogItemsDeleteHandler = async (req: Request, res: Response) => {
-    // 1. check to see if it exists- 404 if it doesn't
-    // 2. remove backlog item rank entries and update links
-    // 3. remove backlog item
+    let committing = false;
+    let transaction: Transaction;
     try {
-        // const backlogItemRanks = await BacklogItemRankModel.findAll({});
-        // const rankList = new LinkedList<BacklogItem>();
-        // if (backlogItemRanks.length) {
-        //     const backlogItemRanksMapped = backlogItemRanks.map((item) => mapToBacklogItemRank(item));
-        //     backlogItemRanksMapped.forEach((item) => {
-        //         rankList.addLink(item.backlogitemId, item.nextbacklogitemId);
-        //     });
-        // }
+        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
+        await sequelize.query('SET CONSTRAINTS "backlogitemrank_backlogitemId_fkey" DEFERRED;', { transaction });
+        await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
         const id = req.params.backlogItemId;
+        let abort = true;
+        let backlogItem: BacklogItemModel = null;
+        let backlogItemTyped: BacklogItem = null;
         if (!id) {
             respondWithFailedValidation(res, "backlog item ID is required for DELETE");
         }
-        const backlogItem = await BacklogItemModel.findByPk(id);
-        if (backlogItem === null) {
+        backlogItem = await BacklogItemModel.findByPk(id, { transaction });
+        if (!backlogItem) {
             respondWithNotFound(res, `unable to find item by primary key ${id}`);
+        } else {
+            backlogItemTyped = mapToBacklogItem(backlogItem);
+            abort = false;
         }
-        // backlogItems.forEach((item) => {
-        //     const backlogItem = mapToBacklogItem(item);
-        //     const result: BacklogItem = {
-        //         ...backlogItem,
-        //         links: [buildSelfLink(backlogItem, "/api/v1/backlog-items/")]
-        //     };
-        //     rankList.addItemData(result.id, result);
-        // });
-        const deletedItem = {};
-        respondWithOk(res, deletedItem);
-    } catch (error) {
-        respondWithError(res, error);
-        console.log(`unable to fetch backlog items: ${error}`);
+        if (!abort) {
+            const firstLink = await BacklogItemRankModel.findOne({
+                where: { nextbacklogitemId: id },
+                transaction
+            });
+            let firstLinkTyped: BacklogItemRank = null;
+            if (!firstLink) {
+                respondWithNotFound(res, `Unable to find rank entry with next = ${id}`);
+                abort = true;
+            } else {
+                firstLinkTyped = (firstLink as unknown) as BacklogItemRank;
+            }
+
+            let secondLink: BacklogItemRankModel = null;
+            let secondLinkTyped: BacklogItemRank = null;
+
+            if (!abort) {
+                secondLink = await BacklogItemRankModel.findOne({
+                    where: { backlogitemId: id },
+                    transaction
+                });
+                if (!secondLink) {
+                    respondWithNotFound(res, `Unable to find rank entry with id = ${id}`);
+                    abort = true;
+                } else {
+                    secondLinkTyped = (secondLink as unknown) as BacklogItemRank;
+                }
+            }
+
+            if (!abort) {
+                await firstLink.update({ nextbacklogitemId: secondLinkTyped.nextbacklogitemId }, { transaction });
+                await BacklogItemRankModel.destroy({ where: { id: secondLinkTyped.id }, transaction });
+                await BacklogItemModel.destroy({ where: { id: backlogItemTyped.id }, transaction });
+                committing = true;
+                await transaction.commit();
+                respondWithOk(res, backlogItemTyped);
+            }
+        }
+    } catch (err) {
+        if (committing) {
+            console.log("an error occurred, skipping rollback because commit was already in progress");
+        } else if (transaction) {
+            await transaction.rollback();
+        }
+        respondWithError(res, err);
     }
 };
 
@@ -217,9 +249,7 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
 
         if (!rolledBack) {
             await transaction.commit();
-            res.status(HttpStatus.OK).json({
-                status: HttpStatus.OK
-            });
+            respondWithOk(res);
         }
     } catch (err) {
         if (transaction) {
