@@ -12,11 +12,13 @@ import {
     CancelIcon,
     DragIcon,
     DoneIcon,
+    EditDetailIcon,
     EditIcon,
     RefreshIcon,
     HamburgerIcon,
     IssueIcon,
-    StoryIcon
+    StoryIcon,
+    TrashIcon
 } from "@atoll/shared";
 import { SingleIconContainer, SideBySideIconContainers } from "../../common";
 
@@ -26,8 +28,10 @@ import "../../storybook";
 const invertibleIcons = {
     AppIcon,
     DragIcon,
+    EditDetailIcon,
     IssueIcon,
-    StoryIcon
+    StoryIcon,
+    TrashIcon
 };
 
 const icons = {
@@ -47,10 +51,12 @@ const iconNames = [
     "DragIcon",
     "DoneIcon",
     "EditIcon",
+    "EditDetailIcon",
     "RefreshIcon",
     "HamburgerIcon",
     "IssueIcon",
-    "StoryIcon"
+    "StoryIcon",
+    "TrashIcon"
 ];
 
 const getComponent = (iconName: string, isInverted: boolean) => {
