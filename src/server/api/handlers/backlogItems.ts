@@ -103,7 +103,12 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
             }
 
             if (!abort) {
-                await firstLink.update({ nextbacklogitemId: secondLinkTyped.nextbacklogitemId }, { transaction });
+                if (!firstLinkTyped.backlogitemId && !secondLinkTyped.nextbacklogitemId) {
+                    // we'll end up with one null-null row, just remove it instead
+                    await BacklogItemRankModel.destroy({ where: { id: firstLinkTyped.id }, transaction });
+                } else {
+                    await firstLink.update({ nextbacklogitemId: secondLinkTyped.nextbacklogitemId }, { transaction });
+                }
                 await BacklogItemRankModel.destroy({ where: { id: secondLinkTyped.id }, transaction });
                 await BacklogItemModel.destroy({ where: { id: backlogItemTyped.id }, transaction });
                 committing = true;
@@ -122,6 +127,8 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
 };
 
 export const backlogItemsPostHandler = async (req: Request, res: Response) => {
+    // TODO: Fix this code:
+    //       - must insert `null x` and `x null` entries
     const bodyWithId = { ...addIdToBody(req.body) };
     const prevBacklogItemId = bodyWithId.prevBacklogItemId;
     delete bodyWithId.prevBacklogItemId;
@@ -134,10 +141,16 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         const addedBacklogItem = await BacklogItemModel.create(bodyWithId, { transaction } as CreateOptions);
         if (!prevBacklogItemId) {
             // inserting first item means one of 2 scenarios:
-            //   1) no items in database yet (add prev = null, next = this new item)
+            //   1) no items in database yet (add prev = null, next = this new item + add prev = new item, next = null)
             //   2) insert before first item (update item's prev to this item, add prev = null, next = this new item)
             const firstItems = await BacklogItemRankModel.findAll({ where: { backlogitemId: null }, transaction });
-            if (firstItems.length) {
+            if (!firstItems.length) {
+                // scenario 1, insert head and tail
+                await BacklogItemRankModel.create({ ...addIdToBody({ backlogitemId: bodyWithId.id, nextbacklogitemId: null }) }, {
+                    transaction
+                } as CreateOptions);
+            } else {
+                // scenario 2, insert before first item
                 const firstItem = firstItems[0];
                 await firstItem.update({ backlogitemId: bodyWithId.id }, { transaction });
             }
