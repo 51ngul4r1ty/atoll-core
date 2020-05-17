@@ -59,7 +59,7 @@
     "check": "node ./scripts/check-package-json.js"
   },
   "dependencies": {
-    "@atoll/shared": "file:.yalc/@atoll/shared",
+    "@atoll/shared": "0.7.1",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.19.2",
