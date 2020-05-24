@@ -1,5 +1,5 @@
 // interfaces/types
-import { ItemWithId, Link } from "../dataaccess/types";
+import { ItemWithId, Link } from "@atoll/shared";
 
 // consts/enums
 import { APPLICATION_JSON } from "@atoll/shared";
@@ -9,6 +9,15 @@ export const buildSelfLink = (item: ItemWithId, basePath: string): Link => {
         type: APPLICATION_JSON,
         method: "GET",
         rel: "self",
+        uri: `${basePath}${item.id}`
+    };
+};
+
+export const buildUpdateLink = (item: ItemWithId, basePath: string): Link => {
+    return {
+        type: APPLICATION_JSON,
+        method: "PUT",
+        rel: "update",
         uri: `${basePath}${item.id}`
     };
 };
