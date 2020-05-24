@@ -1,13 +1,14 @@
-import { BacklogItem, BacklogItemRank, Sprint } from "./types";
+// libraries
+import { ApiBacklogItem, ApiBacklogItemRank, ApiSprint } from "@atoll/shared";
 
-export const mapToBacklogItem = (item: any): BacklogItem => ({
+export const mapToBacklogItem = (item: any): ApiBacklogItem => ({
     ...item.dataValues
 });
 
-export const mapToBacklogItemRank = (item: any): BacklogItemRank => ({
+export const mapToBacklogItemRank = (item: any): ApiBacklogItemRank => ({
     ...item.dataValues
 });
 
-export const mapToSprint = (item: any): Sprint => ({
+export const mapToSprint = (item: any): ApiSprint => ({
     ...item.dataValues
 });

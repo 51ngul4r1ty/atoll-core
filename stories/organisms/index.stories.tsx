@@ -72,7 +72,7 @@ storiesOf("Organisms|Forms/BacklogItemDetailForm", module)
 
 const allItems: BacklogItemWithSource[] = [
     {
-        creationDateTime: undefined,
+        createdAt: undefined,
         estimate: null,
         externalId: "id-1",
         id: "db-id-1",
@@ -84,7 +84,7 @@ const allItems: BacklogItemWithSource[] = [
         source: BacklogItemSource.Loaded
     },
     {
-        creationDateTime: undefined,
+        createdAt: undefined,
         estimate: null,
         externalId: "p-x",
         id: "db-pushed-id-x",
@@ -96,7 +96,7 @@ const allItems: BacklogItemWithSource[] = [
         source: BacklogItemSource.Pushed
     },
     {
-        creationDateTime: undefined,
+        createdAt: undefined,
         estimate: null,
         externalId: "id-2",
         id: "db-id-2",
@@ -108,7 +108,7 @@ const allItems: BacklogItemWithSource[] = [
         source: BacklogItemSource.Loaded
     },
     {
-        creationDateTime: undefined,
+        createdAt: undefined,
         estimate: null,
         externalId: "id-3",
         id: "db-id-3",
@@ -120,7 +120,7 @@ const allItems: BacklogItemWithSource[] = [
         source: BacklogItemSource.Loaded
     },
     {
-        creationDateTime: undefined,
+        createdAt: undefined,
         estimate: null,
         externalId: "id-4",
         id: "db-id-4",
@@ -135,7 +135,7 @@ const allItems: BacklogItemWithSource[] = [
 
 for (let i = 5; i <= 50; i++) {
     allItems.push({
-        creationDateTime: undefined,
+        createdAt: undefined,
         estimate: null,
         externalId: `id-${i}`,
         id: `db-id-${i}`,

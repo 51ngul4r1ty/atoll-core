@@ -9,7 +9,8 @@ import {
     backlogItemsDeleteHandler,
     backlogItemsGetHandler,
     backlogItemsPostHandler,
-    backlogItemsReorderPostHandler
+    backlogItemsReorderPostHandler,
+    backlogItemGetHandler
 } from "./handlers/backlogItems";
 import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
@@ -28,6 +29,7 @@ router.get("/users/:userId/feature-toggles", auth, featureTogglesHandler);
 router.get("/sprints", auth, sprintsHandler);
 
 router.get("/backlog-items", auth, backlogItemsGetHandler);
+router.get("/backlog-items/:itemId", auth, backlogItemGetHandler);
 router.post("/backlog-items", auth, backlogItemsPostHandler);
 router.delete("/backlog-items/:backlogItemId", auth, backlogItemsDeleteHandler);
 
