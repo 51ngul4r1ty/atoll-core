@@ -61,7 +61,8 @@ export interface BacklogItemGetParams extends core.ParamsDictionary {
 
 export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, res: Response) => {
     try {
-        const id = req.query.itemId;
+        const id = req.params.itemId;
+        console.log(`id: ${id}`);
         const backlogItem = await BacklogItemModel.findByPk(id);
         const backlogItemTyped = mapToBacklogItem(backlogItem);
         const result: ApiBacklogItem = {
