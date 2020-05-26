@@ -9,7 +9,7 @@ import { ApiBacklogItem, ApiBacklogItemRank } from "@atoll/shared";
 
 // utils
 import { LinkedList } from "@atoll/shared";
-import { buildItemLink } from "../../utils/linkBuilder";
+import { buildSelfLink } from "../../utils/linkBuilder";
 import { respondWithFailedValidation, respondWithNotFound, respondWithError, respondWithOk } from "../utils/responder";
 
 // data access
@@ -34,7 +34,7 @@ export const backlogItemsGetHandler = async (req: Request, res: Response) => {
             const backlogItem = mapToBacklogItem(item);
             const result: ApiBacklogItem = {
                 ...backlogItem,
-                links: [buildItemLink(backlogItem, "/api/v1/backlog-items/")]
+                links: [buildSelfLink(backlogItem, "/api/v1/backlog-items/")]
             };
             rankList.addItemData(result.id, result);
         });
@@ -62,17 +62,11 @@ export interface BacklogItemGetParams extends core.ParamsDictionary {
 export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, res: Response) => {
     try {
         const id = req.params.itemId;
-        console.log(`id: ${id}`);
         const backlogItem = await BacklogItemModel.findByPk(id);
-        const backlogItemTyped = mapToBacklogItem(backlogItem);
-        const result: ApiBacklogItem = {
-            ...backlogItemTyped,
-            links: [buildItemLink(backlogItemTyped, "/api/v1/backlog-items/")]
-        };
         res.json({
             status: HttpStatus.OK,
             data: {
-                item: result
+                item: mapToBacklogItem(backlogItem)
             }
         });
     } catch (error) {

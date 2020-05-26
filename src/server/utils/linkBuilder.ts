@@ -4,20 +4,14 @@ import { ItemWithId, Link } from "@atoll/shared";
 // consts/enums
 import { APPLICATION_JSON } from "@atoll/shared";
 
-export const buildItemLink = (item: ItemWithId, basePath: string): Link => {
+export const buildLink = (item: ItemWithId, basePath: string, rel: string): Link => {
     return {
         type: APPLICATION_JSON,
-        method: "GET",
-        rel: "item",
+        rel,
         uri: `${basePath}${item.id}`
     };
 };
 
-export const buildUpdateLink = (item: ItemWithId, basePath: string): Link => {
-    return {
-        type: APPLICATION_JSON,
-        method: "PUT",
-        rel: "update",
-        uri: `${basePath}${item.id}`
-    };
-};
+export const buildItemLink = (item: ItemWithId, basePath: string) => buildLink(item, basePath, "item");
+
+export const buildSelfLink = (item: ItemWithId, basePath: string) => buildLink(item, basePath, "self");
