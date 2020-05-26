@@ -17,7 +17,9 @@ import { rootHandler } from "./handlers/root";
 import { sprintsHandler } from "./handlers/sprint";
 import { userPreferencesHandler } from "./handlers/userPreferences";
 import { loginPostHandler, refreshTokenPostHandler } from "./handlers/auth";
-import { route } from "./utils/routerHelper";
+
+// utils
+import { setupRoutes, setupNoAuthRoutes } from "./utils/routerHelper";
 
 export const router = express.Router();
 
@@ -27,23 +29,19 @@ router.options("/*", (req, res, next) => {
     next();
 });
 
-router.options("/", (req, res) => {
-    res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
-    res.status(204).send();
-});
-router.get("/", rootHandler);
+setupNoAuthRoutes(router, "/", { get: rootHandler });
 
-router.get("/users/:userId/preferences", auth, userPreferencesHandler);
+setupRoutes(router, "/users/:userId/preferences", { get: userPreferencesHandler });
 
-router.get("/users/:userId/feature-toggles", auth, featureTogglesHandler);
+setupRoutes(router, "/users/:userId/feature-toggles", { get: featureTogglesHandler });
 
-router.get("/sprints", auth, sprintsHandler);
+setupRoutes(router, "/sprints", { get: sprintsHandler });
 
-router.get("/backlog-items", auth, backlogItemsGetHandler);
-router.post("/backlog-items", auth, backlogItemsPostHandler);
+setupRoutes(router, "/backlog-items", { get: backlogItemsGetHandler, post: backlogItemsPostHandler });
 
-route(router, "/backlog-items/:itemId", { get: backlogItemGetHandler, delete: backlogItemsDeleteHandler });
+setupRoutes(router, "/backlog-items/:itemId", { get: backlogItemGetHandler, delete: backlogItemsDeleteHandler });
 
+// TODO: Add options routes for these actions
 router.post("/actions/reorder-backlog-items", auth, backlogItemsReorderPostHandler);
 
 router.post("/actions/login", loginPostHandler);
