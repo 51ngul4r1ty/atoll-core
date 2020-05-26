@@ -9,7 +9,7 @@ import { ApiBacklogItem, ApiBacklogItemRank } from "@atoll/shared";
 
 // utils
 import { LinkedList } from "@atoll/shared";
-import { buildSelfLink } from "../../utils/linkBuilder";
+import { buildItemLink } from "../../utils/linkBuilder";
 import { respondWithFailedValidation, respondWithNotFound, respondWithError, respondWithOk } from "../utils/responder";
 
 // data access
@@ -34,7 +34,7 @@ export const backlogItemsGetHandler = async (req: Request, res: Response) => {
             const backlogItem = mapToBacklogItem(item);
             const result: ApiBacklogItem = {
                 ...backlogItem,
-                links: [buildSelfLink(backlogItem, "/api/v1/backlog-items/")]
+                links: [buildItemLink(backlogItem, "/api/v1/backlog-items/")]
             };
             rankList.addItemData(result.id, result);
         });
@@ -67,7 +67,7 @@ export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, 
         const backlogItemTyped = mapToBacklogItem(backlogItem);
         const result: ApiBacklogItem = {
             ...backlogItemTyped,
-            links: [buildSelfLink(backlogItemTyped, "/api/v1/backlog-items/")]
+            links: [buildItemLink(backlogItemTyped, "/api/v1/backlog-items/")]
         };
         res.json({
             status: HttpStatus.OK,

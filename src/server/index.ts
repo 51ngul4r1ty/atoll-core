@@ -6,7 +6,7 @@ import * as TextEncodingPolyfill from "text-encoding-polyfill";
 // import * as uuidv1 from "uuid/v1";
 
 import bodyParser from "body-parser";
-import cors from "cors";
+// import cors from "cors";
 import chalk from "chalk";
 import manifestHelpers from "express-manifest-helpers";
 import path from "path";
@@ -110,7 +110,7 @@ ws.app.ws("/ws", function(ws2, req) {
 app.use(paths.publicPath, express.static(path.join(paths.clientBuild, paths.publicPath)));
 //}
 
-app.use(cors());
+//app.use(cors());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -149,6 +149,14 @@ app.use(
         manifestPath: `${manifestPath}/manifest.json`
     })
 );
+
+// app.use("/api/v1/backlog-items/*", function(req, res, next) {
+//     console.log("GOT HERE");
+//     res.header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+//     // .header("Access-Control-Allow-Origin", "*")
+//     // .header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
+//     next();
+// });
 
 app.use("/api/v1", router);
 

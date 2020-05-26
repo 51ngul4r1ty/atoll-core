@@ -2,7 +2,7 @@
 import { ApiSprint } from "@atoll/shared";
 
 // utils
-import { buildSelfLink } from "../../utils/linkBuilder";
+import { buildItemLink } from "../../utils/linkBuilder";
 
 // data access
 import { mapToSprint, SprintModel } from "../../dataaccess";
@@ -14,7 +14,7 @@ export const sprintsHandler = function(req, res) {
                 const sprint = mapToSprint(item);
                 const result: ApiSprint = {
                     ...sprint,
-                    links: [buildSelfLink(sprint, "/api/v1/sprints/")]
+                    links: [buildItemLink(sprint, "/api/v1/sprints/")]
                 };
                 return result;
             });
