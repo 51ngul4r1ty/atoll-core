@@ -243,6 +243,26 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
     }
 };
 
+export const backlogItemPutHandler = async (req: Request, res: Response) => {
+    try {
+        const backlogItem = await BacklogItemModel.findOne({
+            where: { id: req.body.id }
+        });
+        if (!backlogItem) {
+            respondWithNotFound(res, `Unable to find item to update with ID ${req.body.id}`);
+        }
+        await backlogItem.update(req.body);
+        res.status(HttpStatus.OK).json({
+            status: HttpStatus.OK,
+            data: {
+                item: backlogItem
+            }
+        });
+    } catch (err) {
+        respondWithError(res, err);
+    }
+};
+
 export const backlogItemsReorderPostHandler = async (req: Request, res: Response) => {
     const sourceItemId = req.body.sourceItemId;
     const targetItemId = req.body.targetItemId;

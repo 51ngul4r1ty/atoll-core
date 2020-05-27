@@ -10,7 +10,8 @@ import {
     backlogItemsGetHandler,
     backlogItemsPostHandler,
     backlogItemsReorderPostHandler,
-    backlogItemGetHandler
+    backlogItemGetHandler,
+    backlogItemPutHandler
 } from "./handlers/backlogItems";
 import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
@@ -39,7 +40,11 @@ setupRoutes(router, "/sprints", { get: sprintsHandler });
 
 setupRoutes(router, "/backlog-items", { get: backlogItemsGetHandler, post: backlogItemsPostHandler });
 
-setupRoutes(router, "/backlog-items/:itemId", { get: backlogItemGetHandler, delete: backlogItemsDeleteHandler });
+setupRoutes(router, "/backlog-items/:itemId", {
+    get: backlogItemGetHandler,
+    put: backlogItemPutHandler,
+    delete: backlogItemsDeleteHandler
+});
 
 // TODO: Add options routes for these actions
 router.post("/actions/reorder-backlog-items", auth, backlogItemsReorderPostHandler);
