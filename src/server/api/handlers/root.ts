@@ -11,8 +11,7 @@ export const rootHandler = function(req, res) {
                     links: [
                         {
                             type: APPLICATION_JSON,
-                            method: "GET",
-                            rel: "self",
+                            rel: "collection",
                             uri: "/api/v1/users/{self}/preferences"
                         }
                     ]
@@ -23,8 +22,7 @@ export const rootHandler = function(req, res) {
                     links: [
                         {
                             type: APPLICATION_JSON,
-                            method: "GET",
-                            rel: "self",
+                            rel: "collection",
                             uri: "/api/v1/users/{self}/feature-toggles"
                         }
                     ]
@@ -35,8 +33,7 @@ export const rootHandler = function(req, res) {
                     links: [
                         {
                             type: APPLICATION_JSON,
-                            method: "GET",
-                            rel: "self",
+                            rel: "collection",
                             uri: "/api/v1/sprints"
                         }
                     ]
@@ -47,8 +44,7 @@ export const rootHandler = function(req, res) {
                     links: [
                         {
                             type: APPLICATION_JSON,
-                            method: "GET",
-                            rel: "self",
+                            rel: "collection",
                             uri: "/api/v1/backlog-items"
                         }
                     ]

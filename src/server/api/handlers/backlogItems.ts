@@ -1,7 +1,11 @@
 // externals
 import { Request, Response } from "express";
+import * as core from "express-serve-static-core";
 import * as HttpStatus from "http-status-codes";
 import { CreateOptions, Transaction } from "sequelize";
+
+// libraries
+import { ApiBacklogItem, ApiBacklogItemRank } from "@atoll/shared";
 
 // utils
 import { LinkedList } from "@atoll/shared";
@@ -13,13 +17,12 @@ import { mapToBacklogItem, mapToBacklogItemRank, BacklogItemModel, BacklogItemRa
 import { sequelize } from "../../dataaccess/connection";
 
 // interfaces/types
-import { BacklogItem, BacklogItemRank } from "../../dataaccess/types";
 import { addIdToBody } from "../utils/uuidHelper";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     try {
         const backlogItemRanks = await BacklogItemRankModel.findAll({});
-        const rankList = new LinkedList<BacklogItem>();
+        const rankList = new LinkedList<ApiBacklogItem>();
         if (backlogItemRanks.length) {
             const backlogItemRanksMapped = backlogItemRanks.map((item) => mapToBacklogItemRank(item));
             backlogItemRanksMapped.forEach((item) => {
@@ -29,7 +32,7 @@ export const backlogItemsGetHandler = async (req: Request, res: Response) => {
         const backlogItems = await BacklogItemModel.findAll({});
         backlogItems.forEach((item) => {
             const backlogItem = mapToBacklogItem(item);
-            const result: BacklogItem = {
+            const result: ApiBacklogItem = {
                 ...backlogItem,
                 links: [buildSelfLink(backlogItem, "/api/v1/backlog-items/")]
             };
@@ -39,6 +42,31 @@ export const backlogItemsGetHandler = async (req: Request, res: Response) => {
             status: HttpStatus.OK,
             data: {
                 items: rankList.toArray()
+            }
+        });
+    } catch (error) {
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            error: {
+                msg: error
+            }
+        });
+        console.log(`unable to fetch backlog items: ${error}`);
+    }
+};
+
+export interface BacklogItemGetParams extends core.ParamsDictionary {
+    itemId: string;
+}
+
+export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, res: Response) => {
+    try {
+        const id = req.params.itemId;
+        const backlogItem = await BacklogItemModel.findByPk(id);
+        res.json({
+            status: HttpStatus.OK,
+            data: {
+                item: mapToBacklogItem(backlogItem)
             }
         });
     } catch (error) {
@@ -62,7 +90,7 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
         const id = req.params.backlogItemId;
         let abort = true;
         let backlogItem: BacklogItemModel = null;
-        let backlogItemTyped: BacklogItem = null;
+        let backlogItemTyped: ApiBacklogItem = null;
         if (!id) {
             respondWithFailedValidation(res, "backlog item ID is required for DELETE");
         }
@@ -78,16 +106,16 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
                 where: { nextbacklogitemId: id },
                 transaction
             });
-            let firstLinkTyped: BacklogItemRank = null;
+            let firstLinkTyped: ApiBacklogItemRank = null;
             if (!firstLink) {
                 respondWithNotFound(res, `Unable to find rank entry with next = ${id}`);
                 abort = true;
             } else {
-                firstLinkTyped = (firstLink as unknown) as BacklogItemRank;
+                firstLinkTyped = (firstLink as unknown) as ApiBacklogItemRank;
             }
 
             let secondLink: BacklogItemRankModel = null;
-            let secondLinkTyped: BacklogItemRank = null;
+            let secondLinkTyped: ApiBacklogItemRank = null;
 
             if (!abort) {
                 secondLink = await BacklogItemRankModel.findOne({
@@ -98,7 +126,7 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
                     respondWithNotFound(res, `Unable to find rank entry with id = ${id}`);
                     abort = true;
                 } else {
-                    secondLinkTyped = (secondLink as unknown) as BacklogItemRank;
+                    secondLinkTyped = (secondLink as unknown) as ApiBacklogItemRank;
                 }
             }
 
@@ -181,7 +209,7 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
             } else {
                 const prevBacklogItem = prevBacklogItems[0];
                 // (2) oldNextItemId = prevBacklogItem.nextbacklogitemId
-                const oldNextItemId = ((prevBacklogItem as unknown) as BacklogItemRank).nextbacklogitemId;
+                const oldNextItemId = ((prevBacklogItem as unknown) as ApiBacklogItemRank).nextbacklogitemId;
                 // (3) update existing entry with nextbacklogitemId = bodyWithId.id
                 await prevBacklogItem.update({ nextbacklogitemId: bodyWithId.id }, { transaction });
                 // (4) add new row with backlogitemId = bodyWithId.id, nextbacklogitemId = oldNextItemId
@@ -211,6 +239,26 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         if (transaction) {
             await transaction.rollback();
         }
+        respondWithError(res, err);
+    }
+};
+
+export const backlogItemPutHandler = async (req: Request, res: Response) => {
+    try {
+        const backlogItem = await BacklogItemModel.findOne({
+            where: { id: req.body.id }
+        });
+        if (!backlogItem) {
+            respondWithNotFound(res, `Unable to find item to update with ID ${req.body.id}`);
+        }
+        await backlogItem.update(req.body);
+        res.status(HttpStatus.OK).json({
+            status: HttpStatus.OK,
+            data: {
+                item: backlogItem
+            }
+        });
+    } catch (err) {
         respondWithError(res, err);
     }
 };

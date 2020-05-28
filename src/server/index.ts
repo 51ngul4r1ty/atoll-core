@@ -6,7 +6,6 @@ import * as TextEncodingPolyfill from "text-encoding-polyfill";
 // import * as uuidv1 from "uuid/v1";
 
 import bodyParser from "body-parser";
-import cors from "cors";
 import chalk from "chalk";
 import manifestHelpers from "express-manifest-helpers";
 import path from "path";
@@ -109,8 +108,6 @@ ws.app.ws("/ws", function(ws2, req) {
 //if (process.env.NODE_ENV === "development") {
 app.use(paths.publicPath, express.static(path.join(paths.clientBuild, paths.publicPath)));
 //}
-
-app.use(cors());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

@@ -9,7 +9,9 @@ import {
     backlogItemsDeleteHandler,
     backlogItemsGetHandler,
     backlogItemsPostHandler,
-    backlogItemsReorderPostHandler
+    backlogItemsReorderPostHandler,
+    backlogItemGetHandler,
+    backlogItemPutHandler
 } from "./handlers/backlogItems";
 import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
@@ -17,20 +19,34 @@ import { sprintsHandler } from "./handlers/sprint";
 import { userPreferencesHandler } from "./handlers/userPreferences";
 import { loginPostHandler, refreshTokenPostHandler } from "./handlers/auth";
 
+// utils
+import { setupRoutes, setupNoAuthRoutes } from "./utils/routerHelper";
+
 export const router = express.Router();
 
-router.get("/", auth, rootHandler);
+router.options("/*", (req, res, next) => {
+    res.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.set("Access-Control-Allow-Origin", "*");
+    next();
+});
 
-router.get("/users/:userId/preferences", auth, userPreferencesHandler);
+setupNoAuthRoutes(router, "/", { get: rootHandler });
 
-router.get("/users/:userId/feature-toggles", auth, featureTogglesHandler);
+setupRoutes(router, "/users/:userId/preferences", { get: userPreferencesHandler });
 
-router.get("/sprints", auth, sprintsHandler);
+setupRoutes(router, "/users/:userId/feature-toggles", { get: featureTogglesHandler });
 
-router.get("/backlog-items", auth, backlogItemsGetHandler);
-router.post("/backlog-items", auth, backlogItemsPostHandler);
-router.delete("/backlog-items/:backlogItemId", auth, backlogItemsDeleteHandler);
+setupRoutes(router, "/sprints", { get: sprintsHandler });
 
+setupRoutes(router, "/backlog-items", { get: backlogItemsGetHandler, post: backlogItemsPostHandler });
+
+setupRoutes(router, "/backlog-items/:itemId", {
+    get: backlogItemGetHandler,
+    put: backlogItemPutHandler,
+    delete: backlogItemsDeleteHandler
+});
+
+// TODO: Add options routes for these actions
 router.post("/actions/reorder-backlog-items", auth, backlogItemsReorderPostHandler);
 
 router.post("/actions/login", loginPostHandler);
