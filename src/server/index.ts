@@ -147,14 +147,6 @@ app.use(
     })
 );
 
-// app.use("/api/v1/backlog-items/*", function(req, res, next) {
-//     console.log("GOT HERE");
-//     res.header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
-//     // .header("Access-Control-Allow-Origin", "*")
-//     // .header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
-//     next();
-// });
-
 app.use("/api/v1", router);
 
 app.use(serverRenderer());
