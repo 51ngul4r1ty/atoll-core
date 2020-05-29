@@ -29,7 +29,7 @@ Steps after Cloning Repo
 1. `npm ci` (if you see errors about removing node_modules then remove package-lock.json and use
    `npm i` instead)
 2. Clone `atoll-shared` repo and follow instructions in its README.md to get it building correctly.
-3. `npm run sync` in `atoll-core` repo to get it to use the latest version of the shared repo code.
+3. `npm run sync-quick` in `atoll-core` repo to get it to use the latest version of the shared repo code.
 4. `npm run build` (if this succeeds you have all dependencies correct)
 5. Use `setup.sql` to set up "atoll" database and `data.sql` to set up some sample data.
 6. Use VS Code to open `atoll-core-main.code-workspace` - this will ensure that you see `atoll-core`
@@ -42,6 +42,13 @@ Steps after Cloning Repo
    perform TDD coding iterations.  This will cause the tests to run every time code
    changes are saved and coverage gutters will be updated automatically (use "Watch"
    in the VS Code tray area).
+
+Active Development
+------------------
+
+- Use `npm start` to start up the local dev server (after using `npm run sync-quick` at least once to make sure it compiles and uses
+  the local "atoll-shared" module).
+- Use `npm run storybook` to start up storybook for developing components.
 
 Debugging Server
 ----------------
