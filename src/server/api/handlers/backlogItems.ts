@@ -87,7 +87,7 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_backlogitemId_fkey" DEFERRED;', { transaction });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
-        const id = req.params.backlogItemId;
+        const id = req.params.itemId;
         let abort = true;
         let backlogItem: BacklogItemModel = null;
         let backlogItemTyped: ApiBacklogItem = null;
@@ -244,9 +244,22 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
 };
 
 export const backlogItemPutHandler = async (req: Request, res: Response) => {
+    const queryParamItemId = req.params.itemId;
+    if (!queryParamItemId) {
+        respondWithFailedValidation(res, "Item ID is required in URI path for this operation");
+        return;
+    }
+    const bodyItemId = req.body.id;
+    if (queryParamItemId != bodyItemId) {
+        respondWithFailedValidation(
+            res,
+            `Item ID in URI path (${queryParamItemId}) should match Item ID in payload (${bodyItemId})`
+        );
+        return;
+    }
     try {
         const backlogItem = await BacklogItemModel.findOne({
-            where: { id: req.body.id }
+            where: { id: bodyItemId }
         });
         if (!backlogItem) {
             respondWithNotFound(res, `Unable to find item to update with ID ${req.body.id}`);
