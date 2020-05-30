@@ -15,9 +15,9 @@ import {
     BacklogItemDetailForm,
     BacklogItemPlanningPanel,
     BacklogItemWithSource,
-    BacklogItemType,
     BacklogItemSource,
-    EditMode
+    EditMode,
+    PushState
 } from "@atoll/shared";
 
 const mockStore = configureStore();
@@ -29,6 +29,7 @@ storiesOf("Organisms|Forms/BacklogItemDetailForm", module)
     .add("BacklogItemDetailForm (issue)", () => (
         <div>
             <BacklogItemDetailForm
+                id="1"
                 type={select("type", ["issue", "story"], "issue")}
                 estimate={number("estimate", 13)}
                 externalId={text("externalId", "B1000032")}
@@ -43,6 +44,7 @@ storiesOf("Organisms|Forms/BacklogItemDetailForm", module)
     .add("BacklogItemDetailForm (story)", () => (
         <div>
             <BacklogItemDetailForm
+                id="2"
                 type={select("type", ["issue", "story"], "story")}
                 estimate={number("estimate", 8)}
                 externalId={text("externalId", "527")}
@@ -57,6 +59,7 @@ storiesOf("Organisms|Forms/BacklogItemDetailForm", module)
     .add("BacklogItemDetailForm Mobile (story)", () => (
         <div>
             <BacklogItemDetailForm
+                id="3"
                 type={select("type", ["issue", "story"], "story")}
                 estimate={number("estimate", 8)}
                 externalId={text("externalId", "527")}
@@ -117,7 +120,8 @@ const allItems: BacklogItemWithSource[] = [
         storyPhrase: "I can delete a backlog item",
         type: "story",
         saved: true,
-        source: BacklogItemSource.Loaded
+        source: BacklogItemSource.Loaded,
+        pushState: PushState.Changed
     },
     {
         createdAt: undefined,
@@ -129,7 +133,8 @@ const allItems: BacklogItemWithSource[] = [
         storyPhrase: "I can filter the list of backlog items",
         type: "story",
         saved: true,
-        source: BacklogItemSource.Loaded
+        source: BacklogItemSource.Loaded,
+        pushState: PushState.Removed
     }
 ];
 
@@ -160,6 +165,7 @@ storiesOf("Organisms|Panels/BacklogItemPlanningPanel", module).add("BacklogItemP
                 onReorderBacklogItems={() => {
                     alert("re-order backlog items");
                 }}
+                openedDetailMenuBacklogItemId={null}
             />
         </Provider>
     </div>
@@ -167,15 +173,6 @@ storiesOf("Organisms|Panels/BacklogItemPlanningPanel", module).add("BacklogItemP
 
 storiesOf("Organisms|Forms/LoginForm", module).add("LoginForm", () => (
     <div>
-        <LoginForm
-            type={select("type", ["issue", "story"], "issue")}
-            estimate={number("estimate", 13)}
-            externalId={text("externalId", "B1000032")}
-            rolePhrase={text("rolePhrase", null)}
-            storyPhrase={text("storyPhrase", bugStoryPhrase)}
-            reasonPhrase={text("reasonPhrase", null)}
-            editing={boolean("editing", false)}
-            instanceId={number("instanceId", 1)}
-        />
+        <LoginForm username="username" password="password" />
     </div>
 ));
