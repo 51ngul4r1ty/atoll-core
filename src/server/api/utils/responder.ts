@@ -25,6 +25,11 @@ export const respondWithFailedValidation = (res: Response, message: string) => {
     respondWithStatus(res, message, HttpStatus.BAD_REQUEST);
 };
 
-export const respondWithOk = (res: Response, data?: object) => {
-    res.send({ data, status: HttpStatus.OK });
+export const respondWithOk = (res: Response, data?: object, original?: object) => {
+    const responseObj = { data, status: HttpStatus.OK };
+    if (original) {
+        res.send({ ...responseObj, meta: { original } });
+    } else {
+        res.send(responseObj);
+    }
 };

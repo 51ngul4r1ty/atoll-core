@@ -89,18 +89,18 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
         const id = req.params.itemId;
         let abort = true;
-        let backlogItem: BacklogItemModel = null;
-        let backlogItemTyped: ApiBacklogItem = null;
         if (!id) {
             respondWithFailedValidation(res, "backlog item ID is required for DELETE");
         }
-        backlogItem = await BacklogItemModel.findByPk(id, { transaction });
+        let backlogItemTyped: ApiBacklogItem = null;
+        let backlogItem: BacklogItemModel = await BacklogItemModel.findByPk(id, { transaction });
         if (!backlogItem) {
             respondWithNotFound(res, `unable to find item by primary key ${id}`);
         } else {
             backlogItemTyped = mapToBacklogItem(backlogItem);
             abort = false;
         }
+        const originalBacklogItem = { ...backlogItemTyped };
         if (!abort) {
             const firstLink = await BacklogItemRankModel.findOne({
                 where: { nextbacklogitemId: id },
@@ -141,7 +141,7 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
                 await BacklogItemModel.destroy({ where: { id: backlogItemTyped.id }, transaction });
                 committing = true;
                 await transaction.commit();
-                respondWithOk(res, backlogItemTyped);
+                respondWithOk(res, backlogItemTyped, originalBacklogItem);
             }
         }
     } catch (err) {
