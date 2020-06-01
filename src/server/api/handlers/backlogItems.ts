@@ -10,7 +10,7 @@ import { ApiBacklogItem, ApiBacklogItemRank } from "@atoll/shared";
 // utils
 import { LinkedList } from "@atoll/shared";
 import { buildSelfLink } from "../../utils/linkBuilder";
-import { respondWithFailedValidation, respondWithNotFound, respondWithError, respondWithOk } from "../utils/responder";
+import { respondWithFailedValidation, respondWithNotFound, respondWithError, respondWithOk, respondWithItem } from "../utils/responder";
 
 // data access
 import { mapToBacklogItem, mapToBacklogItemRank, BacklogItemModel, BacklogItemRankModel } from "../../dataaccess";
@@ -100,7 +100,6 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
             backlogItemTyped = mapToBacklogItem(backlogItem);
             abort = false;
         }
-        const originalBacklogItem = { ...backlogItemTyped };
         if (!abort) {
             const firstLink = await BacklogItemRankModel.findOne({
                 where: { nextbacklogitemId: id },
@@ -141,7 +140,7 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
                 await BacklogItemModel.destroy({ where: { id: backlogItemTyped.id }, transaction });
                 committing = true;
                 await transaction.commit();
-                respondWithOk(res, backlogItemTyped, originalBacklogItem);
+                respondWithItem(res, backlogItemTyped);
             }
         }
     } catch (err) {
@@ -264,13 +263,10 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
         if (!backlogItem) {
             respondWithNotFound(res, `Unable to find item to update with ID ${req.body.id}`);
         }
+        const originalBacklogItem = mapToBacklogItem(backlogItem);
+
         await backlogItem.update(req.body);
-        res.status(HttpStatus.OK).json({
-            status: HttpStatus.OK,
-            data: {
-                item: backlogItem
-            }
-        });
+        respondWithItem(res, backlogItem, originalBacklogItem);
     } catch (err) {
         respondWithError(res, err);
     }
