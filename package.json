@@ -1,6 +1,6 @@
 {
   "name": "atoll",
-  "version": "0.8.2",
+  "version": "0.9.2",
   "author": {
     "name": "Kevin Berry",
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
@@ -62,7 +62,7 @@
     "check": "node ./scripts/check-package-json.js"
   },
   "dependencies": {
-    "@atoll/shared": "0.8.3-alpha.1",
+    "@atoll/shared": "0.9.2",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.19.2",
