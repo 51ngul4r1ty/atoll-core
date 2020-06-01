@@ -2,7 +2,7 @@
 import { Request, Response } from "express";
 
 // libraries
-import { respondWithNotImplemented, respondWithOk } from "../utils/responder";
+import { respondWithNotImplemented, respondWithOk, respondWithItems } from "../utils/responder";
 
 // consts/enums
 import { FEATURE_TOGGLE_LIST } from "../../api/data/featureToggles";
@@ -15,6 +15,6 @@ export const featureTogglesHandler = function(req: Request, res: Response) {
             "This endpoint is intended as an admin endpoint, so a typical user would not be able to use it."
         );
     } else {
-        respondWithOk(res, FEATURE_TOGGLE_LIST);
+        respondWithItems(res, FEATURE_TOGGLE_LIST);
     }
 };

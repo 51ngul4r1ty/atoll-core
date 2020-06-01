@@ -10,7 +10,7 @@ import { ApiBacklogItem, ApiBacklogItemRank } from "@atoll/shared";
 // utils
 import { LinkedList } from "@atoll/shared";
 import { buildSelfLink } from "../../utils/linkBuilder";
-import { respondWithFailedValidation, respondWithNotFound, respondWithError, respondWithOk } from "../utils/responder";
+import { respondWithFailedValidation, respondWithNotFound, respondWithError, respondWithOk, respondWithItem } from "../utils/responder";
 
 // data access
 import { mapToBacklogItem, mapToBacklogItemRank, BacklogItemModel, BacklogItemRankModel } from "../../dataaccess";
@@ -89,12 +89,11 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
         const id = req.params.itemId;
         let abort = true;
-        let backlogItem: BacklogItemModel = null;
-        let backlogItemTyped: ApiBacklogItem = null;
         if (!id) {
             respondWithFailedValidation(res, "backlog item ID is required for DELETE");
         }
-        backlogItem = await BacklogItemModel.findByPk(id, { transaction });
+        let backlogItemTyped: ApiBacklogItem = null;
+        let backlogItem: BacklogItemModel = await BacklogItemModel.findByPk(id, { transaction });
         if (!backlogItem) {
             respondWithNotFound(res, `unable to find item by primary key ${id}`);
         } else {
@@ -141,7 +140,7 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
                 await BacklogItemModel.destroy({ where: { id: backlogItemTyped.id }, transaction });
                 committing = true;
                 await transaction.commit();
-                respondWithOk(res, backlogItemTyped);
+                respondWithItem(res, backlogItemTyped);
             }
         }
     } catch (err) {
@@ -264,13 +263,10 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
         if (!backlogItem) {
             respondWithNotFound(res, `Unable to find item to update with ID ${req.body.id}`);
         }
+        const originalBacklogItem = mapToBacklogItem(backlogItem);
+
         await backlogItem.update(req.body);
-        res.status(HttpStatus.OK).json({
-            status: HttpStatus.OK,
-            data: {
-                item: backlogItem
-            }
-        });
+        respondWithItem(res, backlogItem, originalBacklogItem);
     } catch (err) {
         respondWithError(res, err);
     }
