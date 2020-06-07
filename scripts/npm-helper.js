@@ -9,7 +9,7 @@ const getNpxCmd = () => {
 };
 
 const shellNpxScript = (scriptName, scriptArgs, excludeNoInstall) => {
-    const scriptCmdLine = `${scriptName} ${scriptArgs}`;
+    const scriptCmdLine = `${scriptName} "${scriptArgs}"`;
     const p = spawn(getNpxCmd(), [scriptName, scriptArgs]);
     p.on("exit", function(code) {
         const options = excludeNoInstall ? "" : "--no-install ";
