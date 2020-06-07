@@ -59,7 +59,8 @@
     "pull:shared": "cd .. && cd atoll-shared && npm run push && cd ..",
     "start:client-only": "npm run build:dev && npm run start:client",
     "output:now": "node -e \"console.log(JSON.stringify(new Date()))\"",
-    "check": "node ./scripts/check-package-json.js"
+    "check": "node ./scripts/check-package-json.js",
+    "open:deploy": "node ./scripts/open-deploy.js"
   },
   "dependencies": {
     "@atoll/shared": "0.10.2",
