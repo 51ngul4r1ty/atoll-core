@@ -1,6 +1,6 @@
 {
   "name": "atoll",
-  "version": "0.9.2",
+  "version": "0.10.2",
   "author": {
     "name": "Kevin Berry",
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
@@ -59,10 +59,11 @@
     "pull:shared": "cd .. && cd atoll-shared && npm run push && cd ..",
     "start:client-only": "npm run build:dev && npm run start:client",
     "output:now": "node -e \"console.log(JSON.stringify(new Date()))\"",
-    "check": "node ./scripts/check-package-json.js"
+    "check": "node ./scripts/check-package-json.js",
+    "open:deploy": "node ./scripts/open-deploy.js"
   },
   "dependencies": {
-    "@atoll/shared": "0.9.2",
+    "@atoll/shared": "0.10.3",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.19.2",
