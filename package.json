@@ -1,6 +1,6 @@
 {
   "name": "atoll",
-  "version": "0.11.2",
+  "version": "0.11.4",
   "author": {
     "name": "Kevin Berry",
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
@@ -63,7 +63,7 @@
     "open:deploy": "node ./scripts/open-deploy.js"
   },
   "dependencies": {
-    "@atoll/shared": "0.11.2",
+    "@atoll/shared": "0.11.4",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.19.2",
