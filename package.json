@@ -1,6 +1,6 @@
 {
   "name": "atoll",
-  "version": "0.10.3-alpha.1",
+  "version": "0.11.2",
   "author": {
     "name": "Kevin Berry",
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
@@ -63,7 +63,7 @@
     "open:deploy": "node ./scripts/open-deploy.js"
   },
   "dependencies": {
-    "@atoll/shared": "0.11.1",
+    "@atoll/shared": "0.11.2",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.19.2",
@@ -142,7 +142,7 @@
     "cross-env": "7.0.2",
     "css-hot-loader": "1.4.4",
     "css-loader": "3.4.2",
-    "dependency-cruiser": "7.2.0",
+    "dependency-cruiser": "9.7.0",
     "eslint": "6.8.0",
     "file-loader": "5.1.0",
     "fs-extra": "9.0.0",
