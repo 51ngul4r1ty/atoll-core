@@ -7,7 +7,14 @@ import { Store } from "redux";
 import { Provider } from "react-redux";
 
 // libraries
-import { FeatureTogglesState, StateTree, remapAssetPath, initConfig, getAssetPortOverride } from "@atoll/shared";
+import {
+    FeatureTogglesState,
+    StateTree,
+    buildFeatureTogglesList,
+    getAssetPortOverride,
+    initConfig,
+    remapAssetPath
+} from "@atoll/shared";
 
 // components
 import Html from "../components/HTML";
@@ -42,15 +49,6 @@ const mapAcceptLanguageToLocale = (acceptLanguage: string): Locale => {
         default:
             return "default";
     }
-};
-
-const buildFeatureTogglesList = (featureToggles: FeatureTogglesState) => {
-    const result = {};
-    Object.keys(featureToggles.toggles).forEach((key) => {
-        const value = featureToggles.toggles[key];
-        result[key] = value.enabled;
-    });
-    return result;
 };
 
 const serverRenderer: any = () => (req: express.Request & { store: Store }, res: express.Response, next: express.NextFunction) => {
@@ -101,7 +99,7 @@ const serverRenderer: any = () => (req: express.Request & { store: Store }, res:
                         ]}
                         state={state}
                         language={locale}
-                        toggles={buildFeatureTogglesList(featureToggles)}
+                        toggles={buildFeatureTogglesList(featureToggles?.toggles)}
                     >
                         {content}
                     </Html>
