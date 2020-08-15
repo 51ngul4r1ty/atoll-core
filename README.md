@@ -32,13 +32,15 @@ Steps after Cloning Repo
 3. `npm run sync-quick` in `atoll-core` repo to get it to use the latest version of the shared repo code.
 4. `npm run build` (if this succeeds you have all dependencies correct)
 5. Use `setup.sql` to set up "atoll" database and `data.sql` to set up some sample data.
-6. Use VS Code to open `atoll-core-main.code-workspace` - this will ensure that you see `atoll-core`
+6. Set environment variable `ATOLL_DATABASE_URL` to "postgres://atoll:l1m3atoll@localhost:5432/atoll".
+7. Set environment variable `ATOLL_AUTH_KEY` to "local-dev-test-key".
+8. Use VS Code to open `atoll-core-main.code-workspace` - this will ensure that you see `atoll-core`
    and `atoll-shared` folders in the editor.
-7. Use VS Code's debugger to launch "App" and/or "Storybook"
+9. Use VS Code's debugger to launch "App" and/or "Storybook"
    - If you prefer to use npm scripts you can use `npm start` and/or `npm run storybook`
      but you won't be able to set breakpoints in the app if you use `npm start` so we
      recommend the former approach.
-8. Use `npm test` while editing code to ensure that the tests keep passing while you
+10. Use `npm test` while editing code to ensure that the tests keep passing while you
    perform TDD coding iterations.  This will cause the tests to run every time code
    changes are saved and coverage gutters will be updated automatically (use "Watch"
    in the VS Code tray area).
