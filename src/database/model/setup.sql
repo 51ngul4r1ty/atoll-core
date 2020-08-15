@@ -56,7 +56,13 @@ ALTER FUNCTION public.newuuid()
 
 /* STEP 3:
 
-Run the app so that it creates the database tables */
+**************************************************
+**************************************************
+RUN THE APP SO THAT IT CREATES THE DATABASE TABLES
+**************************************************
+**************************************************
+
+*/
 
 /* STEP 4:
 
