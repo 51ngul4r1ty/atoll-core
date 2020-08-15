@@ -70,6 +70,5 @@ In the "atoll" database modify the created tables with these SQL commands
 
 */
 
-ALTER TABLE public.backlogitem
-    ADD CONSTRAINT uc_backlogitem_displayindex UNIQUE ("displayIndex");
+/* Nothing here yet, but in future there may be SQL statements needed */
 	
