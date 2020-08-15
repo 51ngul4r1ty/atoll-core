@@ -36,11 +36,12 @@ Steps after Cloning Repo
 7. Set environment variable `ATOLL_AUTH_KEY` to "local-dev-test-key".
 8. Use VS Code to open `atoll-core-main.code-workspace` - this will ensure that you see `atoll-core`
    and `atoll-shared` folders in the editor.
-9. Use VS Code's debugger to launch "App" and/or "Storybook"
+9. Install all recommended extensions in VS Code.
+10. Use VS Code's debugger to launch "App" and/or "Storybook"
    - If you prefer to use npm scripts you can use `npm start` and/or `npm run storybook`
      but you won't be able to set breakpoints in the app if you use `npm start` so we
      recommend the former approach.
-10. Use `npm test` while editing code to ensure that the tests keep passing while you
+11. Use `npm test` while editing code to ensure that the tests keep passing while you
    perform TDD coding iterations.  This will cause the tests to run every time code
    changes are saved and coverage gutters will be updated automatically (use "Watch"
    in the VS Code tray area).
