@@ -21,7 +21,8 @@ Tools Used
    - Make sure you install the recommended workspace extensions.
 3. Yalc (`yalc`) to locally "publish" npm modules for easier development.
 4. PostgreSQL 12.2 for storing data:
-   `https://www.enterprisedb.com/downloads/postgres-postgresql-downloads`
+   `https://www.enterprisedb.com/downloads/postgres-postgresql-downloads` (Windows 10 / Mac OS X)
+   `https://computingforgeeks.com/install-postgresql-12-on-ubuntu/` (Ubuntu with links to other distros)
 
 Steps after Cloning Repo
 ------------------------
