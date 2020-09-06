@@ -63,7 +63,7 @@
     "open:deploy": "node ./scripts/open-deploy.js"
   },
   "dependencies": {
-    "@atoll/shared": "0.15.0",
+    "@atoll/shared": "0.17.0",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.19.2",
