@@ -32,6 +32,7 @@ storiesOf("Organisms|Forms/BacklogItemDetailForm", module)
                 id="1"
                 type={select("type", ["issue", "story"], "issue")}
                 estimate={number("estimate", 13)}
+                friendlyId={text("friendlyId", "i-42")}
                 externalId={text("externalId", "B1000032")}
                 rolePhrase={text("rolePhrase", null)}
                 storyPhrase={text("storyPhrase", bugStoryPhrase)}
@@ -47,6 +48,7 @@ storiesOf("Organisms|Forms/BacklogItemDetailForm", module)
                 id="2"
                 type={select("type", ["issue", "story"], "story")}
                 estimate={number("estimate", 8)}
+                friendlyId={text("friendlyId", "s-19")}
                 externalId={text("externalId", "527")}
                 rolePhrase={text("rolePhrase", "as a developer")}
                 storyPhrase={text("storyPhrase", "use the v3 api to sign up a user")}
@@ -62,6 +64,7 @@ storiesOf("Organisms|Forms/BacklogItemDetailForm", module)
                 id="3"
                 type={select("type", ["issue", "story"], "story")}
                 estimate={number("estimate", 8)}
+                friendlyId={text("friendlyId", "s-19")}
                 externalId={text("externalId", "527")}
                 rolePhrase={text("rolePhrase", "as a developer")}
                 storyPhrase={text("storyPhrase", "use the v3 api to sign up a user")}
@@ -78,6 +81,7 @@ const allItems: BacklogItemWithSource[] = [
         createdAt: undefined,
         updatedAt: undefined,
         estimate: null,
+        friendlyId: "s-1",
         externalId: "id-1",
         id: "db-id-1",
         reasonPhrase: null,
@@ -91,6 +95,7 @@ const allItems: BacklogItemWithSource[] = [
         createdAt: undefined,
         updatedAt: undefined,
         estimate: null,
+        friendlyId: "s-2",
         externalId: "p-x",
         id: "db-pushed-id-x",
         reasonPhrase: null,
@@ -104,6 +109,7 @@ const allItems: BacklogItemWithSource[] = [
         createdAt: undefined,
         updatedAt: undefined,
         estimate: null,
+        friendlyId: "s-3",
         externalId: "id-2",
         id: "db-id-2",
         reasonPhrase: null,
@@ -117,6 +123,7 @@ const allItems: BacklogItemWithSource[] = [
         createdAt: undefined,
         updatedAt: undefined,
         estimate: null,
+        friendlyId: "s-4",
         externalId: "id-3",
         id: "db-id-3",
         reasonPhrase: null,
@@ -131,6 +138,7 @@ const allItems: BacklogItemWithSource[] = [
         createdAt: undefined,
         updatedAt: undefined,
         estimate: null,
+        friendlyId: "s-5",
         externalId: "id-4",
         id: "db-id-4",
         reasonPhrase: null,
@@ -148,6 +156,7 @@ for (let i = 5; i <= 50; i++) {
         createdAt: undefined,
         updatedAt: undefined,
         estimate: null,
+        friendlyId: `s-${i}`,
         externalId: `id-${i}`,
         id: `db-id-${i}`,
         reasonPhrase: null,

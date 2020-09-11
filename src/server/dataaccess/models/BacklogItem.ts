@@ -12,6 +12,10 @@ BacklogItemModel.init(
             type: DataTypes.STRING(32),
             primaryKey: true
         },
+        friendlyId: {
+            type: DataTypes.STRING(30),
+            allowNull: true
+        },
         externalId: {
             type: DataTypes.STRING(30),
             allowNull: true
