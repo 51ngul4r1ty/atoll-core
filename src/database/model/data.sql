@@ -53,3 +53,8 @@ values
 	('2d96969bb2754832820bd68a90286c59', '920581ae222e4fa2ab24117664cda3fb', null,
 	 '2020-03-15 18:17:00-05', '2020-03-15 18:17:00-05');
 
+/* 4. projects */
+
+insert into project (id, name, description, "createdAt", "updatedAt") values ('8220723fed61402abb8ee5170be741cb', 'Pixelplace.me', 'Web app for organizing and presenting large collections of photographs', '9/10/2020', '9/10/2020')
+insert into project (id, name, description, "createdAt", "updatedAt") values ('69a9288264964568beb5dd243dc29008', 'Atoll', 'Web app for managing projects using scrum', '9/10/2020', '9/10/2020')
+

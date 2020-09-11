@@ -93,3 +93,33 @@ The algorithm to re-order items is as follows:
    number is negative.
 5. If an item is inserted below the bottom item, displayIndex should be `last item's displayIndex + 1`.
 6. If multiple items are inserted between two items then space them evenly.
+
+Project Hierarchy
+=================
+
+Organization Teams
+------------------
+
+* Organizations have their own hierarchies of teams, but at the foundation is an individual team.
+* Team members fall into 2 categories:
+  - shared members (can be in more than one team, for example, a PO or a SM may be shared across teams)
+  - dedicated members (semi-permanent because people may move around in an organization, leave, or join)
+
+Work Items
+----------
+
+* Issues or stories are managed in backlogs.
+* These items can only be in one backlog at a time.
+
+Backlogs
+--------
+
+* Team Backlog: owned by the specific scrum team.
+* Release Train Backlog: a level above a team backlog.  NOTE: Atoll must allow customization of the level names, but allow as many
+  as an organization needs.
+
+Projects & Domains
+------------------
+
+* Projects are the high level "bucket" representing an application (typically) and the "Friendly IDs" within a project are unique.
+* A Domain is an area of an application owned by a team.
