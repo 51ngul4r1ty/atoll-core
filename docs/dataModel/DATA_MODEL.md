@@ -123,3 +123,20 @@ Projects & Domains
 
 * Projects are the high level "bucket" representing an application (typically) and the "Friendly IDs" within a project are unique.
 * A Domain is an area of an application owned by a team.
+
+Users & Preferences
+===================
+
+User
+----
+
+A user account is intended for logging into the system.
+
+Preferences
+-----------
+
+There are 4 levels of preferences:
+- System defaults
+- Organization defaults
+- User settings
+- Instance overrides (electron client, web app, )
