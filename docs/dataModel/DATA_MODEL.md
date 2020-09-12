@@ -141,7 +141,11 @@ There are 4 levels of preferences:
 - System defaults
 - Organization defaults
 - User settings
+- Device overrides (phone vs desktop app vs web app)
 - Instance overrides (electron client, web app, etc.)
+
+Anything can be overridden at whatever level the user desires- the system will respect the override.  At any time the setting
+override can be cleared at that level without reverting other overrides at that same level.
 
 Audit Trail
 -----------
