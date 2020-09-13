@@ -61,7 +61,8 @@
     "start:client-only": "npm run build:dev && npm run start:client",
     "output:now": "node -e \"console.log(JSON.stringify(new Date()))\"",
     "check": "node ./scripts/check-package-json.js",
-    "open:deploy": "node ./scripts/open-deploy.js"
+    "open:deploy": "node ./scripts/open-deploy.js",
+    "setup": "ts-node ./scripts/setup.ts"
   },
   "dependencies": {
     "@atoll/shared": "file:.yalc/@atoll/shared",
@@ -172,6 +173,7 @@
     "stylelint-config-prettier": "8.0.1",
     "stylelint-order": "4.0.0",
     "stylelint-prettier": "1.1.2",
+    "ts-node": "9.0.0",
     "typescript": "4.0.2",
     "url-loader": "3.0.0",
     "webpack": "4.41.6",
