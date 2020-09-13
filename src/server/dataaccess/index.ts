@@ -4,6 +4,7 @@ export * from "./models/BacklogItemRank";
 export * from "./models/Sprint";
 export * from "./models/Project";
 export * from "./models/AppUser";
+export * from "./models/UserSettings";
 export * from "./mappers";
 
 // data access
