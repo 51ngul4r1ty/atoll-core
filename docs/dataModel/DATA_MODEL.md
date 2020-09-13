@@ -127,6 +127,8 @@ Projects & Domains
 Users & Preferences
 ===================
 
+The information for a user and the credentials records will be kept separate.
+
 User
 ----
 
@@ -139,4 +141,20 @@ There are 4 levels of preferences:
 - System defaults
 - Organization defaults
 - User settings
-- Instance overrides (electron client, web app, )
+- Device overrides (phone vs desktop app vs web app)
+- Instance overrides (electron client, web app, etc.)
+
+Anything can be overridden at whatever level the user desires- the system will respect the override.  At any time the setting
+override can be cleared at that level without reverting other overrides at that same level.
+
+Audit Trail
+-----------
+
+For security reasons authentication requests will be tracked for each user and active times will also be tracked (i.e. as each
+network request is serviced for a user's auth tokens).
+
+Activity
+--------
+
+Web sockets poll frequently (at least once a minute) and they can be used to track active times (although a user can leave their
+browser open without being active so we will also need to add mouse movement tracking to ensure truly active time is measured).
