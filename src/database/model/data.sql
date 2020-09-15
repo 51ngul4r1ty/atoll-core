@@ -82,3 +82,9 @@ insert into project
 values
 	('69a9288264964568beb5dd243dc29008', 'Atoll', 'Web app for managing projects using scrum', '9/10/2020', '9/10/2020');
 
+/* 5. settings */
+
+insert into usersettings
+	(id, "appuserId", settings, "createdAt", "updatedAt", "version")
+values
+	('95219be810a3463ab7846a258c8ea69f', '217796f6e1ab455a980263171099533f', '{ "selectedProject": "69a9288264964568beb5dd243dc29008" }', '9/15/2020', '9/15/2020', 0);
