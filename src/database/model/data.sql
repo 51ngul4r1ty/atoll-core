@@ -84,7 +84,25 @@ values
 
 /* 5. settings */
 
+-- user settings
+
 insert into usersettings
 	(id, "appuserId", settings, "createdAt", "updatedAt", "version")
 values
 	('95219be810a3463ab7846a258c8ea69f', '217796f6e1ab455a980263171099533f', '{ "selectedProject": "69a9288264964568beb5dd243dc29008" }', '9/15/2020', '9/15/2020', 0);
+
+-- project settings
+insert into projectsettings
+	(id, "projectId", settings, "createdAt", "updatedAt", "version")
+values
+	('95219be810a3463ab7846a258c8ea69f', null,
+	 '{ "counters": { "story": { "prefix": "s-" } }, "issue": { "prefix": "i-" } }',
+	 '9/15/2020', '9/15/2020', 0);
+
+
+/* 6. counters */
+
+insert into counter (id, entity, "entityId", "entitySubtype", "lastNumber", "lastCounterValue", "createdAt", "updatedAt")
+	values ('d498db0f55154d5fa7482b069ab8490c', 'project', '69a9288264964568beb5dd243dc29008', 'story', 2, 's-2', '9/15/2020', '9/15/2020');
+insert into counter (id, entity, "entityId", "entitySubtype", "lastNumber", "lastCounterValue", "createdAt", "updatedAt")
+	values ('3895a6379d6d4d59b04b5e96c7a8a526', 'project', '69a9288264964568beb5dd243dc29008', 'issue', 2, 'i-2', '9/15/2020', '9/15/2020');

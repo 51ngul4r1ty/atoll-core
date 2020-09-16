@@ -1,5 +1,5 @@
 // externals
-import { Model, DataTypes } from "sequelize";
+import { Model, DataTypes, Deferrable } from "sequelize";
 
 // data access
 import { sequelize } from "../connection";
@@ -11,6 +11,19 @@ BacklogItemModel.init(
         id: {
             type: DataTypes.STRING(32),
             primaryKey: true
+        },
+        projectId: {
+            type: DataTypes.STRING(32),
+            primaryKey: false,
+            references: {
+                model: "project",
+                key: "id",
+                // TODO: Find out why it was defined this way:
+                deferrable: Deferrable.INITIALLY_DEFERRED as any
+            },
+            get: function() {
+                return this.getDataValue("projectId");
+            }
         },
         friendlyId: {
             type: DataTypes.STRING(30),
