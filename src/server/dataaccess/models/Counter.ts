@@ -1,9 +1,8 @@
 // externals
-import { Model, DataTypes, Deferrable } from "sequelize";
+import { Model, DataTypes } from "sequelize";
 
 // data access
 import { sequelize } from "../connection";
-import { BacklogItemModel } from "./BacklogItem";
 
 export class CounterModel extends Model {}
 
@@ -39,8 +38,3 @@ CounterModel.init(
         sequelize
     }
 );
-
-CounterModel.belongsTo(BacklogItemModel);
-CounterModel.belongsTo(BacklogItemModel, {
-    as: "nextbacklogitem"
-});
