@@ -10,10 +10,23 @@ import { ApiBacklogItem, ApiBacklogItemRank } from "@atoll/shared";
 // utils
 import { LinkedList } from "@atoll/shared";
 import { buildSelfLink } from "../../utils/linkBuilder";
-import { respondWithFailedValidation, respondWithNotFound, respondWithError, respondWithOk, respondWithItem } from "../utils/responder";
+import {
+    respondWithFailedValidation,
+    respondWithNotFound,
+    respondWithError,
+    respondWithOk,
+    respondWithItem
+} from "../utils/responder";
 
 // data access
-import { mapToBacklogItem, mapToBacklogItemRank, BacklogItemModel, BacklogItemRankModel } from "../../dataaccess";
+import {
+    mapToBacklogItem,
+    mapToBacklogItemRank,
+    BacklogItemModel,
+    BacklogItemRankModel,
+    CounterModel,
+    mapToCounter
+} from "../../dataaccess";
 import { sequelize } from "../../dataaccess/connection";
 
 // interfaces/types
@@ -153,10 +166,47 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
     }
 };
 
+const getNewCounterValue = async (backlogItemType: string) => {
+    let result: string;
+    const entitySubtype = backlogItemType === "story" ? "story" : "issue";
+    const entityNumberPrefix = backlogItemType === "story" ? "s-" : "i-";
+    const projectId = "69a9288264964568beb5dd243dc29008";
+    let transaction: Transaction;
+    try {
+        let rolledBack = false;
+        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
+        const counterItem: any = await CounterModel.findOne({
+            where: { entity: "project", entityId: projectId, entitySubtype },
+            transaction
+        });
+        if (counterItem) {
+            const counterItemTyped = mapToCounter(counterItem);
+            counterItemTyped.lastNumber++;
+            counterItemTyped.lastCounterValue = `${entityNumberPrefix}${counterItemTyped.lastNumber}`;
+            await counterItem.update(counterItemTyped);
+            result = counterItem.lastCounterValue;
+        }
+        if (!rolledBack) {
+            await transaction.commit();
+        }
+    } catch (err) {
+        if (transaction) {
+            await transaction.rollback();
+        }
+        throw new Error(`Unable to get new ID value, ${err}`);
+    }
+    if (!result) {
+        throw new Error("Unable to get new ID value - could not retrieve counter item");
+    }
+    return result;
+};
+
 export const backlogItemsPostHandler = async (req: Request, res: Response) => {
-    // TODO: Fix this code:
-    //       - must insert `null x` and `x null` entries
     const bodyWithId = { ...addIdToBody(req.body) };
+    if (!bodyWithId.friendlyId) {
+        const friendlyIdValue = await getNewCounterValue(req.body.type);
+        bodyWithId.friendlyId = friendlyIdValue;
+    }
     const prevBacklogItemId = bodyWithId.prevBacklogItemId;
     delete bodyWithId.prevBacklogItemId;
     let transaction: Transaction;
