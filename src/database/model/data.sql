@@ -96,7 +96,7 @@ insert into projectsettings
 	(id, "projectId", settings, "createdAt", "updatedAt", "version")
 values
 	('95219be810a3463ab7846a258c8ea69f', null,
-	 '{ "counters": { "story": { "prefix": "s-" } }, "issue": { "prefix": "i-" } }',
+	 '{ "counters": { "story": { "prefix": "s-" }, "issue": { "prefix": "i-" } } }',
 	 '9/15/2020', '9/15/2020', 0);
 
 
