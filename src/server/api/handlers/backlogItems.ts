@@ -20,12 +20,14 @@ import {
 
 // data access
 import {
-    mapToBacklogItem,
-    mapToBacklogItemRank,
     BacklogItemModel,
     BacklogItemRankModel,
     CounterModel,
-    mapToCounter
+    ProjectSettingsModel,
+    mapToBacklogItem,
+    mapToBacklogItemRank,
+    mapToCounter,
+    mapToProjectSettings
 } from "../../dataaccess";
 import { sequelize } from "../../dataaccess/connection";
 
@@ -166,25 +168,55 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
     }
 };
 
+const formatNumber = (value: number, length: number | undefined) => {
+    if (!length) {
+        return `${value}`;
+    } else {
+        let result = `${value}`;
+        while (result.length < length) {
+            result = "0" + result;
+        }
+        return result;
+    }
+};
+
 const getNewCounterValue = async (backlogItemType: string) => {
     let result: string;
     const entitySubtype = backlogItemType === "story" ? "story" : "issue";
-    const entityNumberPrefix = backlogItemType === "story" ? "s-" : "i-";
     const projectId = "69a9288264964568beb5dd243dc29008";
     let transaction: Transaction;
     try {
         let rolledBack = false;
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        const counterItem: any = await CounterModel.findOne({
-            where: { entity: "project", entityId: projectId, entitySubtype },
+        let projectSettingsItem: any = await ProjectSettingsModel.findOne({
+            where: { projectId: projectId },
             transaction
         });
-        if (counterItem) {
-            const counterItemTyped = mapToCounter(counterItem);
-            counterItemTyped.lastNumber++;
-            counterItemTyped.lastCounterValue = `${entityNumberPrefix}${counterItemTyped.lastNumber}`;
-            await counterItem.update(counterItemTyped);
-            result = counterItem.lastCounterValue;
+        if (!projectSettingsItem) {
+            projectSettingsItem = await ProjectSettingsModel.findOne({
+                where: { projectId: null },
+                transaction
+            });
+        }
+        if (projectSettingsItem) {
+            const projectSettingsItemTyped = mapToProjectSettings(projectSettingsItem);
+            const counterSettings = projectSettingsItemTyped.settings.counters[entitySubtype];
+            const entityNumberPrefix = counterSettings.prefix;
+            const entityNumberSuffix = counterSettings.suffix;
+            const counterItem: any = await CounterModel.findOne({
+                where: { entity: "project", entityId: projectId, entitySubtype },
+                transaction
+            });
+            if (counterItem) {
+                const counterItemTyped = mapToCounter(counterItem);
+                counterItemTyped.lastNumber++;
+                let counterValue = entityNumberPrefix || "";
+                counterValue += formatNumber(counterItemTyped.lastNumber, counterSettings.totalFixedLength);
+                counterValue += entityNumberSuffix || "";
+                counterItemTyped.lastCounterValue = counterValue;
+                await counterItem.update(counterItemTyped);
+                result = counterItem.lastCounterValue;
+            }
         }
         if (!rolledBack) {
             await transaction.commit();

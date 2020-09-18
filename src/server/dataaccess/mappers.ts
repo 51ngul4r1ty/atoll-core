@@ -1,5 +1,5 @@
 // libraries
-import { ApiBacklogItem, ApiBacklogItemRank, ApiCounter, ApiSprint } from "@atoll/shared";
+import { ApiBacklogItem, ApiBacklogItemRank, ApiCounter, ApiProjectSettings, ApiSprint } from "@atoll/shared";
 
 export const mapToBacklogItem = (item: any): ApiBacklogItem => ({
     ...item.dataValues
@@ -14,5 +14,9 @@ export const mapToSprint = (item: any): ApiSprint => ({
 });
 
 export const mapToCounter = (item: any): ApiCounter => ({
+    ...item.dataValues
+});
+
+export const mapToProjectSettings = (item: any): ApiProjectSettings => ({
     ...item.dataValues
 });
