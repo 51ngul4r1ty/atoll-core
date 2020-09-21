@@ -20,3 +20,7 @@ export const mapToCounter = (item: any): ApiCounter => ({
 export const mapToProjectSettings = (item: any): ApiProjectSettings => ({
     ...item.dataValues
 });
+
+export const mapToUserSettings = (item: any): ApiUserSettings => ({
+    ...item.dataValues
+});

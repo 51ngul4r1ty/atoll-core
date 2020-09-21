@@ -180,10 +180,10 @@ const formatNumber = (value: number, length: number | undefined) => {
     }
 };
 
-const getNewCounterValue = async (backlogItemType: string) => {
+const getNewCounterValue = async (projectId: string, backlogItemType: string) => {
     let result: string;
     const entitySubtype = backlogItemType === "story" ? "story" : "issue";
-    const projectId = "69a9288264964568beb5dd243dc29008";
+    //    const projectId = "69a9288264964568beb5dd243dc29008";
     let transaction: Transaction;
     try {
         let rolledBack = false;
@@ -236,7 +236,7 @@ const getNewCounterValue = async (backlogItemType: string) => {
 export const backlogItemsPostHandler = async (req: Request, res: Response) => {
     const bodyWithId = { ...addIdToBody(req.body) };
     if (!bodyWithId.friendlyId) {
-        const friendlyIdValue = await getNewCounterValue(req.body.type);
+        const friendlyIdValue = await getNewCounterValue(req.body.projectId, req.body.type);
         bodyWithId.friendlyId = friendlyIdValue;
     }
     const prevBacklogItemId = bodyWithId.prevBacklogItemId;
