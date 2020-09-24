@@ -10,29 +10,29 @@ values
 
 /* 2. backlog items */
 insert into backlogitem
-	(id, "internalId", "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "createdAt", "updatedAt", "version")
+	(id, "friendlyId", "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "createdAt", "updatedAt", "version")
 values
-	('30397fe2bd6747b8a0c3a56105b68843', '6', '531', 'as a developer', 'use the v3 api to get/update current user data', null, 3, 'story', now(), now(), 1);
+	('30397fe2bd6747b8a0c3a56105b68843', 's-6', '531', 'as a developer', 'use the v3 api to get/update current user data', null, 3, 'story', now(), now(), 1);
 insert into backlogitem
-	(id, "internalId", "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "createdAt", "updatedAt", "version")
+	(id, "friendlyId", "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "createdAt", "updatedAt", "version")
 values
-	('6d2f1bf323f74c0193e84f6a2168e417', '5', '530', 'as a developer', 'use the v3 api to get/update filter criteria', null, 5, 'story', now(), now(), 1);
+	('6d2f1bf323f74c0193e84f6a2168e417', 's-5', '530', 'as a developer', 'use the v3 api to get/update filter criteria', null, 5, 'story', now(), now(), 1);
 insert into backlogitem
-	(id, "internalId", "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "createdAt", "updatedAt", "version")
+	(id, "friendlyId", "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "createdAt", "updatedAt", "version")
 values
-	('81208c00e34d45209bbf27d6ac63b37a', '4', '529', 'as a developer', 'use the v3 api to update filters', null, 5, 'story', now(), now(), 1);
+	('81208c00e34d45209bbf27d6ac63b37a', 's-4', '529', 'as a developer', 'use the v3 api to update filters', null, 5, 'story', now(), now(), 1);
 insert into backlogitem
-	(id, "internalId", "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "createdAt", "updatedAt", "version")
+	(id, "friendlyId", "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "createdAt", "updatedAt", "version")
 values
-	('7a7b9fe004034a4a9532464a10e5a0ad', '3', '528', 'as a developer', 'use the v3 api to retrieve & add custom tags', null, 5, 'story', now(), now(), 1);
+	('7a7b9fe004034a4a9532464a10e5a0ad', 's-3', '528', 'as a developer', 'use the v3 api to retrieve & add custom tags', null, 5, 'story', now(), now(), 1);
 insert into backlogitem
-	(id, "internalId", "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "createdAt", "updatedAt", "version")
+	(id, "friendlyId", "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "createdAt", "updatedAt", "version")
 values
-	('d434aab2e71e4c8bbd24dae22941d06f', '2', '527', 'as a developer', 'use the v3 api to sign up a user', null, 5, 'story', now(), now(), 1);
+	('d434aab2e71e4c8bbd24dae22941d06f', 's-2', '527', 'as a developer', 'use the v3 api to sign up a user', null, 5, 'story', now(), now(), 1);
 insert into backlogitem
-	(id, "internalId", "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "createdAt", "updatedAt", "version")
+	(id, "friendlyId", "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "createdAt", "updatedAt", "version")
 values
-	('920581ae222e4fa2ab24117664cda3fb', '1', 'B1000032', null, 'Filter seems to be taking longer & longer (investigate)', null, null, 'issue', now(), now(), 1);
+	('920581ae222e4fa2ab24117664cda3fb', 's-1', 'B1000032', null, 'Filter seems to be taking longer & longer (investigate)', null, null, 'issue', now(), now(), 1);
 
 /* 3. backlog item rank */
 insert into backlogitemrank
