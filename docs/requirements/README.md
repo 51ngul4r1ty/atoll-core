@@ -36,6 +36,9 @@ Planning View
   - business items (feature work)
 * Show recommended story type mix (75% feature, 25% tech debt) defined
   by organization
+* Show story/bug age mix (break down by 2 sprints, last year, older? or maybe base each partition off percentage items in age range
+  for example: out of all 100% in full backlog, 33% of items in last month, next 33% items in previous 6 months, last 33% in
+    previous 2 years)
 
 Refinement View
 ---------------

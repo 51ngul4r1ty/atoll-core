@@ -93,3 +93,68 @@ The algorithm to re-order items is as follows:
    number is negative.
 5. If an item is inserted below the bottom item, displayIndex should be `last item's displayIndex + 1`.
 6. If multiple items are inserted between two items then space them evenly.
+
+Project Hierarchy
+=================
+
+Organization Teams
+------------------
+
+* Organizations have their own hierarchies of teams, but at the foundation is an individual team.
+* Team members fall into 2 categories:
+  - shared members (can be in more than one team, for example, a PO or a SM may be shared across teams)
+  - dedicated members (semi-permanent because people may move around in an organization, leave, or join)
+
+Work Items
+----------
+
+* Issues or stories are managed in backlogs.
+* These items can only be in one backlog at a time.
+
+Backlogs
+--------
+
+* Team Backlog: owned by the specific scrum team.
+* Release Train Backlog: a level above a team backlog.  NOTE: Atoll must allow customization of the level names, but allow as many
+  as an organization needs.
+
+Projects & Domains
+------------------
+
+* Projects are the high level "bucket" representing an application (typically) and the "Friendly IDs" within a project are unique.
+* A Domain is an area of an application owned by a team.
+
+Users & Preferences
+===================
+
+The information for a user and the credentials records will be kept separate.
+
+User
+----
+
+A user account is intended for logging into the system.
+
+Preferences
+-----------
+
+There are 4 levels of preferences:
+- System defaults
+- Organization defaults
+- User settings
+- Device overrides (phone vs desktop app vs web app)
+- Instance overrides (electron client, web app, etc.)
+
+Anything can be overridden at whatever level the user desires- the system will respect the override.  At any time the setting
+override can be cleared at that level without reverting other overrides at that same level.
+
+Audit Trail
+-----------
+
+For security reasons authentication requests will be tracked for each user and active times will also be tracked (i.e. as each
+network request is serviced for a user's auth tokens).
+
+Activity
+--------
+
+Web sockets poll frequently (at least once a minute) and they can be used to track active times (although a user can leave their
+browser open without being active so we will also need to add mouse movement tracking to ensure truly active time is measured).

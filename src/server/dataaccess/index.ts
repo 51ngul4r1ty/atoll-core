@@ -1,7 +1,12 @@
+export * from "./models/AppUser";
 export * from "./models/BacklogItem";
-export * from "./models/BacklogItemTag";
 export * from "./models/BacklogItemRank";
+export * from "./models/BacklogItemTag";
+export * from "./models/Counter";
+export * from "./models/Project";
+export * from "./models/ProjectSettings";
 export * from "./models/Sprint";
+export * from "./models/UserSettings";
 export * from "./mappers";
 
 // data access

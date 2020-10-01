@@ -23,6 +23,7 @@ export const loginPostHandler = async (req: Request, res: Response) => {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).send("Invalid configuration - auth key has not been set up");
         return;
     }
+    // TODO: Query the database to get list of users
     if (username === "test" && password === "atoll") {
         try {
             const refreshTokenId = getSimpleUuid();
@@ -30,8 +31,8 @@ export const loginPostHandler = async (req: Request, res: Response) => {
                 status: HttpStatus.OK,
                 data: {
                     item: {
-                        authToken: buildAuthToken("test-id", username, ROLE_USER),
-                        refreshToken: buildRefreshToken("test-id", username, refreshTokenId)
+                        authToken: buildAuthToken("217796f6e1ab455a980263171099533f", username, ROLE_USER),
+                        refreshToken: buildRefreshToken("217796f6e1ab455a980263171099533f", username, refreshTokenId)
                     }
                 }
             });
@@ -69,8 +70,8 @@ export const refreshTokenPostHandler = async (req: Request, res: Response) => {
             status: HttpStatus.OK,
             data: {
                 item: {
-                    authToken: buildAuthToken("test-id", decoded.username, ROLE_USER),
-                    refreshToken: buildRefreshToken("test-id", decoded.username, decoded.refreshTokenId)
+                    authToken: buildAuthToken("217796f6e1ab455a980263171099533f", decoded.username, ROLE_USER),
+                    refreshToken: buildRefreshToken("217796f6e1ab455a980263171099533f", decoded.username, decoded.refreshTokenId)
                 }
             }
         });

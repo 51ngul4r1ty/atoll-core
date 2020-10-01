@@ -10,10 +10,25 @@ import { ApiBacklogItem, ApiBacklogItemRank } from "@atoll/shared";
 // utils
 import { LinkedList } from "@atoll/shared";
 import { buildSelfLink } from "../../utils/linkBuilder";
-import { respondWithFailedValidation, respondWithNotFound, respondWithError, respondWithOk, respondWithItem } from "../utils/responder";
+import {
+    respondWithFailedValidation,
+    respondWithNotFound,
+    respondWithError,
+    respondWithOk,
+    respondWithItem
+} from "../utils/responder";
 
 // data access
-import { mapToBacklogItem, mapToBacklogItemRank, BacklogItemModel, BacklogItemRankModel } from "../../dataaccess";
+import {
+    BacklogItemModel,
+    BacklogItemRankModel,
+    CounterModel,
+    ProjectSettingsModel,
+    mapToBacklogItem,
+    mapToBacklogItemRank,
+    mapToCounter,
+    mapToProjectSettings
+} from "../../dataaccess";
 import { sequelize } from "../../dataaccess/connection";
 
 // interfaces/types
@@ -153,10 +168,77 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
     }
 };
 
+const formatNumber = (value: number, length: number | undefined) => {
+    if (!length) {
+        return `${value}`;
+    } else {
+        let result = `${value}`;
+        while (result.length < length) {
+            result = "0" + result;
+        }
+        return result;
+    }
+};
+
+const getNewCounterValue = async (projectId: string, backlogItemType: string) => {
+    let result: string;
+    const entitySubtype = backlogItemType === "story" ? "story" : "issue";
+    //    const projectId = "69a9288264964568beb5dd243dc29008";
+    let transaction: Transaction;
+    try {
+        let rolledBack = false;
+        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
+        let projectSettingsItem: any = await ProjectSettingsModel.findOne({
+            where: { projectId: projectId },
+            transaction
+        });
+        if (!projectSettingsItem) {
+            projectSettingsItem = await ProjectSettingsModel.findOne({
+                where: { projectId: null },
+                transaction
+            });
+        }
+        if (projectSettingsItem) {
+            const projectSettingsItemTyped = mapToProjectSettings(projectSettingsItem);
+            const counterSettings = projectSettingsItemTyped.settings.counters[entitySubtype];
+            const entityNumberPrefix = counterSettings.prefix;
+            const entityNumberSuffix = counterSettings.suffix;
+            const counterItem: any = await CounterModel.findOne({
+                where: { entity: "project", entityId: projectId, entitySubtype },
+                transaction
+            });
+            if (counterItem) {
+                const counterItemTyped = mapToCounter(counterItem);
+                counterItemTyped.lastNumber++;
+                let counterValue = entityNumberPrefix || "";
+                counterValue += formatNumber(counterItemTyped.lastNumber, counterSettings.totalFixedLength);
+                counterValue += entityNumberSuffix || "";
+                counterItemTyped.lastCounterValue = counterValue;
+                await counterItem.update(counterItemTyped);
+                result = counterItem.lastCounterValue;
+            }
+        }
+        if (!rolledBack) {
+            await transaction.commit();
+        }
+    } catch (err) {
+        if (transaction) {
+            await transaction.rollback();
+        }
+        throw new Error(`Unable to get new ID value, ${err}`);
+    }
+    if (!result) {
+        throw new Error("Unable to get new ID value - could not retrieve counter item");
+    }
+    return result;
+};
+
 export const backlogItemsPostHandler = async (req: Request, res: Response) => {
-    // TODO: Fix this code:
-    //       - must insert `null x` and `x null` entries
     const bodyWithId = { ...addIdToBody(req.body) };
+    if (!bodyWithId.friendlyId) {
+        const friendlyIdValue = await getNewCounterValue(req.body.projectId, req.body.type);
+        bodyWithId.friendlyId = friendlyIdValue;
+    }
     const prevBacklogItemId = bodyWithId.prevBacklogItemId;
     delete bodyWithId.prevBacklogItemId;
     let transaction: Transaction;

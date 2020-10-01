@@ -1,0 +1,593 @@
+{
+	"info": {
+		"_postman_id": "853f6bba-f4e8-4204-8104-89d15fa07677",
+		"name": "Atoll",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8500/api/v1",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-auth-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QtaWQiLCJpc0FkbWluIjp0cnVlLCJ1c2VybmFtZSI6InRlc3QiLCJpYXQiOjE1ODczNjcyNjF9.mlu6FeoBYTaa3_AGOPUwUBoNTt7MiB7J5wm7Ohpzb7s",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8500/api/v1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8500",
+					"path": [
+						"api",
+						"v1"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Successful Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8500/api/v1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8500",
+							"path": [
+								"api",
+								"v1"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "297"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"129-eCy4nj8iiPt5Ua0BhA8bSpiwaQ4\""
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 01 Dec 2019 21:36:33 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"data\": {\n        \"items\": [\n            {\n                \"name\": \"Sprints\",\n                \"displayIndex\": 0,\n                \"links\": [\n                    {\n                        \"type\": \"application/json\",\n                        \"method\": \"GET\",\n                        \"rel\": \"self\",\n                        \"uri\": \"/api/v1/sprints\"\n                    }\n                ]\n            },\n            {\n                \"name\": \"Backlog Items\",\n                \"displayIndex\": 1,\n                \"links\": [\n                    {\n                        \"type\": \"application/json\",\n                        \"method\": \"GET\",\n                        \"rel\": \"self\",\n                        \"uri\": \"/api/v1/backlog-items\"\n                    }\n                ]\n            }\n        ]\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "http://localhost:8500/api/v1/users/{self}/feature-toggles",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-auth-token",
+						"type": "text",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QtaWQiLCJpc0FkbWluIjp0cnVlLCJ1c2VybmFtZSI6InRlc3QiLCJpYXQiOjE1ODczNjcyNjF9.mlu6FeoBYTaa3_AGOPUwUBoNTt7MiB7J5wm7Ohpzb7s"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{ATOLL_AUTH_TOKEN}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8500/api/v1/users/{self}/feature-toggles",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8500",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"{self}",
+						"feature-toggles"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Successful Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8500/api/v1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8500",
+							"path": [
+								"api",
+								"v1"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "297"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"129-eCy4nj8iiPt5Ua0BhA8bSpiwaQ4\""
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 01 Dec 2019 21:36:33 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"data\": {\n        \"items\": [\n            {\n                \"name\": \"Sprints\",\n                \"displayIndex\": 0,\n                \"links\": [\n                    {\n                        \"type\": \"application/json\",\n                        \"method\": \"GET\",\n                        \"rel\": \"self\",\n                        \"uri\": \"/api/v1/sprints\"\n                    }\n                ]\n            },\n            {\n                \"name\": \"Backlog Items\",\n                \"displayIndex\": 1,\n                \"links\": [\n                    {\n                        \"type\": \"application/json\",\n                        \"method\": \"GET\",\n                        \"rel\": \"self\",\n                        \"uri\": \"/api/v1/backlog-items\"\n                    }\n                ]\n            }\n        ]\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "http://localhost:8500/api/v1/actions/login",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "8377d8a4-c0af-47f0-b4f8-97dbea2bbf30",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"{{ATOLL_USERNAME}}\",\n\t\"password\": \"{{ATOLL_PASSWORD}}\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8500/api/v1/actions/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8500",
+					"path": [
+						"api",
+						"v1",
+						"actions",
+						"login"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Successful Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8500/api/v1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8500",
+							"path": [
+								"api",
+								"v1"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "297"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"129-eCy4nj8iiPt5Ua0BhA8bSpiwaQ4\""
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 01 Dec 2019 21:36:33 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"data\": {\n        \"items\": [\n            {\n                \"name\": \"Sprints\",\n                \"displayIndex\": 0,\n                \"links\": [\n                    {\n                        \"type\": \"application/json\",\n                        \"method\": \"GET\",\n                        \"rel\": \"self\",\n                        \"uri\": \"/api/v1/sprints\"\n                    }\n                ]\n            },\n            {\n                \"name\": \"Backlog Items\",\n                \"displayIndex\": 1,\n                \"links\": [\n                    {\n                        \"type\": \"application/json\",\n                        \"method\": \"GET\",\n                        \"rel\": \"self\",\n                        \"uri\": \"/api/v1/backlog-items\"\n                    }\n                ]\n            }\n        ]\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "http://localhost:8500/api/v1/actions/refresh-token",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LWlkIiwidXNlcm5hbWUiOiJ0ZXN0IiwicmVmcmVzaFRva2VuSWQiOiI4MDA1NzNkNzYxY2Y0MjVmYmZhOGUyYWJlODE0OTgwZCIsImlhdCI6MTU4ODIxOTEwNn0.K3fhJSP6DTUSsAtx7uYFb9CdKMTjru-U34Fb7dkNdho\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8500/api/v1/actions/refresh-token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8500",
+					"path": [
+						"api",
+						"v1",
+						"actions",
+						"refresh-token"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Successful Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8500/api/v1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8500",
+							"path": [
+								"api",
+								"v1"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "297"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"129-eCy4nj8iiPt5Ua0BhA8bSpiwaQ4\""
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 01 Dec 2019 21:36:33 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"data\": {\n        \"items\": [\n            {\n                \"name\": \"Sprints\",\n                \"displayIndex\": 0,\n                \"links\": [\n                    {\n                        \"type\": \"application/json\",\n                        \"method\": \"GET\",\n                        \"rel\": \"self\",\n                        \"uri\": \"/api/v1/sprints\"\n                    }\n                ]\n            },\n            {\n                \"name\": \"Backlog Items\",\n                \"displayIndex\": 1,\n                \"links\": [\n                    {\n                        \"type\": \"application/json\",\n                        \"method\": \"GET\",\n                        \"rel\": \"self\",\n                        \"uri\": \"/api/v1/backlog-items\"\n                    }\n                ]\n            }\n        ]\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "http://localhost:8500/api/v1/sprints",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{ATOLL_AUTH_TOKEN}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8500/api/v1/sprints",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8500",
+					"path": [
+						"api",
+						"v1",
+						"sprints"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Successful Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8500/api/v1/sprints",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8500",
+							"path": [
+								"api",
+								"v1",
+								"sprints"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "637"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"27d-MFii4uOn6s2Gkf3T3IXAmz66A70\""
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 01 Dec 2019 21:36:00 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"data\": {\n        \"items\": [\n            {\n                \"id\": \"0a6208192fc64a46a592e82099be473a\",\n                \"name\": \"Sprint 192\",\n                \"displayindex\": 0,\n                \"startdate\": \"2019-05-30\",\n                \"finishdate\": \"2019-06-12\",\n                \"createdAt\": null,\n                \"updatedAt\": null,\n                \"version\": null,\n                \"links\": [\n                    {\n                        \"type\": \"application/json\",\n                        \"method\": \"GET\",\n                        \"rel\": \"self\",\n                        \"uri\": \"/api/v1/sprints/0a6208192fc64a46a592e82099be473a\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"6beed46d30b343d0a7ae13b2fb4df5c8\",\n                \"name\": \"Sprint 193\",\n                \"displayindex\": 1,\n                \"startdate\": \"2019-06-13\",\n                \"finishdate\": \"2019-06-26\",\n                \"createdAt\": null,\n                \"updatedAt\": null,\n                \"version\": null,\n                \"links\": [\n                    {\n                        \"type\": \"application/json\",\n                        \"method\": \"GET\",\n                        \"rel\": \"self\",\n                        \"uri\": \"/api/v1/sprints/6beed46d30b343d0a7ae13b2fb4df5c8\"\n                    }\n                ]\n            }\n        ]\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "http://localhost:8500/api/v1/backlog-items",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3f38d667-b9d2-4263-bcfd-3d633575719f",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer  {{ATOLL_AUTH_TOKEN}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8500/api/v1/backlog-items",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8500",
+					"path": [
+						"api",
+						"v1",
+						"backlog-items"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Successful Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8500/api/v1/backlog-items",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8500",
+							"path": [
+								"api",
+								"v1",
+								"backlog-items"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "2191"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"88f-4fYayXiTMdfJnNpzPv+Q7cOQvF4\""
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 01 Dec 2019 21:35:24 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"data\": {\n        \"items\": [\n            {\n                \"id\": \"30397fe2bd6747b8a0c3a56105b68843\",\n                \"externalId\": \"531\",\n                \"rolePhrase\": \"as a developer\",\n                \"storyPhrase\": \"use the v3 api to get/update current user data\",\n                \"reasonPhrase\": null,\n                \"estimate\": 3,\n                \"type\": \"story\",\n                \"displayIndex\": 0,\n                \"createdAt\": \"2019-12-01T05:58:08.717Z\",\n                \"updatedAt\": \"2019-12-01T05:58:08.717Z\",\n                \"version\": 1,\n                \"links\": [\n                    {\n                        \"type\": \"application/json\",\n                        \"method\": \"GET\",\n                        \"rel\": \"self\",\n                        \"uri\": \"/api/v1/backlog-items/30397fe2bd6747b8a0c3a56105b68843\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"6d2f1bf323f74c0193e84f6a2168e417\",\n                \"externalId\": \"530\",\n                \"rolePhrase\": \"as a developer\",\n                \"storyPhrase\": \"use the v3 api to get/update filter criteria\",\n                \"reasonPhrase\": null,\n                \"estimate\": 5,\n                \"type\": \"story\",\n                \"displayIndex\": 1,\n                \"createdAt\": \"2019-12-01T05:58:08.717Z\",\n                \"updatedAt\": \"2019-12-01T05:58:08.717Z\",\n                \"version\": 1,\n                \"links\": [\n                    {\n                        \"type\": \"application/json\",\n                        \"method\": \"GET\",\n                        \"rel\": \"self\",\n                        \"uri\": \"/api/v1/backlog-items/6d2f1bf323f74c0193e84f6a2168e417\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"81208c00e34d45209bbf27d6ac63b37a\",\n                \"externalId\": \"529\",\n                \"rolePhrase\": \"as a developer\",\n                \"storyPhrase\": \"use the v3 api to update filters\",\n                \"reasonPhrase\": null,\n                \"estimate\": 5,\n                \"type\": \"story\",\n                \"displayIndex\": 2,\n                \"createdAt\": \"2019-12-01T05:58:08.717Z\",\n                \"updatedAt\": \"2019-12-01T05:58:08.717Z\",\n                \"version\": 1,\n                \"links\": [\n                    {\n                        \"type\": \"application/json\",\n                        \"method\": \"GET\",\n                        \"rel\": \"self\",\n                        \"uri\": \"/api/v1/backlog-items/81208c00e34d45209bbf27d6ac63b37a\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"7a7b9fe004034a4a9532464a10e5a0ad\",\n                \"externalId\": \"528\",\n                \"rolePhrase\": \"as a developer\",\n                \"storyPhrase\": \"use the v3 api to retrieve & add custom tags\",\n                \"reasonPhrase\": null,\n                \"estimate\": 5,\n                \"type\": \"story\",\n                \"displayIndex\": 3,\n                \"createdAt\": \"2019-12-01T05:58:08.717Z\",\n                \"updatedAt\": \"2019-12-01T05:58:08.717Z\",\n                \"version\": 1,\n                \"links\": [\n                    {\n                        \"type\": \"application/json\",\n                        \"method\": \"GET\",\n                        \"rel\": \"self\",\n                        \"uri\": \"/api/v1/backlog-items/7a7b9fe004034a4a9532464a10e5a0ad\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"d434aab2e71e4c8bbd24dae22941d06f\",\n                \"externalId\": \"527\",\n                \"rolePhrase\": \"as a developer\",\n                \"storyPhrase\": \"use the v3 api to sign up a user\",\n                \"reasonPhrase\": null,\n                \"estimate\": 5,\n                \"type\": \"story\",\n                \"displayIndex\": 4,\n                \"createdAt\": \"2019-12-01T05:58:08.717Z\",\n                \"updatedAt\": \"2019-12-01T05:58:08.717Z\",\n                \"version\": 1,\n                \"links\": [\n                    {\n                        \"type\": \"application/json\",\n                        \"method\": \"GET\",\n                        \"rel\": \"self\",\n                        \"uri\": \"/api/v1/backlog-items/d434aab2e71e4c8bbd24dae22941d06f\"\n                    }\n                ]\n            }\n        ]\n    }\n}"
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "9997d053-5c18-4a6e-ba50-e7a918af33b2",
+				"type": "text/javascript",
+				"exec": [
+					"const username = pm.variables.get(\"ATOLL_USERNAME\");",
+					"const password = pm.variables.get(\"ATOLL_PASSWORD\");",
+					"console.log(`${username} and ${password}`);",
+					"",
+					"pm.sendRequest({",
+					"    url: \"http://localhost:8500/api/v1/actions/login\",",
+					"    method: 'POST',",
+					"    header: {",
+					"        'content-type': 'application/json',",
+					"        'accept': 'application/json'",
+					"    },",
+					"    body: {",
+					"        mode: 'raw',",
+					"        raw: JSON.stringify({",
+					"            username,",
+					"            password",
+					"        })",
+					"    }",
+					"},",
+					"function (err, response) {",
+					"    const responseObj = response.json();",
+					"    const status = responseObj.status;",
+					"    const data = responseObj.data;",
+					"    const item = data.item;",
+					"    const authToken = item.authToken;",
+					"    const refreshToken = item.refreshToken;",
+					"    pm.environment.set(\"ATOLL_AUTH_TOKEN\", authToken);",
+					"});",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "ef11a56e-3365-48b1-9db0-7545f1210263",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
