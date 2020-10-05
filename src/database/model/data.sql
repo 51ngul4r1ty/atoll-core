@@ -82,7 +82,14 @@ insert into project
 values
 	('69a9288264964568beb5dd243dc29008', 'Atoll', 'Web app for managing projects using scrum', '9/10/2020', '9/10/2020');
 
-/* 5. settings */
+/* 5. users */
+insert into appuser
+	("id", "name", description, "firstName", "lastName", "passwordHash", "passwordSalt", "emailAddress", status, "lockedAt", "createdAt", "updatedAt", "version")
+values
+	('217796f6e1ab455a980263171099533f', 'test', 'description', null, null, 'cc1b9980e773604c5d090f29cb927e8e0870eb81d3d883ac1990a3abac2d53ad2edfaa438c9a9577063ab12d102f2c3d66daf2b7c893894a280b3284cdabe3f9', '040c0d737c5f70519d9274e3c5c678d3', null, 'A', null, '2020-09-23 22:15:02.634-04', '2020-09-23 22:15:02.634-04', 0);
+
+
+/* 6. settings */
 
 -- user settings
 
@@ -100,7 +107,7 @@ values
 	 '9/15/2020', '9/15/2020', 0);
 
 
-/* 6. counters */
+/* 7. counters */
 
 insert into counter (id, entity, "entityId", "entitySubtype", "lastNumber", "lastCounterValue", "createdAt", "updatedAt")
 	values ('d498db0f55154d5fa7482b069ab8490c', 'project', '69a9288264964568beb5dd243dc29008', 'story', 2, 's-2', '9/15/2020', '9/15/2020');

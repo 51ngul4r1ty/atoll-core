@@ -11,8 +11,14 @@ import {
     backlogItemsPostHandler,
     backlogItemsReorderPostHandler,
     backlogItemGetHandler,
-    backlogItemPutHandler
+    backlogItemPutHandler,
+    BACKLOG_ITEM_RESOURCE_NAME
 } from "./handlers/backlogItems";
+import {
+    backlogItemRanksGetHandler,
+    backlogItemRankGetHandler,
+    BACKLOG_ITEM_RANK_RESOURCE_NAME
+} from "./handlers/backlogItemRanks";
 import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
 import { sprintsHandler } from "./handlers/sprint";
@@ -38,12 +44,18 @@ setupRoutes(router, "/users/:userId/feature-toggles", { get: featureTogglesHandl
 
 setupRoutes(router, "/sprints", { get: sprintsHandler });
 
-setupRoutes(router, "/backlog-items", { get: backlogItemsGetHandler, post: backlogItemsPostHandler });
+setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}`, { get: backlogItemsGetHandler, post: backlogItemsPostHandler });
 
-setupRoutes(router, "/backlog-items/:itemId", {
+setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}/:itemId`, {
     get: backlogItemGetHandler,
     put: backlogItemPutHandler,
     delete: backlogItemsDeleteHandler
+});
+
+setupRoutes(router, `/${BACKLOG_ITEM_RANK_RESOURCE_NAME}`, { get: backlogItemRanksGetHandler });
+
+setupRoutes(router, `/${BACKLOG_ITEM_RANK_RESOURCE_NAME}/:itemId`, {
+    get: backlogItemRankGetHandler
 });
 
 // TODO: Add options routes for these actions

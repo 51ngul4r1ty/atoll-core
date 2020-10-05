@@ -12,6 +12,7 @@ import {
     PlanViewContainer,
     SprintViewContainer,
     ReviewViewContainer,
+    BacklogItemRankViewContainer,
     layouts
 } from "@atoll/shared";
 
@@ -23,6 +24,7 @@ const appRoutes = (
                 <Route path="/plan" exact component={PlanViewContainer} />
                 <Route path="/sprint" exact component={SprintViewContainer} />
                 <Route path="/review" exact component={ReviewViewContainer} />
+                <Route path="/debug/backlog-item-rank" exact component={BacklogItemRankViewContainer} />
             </Switch>
         </AppContainer>
     </layouts.MainLayout>

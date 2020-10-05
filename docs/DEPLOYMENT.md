@@ -4,6 +4,10 @@ How to Install Atoll
 Heroku
 ------
 
+* Set up Heroku CLI
+  - replace `{app-name}` with your heroku app name in this URL:  
+    https://dashboard.heroku.com/apps/{app-name}/deploy/heroku-git
+    
 * Make sure to set the auth key with this config var: ATOLL_AUTH_KEY
   - Choose something very unique that can't easily be guessed, we recommend a phrase made up of
     two or more sequences of words that aren't in well known public documents - each individual
