@@ -32,6 +32,6 @@ export const sprintsHandler = function(req, res) {
                     msg: error
                 }
             });
-            console.log(`unable to fetch sprints: ${error}`);
+            console.log(`Unable to fetch sprints: ${error}`);
         });
 };

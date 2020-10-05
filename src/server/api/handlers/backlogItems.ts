@@ -34,6 +34,8 @@ import { sequelize } from "../../dataaccess/connection";
 // interfaces/types
 import { addIdToBody } from "../utils/uuidHelper";
 
+export const BACKLOG_ITEM_RESOURCE_NAME = "backlog-items";
+
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     try {
         const backlogItemRanks = await BacklogItemRankModel.findAll({});
@@ -49,7 +51,7 @@ export const backlogItemsGetHandler = async (req: Request, res: Response) => {
             const backlogItem = mapToBacklogItem(item);
             const result: ApiBacklogItem = {
                 ...backlogItem,
-                links: [buildSelfLink(backlogItem, "/api/v1/backlog-items/")]
+                links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]
             };
             rankList.addItemData(result.id, result);
         });
@@ -66,7 +68,7 @@ export const backlogItemsGetHandler = async (req: Request, res: Response) => {
                 msg: error
             }
         });
-        console.log(`unable to fetch backlog items: ${error}`);
+        console.log(`Unable to fetch backlog items: ${error}`);
     }
 };
 
@@ -78,12 +80,16 @@ export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, 
     try {
         const id = req.params.itemId;
         const backlogItem = await BacklogItemModel.findByPk(id);
-        res.json({
-            status: HttpStatus.OK,
-            data: {
-                item: mapToBacklogItem(backlogItem)
-            }
-        });
+        if (!backlogItem) {
+            respondWithNotFound(res, `Unable to find backlogitem by primary key ${id}`);
+        } else {
+            res.json({
+                status: HttpStatus.OK,
+                data: {
+                    item: mapToBacklogItem(backlogItem)
+                }
+            });
+        }
     } catch (error) {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -91,7 +97,7 @@ export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, 
                 msg: error
             }
         });
-        console.log(`unable to fetch backlog items: ${error}`);
+        console.log(`Unable to fetch backlog item: ${error}`);
     }
 };
 
@@ -110,7 +116,7 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
         let backlogItemTyped: ApiBacklogItem = null;
         let backlogItem: BacklogItemModel = await BacklogItemModel.findByPk(id, { transaction });
         if (!backlogItem) {
-            respondWithNotFound(res, `unable to find item by primary key ${id}`);
+            respondWithNotFound(res, `Unable to find backlogitem by primary key ${id}`);
         } else {
             backlogItemTyped = mapToBacklogItem(backlogItem);
             abort = false;
@@ -122,7 +128,7 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
             });
             let firstLinkTyped: ApiBacklogItemRank = null;
             if (!firstLink) {
-                respondWithNotFound(res, `Unable to find rank entry with next = ${id}`);
+                respondWithNotFound(res, `Unable to find backlogitemrank entry with next = ${id}`);
                 abort = true;
             } else {
                 firstLinkTyped = (firstLink as unknown) as ApiBacklogItemRank;
@@ -137,7 +143,7 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
                     transaction
                 });
                 if (!secondLink) {
-                    respondWithNotFound(res, `Unable to find rank entry with id = ${id}`);
+                    respondWithNotFound(res, `Unable to find backlogitemrank entry with id = ${id}`);
                     abort = true;
                 } else {
                     secondLinkTyped = (secondLink as unknown) as ApiBacklogItemRank;
@@ -343,12 +349,13 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
             where: { id: bodyItemId }
         });
         if (!backlogItem) {
-            respondWithNotFound(res, `Unable to find item to update with ID ${req.body.id}`);
-        }
-        const originalBacklogItem = mapToBacklogItem(backlogItem);
+            respondWithNotFound(res, `Unable to find backlogitem to update with ID ${req.body.id}`);
+        } else {
+            const originalBacklogItem = mapToBacklogItem(backlogItem);
 
-        await backlogItem.update(req.body);
-        respondWithItem(res, backlogItem, originalBacklogItem);
+            await backlogItem.update(req.body);
+            respondWithItem(res, backlogItem, originalBacklogItem);
+        }
     } catch (err) {
         respondWithError(res, err);
     }
