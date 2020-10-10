@@ -21,6 +21,7 @@
     "bookmarks.navigateThroughAllFiles": true,
     "bookmarks.backgroundLineColor": "#102030",
     "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "coverage-gutters.showGutterCoverage": true,
     "coverage-gutters.coverageFileNames": [
         "lcov.info"
