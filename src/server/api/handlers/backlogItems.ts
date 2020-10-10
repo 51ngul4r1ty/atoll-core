@@ -43,7 +43,7 @@ export const backlogItemsGetHandler = async (req: Request, res: Response) => {
         if (backlogItemRanks.length) {
             const backlogItemRanksMapped = backlogItemRanks.map((item) => mapToBacklogItemRank(item));
             backlogItemRanksMapped.forEach((item) => {
-                rankList.addLink(item.backlogitemId, item.nextbacklogitemId);
+                rankList.addInitialLink(item.backlogitemId, item.nextbacklogitemId);
             });
         }
         const backlogItems = await BacklogItemModel.findAll({});
