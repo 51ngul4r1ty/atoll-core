@@ -1,5 +1,5 @@
 // externals
-import { Model, DataTypes } from "sequelize";
+import { Model, DataTypes, Deferrable } from "sequelize";
 
 // data access
 import { sequelize } from "../connection";
@@ -11,6 +11,18 @@ SprintModel.init(
         id: {
             type: DataTypes.STRING(32),
             primaryKey: true
+        },
+        projectId: {
+            type: DataTypes.STRING(32),
+            primaryKey: false,
+            references: {
+                model: "project",
+                key: "id",
+                deferrable: Deferrable.INITIALLY_DEFERRED as any
+            },
+            get: function() {
+                return this.getDataValue("projectId");
+            }
         },
         name: DataTypes.STRING(50),
         displayindex: DataTypes.INTEGER,
