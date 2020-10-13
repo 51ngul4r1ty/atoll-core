@@ -17,6 +17,7 @@ import {
     respondWithOk,
     respondWithItem
 } from "../utils/responder";
+import { buildOptions } from "../utils/filterHelper";
 
 // data access
 import {
@@ -38,7 +39,7 @@ export const BACKLOG_ITEM_RESOURCE_NAME = "backlog-items";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     try {
-        const backlogItemRanks = await BacklogItemRankModel.findAll({});
+        const backlogItemRanks = await BacklogItemRankModel.findAll(buildOptions(req));
         const rankList = new LinkedList<ApiBacklogItem>();
         if (backlogItemRanks.length) {
             const backlogItemRanksMapped = backlogItemRanks.map((item) => mapToBacklogItemRank(item));
@@ -46,7 +47,7 @@ export const backlogItemsGetHandler = async (req: Request, res: Response) => {
                 rankList.addInitialLink(item.backlogitemId, item.nextbacklogitemId);
             });
         }
-        const backlogItems = await BacklogItemModel.findAll({});
+        const backlogItems = await BacklogItemModel.findAll(buildOptions(req));
         backlogItems.forEach((item) => {
             const backlogItem = mapToBacklogItem(item);
             const result: ApiBacklogItem = {

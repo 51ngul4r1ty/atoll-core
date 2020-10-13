@@ -1,14 +1,18 @@
+// externals
+import { Request } from "express";
+
 // libraries
 import { ApiSprint } from "@atoll/shared";
 
 // utils
 import { buildItemLink } from "../../utils/linkBuilder";
+import { buildOptions } from "../utils/filterHelper";
 
 // data access
 import { mapToSprint, SprintModel } from "../../dataaccess";
 
-export const sprintsHandler = function(req, res) {
-    SprintModel.findAll()
+export const sprintsHandler = function(req: Request, res) {
+    SprintModel.findAll(buildOptions(req))
         .then((sprints) => {
             const items = sprints.map((item) => {
                 const sprint = mapToSprint(item);
