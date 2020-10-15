@@ -8,8 +8,6 @@ import { CreateOptions, Transaction } from "sequelize";
 import { ApiBacklogItem, ApiBacklogItemRank } from "@atoll/shared";
 
 // utils
-import { LinkedList } from "@atoll/shared";
-import { buildSelfLink } from "../../utils/linkBuilder";
 import {
     respondWithFailedValidation,
     respondWithNotFound,
@@ -17,7 +15,7 @@ import {
     respondWithOk,
     respondWithItem
 } from "../utils/responder";
-import { buildOptions } from "../utils/filterHelper";
+import { getParamsFromRequest } from "../utils/filterHelper";
 
 // data access
 import {
@@ -26,7 +24,6 @@ import {
     CounterModel,
     ProjectSettingsModel,
     mapToBacklogItem,
-    mapToBacklogItemRank,
     mapToCounter,
     mapToProjectSettings
 } from "../../dataaccess";
@@ -34,42 +31,21 @@ import { sequelize } from "../../dataaccess/connection";
 
 // interfaces/types
 import { addIdToBody } from "../utils/uuidHelper";
-
-export const BACKLOG_ITEM_RESOURCE_NAME = "backlog-items";
+import { backlogItemFetcher } from "./fetchers/backlogItemFetcher";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
-    try {
-        const backlogItemRanks = await BacklogItemRankModel.findAll(buildOptions(req));
-        const rankList = new LinkedList<ApiBacklogItem>();
-        if (backlogItemRanks.length) {
-            const backlogItemRanksMapped = backlogItemRanks.map((item) => mapToBacklogItemRank(item));
-            backlogItemRanksMapped.forEach((item) => {
-                rankList.addInitialLink(item.backlogitemId, item.nextbacklogitemId);
-            });
-        }
-        const backlogItems = await BacklogItemModel.findAll(buildOptions(req));
-        backlogItems.forEach((item) => {
-            const backlogItem = mapToBacklogItem(item);
-            const result: ApiBacklogItem = {
-                ...backlogItem,
-                links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]
-            };
-            rankList.addItemData(result.id, result);
-        });
-        res.json({
-            status: HttpStatus.OK,
-            data: {
-                items: rankList.toArray()
-            }
-        });
-    } catch (error) {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
+    const params = getParamsFromRequest(req);
+    const result = await backlogItemFetcher(params.projectId);
+    if (result.status === HttpStatus.OK) {
+        res.json(result);
+    } else {
+        res.status(result.status).json({
+            status: result.status,
             error: {
-                msg: error
+                msg: result.error.msg
             }
         });
-        console.log(`Unable to fetch backlog items: ${error}`);
+        console.log(`Unable to fetch backlog items: ${result.error.msg}`);
     }
 };
 

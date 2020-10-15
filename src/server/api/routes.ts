@@ -4,6 +4,9 @@ import * as express from "express";
 // middleware
 import auth from "../middleware/auth";
 
+// consts/enums
+import { BACKLOG_ITEM_RANK_RESOURCE_NAME, BACKLOG_ITEM_RESOURCE_NAME, SPRINT_RESOURCE_NAME } from "../resourceNames";
+
 // handlers
 import {
     backlogItemsDeleteHandler,
@@ -11,22 +14,18 @@ import {
     backlogItemsPostHandler,
     backlogItemsReorderPostHandler,
     backlogItemGetHandler,
-    backlogItemPutHandler,
-    BACKLOG_ITEM_RESOURCE_NAME
+    backlogItemPutHandler
 } from "./handlers/backlogItems";
-import {
-    backlogItemRanksGetHandler,
-    backlogItemRankGetHandler,
-    BACKLOG_ITEM_RANK_RESOURCE_NAME
-} from "./handlers/backlogItemRanks";
+import { sprintsGetHandler } from "./handlers/sprints";
+import { backlogItemRanksGetHandler, backlogItemRankGetHandler } from "./handlers/backlogItemRanks";
 import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
-import { sprintsHandler } from "./handlers/sprint";
 import { userPreferencesHandler } from "./handlers/userPreferences";
 import { loginPostHandler, refreshTokenPostHandler } from "./handlers/auth";
 
 // utils
 import { setupRoutes, setupNoAuthRoutes } from "./utils/routerHelper";
+import { planViewBffGetHandler } from "./handlers/views/planViewBff";
 
 export const router = express.Router();
 
@@ -42,7 +41,7 @@ setupRoutes(router, "/users/:userId/preferences", { get: userPreferencesHandler 
 
 setupRoutes(router, "/users/:userId/feature-toggles", { get: featureTogglesHandler });
 
-setupRoutes(router, "/sprints", { get: sprintsHandler });
+setupRoutes(router, `/${SPRINT_RESOURCE_NAME}`, { get: sprintsGetHandler });
 
 setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}`, { get: backlogItemsGetHandler, post: backlogItemsPostHandler });
 
@@ -57,6 +56,8 @@ setupRoutes(router, `/${BACKLOG_ITEM_RANK_RESOURCE_NAME}`, { get: backlogItemRan
 setupRoutes(router, `/${BACKLOG_ITEM_RANK_RESOURCE_NAME}/:itemId`, {
     get: backlogItemRankGetHandler
 });
+
+setupRoutes(router, `/bff/views/plan`, { get: planViewBffGetHandler });
 
 // TODO: Add options routes for these actions
 router.post("/actions/reorder-backlog-items", auth, backlogItemsReorderPostHandler);
