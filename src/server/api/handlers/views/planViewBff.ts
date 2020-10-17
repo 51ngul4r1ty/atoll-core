@@ -6,6 +6,9 @@ import * as HttpStatus from "http-status-codes";
 import { getParamsFromRequest } from "../../utils/filterHelper";
 import { backlogItemFetcher } from "../fetchers/backlogItemFetcher";
 import { sprintFetcher } from "../fetchers/sprintFetcher";
+import { userPreferencesFetcher, UserPreferencesSuccessResponse } from "../fetchers/userPreferencesFetcher";
+import { getLoggedInAppUserId } from "../../utils/authUtils";
+import { FetcherErrorResponse } from "../fetchers/types";
 
 export const getRangeBegin = (status: number) => {
     if (status >= 0 && status < 100) {
@@ -87,25 +90,34 @@ export const combineStatuses = (...statuses: number[]): number => {
 
 export const planViewBffGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
-    //    const backlogItemsResult = await backlogItemFetcher(params.projectId);
+    const userPreferencesResult = await userPreferencesFetcher("{self}", () => getLoggedInAppUserId(req));
+    const selectedProjectId = (userPreferencesResult as UserPreferencesSuccessResponse).data.item.settings.selectedProject;
+
     let [backlogItemsResult, sprintsResult] = await Promise.all([
-        backlogItemFetcher(params.projectId),
-        sprintFetcher(params.projectId)
+        backlogItemFetcher(selectedProjectId),
+        sprintFetcher(selectedProjectId)
     ]);
-    if (backlogItemsResult.status === HttpStatus.OK && sprintsResult.status === HttpStatus.OK) {
+    if (
+        backlogItemsResult.status === HttpStatus.OK &&
+        sprintsResult.status === HttpStatus.OK &&
+        userPreferencesResult.status === HttpStatus.OK
+    ) {
         res.json({
             status: HttpStatus.OK,
             data: {
                 backlogItems: backlogItemsResult.data?.items,
-                sprints: sprintsResult.data?.items
+                sprints: sprintsResult.data?.items,
+                userPreferences: (userPreferencesResult as UserPreferencesSuccessResponse).data?.item
             }
         });
     } else {
         res.status(backlogItemsResult.status).json({
-            status: combineStatuses(backlogItemsResult.status, sprintsResult.status),
-            error: {
-                msg: combineMessages(backlogItemsResult.error.msg, backlogItemsResult.error.msg)
-            }
+            status: combineStatuses(backlogItemsResult.status, sprintsResult.status, userPreferencesResult.status),
+            message: combineMessages(
+                backlogItemsResult.error?.msg,
+                backlogItemsResult.error?.msg,
+                (userPreferencesResult as FetcherErrorResponse).message
+            )
         });
         console.log(`Unable to fetch backlog items: ${backlogItemsResult.error?.msg}`);
         console.log(`Unable to sprints: ${sprintsResult.error?.msg}`);
