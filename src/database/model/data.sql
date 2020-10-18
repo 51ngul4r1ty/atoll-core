@@ -9,13 +9,17 @@ values
 	('6beed46d30b343d0a7ae13b2fb4df5c8', '8220723fed61402abb8ee5170be741cb', 'Sprint 193', 1, '2019-06-13', '2019-06-26', now(), now(), 1);
 
 insert into sprint
-	(id, name, displayindex, startdate, finishdate, "createdAt", "updatedAt", version, "projectId")
+	(id, name, displayindex, startdate, finishdate, "createdAt", "updatedAt", version, "projectId",
+	"plannedPoints", "acceptedPoints", "velocityPoints", "usedSplitPoints", "remainingSplitPoints")
 values
-	('dbc625b000d64975881db9b1d3e7f093', 'Sprint 33', 33, '2020-10-04 00:00:00-04', '2020-10-18 00:00:00-04', '2020-10-11 22:42:16-04', '2020-10-11 22:42:16-04', 0, '69a9288264964568beb5dd243dc29008');
+	('dbc625b000d64975881db9b1d3e7f093', 'Sprint 33', 33, '2020-10-04 00:00:00-04', '2020-10-18 00:00:00-04', '2020-10-11 22:42:16-04', '2020-10-11 22:42:16-04', 0, '69a9288264964568beb5dd243dc29008',
+	23, 20, 22, 3, null);
 insert into sprint
-	(id, name, displayindex, startdate, finishdate, "createdAt", "updatedAt", version, "projectId")
+	(id, name, displayindex, startdate, finishdate, "createdAt", "updatedAt", version, "projectId",
+	"plannedPoints", "acceptedPoints", "velocityPoints", "usedSplitPoints", "remainingSplitPoints")
 values
-	('c5010380d64649acb02dcdf07240f644', 'Sprint 34', 34, '2020-10-18 00:00:00-04', '2020-11-01 00:00:00-04', '2020-10-11 22:42:16-04', '2020-10-11 22:42:16-04', 0, '69a9288264964568beb5dd243dc29008');
+	('c5010380d64649acb02dcdf07240f644', 'Sprint 34', 34, '2020-10-18 00:00:00-04', '2020-11-01 00:00:00-04', '2020-10-11 22:42:16-04', '2020-10-11 22:42:16-04', 0, '69a9288264964568beb5dd243dc29008'
+	2, null, 22, null, 2);
 
 
 /* 2. backlog items */
