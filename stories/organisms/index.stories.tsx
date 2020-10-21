@@ -17,7 +17,9 @@ import {
     BacklogItemWithSource,
     BacklogItemSource,
     EditMode,
-    PushState
+    PushState,
+    SprintPlanningPanel,
+    SprintStatus
 } from "@atoll/shared";
 
 const mockStore = configureStore();
@@ -170,6 +172,27 @@ for (let i = 5; i <= 50; i++) {
         source: BacklogItemSource.Loaded
     });
 }
+
+storiesOf("Organisms|Panels/SprintPlanningPanel", module).add("SprintPlanningPanel", () => (
+    <div>
+        <SprintPlanningPanel
+            expanded={false}
+            sprints={[
+                {
+                    name: "sprint name",
+                    startDate: new Date(2020, 9, 14),
+                    finishDate: new Date(2020, 9, 28),
+                    status: SprintStatus.InProgress,
+                    plannedPoints: 23,
+                    acceptedPoints: 5,
+                    velocityPoints: 20,
+                    usedSplitPoints: 0,
+                    remainingSplitPoints: 0
+                }
+            ]}
+        />
+    </div>
+));
 
 storiesOf("Organisms|Panels/BacklogItemPlanningPanel", module).add("BacklogItemPlanningPanel", () => (
     <div>
