@@ -18,7 +18,7 @@ import { BACKLOG_ITEM_RESOURCE_NAME } from "../../../resourceNames";
 
 export const backlogItemFetcher = async (projectId: string | null) => {
     try {
-        const options = buildOptionsFromParams(projectId);
+        const options = buildOptionsFromParams({ projectId });
         const backlogItemRanks = await BacklogItemRankModel.findAll(options);
         const rankList = new LinkedList<ApiBacklogItem>();
         if (backlogItemRanks.length) {

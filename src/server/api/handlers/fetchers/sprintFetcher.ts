@@ -17,7 +17,7 @@ import { SprintModel } from "../../../dataaccess/models/Sprint";
 
 export const sprintFetcher = async (projectId: string | null) => {
     try {
-        const options = buildOptionsFromParams(projectId);
+        const options = buildOptionsFromParams({ projectId });
         const sprints = await SprintModel.findAll(options);
         const items = sprints.map((item) => {
             const sprint = mapToSprint(item);

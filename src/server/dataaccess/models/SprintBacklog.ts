@@ -3,6 +3,8 @@ import { Model, DataTypes, Deferrable } from "sequelize";
 
 // data access
 import { sequelize } from "../connection";
+import { BacklogItemModel } from "./BacklogItem";
+import { SprintModel } from "./Sprint";
 
 export class SprintBacklogModel extends Model {}
 
@@ -47,3 +49,6 @@ SprintBacklogModel.init(
         sequelize
     }
 );
+
+BacklogItemModel.hasMany(SprintBacklogModel, { foreignKey: "backlogitemId" });
+SprintBacklogModel.belongsTo(BacklogItemModel, { foreignKey: "backlogitemId" });

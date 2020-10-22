@@ -127,3 +127,9 @@ insert into counter (id, entity, "entityId", "entitySubtype", "lastNumber", "las
 	values ('d498db0f55154d5fa7482b069ab8490c', 'project', '69a9288264964568beb5dd243dc29008', 'story', 2, 's-2', '9/15/2020', '9/15/2020');
 insert into counter (id, entity, "entityId", "entitySubtype", "lastNumber", "lastCounterValue", "createdAt", "updatedAt")
 	values ('3895a6379d6d4d59b04b5e96c7a8a526', 'project', '69a9288264964568beb5dd243dc29008', 'issue', 2, 'i-2', '9/15/2020', '9/15/2020');
+
+/* 8. sprint backlog items */
+
+insert into sprintbacklog (id, "sprintId", "backlogitemId", displayindex, "createdAt", "updatedAt", version)
+	values ('b6bc48899ae141ba8a7e4b7ffd090dec', 'c5010380d64649acb02dcdf07240f644', '920581ae222e4fa2ab24117664cda3fb',
+		0, '2020-10-21 00:00:00-04', '2020-10-21 00:00:00-04', 0);

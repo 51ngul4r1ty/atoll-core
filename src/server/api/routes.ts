@@ -5,7 +5,13 @@ import * as express from "express";
 import auth from "../middleware/auth";
 
 // consts/enums
-import { BACKLOG_ITEM_RANK_RESOURCE_NAME, BACKLOG_ITEM_RESOURCE_NAME, SPRINT_RESOURCE_NAME } from "../resourceNames";
+import {
+    BACKLOG_ITEM_RANK_RESOURCE_NAME,
+    BACKLOG_ITEM_RESOURCE_NAME,
+    SPRINT_BACKLOG_CHILD_RESOURCE_NAME,
+    SPRINT_BACKLOG_PARENT_RESOURCE_NAME,
+    SPRINT_RESOURCE_NAME
+} from "../resourceNames";
 
 // handlers
 import {
@@ -26,6 +32,7 @@ import { loginPostHandler, refreshTokenPostHandler } from "./handlers/auth";
 // utils
 import { setupRoutes, setupNoAuthRoutes } from "./utils/routerHelper";
 import { planViewBffGetHandler } from "./handlers/views/planViewBff";
+import { sprintBacklogItemsGetHandler } from "./handlers/sprintBacklogItems";
 
 export const router = express.Router();
 
@@ -42,6 +49,10 @@ setupRoutes(router, "/users/:userId/preferences", { get: userPreferencesHandler 
 setupRoutes(router, "/users/:userId/feature-toggles", { get: featureTogglesHandler });
 
 setupRoutes(router, `/${SPRINT_RESOURCE_NAME}`, { get: sprintsGetHandler });
+
+setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`, {
+    get: sprintBacklogItemsGetHandler
+});
 
 setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}`, { get: backlogItemsGetHandler, post: backlogItemsPostHandler });
 
