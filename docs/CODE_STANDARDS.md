@@ -58,6 +58,10 @@ Types related to the data structure that the reducer stores in the state tree sh
 Components
 ----------
 
+Prefer React.FC components over the legacy style components.  Atoll started before functional components were widely used, so there
+may still be some code that does not use FC, but don't be tempted to use these as templates for new components- rewrite using FC
+instead.
+
 Use `React.FC<ComponentNameProps>` as the default component definition where `ComponentName` will be your actual component name,
 e.g. `MyButton`.
 
