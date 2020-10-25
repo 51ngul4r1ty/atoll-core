@@ -18,7 +18,7 @@ insert into sprint
 	(id, name, displayindex, startdate, finishdate, "createdAt", "updatedAt", version, "projectId",
 	"plannedPoints", "acceptedPoints", "velocityPoints", "usedSplitPoints", "remainingSplitPoints")
 values
-	('c5010380d64649acb02dcdf07240f644', 'Sprint 34', 34, '2020-10-18 00:00:00-04', '2020-11-01 00:00:00-04', '2020-10-11 22:42:16-04', '2020-10-11 22:42:16-04', 0, '69a9288264964568beb5dd243dc29008'
+	('c5010380d64649acb02dcdf07240f644', 'Sprint 34', 34, '2020-10-18 00:00:00-04', '2020-11-01 00:00:00-04', '2020-10-11 22:42:16-04', '2020-10-11 22:42:16-04', 0, '69a9288264964568beb5dd243dc29008',
 	2, null, 22, null, 2);
 
 
