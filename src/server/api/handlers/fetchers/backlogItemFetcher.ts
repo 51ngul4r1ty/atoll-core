@@ -9,7 +9,7 @@ import { mapToBacklogItem, mapToBacklogItemRank } from "../../../dataaccess/mapp
 import { buildOptionsFromParams } from "../../utils/filterHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 
-// interfaces/types
+// data access
 import { BacklogItemModel } from "../../../dataaccess/models/BacklogItem";
 import { BacklogItemRankModel } from "../../../dataaccess/models/BacklogItemRank";
 

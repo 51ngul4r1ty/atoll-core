@@ -5,14 +5,14 @@ import * as HttpStatus from "http-status-codes";
 import { ApiBacklogItem } from "@atoll/shared";
 
 // utils
-import { mapSprintBacklogToItem } from "../../../dataaccess/mappers";
+import { mapSprintBacklogToBacklogItem } from "../../../dataaccess/mappers";
 import { buildOptionsFromParams } from "../../utils/filterHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 
 // consts/enums
 import { SPRINT_BACKLOG_PARENT_RESOURCE_NAME, SPRINT_BACKLOG_CHILD_RESOURCE_NAME } from "../../../resourceNames";
 
-// interfaces/types
+// data access
 import { SprintBacklogModel } from "../../../dataaccess/models/SprintBacklog";
 import { BacklogItemModel } from "../../../dataaccess/models/BacklogItem";
 
@@ -25,7 +25,7 @@ export const sprintBacklogItemFetcher = async (sprintId: string | null) => {
             order: [["displayindex", "ASC"]]
         });
         const items = sprintBacklogs.map((item) => {
-            const sprintBacklog = mapSprintBacklogToItem(item);
+            const sprintBacklog = mapSprintBacklogToBacklogItem(item);
             const result: ApiBacklogItem = {
                 ...sprintBacklog,
                 links: [

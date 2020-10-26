@@ -16,6 +16,7 @@ import {
     respondWithItem
 } from "../utils/responder";
 import { getParamsFromRequest } from "../utils/filterHelper";
+import { backlogItemFetcher } from "./fetchers/backlogItemFetcher";
 
 // data access
 import {
@@ -31,7 +32,6 @@ import { sequelize } from "../../dataaccess/connection";
 
 // interfaces/types
 import { addIdToBody } from "../utils/uuidHelper";
-import { backlogItemFetcher } from "./fetchers/backlogItemFetcher";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);

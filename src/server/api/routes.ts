@@ -32,7 +32,7 @@ import { loginPostHandler, refreshTokenPostHandler } from "./handlers/auth";
 // utils
 import { setupRoutes, setupNoAuthRoutes } from "./utils/routerHelper";
 import { planViewBffGetHandler } from "./handlers/views/planViewBff";
-import { sprintBacklogItemsGetHandler } from "./handlers/sprintBacklogItems";
+import { sprintBacklogItemsGetHandler, sprintBacklogItemsPostHandler } from "./handlers/sprintBacklogItems";
 
 export const router = express.Router();
 
@@ -51,7 +51,8 @@ setupRoutes(router, "/users/:userId/feature-toggles", { get: featureTogglesHandl
 setupRoutes(router, `/${SPRINT_RESOURCE_NAME}`, { get: sprintsGetHandler });
 
 setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`, {
-    get: sprintBacklogItemsGetHandler
+    get: sprintBacklogItemsGetHandler,
+    post: sprintBacklogItemsPostHandler
 });
 
 setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}`, { get: backlogItemsGetHandler, post: backlogItemsPostHandler });

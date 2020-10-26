@@ -4,8 +4,10 @@ import * as HttpStatus from "http-status-codes";
 // utils
 import { mapToUserSettings } from "../../../dataaccess/mappers";
 
-// interfaces/types
+// data access
 import { UserSettingsModel } from "../../../dataaccess/models/UserSettings";
+
+// interfaces/types
 import { FetcherErrorResponse } from "./types";
 
 // consts/enums

@@ -21,7 +21,7 @@ export const mapToSprint = (item: any): ApiSprint => ({
     ...item.dataValues
 });
 
-export const mapSprintBacklogToItem = (item: any): ApiBacklogItem => {
+export const mapSprintBacklogToBacklogItem = (item: any): ApiBacklogItem => {
     const sprintBacklogWithItems = {
         ...item.dataValues
     };
@@ -40,6 +40,12 @@ export const mapSprintBacklogToItem = (item: any): ApiBacklogItem => {
         version: sprintBacklogWithItems.backlogitem.version
     };
     return result;
+};
+
+export const mapToSprintBacklog = (item: any): ApiSprintBacklog => {
+    return {
+        ...item.dataValues
+    };
 };
 
 export const mapToCounter = (item: any): ApiCounter => ({

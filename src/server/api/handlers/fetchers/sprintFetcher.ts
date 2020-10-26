@@ -12,7 +12,7 @@ import { buildSelfLink } from "../../../utils/linkBuilder";
 // consts/enums
 import { SPRINT_RESOURCE_NAME } from "../../../resourceNames";
 
-// interfaces/types
+// data access
 import { SprintModel } from "../../../dataaccess/models/Sprint";
 
 export const sprintFetcher = async (projectId: string | null) => {
