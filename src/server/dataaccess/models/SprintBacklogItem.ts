@@ -4,11 +4,10 @@ import { Model, DataTypes, Deferrable } from "sequelize";
 // data access
 import { sequelize } from "../connection";
 import { BacklogItemModel } from "./BacklogItem";
-import { SprintModel } from "./Sprint";
 
-export class SprintBacklogModel extends Model {}
+export class SprintBacklogItemModel extends Model {}
 
-SprintBacklogModel.init(
+SprintBacklogItemModel.init(
     {
         id: {
             type: DataTypes.STRING(32),
@@ -16,6 +15,7 @@ SprintBacklogModel.init(
         },
         sprintId: {
             type: DataTypes.STRING(32),
+            allowNull: false,
             primaryKey: false,
             references: {
                 model: "sprint",
@@ -28,6 +28,7 @@ SprintBacklogModel.init(
         },
         backlogitemId: {
             type: DataTypes.STRING(32),
+            allowNull: false,
             primaryKey: false,
             references: {
                 model: "backlogitem",
@@ -41,7 +42,7 @@ SprintBacklogModel.init(
         displayindex: DataTypes.INTEGER
     },
     {
-        modelName: "sprintbacklog",
+        modelName: "sprintbacklogitem",
         freezeTableName: true,
         paranoid: false,
         timestamps: true,
@@ -50,5 +51,5 @@ SprintBacklogModel.init(
     }
 );
 
-BacklogItemModel.hasMany(SprintBacklogModel, { foreignKey: "backlogitemId" });
-SprintBacklogModel.belongsTo(BacklogItemModel, { foreignKey: "backlogitemId" });
+BacklogItemModel.hasMany(SprintBacklogItemModel, { foreignKey: "backlogitemId" });
+SprintBacklogItemModel.belongsTo(BacklogItemModel, { foreignKey: "backlogitemId" });

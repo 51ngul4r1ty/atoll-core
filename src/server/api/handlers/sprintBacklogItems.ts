@@ -12,7 +12,7 @@ import { sprintBacklogItemFetcher } from "./fetchers/sprintBacklogItemFetcher";
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
-import { SprintBacklogModel } from "../../dataaccess/models/SprintBacklog";
+import { SprintBacklogItemModel } from "../../dataaccess/models/SprintBacklogItem";
 
 export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
@@ -39,7 +39,7 @@ export const sprintBacklogItemsPostHandler = async (req: Request, res) => {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         let displayIndex: number;
         const options = buildOptionsFromParams({ sprintId });
-        const sprintBacklogs = await SprintBacklogModel.findAll({
+        const sprintBacklogs = await SprintBacklogItemModel.findAll({
             ...options,
             order: [["displayindex", "ASC"]]
         });
@@ -56,7 +56,8 @@ export const sprintBacklogItemsPostHandler = async (req: Request, res) => {
             displayindex: displayIndex
         });
         console.log(`DB BODY: ${JSON.stringify(bodyWithId)}`);
-        const addedSprintBacklog = await SprintBacklogModel.create(bodyWithId, { transaction } as CreateOptions);
+        const addedSprintBacklog = await SprintBacklogItemModel.create(bodyWithId, { transaction } as CreateOptions);
+        console.log(`GOT RESULT: ${JSON.stringify(addedSprintBacklog)}`);
         if (!rolledBack) {
             await transaction.commit();
             console.log("GOT HERE");

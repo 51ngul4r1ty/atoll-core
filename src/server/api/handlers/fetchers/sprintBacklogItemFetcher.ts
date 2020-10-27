@@ -13,13 +13,13 @@ import { buildSelfLink } from "../../../utils/linkBuilder";
 import { SPRINT_BACKLOG_PARENT_RESOURCE_NAME, SPRINT_BACKLOG_CHILD_RESOURCE_NAME } from "../../../resourceNames";
 
 // data access
-import { SprintBacklogModel } from "../../../dataaccess/models/SprintBacklog";
+import { SprintBacklogItemModel } from "../../../dataaccess/models/SprintBacklogItem";
 import { BacklogItemModel } from "../../../dataaccess/models/BacklogItem";
 
 export const sprintBacklogItemFetcher = async (sprintId: string | null) => {
     try {
         const options = buildOptionsFromParams({ sprintId });
-        const sprintBacklogs = await SprintBacklogModel.findAll({
+        const sprintBacklogs = await SprintBacklogItemModel.findAll({
             ...options,
             include: [BacklogItemModel],
             order: [["displayindex", "ASC"]]
