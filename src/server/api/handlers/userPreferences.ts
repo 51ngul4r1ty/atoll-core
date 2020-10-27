@@ -14,9 +14,7 @@ export const userPreferencesHandler = async function(req: Request, res: Response
     } else {
         res.status(result.status).json({
             status: result.status,
-            error: {
-                msg: result.error.msg
-            }
+            message: result.message
         });
         console.log(`Unable to fetch user preferences: ${result.error.msg}`);
     }

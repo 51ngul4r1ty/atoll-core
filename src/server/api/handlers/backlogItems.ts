@@ -32,6 +32,7 @@ import { sequelize } from "../../dataaccess/connection";
 
 // interfaces/types
 import { addIdToBody } from "../utils/uuidHelper";
+import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -41,11 +42,9 @@ export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     } else {
         res.status(result.status).json({
             status: result.status,
-            error: {
-                msg: result.error.msg
-            }
+            message: result.message
         });
-        console.log(`Unable to fetch backlog items: ${result.error.msg}`);
+        console.log(`Unable to fetch backlog items: ${result.message}`);
     }
 };
 
@@ -70,9 +69,7 @@ export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, 
     } catch (error) {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: {
-                msg: error
-            }
+            message: error
         });
         console.log(`Unable to fetch backlog item: ${error}`);
     }

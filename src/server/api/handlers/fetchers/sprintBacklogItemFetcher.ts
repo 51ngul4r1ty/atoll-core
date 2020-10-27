@@ -6,7 +6,7 @@ import { ApiBacklogItem } from "@atoll/shared";
 
 // utils
 import { mapSprintBacklogToBacklogItem } from "../../../dataaccess/mappers";
-import { buildOptionsFromParams } from "../../utils/filterHelper";
+import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 
 // consts/enums
@@ -46,9 +46,7 @@ export const sprintBacklogItemFetcher = async (sprintId: string | null) => {
     } catch (error) {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: {
-                msg: error
-            }
+            message: error
         };
     }
 };

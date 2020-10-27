@@ -6,7 +6,7 @@ import { ApiSprint } from "@atoll/shared";
 
 // utils
 import { mapToSprint } from "../../../dataaccess/mappers";
-import { buildOptionsFromParams } from "../../utils/filterHelper";
+import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 
 // consts/enums
@@ -36,9 +36,7 @@ export const sprintFetcher = async (projectId: string | null) => {
     } catch (error) {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: {
-                msg: error
-            }
+            message: error
         };
     }
 };

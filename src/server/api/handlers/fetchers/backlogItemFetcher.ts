@@ -6,7 +6,7 @@ import { ApiBacklogItem, LinkedList } from "@atoll/shared";
 
 // utils
 import { mapToBacklogItem, mapToBacklogItemRank } from "../../../dataaccess/mappers";
-import { buildOptionsFromParams } from "../../utils/filterHelper";
+import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 
 // data access
@@ -45,9 +45,7 @@ export const backlogItemFetcher = async (projectId: string | null) => {
     } catch (error) {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: {
-                msg: error
-            }
+            message: error
         };
     }
 };

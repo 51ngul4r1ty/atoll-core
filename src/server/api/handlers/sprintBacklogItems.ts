@@ -4,7 +4,8 @@ import * as HttpStatus from "http-status-codes";
 import { CreateOptions, Transaction } from "sequelize";
 
 // utils
-import { buildOptionsFromParams, getParamsFromRequest } from "../utils/filterHelper";
+import { getParamsFromRequest } from "../utils/filterHelper";
+import { buildOptionsFromParams } from "../utils/sequelizeHelper";
 import { respondWithError } from "../utils/responder";
 import { mapToSprintBacklog } from "../../dataaccess/mappers";
 import { addIdToBody } from "../utils/uuidHelper";
@@ -13,6 +14,7 @@ import { sprintBacklogItemFetcher } from "./fetchers/sprintBacklogItemFetcher";
 // data access
 import { sequelize } from "../../dataaccess/connection";
 import { SprintBacklogItemModel } from "../../dataaccess/models/SprintBacklogItem";
+import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
 
 export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
@@ -22,9 +24,7 @@ export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     } else {
         res.status(result.status).json({
             status: result.status,
-            error: {
-                msg: result.error.msg
-            }
+            message: result.error.msg
         });
         console.log(`Unable to fetch sprintBacklogItems: ${result.error.msg}`);
     }
@@ -32,6 +32,7 @@ export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
 
 export const sprintBacklogItemsPostHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
+    const backlogitemId = req.body.backlogitemId;
     const sprintId = params.sprintId;
     let transaction: Transaction;
     try {
@@ -52,12 +53,23 @@ export const sprintBacklogItemsPostHandler = async (req: Request, res) => {
         console.log(`BODY: ${JSON.stringify(req.body)}`);
         const bodyWithId = addIdToBody({
             sprintId,
-            backlogitemId: req.body.backlogitemId,
+            backlogitemId,
             displayindex: displayIndex
         });
         console.log(`DB BODY: ${JSON.stringify(bodyWithId)}`);
         const addedSprintBacklog = await SprintBacklogItemModel.create(bodyWithId, { transaction } as CreateOptions);
         console.log(`GOT RESULT: ${JSON.stringify(addedSprintBacklog)}`);
+        const removeProductBacklogItemResult = await removeFromProductBacklog(backlogitemId, transaction);
+        if (removeProductBacklogItemResult.status !== HttpStatus.OK) {
+            await transaction.rollback();
+            rolledBack = true;
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                message:
+                    `Error ${removeProductBacklogItemResult.message} (status ${removeProductBacklogItemResult.status}) ` +
+                    "when trying to remove backlog item from the product backlog"
+            });
+        }
         if (!rolledBack) {
             await transaction.commit();
             console.log("GOT HERE");

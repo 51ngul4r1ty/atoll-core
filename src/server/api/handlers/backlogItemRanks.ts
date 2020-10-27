@@ -37,9 +37,7 @@ export const backlogItemRanksGetHandler = async (req: Request, res: Response) =>
     } catch (error) {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: {
-                msg: error
-            }
+            message: error
         });
         console.log(`Unable to fetch backlog item ranks: ${error}`);
     }
@@ -66,9 +64,7 @@ export const backlogItemRankGetHandler = async (req: Request<BacklogItemGetParam
     } catch (error) {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: {
-                msg: error
-            }
+            message: error
         });
         console.log(`Unable to fetch backlog item rank: ${error}`);
     }
