@@ -16,8 +16,8 @@ export const sprintsGetHandler = async (req: Request, res) => {
     } else {
         res.status(result.status).json({
             status: result.status,
-            message: result.error.msg
+            message: result.message
         });
-        console.log(`Unable to fetch sprints: ${result.error.msg}`);
+        console.log(`Unable to fetch sprints: ${result.message}`);
     }
 };

@@ -4,6 +4,7 @@ import * as HttpStatus from "http-status-codes";
 
 // utils
 import { getLoggedInAppUserId } from "../utils/authUtils";
+import { FetcherErrorResponse } from "./fetchers/types";
 import { userPreferencesFetcher } from "./fetchers/userPreferencesFetcher";
 
 export const userPreferencesHandler = async function(req: Request, res: Response) {
@@ -12,10 +13,11 @@ export const userPreferencesHandler = async function(req: Request, res: Response
     if (result.status === HttpStatus.OK) {
         res.json(result);
     } else {
-        res.status(result.status).json({
-            status: result.status,
-            message: result.message
+        const errorResult = result as FetcherErrorResponse;
+        res.status(errorResult.status).json({
+            status: errorResult.status,
+            message: errorResult.message
         });
-        console.log(`Unable to fetch user preferences: ${result.error.msg}`);
+        console.log(`Unable to fetch user preferences: ${errorResult.message}`);
     }
 };

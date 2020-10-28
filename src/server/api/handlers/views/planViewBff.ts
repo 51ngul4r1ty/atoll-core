@@ -114,12 +114,12 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
         res.status(backlogItemsResult.status).json({
             status: combineStatuses(backlogItemsResult.status, sprintsResult.status, userPreferencesResult.status),
             message: combineMessages(
-                backlogItemsResult.error?.msg,
-                backlogItemsResult.error?.msg,
+                backlogItemsResult.message,
+                backlogItemsResult.message,
                 (userPreferencesResult as FetcherErrorResponse).message
             )
         });
-        console.log(`Unable to fetch backlog items: ${backlogItemsResult.error?.msg}`);
-        console.log(`Unable to sprints: ${sprintsResult.error?.msg}`);
+        console.log(`Unable to fetch backlog items: ${backlogItemsResult.message}`);
+        console.log(`Unable to sprints: ${sprintsResult.message}`);
     }
 };

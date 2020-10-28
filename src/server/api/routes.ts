@@ -20,8 +20,7 @@ import {
     backlogItemsPostHandler,
     backlogItemsReorderPostHandler,
     backlogItemGetHandler,
-    backlogItemPutHandler,
-    backlogItemDeleteHandler
+    backlogItemPutHandler
 } from "./handlers/backlogItems";
 import { sprintsGetHandler } from "./handlers/sprints";
 import { backlogItemRanksGetHandler, backlogItemRankGetHandler } from "./handlers/backlogItemRanks";
@@ -67,8 +66,7 @@ setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}/:itemId`, {
 setupRoutes(router, `/${BACKLOG_ITEM_RANK_RESOURCE_NAME}`, { get: backlogItemRanksGetHandler });
 
 setupRoutes(router, `/${BACKLOG_ITEM_RANK_RESOURCE_NAME}/:itemId`, {
-    get: backlogItemRankGetHandler,
-    delete: backlogItemDeleteHandler
+    get: backlogItemRankGetHandler
 });
 
 setupRoutes(router, `/bff/views/plan`, { get: planViewBffGetHandler });
