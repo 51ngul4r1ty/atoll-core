@@ -1,10 +1,14 @@
-Architecture
-============
+Overview
+========
 
 This document provides high level guidance on the application's architecture.
 
 Restful API
 ===========
+
+NOTE: If you're looking for information about using the API "framework"
+  (i.e. code level details) then take a look at the
+  [ARCHITECTURE_API.md](ARCHITECTURE_API.md) document.
 
 Atoll's API should follow a true RESTful API pattern, including the use of HATEOAS.
 
