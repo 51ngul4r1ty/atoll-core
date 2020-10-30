@@ -72,17 +72,14 @@ export const sprintBacklogItemsPostHandler = async (req: Request, res) => {
         }
         if (!rolledBack) {
             await transaction.commit();
-            console.log("GOT HERE");
             res.status(HttpStatus.CREATED).json({
                 status: HttpStatus.CREATED,
                 data: {
                     item: addedSprintBacklog
                 }
             });
-            console.log("GOT HERE 2");
         }
     } catch (err) {
-        console.log(`GOT HERE 3: ${err}`);
         if (transaction) {
             await transaction.rollback();
         }
