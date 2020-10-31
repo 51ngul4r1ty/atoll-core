@@ -28,16 +28,24 @@ export const removeFromProductBacklog = async (backlogitemId: string | null, tra
             transaction
         );
         const itemAfter = nextBacklogItemId ? await BacklogItemRankModel.findOne(findItemAfterOptions) : null;
-        if (!itemAfter) {
+        if (nextBacklogItemId && !itemAfter) {
             return {
                 status: HttpStatus.INTERNAL_SERVER_ERROR,
                 message: `Backlog item ${backlogitemId} was found, but next item wasn't found!`
             };
         }
         let itemData = mapToBacklogItemRank(item);
-        const updateOptions: InstanceUpdateOptions = buildOptionsWithTransaction(undefined, transaction);
-        await itemBefore.update({ nextbacklogitemId: nextBacklogItemId }, updateOptions);
+        let itemBeforeData = mapToBacklogItemRank(itemBefore);
         const destroyOptions: InstanceDestroyOptions = buildOptionsWithTransaction(undefined, transaction);
+        if (itemBeforeData.backlogitemId === null && !nextBacklogItemId) {
+            // This is the first item in the list and we're telling it that nothing is after it... so we really should just remove
+            // it- there's an empty list now!
+            // Also, we have to remove items that point to the next item before removing that item itself which occurs below.
+            await itemBefore.destroy(destroyOptions);
+        } else {
+            const updateOptions: InstanceUpdateOptions = buildOptionsWithTransaction(undefined, transaction);
+            await itemBefore.update({ nextbacklogitemId: nextBacklogItemId }, updateOptions);
+        }
         await item.destroy(destroyOptions);
         return {
             status: HttpStatus.OK,
