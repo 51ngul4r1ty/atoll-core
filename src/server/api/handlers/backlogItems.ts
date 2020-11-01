@@ -235,17 +235,23 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
             const firstItems = await BacklogItemRankModel.findAll({ where: { backlogitemId: null }, transaction });
             if (!firstItems.length) {
                 // scenario 1, insert head and tail
-                await BacklogItemRankModel.create({ ...addIdToBody({ backlogitemId: bodyWithId.id, nextbacklogitemId: null }) }, {
-                    transaction
-                } as CreateOptions);
+                await BacklogItemRankModel.create(
+                    { ...addIdToBody({ projectId: bodyWithId.projectId, backlogitemId: bodyWithId.id, nextbacklogitemId: null }) },
+                    {
+                        transaction
+                    } as CreateOptions
+                );
             } else {
                 // scenario 2, insert before first item
                 const firstItem = firstItems[0];
                 await firstItem.update({ backlogitemId: bodyWithId.id }, { transaction });
             }
-            await BacklogItemRankModel.create({ ...addIdToBody({ backlogitemId: null, nextbacklogitemId: bodyWithId.id }) }, {
-                transaction
-            } as CreateOptions);
+            await BacklogItemRankModel.create(
+                { ...addIdToBody({ projectId: bodyWithId.projectId, backlogitemId: null, nextbacklogitemId: bodyWithId.id }) },
+                {
+                    transaction
+                } as CreateOptions
+            );
         } else {
             // 1. if there is a single item in database then we'll have this entry:
             //   backlogitemId=null, nextbacklogitemId=item1
@@ -275,7 +281,13 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
                 await prevBacklogItem.update({ nextbacklogitemId: bodyWithId.id }, { transaction });
                 // (4) add new row with backlogitemId = bodyWithId.id, nextbacklogitemId = oldNextItemId
                 await BacklogItemRankModel.create(
-                    { ...addIdToBody({ backlogitemId: bodyWithId.id, nextbacklogitemId: oldNextItemId }) },
+                    {
+                        ...addIdToBody({
+                            projectId: bodyWithId.projectId,
+                            backlogitemId: bodyWithId.id,
+                            nextbacklogitemId: oldNextItemId
+                        })
+                    },
                     {
                         transaction
                     } as CreateOptions
