@@ -5,7 +5,7 @@ import {
     ApiCounter,
     ApiProjectSettings,
     ApiSprint,
-    ApiSprintBacklog,
+    ApiSprintBacklogItem,
     ApiUserSettings
 } from "@atoll/shared";
 
@@ -42,7 +42,7 @@ export const mapSprintBacklogToBacklogItem = (item: any): ApiBacklogItem => {
     return result;
 };
 
-export const mapToSprintBacklog = (item: any): ApiSprintBacklog => {
+export const mapToSprintBacklogItem = (item: any): ApiSprintBacklogItem => {
     return {
         ...item.dataValues
     };

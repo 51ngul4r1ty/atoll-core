@@ -7,7 +7,7 @@ import { CreateOptions, Transaction } from "sequelize";
 import { getParamsFromRequest } from "../utils/filterHelper";
 import { buildOptionsFromParams } from "../utils/sequelizeHelper";
 import { respondWithError } from "../utils/responder";
-import { mapToSprintBacklog } from "../../dataaccess/mappers";
+import { mapSprintBacklogToBacklogItem, mapToSprintBacklogItem } from "../../dataaccess/mappers";
 import { addIdToBody } from "../utils/uuidHelper";
 import { sprintBacklogItemFetcher } from "./fetchers/sprintBacklogItemFetcher";
 
@@ -15,6 +15,7 @@ import { sprintBacklogItemFetcher } from "./fetchers/sprintBacklogItemFetcher";
 import { sequelize } from "../../dataaccess/connection";
 import { SprintBacklogItemModel } from "../../dataaccess/models/SprintBacklogItem";
 import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
+import { BacklogItemModel } from "dataaccess/models/BacklogItem";
 
 export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
@@ -30,7 +31,7 @@ export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     }
 };
 
-export const sprintBacklogItemsPostHandler = async (req: Request, res) => {
+export const sprintBacklogItemPostHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
     const backlogitemId = req.body.backlogitemId;
     const sprintId = params.sprintId;
@@ -45,20 +46,17 @@ export const sprintBacklogItemsPostHandler = async (req: Request, res) => {
             order: [["displayindex", "ASC"]]
         });
         if (sprintBacklogs && sprintBacklogs.length) {
-            const lastSprintBacklogItem = mapToSprintBacklog(sprintBacklogs[sprintBacklogs.length - 1]);
+            const lastSprintBacklogItem = mapToSprintBacklogItem(sprintBacklogs[sprintBacklogs.length - 1]);
             displayIndex = lastSprintBacklogItem.displayindex + 1;
         } else {
             displayIndex = 0;
         }
-        console.log(`BODY: ${JSON.stringify(req.body)}`);
         const bodyWithId = addIdToBody({
             sprintId,
             backlogitemId,
             displayindex: displayIndex
         });
-        console.log(`DB BODY: ${JSON.stringify(bodyWithId)}`);
         const addedSprintBacklog = await SprintBacklogItemModel.create(bodyWithId, { transaction } as CreateOptions);
-        console.log(`GOT RESULT: ${JSON.stringify(addedSprintBacklog)}`);
         const removeProductBacklogItemResult = await removeFromProductBacklog(backlogitemId, transaction);
         if (removeProductBacklogItemResult.status !== HttpStatus.OK) {
             await transaction.rollback();
@@ -76,6 +74,37 @@ export const sprintBacklogItemsPostHandler = async (req: Request, res) => {
                 status: HttpStatus.CREATED,
                 data: {
                     item: addedSprintBacklog
+                }
+            });
+        }
+    } catch (err) {
+        if (transaction) {
+            await transaction.rollback();
+        }
+        respondWithError(res, err);
+    }
+};
+
+export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
+    const params = getParamsFromRequest(req);
+    const backlogItemId = params.backlogItemId;
+    const sprintId = params.sprintId;
+    let transaction: Transaction;
+    try {
+        let rolledBack = false;
+        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
+        let sprintBacklogItem: any = await SprintBacklogItemModel.findOne({
+            where: { sprintId, backlogitemId: backlogItemId },
+            include: [BacklogItemModel],
+            transaction
+        });
+        const sprintBacklogItemTyped = mapSprintBacklogToBacklogItem(sprintBacklogItem);
+        if (!rolledBack) {
+            await transaction.commit();
+            res.status(HttpStatus.OK).json({
+                status: HttpStatus.OK,
+                data: {
+                    item: sprintBacklogItemTyped
                 }
             });
         }

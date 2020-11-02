@@ -32,7 +32,11 @@ import { loginPostHandler, refreshTokenPostHandler } from "./handlers/auth";
 // utils
 import { setupRoutes, setupNoAuthRoutes } from "./utils/routerHelper";
 import { planViewBffGetHandler } from "./handlers/views/planViewBff";
-import { sprintBacklogItemsGetHandler, sprintBacklogItemsPostHandler } from "./handlers/sprintBacklogItems";
+import {
+    sprintBacklogItemDeleteHandler,
+    sprintBacklogItemsGetHandler,
+    sprintBacklogItemPostHandler
+} from "./handlers/sprintBacklogItems";
 
 export const router = express.Router();
 
@@ -52,7 +56,11 @@ setupRoutes(router, `/${SPRINT_RESOURCE_NAME}`, { get: sprintsGetHandler });
 
 setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`, {
     get: sprintBacklogItemsGetHandler,
-    post: sprintBacklogItemsPostHandler
+    post: sprintBacklogItemPostHandler
+});
+
+setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}/:backlogItemId`, {
+    delete: sprintBacklogItemDeleteHandler
 });
 
 setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}`, { get: backlogItemsGetHandler, post: backlogItemsPostHandler });

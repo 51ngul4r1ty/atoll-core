@@ -22,5 +22,9 @@ export const getParamsFromRequest = (req: Request) => {
     if (projectId) {
         result.projectId = projectId;
     }
+    const backlogItemId = getParamFromRequest(req, "backlogItemId");
+    if (backlogItemId) {
+        result.backlogItemId = backlogItemId;
+    }
     return result;
 };
