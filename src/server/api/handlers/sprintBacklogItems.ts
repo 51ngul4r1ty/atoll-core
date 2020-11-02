@@ -16,6 +16,7 @@ import { sequelize } from "../../dataaccess/connection";
 import { SprintBacklogItemModel } from "../../dataaccess/models/SprintBacklogItem";
 import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
 import { BacklogItemModel } from "dataaccess/models/BacklogItem";
+import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
 
 export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
@@ -93,12 +94,23 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
     try {
         let rolledBack = false;
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        let sprintBacklogItem: any = await SprintBacklogItemModel.findOne({
+        let sprintBacklogItem = await SprintBacklogItemModel.findOne({
             where: { sprintId, backlogitemId: backlogItemId },
             include: [BacklogItemModel],
             transaction
         });
         const sprintBacklogItemTyped = mapSprintBacklogToBacklogItem(sprintBacklogItem);
+        const result = await backlogItemRankFirstItemInserter(sprintBacklogItemTyped, transaction);
+        if (result.status === HttpStatus.OK) {
+            await SprintBacklogItemModel.destroy({ where: { sprintId, backlogitemId: backlogItemId }, transaction });
+        } else {
+            await transaction.rollback();
+            rolledBack = true;
+            respondWithError(
+                res,
+                `Unable to insert new backlogitemrank entries, aborting move to product backlog for item ID ${backlogItemId}`
+            );
+        }
         if (!rolledBack) {
             await transaction.commit();
             res.status(HttpStatus.OK).json({

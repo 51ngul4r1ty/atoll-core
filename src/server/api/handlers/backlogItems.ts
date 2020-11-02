@@ -32,7 +32,7 @@ import { sequelize } from "../../dataaccess/connection";
 
 // interfaces/types
 import { addIdToBody } from "../utils/uuidHelper";
-import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
+import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -229,29 +229,7 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
         const addedBacklogItem = await BacklogItemModel.create(bodyWithId, { transaction } as CreateOptions);
         if (!prevBacklogItemId) {
-            // inserting first item means one of 2 scenarios:
-            //   1) no items in database yet (add prev = null, next = this new item + add prev = new item, next = null)
-            //   2) insert before first item (update item's prev to this item, add prev = null, next = this new item)
-            const firstItems = await BacklogItemRankModel.findAll({ where: { backlogitemId: null }, transaction });
-            if (!firstItems.length) {
-                // scenario 1, insert head and tail
-                await BacklogItemRankModel.create(
-                    { ...addIdToBody({ projectId: bodyWithId.projectId, backlogitemId: bodyWithId.id, nextbacklogitemId: null }) },
-                    {
-                        transaction
-                    } as CreateOptions
-                );
-            } else {
-                // scenario 2, insert before first item
-                const firstItem = firstItems[0];
-                await firstItem.update({ backlogitemId: bodyWithId.id }, { transaction });
-            }
-            await BacklogItemRankModel.create(
-                { ...addIdToBody({ projectId: bodyWithId.projectId, backlogitemId: null, nextbacklogitemId: bodyWithId.id }) },
-                {
-                    transaction
-                } as CreateOptions
-            );
+            await backlogItemRankFirstItemInserter(bodyWithId, transaction);
         } else {
             // 1. if there is a single item in database then we'll have this entry:
             //   backlogitemId=null, nextbacklogitemId=item1
