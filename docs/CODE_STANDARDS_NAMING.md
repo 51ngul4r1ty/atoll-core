@@ -67,25 +67,69 @@ Redux Action Naming
 Overview
 --------
 
+The action naming falls into a number of categories detailed below:
+* Constant naming
+* Constant value format
+* Flow-related naming
+
+Constant Naming
+---------------
+
+* All uppercase, words separated by underscores, e.g. `INIT_APP`
+
+Constant Value Naming
+---------------------
+
 Simple "global" actions: `app/{verb}`
 Targeted actions: `app/{target}:{verb}`
 API actions: `app/api:{call}:{stage}`
 
-Simple Global Actions
----------------------
+Flow-related Naming
+-------------------
+
+Actions fit into a number of categories:
+* Simple global actions
+* Targeted actions
+* API actions
+* Life-cycle
+
+Life-cycle overrides all other naming, so it is defined first.
+
+**Life-cycle**
+
+UI action prefermed, API call is made, result is succesful, data needs to be retrieved,
+UI needs to be updated.
+
+* UI action is performed (button clicked etc.)
+* API call naming is defined below and follows the specific API call life-cycle:
+  1) Request
+  2) Success / Failure
+* Orchestration Middleware then processes the sucessful result and retrieves any other
+  data that will be needed by reducers, for example if the backlog item ID was used for
+  the operation it may be necessary to retrieve the full backlog item data before
+  proceeding.
+* UI then needs to be updated - the action will need to make it obvious that just a
+  local state change results from this.
+
+Example:
+* MOVE_SPRINT_ITEM_TO_PRODUCT_BACKLOG_CLICKED
+* API_DELETE_SPRINT_BACKLOG_ITEM_REQUEST
+* API_DELETE_SPRINT_BACKLOG_ITEM_SUCCESS
+* ADD_PRODUCT_BACKLOG_ITEM
+* REMOVE_SPRINT_BACKLOG_ITEM
+
+**Simple Global Actions**
 
 Example: `INIT_APP = "app/init"`
 
-Targeted Actions
-----------------
+**Targeted Actions**
 
 Example: `LOCAL_STORE_REFRESH_TOKEN = "app/local-store:refresh-token"`
 
 * `local-store` is the "target" of the action
 * `refresh-token` is the verb performed for the "target"
 
-API Actions
------------
+**API Actions**
 
 Example: `API_GET_USER_PREFS_REQUEST: "app/api:get-user-prefs:request"`
 
