@@ -1,6 +1,7 @@
 // libraries
 import {
     ApiBacklogItem,
+    ApiBacklogItemInSprint,
     ApiBacklogItemRank,
     ApiCounter,
     ApiProjectSettings,
@@ -21,7 +22,7 @@ export const mapToSprint = (item: any): ApiSprint => ({
     ...item.dataValues
 });
 
-export const mapSprintBacklogToBacklogItem = (item: any): ApiBacklogItem => {
+export const mapSprintBacklogToBacklogItem = (item: any): ApiBacklogItemInSprint => {
     const sprintBacklogWithItems = {
         ...item.dataValues
     };
@@ -37,7 +38,8 @@ export const mapSprintBacklogToBacklogItem = (item: any): ApiBacklogItem => {
         type: sprintBacklogWithItems.backlogitem.type,
         createdAt: sprintBacklogWithItems.backlogitem.createdAt,
         updatedAt: sprintBacklogWithItems.backlogitem.updatedAt,
-        version: sprintBacklogWithItems.backlogitem.version
+        version: sprintBacklogWithItems.backlogitem.version,
+        displayindex: sprintBacklogWithItems.displayindex
     };
     return result;
 };
