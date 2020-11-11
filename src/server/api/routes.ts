@@ -22,7 +22,7 @@ import {
     backlogItemGetHandler,
     backlogItemPutHandler
 } from "./handlers/backlogItems";
-import { sprintsGetHandler } from "./handlers/sprints";
+import { sprintPostHandler, sprintsGetHandler } from "./handlers/sprints";
 import { backlogItemRanksGetHandler, backlogItemRankGetHandler } from "./handlers/backlogItemRanks";
 import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
@@ -52,7 +52,10 @@ setupRoutes(router, "/users/:userId/preferences", { get: userPreferencesHandler 
 
 setupRoutes(router, "/users/:userId/feature-toggles", { get: featureTogglesHandler });
 
-setupRoutes(router, `/${SPRINT_RESOURCE_NAME}`, { get: sprintsGetHandler });
+setupRoutes(router, `/${SPRINT_RESOURCE_NAME}`, {
+    get: sprintsGetHandler,
+    post: sprintPostHandler
+});
 
 setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`, {
     get: sprintBacklogItemsGetHandler,
