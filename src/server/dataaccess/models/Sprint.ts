@@ -25,7 +25,6 @@ SprintModel.init(
             }
         },
         name: DataTypes.STRING(50),
-        displayindex: DataTypes.INTEGER,
         startdate: DataTypes.DATE,
         finishdate: DataTypes.DATE,
         plannedPoints: DataTypes.INTEGER,

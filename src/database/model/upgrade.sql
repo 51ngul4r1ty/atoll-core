@@ -14,3 +14,5 @@ alter table sprint add column "acceptedPoints" integer;
 alter table sprint add column "velocityPoints" integer;
 alter table sprint add column "usedSplitPoints" integer;
 alter table sprint add column "remainingSplitPoints" integer;
+
+alter table sprint drop column displayindex;
