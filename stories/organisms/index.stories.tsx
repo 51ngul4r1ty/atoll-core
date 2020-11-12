@@ -11,13 +11,14 @@ import { number, text, select, boolean } from "@storybook/addon-knobs";
 
 // components
 import {
-    LoginForm,
     BacklogItemDetailForm,
     BacklogItemPlanningPanel,
     BacklogItemWithSource,
-    Source,
     EditMode,
+    LoginForm,
     PushState,
+    Source,
+    SprintPanel,
     SprintPlanningPanel,
     SprintStatus
 } from "@atoll/shared";
@@ -179,39 +180,72 @@ for (let i = 5; i <= 50; i++) {
     });
 }
 
+storiesOf("Organisms|Panels/SprintPanel", module).add("SprintPanel", () => {
+    <div>
+        <SprintPanel
+            id="sprint-1"
+            name="Sprint 1"
+            startDate={new Date(2020, 9, 14)}
+            finishDate={new Date(2020, 9, 27)}
+            status={SprintStatus.InProgress}
+            plannedPoints={23}
+            acceptedPoints={5}
+            velocityPoints={0}
+            usedSplitPoints={0}
+            remainingSplitPoints={0}
+            backlogItemsLoaded={false}
+            backlogItems={null}
+            expanded={false}
+            saved={true}
+            editing={false}
+            instanceId={null}
+            editMode={EditMode.View}
+            openedDetailMenuBacklogItemId={undefined}
+            renderMobile={false}
+            selectedProductBacklogItemCount={4}
+            onExpandCollapse={(id, expand) => {}}
+            onAddBacklogItem={() => {}}
+            onDetailClicked={(backlogItemId: string) => {}}
+            onMoveItemToBacklogClicked={(backlogItemId: string) => {}}
+        />
+    </div>;
+});
+
 storiesOf("Organisms|Panels/SprintPlanningPanel", module).add("SprintPlanningPanel", () => (
     <div>
-        <SprintPlanningPanel
-            editMode={EditMode.View}
-            openedDetailMenuInfo={undefined}
-            selectedProductBacklogItemCount={0}
-            sprints={[
-                {
-                    id: "sprint-1",
-                    instanceId: 1,
-                    name: "sprint name",
-                    startDate: new Date(2020, 9, 14),
-                    finishDate: new Date(2020, 9, 28),
-                    status: SprintStatus.InProgress,
-                    plannedPoints: 23,
-                    acceptedPoints: 5,
-                    velocityPoints: 20,
-                    usedSplitPoints: 0,
-                    remainingSplitPoints: 0,
-                    backlogItemsLoaded: false,
-                    backlogItems: null,
-                    expanded: false,
-                    saved: true,
-                    editing: false
-                }
-            ]}
-            onExpandCollapse={undefined}
-            onAddBacklogItem={undefined}
-            onAddNewSprintAfter={undefined}
-            onAddNewSprintBefore={undefined}
-            onDetailClicked={undefined}
-            onMoveItemToBacklogClicked={undefined}
-        />
+        <Provider store={store}>
+            <SprintPlanningPanel
+                editMode={EditMode.View}
+                openedDetailMenuInfo={undefined}
+                selectedProductBacklogItemCount={0}
+                sprints={[
+                    {
+                        id: "sprint-1",
+                        instanceId: 1,
+                        name: "sprint name",
+                        startDate: new Date(2020, 9, 14),
+                        finishDate: new Date(2020, 9, 28),
+                        status: SprintStatus.InProgress,
+                        plannedPoints: 23,
+                        acceptedPoints: 5,
+                        velocityPoints: 20,
+                        usedSplitPoints: 0,
+                        remainingSplitPoints: 0,
+                        backlogItemsLoaded: false,
+                        backlogItems: null,
+                        expanded: false,
+                        saved: true,
+                        editing: false
+                    }
+                ]}
+                onExpandCollapse={undefined}
+                onAddBacklogItem={undefined}
+                onAddNewSprintAfter={undefined}
+                onAddNewSprintBefore={undefined}
+                onDetailClicked={undefined}
+                onMoveItemToBacklogClicked={undefined}
+            />
+        </Provider>
     </div>
 ));
 
