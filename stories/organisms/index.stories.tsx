@@ -180,7 +180,7 @@ for (let i = 5; i <= 50; i++) {
     });
 }
 
-storiesOf("Organisms|Panels/SprintPanel", module).add("SprintPanel", () => {
+storiesOf("Organisms|Panels/SprintPanel", module).add("SprintPanel", () => (
     <div>
         <SprintPanel
             id="sprint-1"
@@ -208,8 +208,8 @@ storiesOf("Organisms|Panels/SprintPanel", module).add("SprintPanel", () => {
             onDetailClicked={(backlogItemId: string) => {}}
             onMoveItemToBacklogClicked={(backlogItemId: string) => {}}
         />
-    </div>;
-});
+    </div>
+));
 
 storiesOf("Organisms|Panels/SprintPlanningPanel", module).add("SprintPlanningPanel", () => (
     <div>
