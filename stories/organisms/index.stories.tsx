@@ -18,7 +18,7 @@ import {
     LoginForm,
     PushState,
     Source,
-    SprintPanel,
+    SprintCard,
     SprintPlanningPanel,
     SprintStatus
 } from "@atoll/shared";
@@ -180,9 +180,9 @@ for (let i = 5; i <= 50; i++) {
     });
 }
 
-storiesOf("Organisms|Panels/SprintPanel", module).add("SprintPanel", () => (
+storiesOf("Molecules|Cards/SprintCard", module).add("SprintCard", () => (
     <div>
-        <SprintPanel
+        <SprintCard
             id="sprint-1"
             name="Sprint 1"
             startDate={new Date(2020, 9, 14)}
