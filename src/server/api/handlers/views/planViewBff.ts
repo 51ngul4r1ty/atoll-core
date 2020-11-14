@@ -5,7 +5,7 @@ import * as HttpStatus from "http-status-codes";
 // utils
 import { getParamsFromRequest } from "../../utils/filterHelper";
 import { backlogItemFetcher } from "../fetchers/backlogItemFetcher";
-import { sprintFetcher } from "../fetchers/sprintFetcher";
+import { fetchSprints } from "../fetchers/sprintFetcher";
 import { userPreferencesFetcher, UserPreferencesSuccessResponse } from "../fetchers/userPreferencesFetcher";
 import { getLoggedInAppUserId } from "../../utils/authUtils";
 import { FetcherErrorResponse } from "../fetchers/types";
@@ -95,7 +95,7 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
 
     let [backlogItemsResult, sprintsResult] = await Promise.all([
         backlogItemFetcher(selectedProjectId),
-        sprintFetcher(selectedProjectId)
+        fetchSprints(selectedProjectId)
     ]);
     if (
         backlogItemsResult.status === HttpStatus.OK &&
