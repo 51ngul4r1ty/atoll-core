@@ -14,6 +14,9 @@ import {
     AddIcon,
     BacklogItemCard,
     BacklogItemTypeEnum,
+    Checkbox,
+    CheckboxCheckedIcon,
+    CheckboxUncheckedIcon,
     EditButton,
     EditIcon,
     EditMode,
@@ -75,32 +78,16 @@ storiesOf("Molecules|Buttons/HomeButton", module)
     .add("HomeButton (active)", () => <HomeButton forceStateActive onClick={action("clicked")} />)
     .add("HomeButton (focus)", () => <HomeButton forceStateFocus onClick={action("clicked")} />);
 
-storiesOf("Atoms|Buttons/SimpleButton", module)
-    .add("SimpleButton (Menu w/o caption)", () => <SimpleButton icon={<HamburgerIcon />} onClick={action("clicked menu")} />)
-    .add("SimpleButton (Menu with caption)", () => (
-        <SimpleButton icon={<HamburgerIcon />} onClick={action("clicked menu")}>
-            {text("(children)", "Menu")}
-        </SimpleButton>
-    ))
-    .add("SimpleButton (Edit w/o caption)", () => <SimpleButton iconOnLeft icon={<EditIcon />} onClick={action("clicked menu")} />)
-    .add("SimpleButton (Edit)", () => (
-        <SimpleButton iconOnLeft icon={<EditIcon />} onClick={action("clicked edit")}>
-            {text("(children)", "Edit")}
-        </SimpleButton>
-    ))
-    .add("SimpleButton (Refresh w/o caption)", () => (
-        <SimpleButton iconOnLeft icon={<RefreshIcon />} onClick={action("clicked menu")} />
-    ))
-    .add("SimpleButton (Refresh)", () => (
-        <SimpleButton iconOnLeft icon={<RefreshIcon />} onClick={action("clicked Refresh")}>
-            {text("(children)", "Refresh")}
-        </SimpleButton>
-    ))
-    .add("SimpleButton (Add)", () => (
-        <SimpleButton iconOnLeft icon={<AddIcon />} onClick={action("clicked add")}>
-            {text("(children)", "Add")}
-        </SimpleButton>
-    ));
+storiesOf("Atoms|Inputs/Checkbox", module).add("Checkbox", () => (
+    <Checkbox
+        checked
+        checkedValue="on"
+        inputName="checkbox1"
+        inputId="checkbox1"
+        labelText="Remember me"
+        onClick={action("clicked menu")}
+    />
+));
 
 let activeTabId = "plan";
 

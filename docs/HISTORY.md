@@ -1,8 +1,8 @@
-History
-=======
+Overview
+========
 
-This project was set up using a combination of Manuel Bieh's template, Create React App and other
-references mentioned in this doc.
+This project was set up using a combination of Manuel Bieh's template, Create React App
+and other references mentioned in this doc.
 
 
 References Used to Set this Project Up

@@ -4,11 +4,19 @@ import { ItemWithId, Link } from "@atoll/shared";
 // consts/enums
 import { APPLICATION_JSON } from "@atoll/shared";
 
+export const combinePaths = (baseUrl: string, relativeUrl: string): string => {
+    if (baseUrl.endsWith("/")) {
+        return `${baseUrl}${relativeUrl}`;
+    } else {
+        return `${baseUrl}/${relativeUrl}`;
+    }
+};
+
 export const buildLink = (item: ItemWithId, basePath: string, rel: string): Link => {
     return {
         type: APPLICATION_JSON,
         rel,
-        uri: `${basePath}${item.id}`
+        uri: combinePaths(basePath, item.id)
     };
 };
 

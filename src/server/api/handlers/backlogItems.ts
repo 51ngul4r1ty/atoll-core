@@ -8,8 +8,6 @@ import { CreateOptions, Transaction } from "sequelize";
 import { ApiBacklogItem, ApiBacklogItemRank } from "@atoll/shared";
 
 // utils
-import { LinkedList } from "@atoll/shared";
-import { buildSelfLink } from "../../utils/linkBuilder";
 import {
     respondWithFailedValidation,
     respondWithNotFound,
@@ -17,6 +15,8 @@ import {
     respondWithOk,
     respondWithItem
 } from "../utils/responder";
+import { getParamsFromRequest } from "../utils/filterHelper";
+import { backlogItemFetcher } from "./fetchers/backlogItemFetcher";
 
 // data access
 import {
@@ -25,7 +25,6 @@ import {
     CounterModel,
     ProjectSettingsModel,
     mapToBacklogItem,
-    mapToBacklogItemRank,
     mapToCounter,
     mapToProjectSettings
 } from "../../dataaccess";
@@ -33,42 +32,19 @@ import { sequelize } from "../../dataaccess/connection";
 
 // interfaces/types
 import { addIdToBody } from "../utils/uuidHelper";
-
-export const BACKLOG_ITEM_RESOURCE_NAME = "backlog-items";
+import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
-    try {
-        const backlogItemRanks = await BacklogItemRankModel.findAll({});
-        const rankList = new LinkedList<ApiBacklogItem>();
-        if (backlogItemRanks.length) {
-            const backlogItemRanksMapped = backlogItemRanks.map((item) => mapToBacklogItemRank(item));
-            backlogItemRanksMapped.forEach((item) => {
-                rankList.addInitialLink(item.backlogitemId, item.nextbacklogitemId);
-            });
-        }
-        const backlogItems = await BacklogItemModel.findAll({});
-        backlogItems.forEach((item) => {
-            const backlogItem = mapToBacklogItem(item);
-            const result: ApiBacklogItem = {
-                ...backlogItem,
-                links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]
-            };
-            rankList.addItemData(result.id, result);
+    const params = getParamsFromRequest(req);
+    const result = await backlogItemFetcher(params.projectId);
+    if (result.status === HttpStatus.OK) {
+        res.json(result);
+    } else {
+        res.status(result.status).json({
+            status: result.status,
+            message: result.message
         });
-        res.json({
-            status: HttpStatus.OK,
-            data: {
-                items: rankList.toArray()
-            }
-        });
-    } catch (error) {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: {
-                msg: error
-            }
-        });
-        console.log(`Unable to fetch backlog items: ${error}`);
+        console.log(`Unable to fetch backlog items: ${result.message}`);
     }
 };
 
@@ -93,9 +69,7 @@ export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, 
     } catch (error) {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: {
-                msg: error
-            }
+            message: error
         });
         console.log(`Unable to fetch backlog item: ${error}`);
     }
@@ -255,23 +229,7 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
         const addedBacklogItem = await BacklogItemModel.create(bodyWithId, { transaction } as CreateOptions);
         if (!prevBacklogItemId) {
-            // inserting first item means one of 2 scenarios:
-            //   1) no items in database yet (add prev = null, next = this new item + add prev = new item, next = null)
-            //   2) insert before first item (update item's prev to this item, add prev = null, next = this new item)
-            const firstItems = await BacklogItemRankModel.findAll({ where: { backlogitemId: null }, transaction });
-            if (!firstItems.length) {
-                // scenario 1, insert head and tail
-                await BacklogItemRankModel.create({ ...addIdToBody({ backlogitemId: bodyWithId.id, nextbacklogitemId: null }) }, {
-                    transaction
-                } as CreateOptions);
-            } else {
-                // scenario 2, insert before first item
-                const firstItem = firstItems[0];
-                await firstItem.update({ backlogitemId: bodyWithId.id }, { transaction });
-            }
-            await BacklogItemRankModel.create({ ...addIdToBody({ backlogitemId: null, nextbacklogitemId: bodyWithId.id }) }, {
-                transaction
-            } as CreateOptions);
+            await backlogItemRankFirstItemInserter(bodyWithId, transaction);
         } else {
             // 1. if there is a single item in database then we'll have this entry:
             //   backlogitemId=null, nextbacklogitemId=item1
@@ -301,7 +259,13 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
                 await prevBacklogItem.update({ nextbacklogitemId: bodyWithId.id }, { transaction });
                 // (4) add new row with backlogitemId = bodyWithId.id, nextbacklogitemId = oldNextItemId
                 await BacklogItemRankModel.create(
-                    { ...addIdToBody({ backlogitemId: bodyWithId.id, nextbacklogitemId: oldNextItemId }) },
+                    {
+                        ...addIdToBody({
+                            projectId: bodyWithId.projectId,
+                            backlogitemId: bodyWithId.id,
+                            nextbacklogitemId: oldNextItemId
+                        })
+                    },
                     {
                         transaction
                     } as CreateOptions

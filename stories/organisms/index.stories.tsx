@@ -11,13 +11,16 @@ import { number, text, select, boolean } from "@storybook/addon-knobs";
 
 // components
 import {
-    LoginForm,
     BacklogItemDetailForm,
     BacklogItemPlanningPanel,
     BacklogItemWithSource,
-    BacklogItemSource,
     EditMode,
-    PushState
+    LoginForm,
+    PushState,
+    Source,
+    SprintCard,
+    SprintPlanningPanel,
+    SprintStatus
 } from "@atoll/shared";
 
 const mockStore = configureStore();
@@ -87,12 +90,13 @@ const allItems: BacklogItemWithSource[] = [
         friendlyId: "s-1",
         externalId: "id-1",
         id: "db-id-1",
+        projectId: "project-1",
         reasonPhrase: null,
         rolePhrase: "As a developer",
         storyPhrase: "I can retrieve all backlog items",
         type: "story",
         saved: true,
-        source: BacklogItemSource.Loaded
+        source: Source.Loaded
     },
     {
         createdAt: undefined,
@@ -101,12 +105,13 @@ const allItems: BacklogItemWithSource[] = [
         friendlyId: "s-2",
         externalId: "p-x",
         id: "db-pushed-id-x",
+        projectId: "project-1",
         reasonPhrase: null,
         rolePhrase: null,
         storyPhrase: "Pushed item",
         type: "story",
         saved: true,
-        source: BacklogItemSource.Pushed
+        source: Source.Pushed
     },
     {
         createdAt: undefined,
@@ -115,12 +120,13 @@ const allItems: BacklogItemWithSource[] = [
         friendlyId: "s-3",
         externalId: "id-2",
         id: "db-id-2",
+        projectId: "project-1",
         reasonPhrase: null,
         rolePhrase: "As a developer",
         storyPhrase: "I can add a new backlog item",
         type: "story",
         saved: true,
-        source: BacklogItemSource.Loaded
+        source: Source.Loaded
     },
     {
         createdAt: undefined,
@@ -129,12 +135,13 @@ const allItems: BacklogItemWithSource[] = [
         friendlyId: "s-4",
         externalId: "id-3",
         id: "db-id-3",
+        projectId: "project-1",
         reasonPhrase: null,
         rolePhrase: "As a developer",
         storyPhrase: "I can delete a backlog item",
         type: "story",
         saved: true,
-        source: BacklogItemSource.Loaded,
+        source: Source.Loaded,
         pushState: PushState.Changed
     },
     {
@@ -144,12 +151,13 @@ const allItems: BacklogItemWithSource[] = [
         friendlyId: "s-5",
         externalId: "id-4",
         id: "db-id-4",
+        projectId: "project-1",
         reasonPhrase: null,
         rolePhrase: "As a developer",
         storyPhrase: "I can filter the list of backlog items",
         type: "story",
         saved: true,
-        source: BacklogItemSource.Loaded,
+        source: Source.Loaded,
         pushState: PushState.Removed
     }
 ];
@@ -162,14 +170,84 @@ for (let i = 5; i <= 50; i++) {
         friendlyId: `s-${i}`,
         externalId: `id-${i}`,
         id: `db-id-${i}`,
+        projectId: "project-1",
         reasonPhrase: null,
         rolePhrase: "As a developer",
         storyPhrase: `I can filter the list of backlog items (${i})`,
         type: "story",
         saved: true,
-        source: BacklogItemSource.Loaded
+        source: Source.Loaded
     });
 }
+
+storiesOf("Molecules|Cards/SprintCard", module).add("SprintCard", () => (
+    <div>
+        <SprintCard
+            id="sprint-1"
+            name="Sprint 1"
+            startDate={new Date(2020, 9, 14)}
+            finishDate={new Date(2020, 9, 27)}
+            status={SprintStatus.InProgress}
+            plannedPoints={23}
+            acceptedPoints={5}
+            velocityPoints={0}
+            usedSplitPoints={0}
+            remainingSplitPoints={0}
+            backlogItemsLoaded={false}
+            backlogItems={null}
+            expanded={false}
+            saved={true}
+            editing={false}
+            instanceId={null}
+            editMode={EditMode.View}
+            openedDetailMenuBacklogItemId={undefined}
+            renderMobile={false}
+            selectedProductBacklogItemCount={4}
+            onExpandCollapse={(id, expand) => {}}
+            onAddBacklogItem={() => {}}
+            onDetailClicked={(backlogItemId: string) => {}}
+            onMoveItemToBacklogClicked={(backlogItemId: string) => {}}
+        />
+    </div>
+));
+
+storiesOf("Organisms|Panels/SprintPlanningPanel", module).add("SprintPlanningPanel", () => (
+    <div>
+        <Provider store={store}>
+            <SprintPlanningPanel
+                editMode={EditMode.View}
+                openedDetailMenuInfo={undefined}
+                selectedProductBacklogItemCount={0}
+                sprints={[
+                    {
+                        id: "sprint-1",
+                        instanceId: 1,
+                        name: "sprint name",
+                        startDate: new Date(2020, 9, 14),
+                        finishDate: new Date(2020, 9, 28),
+                        status: SprintStatus.InProgress,
+                        plannedPoints: 23,
+                        acceptedPoints: 5,
+                        velocityPoints: 20,
+                        usedSplitPoints: 0,
+                        remainingSplitPoints: 0,
+                        backlogItemsLoaded: false,
+                        backlogItems: null,
+                        expanded: false,
+                        saved: true,
+                        editing: false
+                    }
+                ]}
+                onExpandCollapse={undefined}
+                onAddBacklogItem={undefined}
+                onAddNewSprintAfter={undefined}
+                onAddNewSprintBefore={undefined}
+                onDetailClicked={undefined}
+                onMoveItemToBacklogClicked={undefined}
+            />
+        </Provider>
+    </div>
+));
 
 storiesOf("Organisms|Panels/BacklogItemPlanningPanel", module).add("BacklogItemPlanningPanel", () => (
     <div>
@@ -177,7 +255,7 @@ storiesOf("Organisms|Panels/BacklogItemPlanningPanel", module).add("BacklogItemP
             <BacklogItemPlanningPanel
                 allItems={allItems}
                 editMode={EditMode.Edit}
-                onAddNewBacklogItem={() => {
+                onAddNewBacklogItemForm={() => {
                     alert("add new backlog item");
                 }}
                 onReorderBacklogItems={() => {

@@ -1,62 +1,43 @@
-Code Standards
-==============
+Overview
+========
 
-Modified Case Naming
---------------------
+This document contains everything but naming conventions, pleas refer
+to [CODE_STANDARDS_NAMING.md](CODE_STANDARDS_NAMING.md) for these details.
 
-Typically a combination of Pascal Case and Camel Case is used in
-TypeScript projects.  Atoll uses modified versions of both.  In
-the case where Pascal Case is normally used (for example, classes
-and interface names) we allow successive capitalized letters, for
-example, "HTML" instead of "Html".  An example of this is:
-`HTMLInputElement` (from the browser "Web API").
+File Purpose Comments
+=====================
 
-Folder Naming
--------------
+Unless it is very obvious what the file's responsibility it is, this should be very clearly defined at the top using this comment block:
 
-**General**  
+```
+/**
+ * Purpose: {defined purpose that makes it obvious what this file's
+     singular responsibility is (think of the "S" in "SOLID"
+     principles)}
+ * Reason to change: {this should help make it clear whether the
+     Single Responsibility Principle is being followed or not}
+ */
+```
 
-1. Folder names should use lowercase letters.
-2. Folder names should use dashes to separate words.
-3. Folder names should not use underscores to separate words.
-
-**Component Folders**
-
-The components are organized using Atomic Design principles, so the following base folders should be used:
-- "atoms" = basic building block components
-- "molecules" = when smaller building blocks are combined they form molecules, for example, "backlog item card"
-- "organisms" = defining sections of the applicaton, for example, "top menu panel", "backlog item planning panel"
-- "templates"
-- "pages"
-
-NOTE: Do not assume that components belong in a upper level folder if they contain items at a lower level.  In a similar vein,
-  do not assume something belongs at the lower level because it doesn't contain anything from that level.  Use the guidelines
-  provided by Atomic Design itself.  It is best to think of this from the UI/UX designer's point of view instead of thinking
-  technically how the components are composed.  A good example of this is used above: "backlog item card" is a "molecule" but, when
-  this was written, it didn't use any "atoms" - but from a UI/UX perspective it does appear to have many smaller building blocks
-  that could potentially be atoms.
-
-**Interface Types**
-
-1. Don't precede interface types with any prefix
-   (for example, "I" for interface or "T" for type, as used in other code standards).
-2. Use the prefix "Base" for an interface that is at the root of the type hierarchy but typically isn't used directly by objects.
-3. Use the prefix "Standard" for an interface that is a lowest common denominator for objects that will extend it. 
-4. Avoid deeply nested hierarchies and instead try to combine other interfaces
-   (for example, StandardInvertibleComponentProps)
-5. Don't use the "Standard" interfaces as replacements for component property types
-   (for example, AppIconProps is an alias for StandardInvertibleComponentProps so that AppIcon has its own props type)  
-   _NOTE: This is done so that consumers of AppIcon aren't aware of StandardInvertibleComponentProps so that they can
-     evolve separately._
-6. Preserve acronym case in interface names (to follow Web API standards, for example, HTMLInputElement).
+For example, at the top of apiOrchestrationMiddleware.ts:
+```
+/**
+ * Purpose: To determine when to make RESTful API calls based on actions that occur.
+ * Reason to change: When new RESTful API calls are needed.
+ */
+```
 
 Reducers
---------
+========
 
 Types related to the data structure that the reducer stores in the state tree should be exported from the reducer itself.
 
 Components
-----------
+==========
+
+Prefer React.FC components over the legacy style components.  Atoll started before functional components were widely used, so there
+may still be some code that does not use FC, but don't be tempted to use these as templates for new components- rewrite using FC
+instead.
 
 Use `React.FC<ComponentNameProps>` as the default component definition where `ComponentName` will be your actual component name,
 e.g. `MyButton`.
@@ -75,7 +56,7 @@ To combine the these two interfaces use:
 
 
 Switch Statements
------------------
+=================
 
 Case statements should always be enclosed in curly braces so that block scope is applied
 and variables within these blocks are scoped to the block.  This allows a variable name to
@@ -100,7 +81,24 @@ For example:
 ```
 
 Import Statements
+=================
+
+Overview
+--------
+
+1. Imports should contain most specific import path.
+2. Import statements should be grouped per "Import Sections" (see below).
+
+Import File Paths
 -----------------
+
+VS Code may provide options such as `module ".."` and
+`module "../reducers/rootReducer"`.  In this case
+`"../reducers/rootReducer"` should be chosen because it is
+the most specific path.
+
+Import Sections
+---------------
 
 Import statments should be grouped into the following commented sections (try
 to stick to this order as well):

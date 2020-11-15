@@ -8,18 +8,13 @@ import { ApiBacklogItemRank } from "@atoll/shared";
 
 // utils
 import { buildSelfLink } from "../../utils/linkBuilder";
-import {
-    respondWithFailedValidation,
-    respondWithNotFound,
-    respondWithError,
-    respondWithOk,
-    respondWithItem
-} from "../utils/responder";
+import { respondWithNotFound } from "../utils/responder";
 
 // data access
 import { BacklogItemRankModel, mapToBacklogItemRank } from "../../dataaccess";
 
-export const BACKLOG_ITEM_RANK_RESOURCE_NAME = "backlog-item-ranks";
+// consts/enums
+import { BACKLOG_ITEM_RANK_RESOURCE_NAME } from "../../resourceNames";
 
 export const backlogItemRanksGetHandler = async (req: Request, res: Response) => {
     try {
@@ -42,9 +37,7 @@ export const backlogItemRanksGetHandler = async (req: Request, res: Response) =>
     } catch (error) {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: {
-                msg: error
-            }
+            message: error
         });
         console.log(`Unable to fetch backlog item ranks: ${error}`);
     }
@@ -71,9 +64,7 @@ export const backlogItemRankGetHandler = async (req: Request<BacklogItemGetParam
     } catch (error) {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: {
-                msg: error
-            }
+            message: error
         });
         console.log(`Unable to fetch backlog item rank: ${error}`);
     }

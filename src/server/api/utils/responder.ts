@@ -2,7 +2,17 @@
 import { Response } from "express";
 import * as HttpStatus from "http-status-codes";
 
-export const respondWithStatus = (res: Response, message: string, status: number) => {
+export const respondWithStatus = (res: Response, rawMessageOrError: any, status: number) => {
+    let message: string;
+    if (typeof rawMessageOrError === "string") {
+        message = rawMessageOrError;
+    } else if (rawMessageOrError.message) {
+        message = rawMessageOrError.message;
+        console.log(`ERROR: ${message}`);
+        console.log(`STACK: ${rawMessageOrError.stack}`);
+    } else {
+        message = `${rawMessageOrError}`;
+    }
     res.status(status).send({
         message,
         status

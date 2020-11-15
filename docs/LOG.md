@@ -1,8 +1,9 @@
 Overview
 ========
 
-This file contains miscellaneous bits of information that are historical in nature and don't fit in any of the other docs.  This is
-intended as a place to put some things that may be useful as reference but aren't essential information.
+This file contains miscellaneous bits of information that are historical in nature
+and don't fit in any of the other docs.  This is intended as a place to put some
+things that may be useful as reference but aren't essential information.
 
 2020-05-01
 ----------
