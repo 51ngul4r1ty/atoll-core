@@ -16,3 +16,8 @@ alter table sprint add column "usedSplitPoints" integer;
 alter table sprint add column "remainingSplitPoints" integer;
 
 alter table sprint drop column displayindex;
+
+alter table sprintbacklogitem add column "status" char(1);
+update sprintbacklogitem set "status" = 'D';
+
+alter table backlogitem alter column estimate type decimal(10, 2);
