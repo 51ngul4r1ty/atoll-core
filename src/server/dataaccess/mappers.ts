@@ -11,7 +11,6 @@ import {
 } from "@atoll/shared";
 
 export const mapToBacklogItem = (item: any): ApiBacklogItem => {
-    //    console.log(`ESTIMATE TYPE = ${typeof item.dataValues.estimate} VALUE = ${item.dataValues.estimate}`);
     const estimateValue = item.dataValues.estimate;
     return {
         ...item.dataValues,
