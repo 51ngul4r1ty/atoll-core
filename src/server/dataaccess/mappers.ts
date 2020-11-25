@@ -10,9 +10,13 @@ import {
     ApiUserSettings
 } from "@atoll/shared";
 
-export const mapToBacklogItem = (item: any): ApiBacklogItem => ({
-    ...item.dataValues
-});
+export const mapToBacklogItem = (item: any): ApiBacklogItem => {
+    const estimateValue = item.dataValues.estimate;
+    return {
+        ...item.dataValues,
+        estimate: estimateValue ? parseFloat(estimateValue) : estimateValue
+    };
+};
 
 export const mapToBacklogItemRank = (item: any): ApiBacklogItemRank => ({
     ...item.dataValues
