@@ -1,6 +1,20 @@
 import { APPLICATION_JSON } from "@atoll/shared";
 
 export const rootHandler = function(req, res) {
+    try {
+        const packageJson = require("../../../../package.json");
+        res.set(
+            "X-Atoll-Info",
+            JSON.stringify({
+                versions: {
+                    app: packageJson.version,
+                    sharedLib: packageJson.dependencies["@atoll/shared"]
+                }
+            })
+        );
+    } catch (err) {
+        console.log(`ERROR REPORTING VERSION INFO: "${err}"`);
+    }
     res.json({
         status: 200,
         data: {
