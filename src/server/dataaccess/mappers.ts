@@ -10,11 +10,13 @@ import {
     ApiUserSettings
 } from "@atoll/shared";
 
+// utils
+import { convertDbFloatToNumber } from "./conversionUtils";
+
 export const mapToBacklogItem = (item: any): ApiBacklogItem => {
-    const estimateValue = item.dataValues.estimate;
     return {
         ...item.dataValues,
-        estimate: estimateValue ? parseFloat(estimateValue) : estimateValue
+        estimate: convertDbFloatToNumber(item.dataValues.estimate)
     };
 };
 
@@ -38,7 +40,7 @@ export const mapSprintBacklogToBacklogItem = (item: any): ApiBacklogItemInSprint
         rolePhrase: sprintBacklogWithItems.backlogitem.rolePhrase,
         storyPhrase: sprintBacklogWithItems.backlogitem.storyPhrase,
         reasonPhrase: sprintBacklogWithItems.backlogitem.reasonPhrase,
-        estimate: sprintBacklogWithItems.backlogitem.estimate,
+        estimate: convertDbFloatToNumber(sprintBacklogWithItems.backlogitem.estimate),
         type: sprintBacklogWithItems.backlogitem.type,
         createdAt: sprintBacklogWithItems.backlogitem.createdAt,
         updatedAt: sprintBacklogWithItems.backlogitem.updatedAt,
