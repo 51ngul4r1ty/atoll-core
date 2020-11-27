@@ -21,7 +21,6 @@ export const getPackageJsonPath = (): string | null => {
         const filePath = currentPath.endsWith(`${path.sep}`)
             ? currentPath + "package.json"
             : currentPath + `${path.sep}package.json`;
-        console.log(`checking for package.json using this path: ${filePath}`);
         if (fs.existsSync(filePath)) {
             foundPath = filePath;
             found = true;
@@ -29,10 +28,8 @@ export const getPackageJsonPath = (): string | null => {
         currentRelativePath + "";
         count++;
     }
-    if (found) {
-        console.log("  Found!");
-    } else {
-        console.log("  NOT FOUND!");
+    if (!found) {
+        console.log("PACKAGE.JSON NOT FOUND!");
     }
     return foundPath;
 };
