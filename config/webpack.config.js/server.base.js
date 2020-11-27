@@ -9,6 +9,10 @@ const plugins = require("./plugins");
 module.exports = {
     name: "server",
     target: "node",
+    node: {
+        __dirname: true,
+        __filename: true
+    },
     entry: {
         // server: [path.resolve(paths.srcServer, 'index.js')],
         server: [

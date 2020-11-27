@@ -1,8 +1,47 @@
 import { APPLICATION_JSON } from "@atoll/shared";
 
+import * as fs from "fs";
+import * as path from "path";
+
+export const getPackageJsonPath = (): string | null => {
+    let count = 0;
+    let found = false;
+    let foundPath: string = null;
+    while (count < 5 && !found) {
+        let currentRelativePath: string;
+        if (count === 0) {
+            currentRelativePath = `.${path.sep}`;
+        } else {
+            currentRelativePath = "";
+            for (let i = 0; i < count; i++) {
+                currentRelativePath += `..${path.sep}`;
+            }
+        }
+        const currentPath = path.resolve(__NAME__, currentRelativePath);
+        const filePath = currentPath.endsWith(`${path.sep}`)
+            ? currentPath + "package.json"
+            : currentPath + `${path.sep}package.json`;
+        console.log(`checking for package.json using this path: ${filePath}`);
+        if (fs.existsSync(filePath)) {
+            foundPath = filePath;
+            found = true;
+        }
+        currentRelativePath + "";
+        count++;
+    }
+    if (found) {
+        console.log("  Found!");
+    } else {
+        console.log("  NOT FOUND!");
+    }
+    return foundPath;
+};
+
 export const rootHandler = function(req, res) {
     try {
-        const packageJson = require("../../../../package.json");
+        const packageJsonPath = getPackageJsonPath();
+        const data = fs.readFileSync(packageJsonPath, { encoding: "utf8", flag: "r" });
+        const packageJson = JSON.parse(data);
         res.set(
             "X-Atoll-Info",
             JSON.stringify({
