@@ -41,7 +41,11 @@ const client = [
 const server = [
     new webpack.DefinePlugin({
         __SERVER__: "true",
-        __BROWSER__: "false"
+        __BROWSER__: "false",
+        __NAME__: webpack.DefinePlugin.runtimeValue((v) => {
+            const res = v.module.rawRequest.substr(2);
+            return JSON.stringify(res); // Strings need to be wrapped in quotes
+        }, [])
     })
 ];
 

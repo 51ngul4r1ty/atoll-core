@@ -61,6 +61,7 @@ declare module "*.json" {
 
 declare const __BROWSER__: string;
 declare const __SERVER__: string;
+declare const __NAME__: string;
 
 interface Window {
     browserHistory: any;
