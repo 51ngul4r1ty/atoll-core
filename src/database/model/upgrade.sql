@@ -21,3 +21,5 @@ alter table sprintbacklogitem add column "status" char(1);
 update sprintbacklogitem set "status" = 'D';
 
 alter table backlogitem alter column estimate type decimal(10, 2);
+
+alter table backlogitem add column status char(1);

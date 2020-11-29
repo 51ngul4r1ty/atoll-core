@@ -32,20 +32,22 @@ export const mapSprintBacklogToBacklogItem = (item: any): ApiBacklogItemInSprint
     const sprintBacklogWithItems = {
         ...item.dataValues
     };
+    const backlogitem = sprintBacklogWithItems.backlogitem;
     const result = {
-        id: sprintBacklogWithItems.backlogitem.id,
-        projectId: sprintBacklogWithItems.backlogitem.projectId,
-        friendlyId: sprintBacklogWithItems.backlogitem.friendlyId,
-        externalId: sprintBacklogWithItems.backlogitem.externalId,
-        rolePhrase: sprintBacklogWithItems.backlogitem.rolePhrase,
-        storyPhrase: sprintBacklogWithItems.backlogitem.storyPhrase,
-        reasonPhrase: sprintBacklogWithItems.backlogitem.reasonPhrase,
-        estimate: convertDbFloatToNumber(sprintBacklogWithItems.backlogitem.estimate),
-        type: sprintBacklogWithItems.backlogitem.type,
-        createdAt: sprintBacklogWithItems.backlogitem.createdAt,
-        updatedAt: sprintBacklogWithItems.backlogitem.updatedAt,
-        version: sprintBacklogWithItems.backlogitem.version,
-        displayindex: sprintBacklogWithItems.displayindex
+        id: backlogitem.id,
+        projectId: backlogitem.projectId,
+        friendlyId: backlogitem.friendlyId,
+        externalId: backlogitem.externalId,
+        rolePhrase: backlogitem.rolePhrase,
+        storyPhrase: backlogitem.storyPhrase,
+        reasonPhrase: backlogitem.reasonPhrase,
+        estimate: convertDbFloatToNumber(backlogitem.estimate),
+        type: backlogitem.type,
+        createdAt: backlogitem.createdAt,
+        updatedAt: backlogitem.updatedAt,
+        version: backlogitem.version,
+        displayindex: sprintBacklogWithItems.displayindex,
+        status: backlogitem.status
     };
     return result;
 };
