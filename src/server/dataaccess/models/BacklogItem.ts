@@ -46,7 +46,11 @@ BacklogItemModel.init(
             type: DataTypes.INTEGER,
             allowNull: true
         },
-        type: DataTypes.STRING(50)
+        type: DataTypes.STRING(50),
+        status: {
+            type: DataTypes.CHAR(1),
+            allowNull: true
+        }
     },
     {
         modelName: "backlogitem",

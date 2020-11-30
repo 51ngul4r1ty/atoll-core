@@ -1,32 +1,29 @@
 {
-    "editor.rulers": [
-        132
-    ],
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true,
-        "node_modules": true,
-        ".yalc": true
-    },
-    "search.exclude": {
-        "**/node_modules": true,
-        "**/bower_components": true,
-        "**/*.code-search": true,
-        "build": true,
-        "coverage": true
-    },
-    "bookmarks.navigateThroughAllFiles": true,
-    "bookmarks.backgroundLineColor": "#102030",
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "coverage-gutters.showGutterCoverage": true,
-    "coverage-gutters.coverageFileNames": [
-        "lcov.info"
-    ],
-    "coverage-gutters.lcovname": "lcov.info",
-    "coverage-gutters.coverageReportFileName": "coverage/**/index.html",
-    "coverage-gutters.showLineCoverage": false
+  "editor.rulers": [132],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "node_modules": true,
+    ".yalc": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true,
+    "build": true,
+    "coverage": true
+  },
+  "bookmarks.navigateThroughAllFiles": true,
+  "bookmarks.backgroundLineColor": "#102030",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "coverage-gutters.showGutterCoverage": true,
+  "coverage-gutters.coverageFileNames": ["lcov.info"],
+  "coverage-gutters.lcovname": "lcov.info",
+  "coverage-gutters.coverageReportFileName": "coverage/**/index.html",
+  "coverage-gutters.showLineCoverage": false,
+  "deno.enable": false
 }

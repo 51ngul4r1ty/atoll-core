@@ -17,6 +17,9 @@ import {
 } from "../utils/responder";
 import { getParamsFromRequest } from "../utils/filterHelper";
 import { backlogItemFetcher } from "./fetchers/backlogItemFetcher";
+import { addIdToBody } from "../utils/uuidHelper";
+import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
+import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
 
 // data access
 import {
@@ -29,10 +32,6 @@ import {
     mapToProjectSettings
 } from "../../dataaccess";
 import { sequelize } from "../../dataaccess/connection";
-
-// interfaces/types
-import { addIdToBody } from "../utils/uuidHelper";
-import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -319,6 +318,43 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
 
             await backlogItem.update(req.body);
             respondWithItem(res, backlogItem, originalBacklogItem);
+        }
+    } catch (err) {
+        respondWithError(res, err);
+    }
+};
+
+export const backlogItemPatchHandler = async (req: Request, res: Response) => {
+    const queryParamItemId = req.params.itemId;
+    if (!queryParamItemId) {
+        respondWithFailedValidation(res, "Item ID is required in URI path for this operation");
+        return;
+    }
+    const bodyItemId = req.body.id;
+    if (bodyItemId) {
+        respondWithFailedValidation(
+            res,
+            `Item ID should only be provided in URI path - Item ID was found in payload: ${bodyItemId}`
+        );
+        return;
+    }
+    try {
+        const backlogItem = await BacklogItemModel.findOne({
+            where: { id: queryParamItemId }
+        });
+        if (!backlogItem) {
+            respondWithNotFound(res, `Unable to find backlogitem to patch with ID ${queryParamItemId}`);
+        } else {
+            const originalBacklogItem = mapToBacklogItem(backlogItem);
+            const invalidPatchMessage = getInvalidPatchMessage(originalBacklogItem, req.body);
+            if (invalidPatchMessage) {
+                respondWithFailedValidation(res, `Unable to patch: ${invalidPatchMessage}`);
+            } else {
+                const newItem = getPatchedItem(originalBacklogItem, req.body);
+
+                await backlogItem.update(newItem);
+                respondWithItem(res, backlogItem, originalBacklogItem);
+            }
         }
     } catch (err) {
         respondWithError(res, err);

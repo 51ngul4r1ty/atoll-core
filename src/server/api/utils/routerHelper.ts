@@ -7,6 +7,7 @@ export type RouteMethodHandler = RequestHandler<any>;
 
 export interface RouteHandlers {
     get?: RouteMethodHandler;
+    patch?: RouteMethodHandler;
     put?: RouteMethodHandler;
     post?: RouteMethodHandler;
     delete?: RouteMethodHandler;
@@ -17,6 +18,10 @@ export const setupRoutes = (router: Router, path: string, handlers: RouteHandler
     if (handlers.get) {
         allowMethods.push("GET");
         router.get(path, auth, handlers.get);
+    }
+    if (handlers.patch) {
+        allowMethods.push("POST");
+        router.patch(path, auth, handlers.patch);
     }
     if (handlers.post) {
         allowMethods.push("POST");

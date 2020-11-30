@@ -5,18 +5,22 @@
         },
         {
             "path": "../atoll-shared"
+        },
+        {
+            "path": "../atoll-scripts"
         }
     ],
     "settings": {
         "bookmarks.navigateThroughAllFiles": true,
         "bookmarks.backgroundLineColor": "#102030",
         "coverage-gutters.showGutterCoverage": true,
-        "coverage-gutters.coverageFileNames": [
-            "lcov.info"
-        ],
+        "coverage-gutters.coverageFileNames": ["lcov.info"],
         "coverage-gutters.lcovname": "lcov.info",
         "coverage-gutters.coverageReportFileName": "coverage/**/index.html",
         "coverage-gutters.showLineCoverage": false,
-        "typescript.tsdk": "atoll-core\\node_modules\\typescript\\lib"
+        "typescript.tsdk": "atoll-core\\node_modules\\typescript\\lib",
+        "deno.import_intellisense_origins": {
+            "https://deno.land": true
+        }
     }
 }
