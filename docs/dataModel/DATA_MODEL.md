@@ -59,8 +59,9 @@ Planned vs Unplanned
 Splitting vs Continuing a Story
 -------------------------------
 
-A story may not be completed in a sprint so it can be continued.  Also, if the team recognizes that a story can be done in multiple
-parts then it can be split.  These are not the same thing and should be treated differently:
+It is possible that a story is not be completed in a sprint.  In that case it will need to span multiple sprints so that it can be
+continued.  Also, if the team recognizes that a story can be done in multiple parts then it can be split.  These are not the same
+thing and should be treated differently:
 - any part of a story (i.e. a task) can be allocated to a sprint individually (2+ sprints containing same story)
 - multiple stories can relate to an originating story (there's an inherent hierachy)
 
