@@ -78,7 +78,7 @@ setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}/:itemId`, {
     put: backlogItemPutHandler,
     patch: backlogItemPatchHandler,
     delete: backlogItemsDeleteHandler
-} as any);
+});
 
 setupRoutes(router, `/${BACKLOG_ITEM_RANK_RESOURCE_NAME}`, { get: backlogItemRanksGetHandler });
 
