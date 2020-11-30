@@ -16,7 +16,8 @@ import { convertDbFloatToNumber } from "./conversionUtils";
 export const mapToBacklogItem = (item: any): ApiBacklogItem => {
     return {
         ...item.dataValues,
-        estimate: convertDbFloatToNumber(item.dataValues.estimate)
+        estimate: convertDbFloatToNumber(item.dataValues.estimate),
+        status: item.dataValues.status || "N"
     };
 };
 
