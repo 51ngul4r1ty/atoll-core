@@ -33,3 +33,9 @@ Atomic Design
 
 A quick overview of Atomic Design terminology:
 https://www.youtube.com/watch?v=aMtnGeiWTyU
+
+Miscellaneous Component References
+----------------------------------
+
+How to build the checkbox:
+https://webdesign.tutsplus.com/tutorials/how-to-make-custom-accessible-checkboxes-and-radio-buttons--cms-32074
