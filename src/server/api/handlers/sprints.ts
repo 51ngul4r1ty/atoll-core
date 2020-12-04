@@ -10,7 +10,7 @@ import { fetchSprints } from "./fetchers/sprintFetcher";
 import { deleteSprint } from "./deleters/sprintDeleter";
 
 // utils
-import { getParamsFromRequest } from "../utils/filterHelper";
+import { getParamFromRequest, getParamsFromRequest } from "../utils/filterHelper";
 import { addIdToBody } from "../utils/uuidHelper";
 import { respondWithError, respondWithFailedValidation, respondWithItem, respondWithNotFound } from "../utils/responder";
 import { mapFromSprint, MapOptions, mapToSprint } from "../../dataaccess/mappers";
@@ -19,7 +19,20 @@ import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
 
 export const sprintsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
-    const result = await fetchSprints(params.projectId);
+    const archived = getParamFromRequest(req, "archived");
+    let archivedValue: string;
+    switch (archived) {
+        case "true":
+            archivedValue = "Y";
+            break;
+        case "false":
+            archivedValue = "N";
+            break;
+        case null:
+            archivedValue = null;
+            break;
+    }
+    const result = await fetchSprints(params.projectId, archivedValue);
     if (result.status === HttpStatus.OK) {
         res.json(result);
     } else {
@@ -50,9 +63,10 @@ export const sprintPatchHandler = async (req: Request, res: Response) => {
         return;
     }
     try {
-        const sprint = await SprintModel.findOne({
+        const options = {
             where: { id: queryParamItemId }
-        });
+        };
+        const sprint = await SprintModel.findOne(options);
         if (!sprint) {
             respondWithNotFound(res, `Unable to find sprint to patch with ID ${queryParamItemId}`);
         } else {
