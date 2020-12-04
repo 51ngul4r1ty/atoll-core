@@ -57,7 +57,7 @@
     "setup": "ts-node ./scripts/setup.ts"
   },
   "dependencies": {
-    "@atoll/shared": "file:.yalc/@atoll/shared",
+    "@atoll/shared": "0.25.0",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.19.2",
