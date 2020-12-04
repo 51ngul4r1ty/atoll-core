@@ -1,11 +1,6 @@
 // externals
-import { Request } from "express";
+import { Request, Response } from "express";
 import * as HttpStatus from "http-status-codes";
-
-// utils
-import { getParamsFromRequest } from "../utils/filterHelper";
-import { addIdToBody } from "../utils/uuidHelper";
-import { respondWithError } from "../utils/responder";
 
 // data access
 import { SprintModel } from "../../dataaccess/models/Sprint";
@@ -14,9 +9,30 @@ import { SprintModel } from "../../dataaccess/models/Sprint";
 import { fetchSprints } from "./fetchers/sprintFetcher";
 import { deleteSprint } from "./deleters/sprintDeleter";
 
+// utils
+import { getParamFromRequest, getParamsFromRequest } from "../utils/filterHelper";
+import { addIdToBody } from "../utils/uuidHelper";
+import { respondWithError, respondWithFailedValidation, respondWithItem, respondWithNotFound } from "../utils/responder";
+import { mapFromSprint, MapOptions, mapToSprint } from "../../dataaccess/mappers";
+import { respondedWithMismatchedItemIds } from "../utils/validationResponders";
+import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
+
 export const sprintsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
-    const result = await fetchSprints(params.projectId);
+    const archived = getParamFromRequest(req, "archived");
+    let archivedValue: string;
+    switch (archived) {
+        case "true":
+            archivedValue = "Y";
+            break;
+        case "false":
+            archivedValue = "N";
+            break;
+        case null:
+            archivedValue = null;
+            break;
+    }
+    const result = await fetchSprints(params.projectId, archivedValue);
     if (result.status === HttpStatus.OK) {
         res.json(result);
     } else {
@@ -28,10 +44,51 @@ export const sprintsGetHandler = async (req: Request, res) => {
     }
 };
 
-export const sprintPostHandler = async (req: Request, res) => {
-    const bodyWithId = { ...addIdToBody(req.body) };
+export const sprintPatchHandler = async (req: Request, res: Response) => {
+    const queryParamItemId = req.params.sprintId;
+    if (!queryParamItemId) {
+        respondWithFailedValidation(res, "Item ID is required in URI path for this operation");
+        return;
+    }
+    const body = mapFromSprint(req.body, MapOptions.ForPatch);
+    const bodyItemId = body.id;
+    if (respondedWithMismatchedItemIds(res, queryParamItemId, bodyItemId)) {
+        return;
+    }
+    if (bodyItemId && bodyItemId !== queryParamItemId) {
+        respondWithFailedValidation(
+            res,
+            `Item ID is optional, but if it is provided it should match the URI path item ID: ${bodyItemId} !== ${queryParamItemId}`
+        );
+        return;
+    }
     try {
-        const addedBacklogItem = await SprintModel.create(bodyWithId);
+        const options = {
+            where: { id: queryParamItemId }
+        };
+        const sprint = await SprintModel.findOne(options);
+        if (!sprint) {
+            respondWithNotFound(res, `Unable to find sprint to patch with ID ${queryParamItemId}`);
+        } else {
+            const originalSprint = mapToSprint(sprint);
+            const invalidPatchMessage = getInvalidPatchMessage(originalSprint, body);
+            if (invalidPatchMessage) {
+                respondWithFailedValidation(res, `Unable to patch: ${invalidPatchMessage}`);
+            } else {
+                const newItem = getPatchedItem(originalSprint, body);
+                await sprint.update(newItem);
+                respondWithItem(res, sprint, originalSprint);
+            }
+        }
+    } catch (err) {
+        respondWithError(res, err);
+    }
+};
+
+export const sprintPostHandler = async (req: Request, res) => {
+    const sprintDataObject = mapFromSprint({ ...addIdToBody(req.body) });
+    try {
+        const addedBacklogItem = await SprintModel.create(sprintDataObject);
         res.status(HttpStatus.CREATED).json({
             status: HttpStatus.CREATED,
             data: {

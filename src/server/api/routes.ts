@@ -23,7 +23,7 @@ import {
     backlogItemPutHandler,
     backlogItemPatchHandler
 } from "./handlers/backlogItems";
-import { sprintPostHandler, sprintsGetHandler, sprintDeleteHandler } from "./handlers/sprints";
+import { sprintPostHandler, sprintsGetHandler, sprintDeleteHandler, sprintPatchHandler } from "./handlers/sprints";
 import { backlogItemRanksGetHandler, backlogItemRankGetHandler } from "./handlers/backlogItemRanks";
 import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
@@ -59,6 +59,7 @@ setupRoutes(router, `/${SPRINT_RESOURCE_NAME}`, {
 });
 
 setupRoutes(router, `/${SPRINT_RESOURCE_NAME}/:sprintId`, {
+    patch: sprintPatchHandler,
     delete: sprintDeleteHandler
 });
 

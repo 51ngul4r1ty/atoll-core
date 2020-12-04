@@ -15,9 +15,9 @@ import { SPRINT_RESOURCE_NAME } from "../../../resourceNames";
 // data access
 import { SprintModel } from "../../../dataaccess/models/Sprint";
 
-export const fetchSprints = async (projectId: string | null) => {
+export const fetchSprints = async (projectId: string | null, archived?: string | null) => {
     try {
-        const options = buildOptionsFromParams({ projectId });
+        const options = buildOptionsFromParams({ projectId, archived });
         const sprints = await SprintModel.findAll(options);
         const items = sprints.map((item) => {
             const sprint = mapToSprint(item);

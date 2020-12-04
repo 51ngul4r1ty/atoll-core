@@ -145,3 +145,19 @@ import { IntlProvider } from "@atoll/shared";
 // layouts
 import { layouts } from "@atoll/shared";
 ```
+Functions
+=========
+
+Preferred Style
+---------------
+
+The preferred style for functions is `const functionName = (arg1: ArgType1, arg2: ArgType2, ...): ResultType => { ... }` as opposed
+to `function functionName(arg1: ArgType1, arg2: ArgType2): ResultType { ... }`.
+
+Argument Types
+--------------
+
+Boolean types should be avoided to improve readability.  For example, `const doSomething = (convertNullToTrue: boolean)` should be
+changed to `const doSomething = (nullConversionOption: NullConversionOption)` where `NullConversionOption` is defined as an enum
+with the value `MapNullToTrue`.  This makes calling code easier to read: `doSomething(NullConversionOption.MapNullToTrue)` means
+something, as opposed to `doSomething(true)` that you would have to explore further to understand.

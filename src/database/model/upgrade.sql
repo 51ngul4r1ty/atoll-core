@@ -23,3 +23,11 @@ update sprintbacklogitem set "status" = 'D';
 alter table backlogitem alter column estimate type decimal(10, 2);
 
 alter table backlogitem add column status char(1);
+
+alter table sprint add column "archived" char(1);
+update sprint set archived = 'N' where archived is null;
+alter table sprint
+    alter column archived type char(1),
+    alter column archived set not null;
+
+	
