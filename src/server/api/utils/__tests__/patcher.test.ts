@@ -27,6 +27,10 @@ describe("Patcher", () => {
             expect(actual.valid).toBeFalsy();
             expect(actual.extraFields).toStrictEqual(["c"]);
         });
+        it("should return valid when original fields have false value", () => {
+            const actual = validateBaseKeys({ a: false, b: 2 }, { a: 10, b: 20 });
+            expect(actual.valid).toBeTruthy();
+        });
         it("should ignore complex object fields in target node", () => {
             const actual = validateBaseKeys({ a: 1, complex: { x: 5, y: 9 } }, { a: 10 });
             expect(actual.valid).toBeTruthy();
