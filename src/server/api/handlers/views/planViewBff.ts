@@ -89,7 +89,6 @@ export const combineStatuses = (...statuses: number[]): number => {
 };
 
 export const planViewBffGetHandler = async (req: Request, res: Response) => {
-    const params = getParamsFromRequest(req);
     const userPreferencesResult = await userPreferencesFetcher("{self}", () => getLoggedInAppUserId(req));
     const selectedProjectId = (userPreferencesResult as UserPreferencesSuccessResponse).data.item.settings.selectedProject;
 
