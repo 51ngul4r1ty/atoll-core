@@ -7,6 +7,18 @@ import { CreateOptions, Transaction } from "sequelize";
 // libraries
 import { ApiBacklogItem, ApiBacklogItemRank } from "@atoll/shared";
 
+// data access
+import {
+    BacklogItemModel,
+    BacklogItemRankModel,
+    CounterModel,
+    ProjectSettingsModel,
+    mapToBacklogItem,
+    mapToCounter,
+    mapToProjectSettings
+} from "../../dataaccess";
+import { sequelize } from "../../dataaccess/connection";
+
 // utils
 import {
     respondWithFailedValidation,
@@ -20,18 +32,7 @@ import { backlogItemFetcher } from "./fetchers/backlogItemFetcher";
 import { addIdToBody } from "../utils/uuidHelper";
 import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
 import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
-
-// data access
-import {
-    BacklogItemModel,
-    BacklogItemRankModel,
-    CounterModel,
-    ProjectSettingsModel,
-    mapToBacklogItem,
-    mapToCounter,
-    mapToProjectSettings
-} from "../../dataaccess";
-import { sequelize } from "../../dataaccess/connection";
+import { respondedWithMismatchedItemIds } from "../utils/validationResponders";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -331,11 +332,7 @@ export const backlogItemPatchHandler = async (req: Request, res: Response) => {
         return;
     }
     const bodyItemId = req.body.id;
-    if (bodyItemId) {
-        respondWithFailedValidation(
-            res,
-            `Item ID should only be provided in URI path - Item ID was found in payload: ${bodyItemId}`
-        );
+    if (respondedWithMismatchedItemIds(res, queryParamItemId, bodyItemId)) {
         return;
     }
     try {

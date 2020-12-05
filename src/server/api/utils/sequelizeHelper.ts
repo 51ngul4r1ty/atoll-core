@@ -8,6 +8,7 @@ import { getParamsFromRequest } from "./filterHelper";
 export interface OptionsParams {
     projectId?: string | null;
     sprintId?: string | null;
+    archived?: string | null;
 }
 
 export const addWhereClauseToOptions = (options: any, key: string, value: any) => {
@@ -24,6 +25,7 @@ export const buildOptionsFromParams = (params: OptionsParams) => {
     const options: any = {};
     addWhereClauseToOptions(options, "projectId", params.projectId);
     addWhereClauseToOptions(options, "sprintId", params.sprintId);
+    addWhereClauseToOptions(options, "archived", params.archived);
     return options;
 };
 

@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import * as HttpStatus from "http-status-codes";
 
 // utils
-import { getParamsFromRequest } from "../../utils/filterHelper";
 import { backlogItemFetcher } from "../fetchers/backlogItemFetcher";
 import { fetchSprints } from "../fetchers/sprintFetcher";
 import { userPreferencesFetcher, UserPreferencesSuccessResponse } from "../fetchers/userPreferencesFetcher";
@@ -92,9 +91,10 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
     const userPreferencesResult = await userPreferencesFetcher("{self}", () => getLoggedInAppUserId(req));
     const selectedProjectId = (userPreferencesResult as UserPreferencesSuccessResponse).data.item.settings.selectedProject;
 
+    const archived = "N";
     let [backlogItemsResult, sprintsResult] = await Promise.all([
         backlogItemFetcher(selectedProjectId),
-        fetchSprints(selectedProjectId)
+        fetchSprints(selectedProjectId, archived)
     ]);
     if (
         backlogItemsResult.status === HttpStatus.OK &&

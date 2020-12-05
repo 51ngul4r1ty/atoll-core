@@ -31,7 +31,11 @@ SprintModel.init(
         acceptedPoints: DataTypes.INTEGER,
         velocityPoints: DataTypes.INTEGER,
         usedSplitPoints: DataTypes.INTEGER,
-        remainingSplitPoints: DataTypes.INTEGER
+        remainingSplitPoints: DataTypes.INTEGER,
+        archived: {
+            type: DataTypes.CHAR(1),
+            allowNull: true
+        }
     },
     {
         modelName: "sprint",

@@ -7,7 +7,7 @@ export const validateBaseKeys = (targetNode: any, sourceNode: any): PatchValidat
     const sourceKeys = Object.keys(sourceNode || {});
     const extraFields = [];
     sourceKeys.forEach((key) => {
-        if (!targetNode[key]) {
+        if (!targetNode.hasOwnProperty(key)) {
             extraFields.push(key);
         }
     });
