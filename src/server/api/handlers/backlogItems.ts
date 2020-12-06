@@ -5,7 +5,7 @@ import * as HttpStatus from "http-status-codes";
 import { CreateOptions, Transaction } from "sequelize";
 
 // libraries
-import { ApiBacklogItem, ApiBacklogItemRank } from "@atoll/shared";
+import { getValidStatuses, isValidStatus, ApiBacklogItem, ApiBacklogItemRank } from "@atoll/shared";
 
 // data access
 import {
@@ -305,6 +305,13 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
         respondWithFailedValidation(
             res,
             `Item ID in URI path (${queryParamItemId}) should match Item ID in payload (${bodyItemId})`
+        );
+        return;
+    }
+    if (!isValidStatus(req.body.status)) {
+        respondWithFailedValidation(
+            res,
+            `Status "${req.body.status}" is not a valid value - it should be one of the following: ${getValidStatuses().join(", ")}`
         );
         return;
     }
