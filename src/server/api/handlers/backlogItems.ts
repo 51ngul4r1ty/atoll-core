@@ -8,16 +8,11 @@ import { CreateOptions, Transaction } from "sequelize";
 import { getValidStatuses, isValidStatus, ApiBacklogItem, ApiBacklogItemRank } from "@atoll/shared";
 
 // data access
-import {
-    BacklogItemModel,
-    BacklogItemRankModel,
-    CounterModel,
-    ProjectSettingsModel,
-    mapToBacklogItem,
-    mapToCounter,
-    mapToProjectSettings
-} from "../../dataaccess";
 import { sequelize } from "../../dataaccess/connection";
+import { BacklogItemModel } from "../../dataaccess/models/BacklogItem";
+import { BacklogItemRankModel } from "../../dataaccess/models/BacklogItemRank";
+import { CounterModel } from "../../dataaccess/models/Counter";
+import { ProjectSettingsModel } from "../../dataaccess/models/ProjectSettings";
 
 // utils
 import {
@@ -33,6 +28,7 @@ import { addIdToBody } from "../utils/uuidHelper";
 import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
 import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
 import { respondedWithMismatchedItemIds } from "../utils/validationResponders";
+import { mapToBacklogItem, mapToCounter, mapToProjectSettings } from "../../dataaccess/mappers/dataAccessToApiMappers";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
