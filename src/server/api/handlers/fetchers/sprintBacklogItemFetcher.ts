@@ -5,7 +5,7 @@ import * as HttpStatus from "http-status-codes";
 import { ApiBacklogItem } from "@atoll/shared";
 
 // utils
-import { mapSprintBacklogToBacklogItem } from "../../../dataaccess/mappers/apiToDataAccessMappers";
+import { mapSprintBacklogToBacklogItem } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 
