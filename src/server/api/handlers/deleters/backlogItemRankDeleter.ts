@@ -1,6 +1,6 @@
 // externals
 import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
-import { mapToBacklogItemRank } from "../../../dataaccess/mappers/apiToDataAcessMappers";
+import { mapToBacklogItemRank } from "../../../dataaccess/mappers/apiToDataAccessMappers";
 import * as HttpStatus from "http-status-codes";
 import { FindOptions, InstanceDestroyOptions, InstanceUpdateOptions, Transaction } from "sequelize";
 

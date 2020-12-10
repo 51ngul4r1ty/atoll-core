@@ -7,7 +7,7 @@ import { CreateOptions, Transaction } from "sequelize";
 import { getParamsFromRequest } from "../utils/filterHelper";
 import { buildOptionsFromParams } from "../utils/sequelizeHelper";
 import { respondWithError } from "../utils/responder";
-import { mapSprintBacklogToBacklogItem, mapToSprintBacklogItem } from "../../dataaccess/mappers/apiToDataAcessMappers";
+import { mapSprintBacklogToBacklogItem, mapToSprintBacklogItem } from "../../dataaccess/mappers/apiToDataAccessMappers";
 import { addIdToBody } from "../utils/uuidHelper";
 import { sprintBacklogItemFetcher } from "./fetchers/sprintBacklogItemFetcher";
 

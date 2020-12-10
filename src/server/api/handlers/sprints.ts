@@ -13,7 +13,7 @@ import { deleteSprint } from "./deleters/sprintDeleter";
 import { getParamFromRequest, getParamsFromRequest } from "../utils/filterHelper";
 import { addIdToBody } from "../utils/uuidHelper";
 import { respondWithError, respondWithFailedValidation, respondWithItem, respondWithNotFound } from "../utils/responder";
-import { mapFromSprint, ApiToDataAccessMapOptions, mapToSprint } from "../../dataaccess/mappers/apiToDataAcessMappers";
+import { mapFromSprint, ApiToDataAccessMapOptions, mapToSprint } from "../../dataaccess/mappers/apiToDataAccessMappers";
 import { respondedWithMismatchedItemIds } from "../utils/validationResponders";
 import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
 

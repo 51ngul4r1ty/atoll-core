@@ -5,7 +5,7 @@ import * as HttpStatus from "http-status-codes";
 import { ApiSprint } from "@atoll/shared";
 
 // utils
-import { mapToSprint } from "../../../dataaccess/mappers/apiToDataAcessMappers";
+import { mapToSprint } from "../../../dataaccess/mappers/apiToDataAccessMappers";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 
