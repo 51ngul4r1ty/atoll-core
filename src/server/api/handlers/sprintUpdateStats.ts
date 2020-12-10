@@ -1,6 +1,6 @@
 // externals
-import { Request, Response } from "express";
 import * as HttpStatus from "http-status-codes";
+import { Request, Response } from "express";
 import { Transaction } from "sequelize";
 
 // libraries
