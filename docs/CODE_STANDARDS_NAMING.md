@@ -61,6 +61,35 @@ NOTE: Do not assume that components belong in an upper level folder if they cont
   that could potentially be atoms.
 
 
+Data Model Naming
+=================
+
+3 Types of Data Objects
+-----------------------
+
+1. API Data Model - the exact structure received from and sent to the Restful API.
+2. Redux State Model - the structure used for the application state.
+3. Sequelize Data Model - the structure retrieved from the database.
+
+| Model Type         | Name Format   | Example     |
+|--------------------|---------------|-------------|
+| API Data Model     | Api{Entity}   | ApiSprint   |
+| Reduxe State Model | {Entity}      | Sprint      |
+| Sequelize Model    | {Entity}Model | SprintModel |
+
+Why We Need All 3
+-----------------
+
+1. Most databases have something that can be a boolean, but it may not specifically be true/false.  So, in Atoll we map boolean to
+   char(1) - "Y" or "N" values.
+2. Redux state (i.e. application state) has specialized needs so it may contain additional fields or not need fields provided by
+   either the API or the data model.
+3. The API data model may return data types in a way that works best for a Restful API (for example ISO Dates) so they will need to
+   be converted to their equivalent types when stored in the application state.
+
+Technically, one could work with the API Model directly for the redux state but we favor the benefits of abstraction over a little
+extra coding.
+
 Redux Action Naming
 ===================
 
