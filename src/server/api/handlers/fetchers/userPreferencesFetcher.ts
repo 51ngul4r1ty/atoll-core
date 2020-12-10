@@ -2,7 +2,7 @@
 import * as HttpStatus from "http-status-codes";
 
 // utils
-import { mapToUserSettings } from "../../../dataaccess/mappers";
+import { mapToUserSettings } from "../../../dataaccess/mappers/apiToDataAcessMappers";
 
 // data access
 import { UserSettingsModel } from "../../../dataaccess/models/UserSettings";

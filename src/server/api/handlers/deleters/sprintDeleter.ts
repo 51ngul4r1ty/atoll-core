@@ -4,7 +4,7 @@ import { FindOptions, InstanceDestroyOptions, Transaction } from "sequelize";
 
 // utils
 import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
-import { mapToSprint } from "../../../dataaccess/mappers";
+import { mapToSprint } from "../../../dataaccess/mappers/apiToDataAcessMappers";
 
 // data access
 import { SprintModel } from "../../../dataaccess/models/Sprint";

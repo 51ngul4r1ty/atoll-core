@@ -8,7 +8,7 @@ export * from "./models/ProjectSettings";
 export * from "./models/Sprint";
 export * from "./models/SprintBacklogItem";
 export * from "./models/UserSettings";
-export * from "./mappers";
+export * from "./mappers/apiToDataAcessMappers";
 
 // data access
 import { sequelize } from "./connection";
