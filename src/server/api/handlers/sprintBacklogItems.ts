@@ -3,10 +3,13 @@ import { Request } from "express";
 import * as HttpStatus from "http-status-codes";
 import { CreateOptions, Transaction } from "sequelize";
 
+// libraries
+import { logger } from "@atoll/shared";
+
 // utils
 import { getParamsFromRequest } from "../utils/filterHelper";
 import { buildOptionsFromParams } from "../utils/sequelizeHelper";
-import { respondWithError } from "../utils/responder";
+import { respondWithError, respondWithNotFound } from "../utils/responder";
 import { mapSprintBacklogToBacklogItem, mapToSprintBacklogItem } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { addIdToBody } from "../utils/uuidHelper";
 import { sprintBacklogItemFetcher } from "./fetchers/sprintBacklogItemFetcher";
@@ -33,6 +36,8 @@ export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
 };
 
 export const sprintBacklogItemPostHandler = async (req: Request, res) => {
+    const functionTag = "sprintBacklogItemPostHandler";
+    const logContext = logger.info("starting call", [functionTag]);
     const params = getParamsFromRequest(req);
     const backlogitemId = req.body.backlogitemId;
     const sprintId = params.sprintId;
@@ -79,14 +84,23 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
             });
         }
     } catch (err) {
+        const errLogContext = logger.warn(`handling error "${err}"`, [functionTag], logContext);
         if (transaction) {
-            await transaction.rollback();
+            logger.info("rolling back transaction", [functionTag], errLogContext);
+            try {
+                await transaction.rollback();
+            } catch (err) {
+                logger.warn(`roll back failed with error "${err}"`, [functionTag], errLogContext);
+            }
         }
         respondWithError(res, err);
+        logger.info(`handling error ${err}`, [functionTag], logContext);
     }
+    logger.info("finishing call", [functionTag]);
 };
 
 export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
+    const functionTag = "sprintBacklogItemDeleteHandler";
     const params = getParamsFromRequest(req);
     const backlogItemId = params.backlogItemId;
     const sprintId = params.sprintId;
@@ -99,30 +113,38 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
             include: [BacklogItemModel],
             transaction
         });
-        const sprintBacklogItemTyped = mapSprintBacklogToBacklogItem(sprintBacklogItem);
-        const result = await backlogItemRankFirstItemInserter(sprintBacklogItemTyped, transaction);
-        if (result.status === HttpStatus.OK) {
-            await SprintBacklogItemModel.destroy({ where: { sprintId, backlogitemId: backlogItemId }, transaction });
+        if (!sprintBacklogItem) {
+            respondWithNotFound(res, `Unable to find sprint backlog item in sprint "${sprintId}" with ID "${backlogItemId}"`);
         } else {
-            await transaction.rollback();
-            rolledBack = true;
-            respondWithError(
-                res,
-                `Unable to insert new backlogitemrank entries, aborting move to product backlog for item ID ${backlogItemId}`
-            );
-        }
-        if (!rolledBack) {
-            await transaction.commit();
-            res.status(HttpStatus.OK).json({
-                status: HttpStatus.OK,
-                data: {
-                    item: sprintBacklogItemTyped
-                }
-            });
+            const sprintBacklogItemTyped = mapSprintBacklogToBacklogItem(sprintBacklogItem);
+            const result = await backlogItemRankFirstItemInserter(sprintBacklogItemTyped, transaction);
+            if (result.status === HttpStatus.OK) {
+                await SprintBacklogItemModel.destroy({ where: { sprintId, backlogitemId: backlogItemId }, transaction });
+            } else {
+                await transaction.rollback();
+                rolledBack = true;
+                respondWithError(
+                    res,
+                    `Unable to insert new backlogitemrank entries, aborting move to product backlog for item ID ${backlogItemId}`
+                );
+            }
+            if (!rolledBack) {
+                await transaction.commit();
+                res.status(HttpStatus.OK).json({
+                    status: HttpStatus.OK,
+                    data: {
+                        item: sprintBacklogItemTyped
+                    }
+                });
+            }
         }
     } catch (err) {
         if (transaction) {
-            await transaction.rollback();
+            try {
+                await transaction.rollback();
+            } catch (err) {
+                logger.warn(`roll back failed with error "${err}"`, [functionTag]);
+            }
         }
         respondWithError(res, err);
     }

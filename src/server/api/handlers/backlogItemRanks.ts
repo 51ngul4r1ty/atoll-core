@@ -9,9 +9,10 @@ import { ApiBacklogItemRank } from "@atoll/shared";
 // utils
 import { buildSelfLink } from "../../utils/linkBuilder";
 import { respondWithNotFound } from "../utils/responder";
+import { mapToBacklogItemRank } from "../../dataaccess/mappers/dataAccessToApiMappers";
 
 // data access
-import { BacklogItemRankModel, mapToBacklogItemRank } from "../../dataaccess";
+import { BacklogItemRankModel } from "../../dataaccess";
 
 // consts/enums
 import { BACKLOG_ITEM_RANK_RESOURCE_NAME } from "../../resourceNames";

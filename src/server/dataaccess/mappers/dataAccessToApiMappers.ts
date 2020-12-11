@@ -14,6 +14,9 @@ import {
 import { convertDbCharToBoolean, convertDbFloatToNumber } from "../conversionUtils";
 
 export const mapToBacklogItem = (item: any): ApiBacklogItem => {
+    if (!item) {
+        return item;
+    }
     return {
         ...item.dataValues,
         estimate: convertDbFloatToNumber(item.dataValues.estimate),
@@ -21,20 +24,33 @@ export const mapToBacklogItem = (item: any): ApiBacklogItem => {
     };
 };
 
-export const mapToBacklogItemRank = (item: any): ApiBacklogItemRank => ({
-    ...item.dataValues
-});
+export const mapToBacklogItemRank = (item: any): ApiBacklogItemRank => {
+    if (!item) {
+        return item;
+    }
+    return {
+        ...item.dataValues
+    };
+};
 
-export const mapToSprint = (item: any): ApiSprint => ({
-    ...item.dataValues,
-    plannedPoints: convertDbFloatToNumber(item.dataValues.plannedPoints),
-    acceptedPoints: convertDbFloatToNumber(item.dataValues.acceptedPoints),
-    velocityPoints: convertDbFloatToNumber(item.dataValues.velocityPoints),
-    remainingSplitPoints: convertDbFloatToNumber(item.dataValues.remainingSplitPoints),
-    archived: convertDbCharToBoolean(item.dataValues.archived)
-});
+export const mapToSprint = (item: any): ApiSprint => {
+    if (!item) {
+        return item;
+    }
+    return {
+        ...item.dataValues,
+        plannedPoints: convertDbFloatToNumber(item.dataValues.plannedPoints),
+        acceptedPoints: convertDbFloatToNumber(item.dataValues.acceptedPoints),
+        velocityPoints: convertDbFloatToNumber(item.dataValues.velocityPoints),
+        remainingSplitPoints: convertDbFloatToNumber(item.dataValues.remainingSplitPoints),
+        archived: convertDbCharToBoolean(item.dataValues.archived)
+    };
+};
 
 export const mapSprintBacklogToBacklogItem = (item: any): ApiBacklogItemInSprint => {
+    if (!item) {
+        return item;
+    }
     const sprintBacklogWithItems = {
         ...item.dataValues
     };
@@ -59,19 +75,37 @@ export const mapSprintBacklogToBacklogItem = (item: any): ApiBacklogItemInSprint
 };
 
 export const mapToSprintBacklogItem = (item: any): ApiSprintBacklogItem => {
+    if (!item) {
+        return item;
+    }
     return {
         ...item.dataValues
     };
 };
 
-export const mapToCounter = (item: any): ApiCounter => ({
-    ...item.dataValues
-});
+export const mapToCounter = (item: any): ApiCounter => {
+    if (!item) {
+        return item;
+    }
+    return {
+        ...item.dataValues
+    };
+};
 
-export const mapToProjectSettings = (item: any): ApiProjectSettings => ({
-    ...item.dataValues
-});
+export const mapToProjectSettings = (item: any): ApiProjectSettings => {
+    if (!item) {
+        return item;
+    }
+    return {
+        ...item.dataValues
+    };
+};
 
-export const mapToUserSettings = (item: any): ApiUserSettings => ({
-    ...item.dataValues
-});
+export const mapToUserSettings = (item: any): ApiUserSettings => {
+    if (!item) {
+        return item;
+    }
+    return {
+        ...item.dataValues
+    };
+};
