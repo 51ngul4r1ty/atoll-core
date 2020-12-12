@@ -4,13 +4,25 @@ import * as HttpStatus from "http-status-codes";
 import { CreateOptions, Transaction } from "sequelize";
 
 // libraries
-import { logger } from "@atoll/shared";
+import {
+    ApiSprintStats,
+    BacklogItemStatus,
+    determineSprintStatus,
+    logger,
+    mapApiItemToBacklogItem,
+    mapApiItemToSprint,
+    SprintStatus
+} from "@atoll/shared";
 
 // utils
 import { getParamsFromRequest } from "../utils/filterHelper";
 import { buildOptionsFromParams } from "../utils/sequelizeHelper";
 import { respondWithError, respondWithNotFound } from "../utils/responder";
-import { mapSprintBacklogToBacklogItem, mapToSprintBacklogItem } from "../../dataaccess/mappers/dataAccessToApiMappers";
+import {
+    mapDbSprintBacklogToApiBacklogItem,
+    mapDbToApiSprint,
+    mapDbToApiSprintBacklogItem
+} from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { addIdToBody } from "../utils/uuidHelper";
 import { sprintBacklogItemFetcher } from "./fetchers/sprintBacklogItemFetcher";
 
@@ -18,8 +30,10 @@ import { sprintBacklogItemFetcher } from "./fetchers/sprintBacklogItemFetcher";
 import { sequelize } from "../../dataaccess/connection";
 import { SprintBacklogItemModel } from "../../dataaccess/models/SprintBacklogItem";
 import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
-import { BacklogItemModel } from "dataaccess/models/BacklogItem";
+import { BacklogItemModel } from "../../dataaccess/models/BacklogItem";
 import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
+import { SprintModel } from "../../dataaccess/models/Sprint";
+import { ApiToDataAccessMapOptions, mapApiToDbSprint } from "../../dataaccess";
 
 export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
@@ -52,7 +66,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
             order: [["displayindex", "ASC"]]
         });
         if (sprintBacklogs && sprintBacklogs.length) {
-            const lastSprintBacklogItem = mapToSprintBacklogItem(sprintBacklogs[sprintBacklogs.length - 1]);
+            const lastSprintBacklogItem = mapDbToApiSprintBacklogItem(sprintBacklogs[sprintBacklogs.length - 1]);
             displayIndex = lastSprintBacklogItem.displayindex + 1;
         } else {
             displayIndex = 0;
@@ -116,24 +130,61 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
         if (!sprintBacklogItem) {
             respondWithNotFound(res, `Unable to find sprint backlog item in sprint "${sprintId}" with ID "${backlogItemId}"`);
         } else {
-            const sprintBacklogItemTyped = mapSprintBacklogToBacklogItem(sprintBacklogItem);
+            let sprintStats: ApiSprintStats;
+            const sprintBacklogItemTyped = mapDbSprintBacklogToApiBacklogItem(sprintBacklogItem);
+            const backlogItem = mapApiItemToBacklogItem(sprintBacklogItemTyped);
             const result = await backlogItemRankFirstItemInserter(sprintBacklogItemTyped, transaction);
-            if (result.status === HttpStatus.OK) {
-                await SprintBacklogItemModel.destroy({ where: { sprintId, backlogitemId: backlogItemId }, transaction });
-            } else {
+            if (result.status !== HttpStatus.OK) {
                 await transaction.rollback();
                 rolledBack = true;
                 respondWithError(
                     res,
                     `Unable to insert new backlogitemrank entries, aborting move to product backlog for item ID ${backlogItemId}`
                 );
+            } else {
+                await SprintBacklogItemModel.destroy({ where: { sprintId, backlogitemId: backlogItemId }, transaction });
+                const dbSprint = await SprintModel.findOne({ where: { id: sprintId }, transaction });
+                const apiSprint = mapDbToApiSprint(dbSprint);
+                const sprint = mapApiItemToSprint(apiSprint);
+                const sprintStatus = determineSprintStatus(sprint.startDate, sprint.finishDate);
+                let totalsChanged = false;
+                sprintStats = {
+                    acceptedPoints: sprint.acceptedPoints,
+                    plannedPoints: sprint.plannedPoints
+                };
+                if (sprintBacklogItemTyped.estimate) {
+                    // TODO: Add function for determining this
+                    if (backlogItem.status === BacklogItemStatus.Accepted || backlogItem.status === BacklogItemStatus.Released) {
+                        totalsChanged = true;
+                        sprint.acceptedPoints -= sprintBacklogItemTyped.estimate;
+                    }
+                    if (sprintStatus === SprintStatus.NotStarted) {
+                        totalsChanged = true;
+                        sprint.plannedPoints -= sprintBacklogItemTyped.estimate;
+                    }
+                    if (totalsChanged) {
+                        const newSprint = {
+                            ...mapApiToDbSprint(apiSprint, ApiToDataAccessMapOptions.None),
+                            plannedPoints: sprint.plannedPoints,
+                            acceptedPoints: sprint.acceptedPoints
+                        };
+                        await dbSprint.update(newSprint);
+                        sprintStats = {
+                            plannedPoints: sprint.plannedPoints,
+                            acceptedPoints: sprint.acceptedPoints
+                        };
+                    }
+                }
             }
             if (!rolledBack) {
                 await transaction.commit();
                 res.status(HttpStatus.OK).json({
                     status: HttpStatus.OK,
                     data: {
-                        item: sprintBacklogItemTyped
+                        item: sprintBacklogItemTyped,
+                        extra: {
+                            sprintStats
+                        }
                     }
                 });
             }

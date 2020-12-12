@@ -13,8 +13,8 @@ import { deleteSprint } from "./deleters/sprintDeleter";
 import { getParamFromRequest, getParamsFromRequest } from "../utils/filterHelper";
 import { addIdToBody } from "../utils/uuidHelper";
 import { respondWithError, respondWithFailedValidation, respondWithItem, respondWithNotFound } from "../utils/responder";
-import { mapFromSprint, ApiToDataAccessMapOptions } from "../../dataaccess/mappers/apiToDataAccessMappers";
-import { mapToSprint } from "../../dataaccess/mappers/dataAccessToApiMappers";
+import { mapApiToDbSprint, ApiToDataAccessMapOptions } from "../../dataaccess/mappers/apiToDataAccessMappers";
+import { mapDbToApiSprint } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { respondedWithMismatchedItemIds } from "../utils/validationResponders";
 import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
 
@@ -51,7 +51,7 @@ export const sprintPatchHandler = async (req: Request, res: Response) => {
         respondWithFailedValidation(res, "Item ID is required in URI path for this operation");
         return;
     }
-    const body = mapFromSprint(req.body, ApiToDataAccessMapOptions.ForPatch);
+    const body = mapApiToDbSprint(req.body, ApiToDataAccessMapOptions.ForPatch);
     const bodyItemId = body.id;
     if (respondedWithMismatchedItemIds(res, queryParamItemId, bodyItemId)) {
         return;
@@ -71,7 +71,7 @@ export const sprintPatchHandler = async (req: Request, res: Response) => {
         if (!sprint) {
             respondWithNotFound(res, `Unable to find sprint to patch with ID ${queryParamItemId}`);
         } else {
-            const originalSprint = mapToSprint(sprint);
+            const originalSprint = mapDbToApiSprint(sprint);
             const invalidPatchMessage = getInvalidPatchMessage(originalSprint, body);
             if (invalidPatchMessage) {
                 respondWithFailedValidation(res, `Unable to patch: ${invalidPatchMessage}`);
@@ -87,7 +87,7 @@ export const sprintPatchHandler = async (req: Request, res: Response) => {
 };
 
 export const sprintPostHandler = async (req: Request, res) => {
-    const sprintDataObject = mapFromSprint({ ...addIdToBody(req.body) });
+    const sprintDataObject = mapApiToDbSprint({ ...addIdToBody(req.body) });
     try {
         const addedBacklogItem = await SprintModel.create(sprintDataObject);
         res.status(HttpStatus.CREATED).json({

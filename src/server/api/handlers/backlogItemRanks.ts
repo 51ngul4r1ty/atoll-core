@@ -9,7 +9,7 @@ import { ApiBacklogItemRank } from "@atoll/shared";
 // utils
 import { buildSelfLink } from "../../utils/linkBuilder";
 import { respondWithNotFound } from "../utils/responder";
-import { mapToBacklogItemRank } from "../../dataaccess/mappers/dataAccessToApiMappers";
+import { mapDbToApiBacklogItemRank } from "../../dataaccess/mappers/dataAccessToApiMappers";
 
 // data access
 import { BacklogItemRankModel } from "../../dataaccess";
@@ -22,7 +22,7 @@ export const backlogItemRanksGetHandler = async (req: Request, res: Response) =>
         const items: ApiBacklogItemRank[] = [];
         const backlogItemRanks = await BacklogItemRankModel.findAll({});
         backlogItemRanks.forEach((item) => {
-            const backlogItemRank = mapToBacklogItemRank(item);
+            const backlogItemRank = mapDbToApiBacklogItemRank(item);
             const result: ApiBacklogItemRank = {
                 ...backlogItemRank,
                 links: [buildSelfLink(backlogItemRank, `/api/v1/${BACKLOG_ITEM_RANK_RESOURCE_NAME}/`)]
@@ -58,7 +58,7 @@ export const backlogItemRankGetHandler = async (req: Request<BacklogItemGetParam
             res.json({
                 status: HttpStatus.OK,
                 data: {
-                    item: mapToBacklogItemRank(backlogItemRank)
+                    item: mapDbToApiBacklogItemRank(backlogItemRank)
                 }
             });
         }

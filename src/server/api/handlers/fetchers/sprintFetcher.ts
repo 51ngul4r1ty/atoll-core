@@ -5,7 +5,7 @@ import * as HttpStatus from "http-status-codes";
 import { ApiSprint } from "@atoll/shared";
 
 // utils
-import { mapToSprint } from "../../../dataaccess/mappers/dataAccessToApiMappers";
+import { mapDbToApiSprint } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 
@@ -20,7 +20,7 @@ export const fetchSprints = async (projectId: string | null, archived?: string |
         const options = buildOptionsFromParams({ projectId, archived });
         const sprints = await SprintModel.findAll(options);
         const items = sprints.map((item) => {
-            const sprint = mapToSprint(item);
+            const sprint = mapDbToApiSprint(item);
             const result: ApiSprint = {
                 ...sprint,
                 links: [buildSelfLink(sprint, `/api/v1/${SPRINT_RESOURCE_NAME}/`)]

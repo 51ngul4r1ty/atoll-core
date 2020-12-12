@@ -5,7 +5,7 @@ import * as HttpStatus from "http-status-codes";
 import { ApiBacklogItem, LinkedList } from "@atoll/shared";
 
 // utils
-import { mapToBacklogItem, mapToBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
+import { mapDbToApiBacklogItem, mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 
@@ -22,14 +22,14 @@ export const backlogItemFetcher = async (projectId: string | null) => {
         const backlogItemRanks = await BacklogItemRankModel.findAll(options);
         const rankList = new LinkedList<ApiBacklogItem>();
         if (backlogItemRanks.length) {
-            const backlogItemRanksMapped = backlogItemRanks.map((item) => mapToBacklogItemRank(item));
+            const backlogItemRanksMapped = backlogItemRanks.map((item) => mapDbToApiBacklogItemRank(item));
             backlogItemRanksMapped.forEach((item) => {
                 rankList.addInitialLink(item.backlogitemId, item.nextbacklogitemId);
             });
         }
         const backlogItems = await BacklogItemModel.findAll(options);
         backlogItems.forEach((item) => {
-            const backlogItem = mapToBacklogItem(item);
+            const backlogItem = mapDbToApiBacklogItem(item);
             const result: ApiBacklogItem = {
                 ...backlogItem,
                 links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]

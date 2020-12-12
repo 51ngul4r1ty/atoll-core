@@ -15,7 +15,7 @@ export enum ApiToDataAccessMapOptions {
  * @param mapOptions optional parameter to determine whether to preserve structure or not, patching requires leaving out fields that
  *                 aren't provided in the input.
  */
-export const mapFromSprint = (sprint: ApiSprint, mapOptions?: ApiToDataAccessMapOptions) => {
+export const mapApiToDbSprint = (sprint: ApiSprint, mapOptions?: ApiToDataAccessMapOptions) => {
     if (mapOptions !== ApiToDataAccessMapOptions.ForPatch || sprint.hasOwnProperty("archived")) {
         return {
             ...sprint,

@@ -28,7 +28,11 @@ import { addIdToBody } from "../utils/uuidHelper";
 import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
 import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
 import { respondedWithMismatchedItemIds } from "../utils/validationResponders";
-import { mapToBacklogItem, mapToCounter, mapToProjectSettings } from "../../dataaccess/mappers/dataAccessToApiMappers";
+import {
+    mapDbToApiBacklogItem,
+    mapDbToApiCounter,
+    mapDbToApiProjectSettings
+} from "../../dataaccess/mappers/dataAccessToApiMappers";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -58,7 +62,7 @@ export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, 
             res.json({
                 status: HttpStatus.OK,
                 data: {
-                    item: mapToBacklogItem(backlogItem)
+                    item: mapDbToApiBacklogItem(backlogItem)
                 }
             });
         }
@@ -88,7 +92,7 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
         if (!backlogItem) {
             respondWithNotFound(res, `Unable to find backlogitem by primary key ${id}`);
         } else {
-            backlogItemTyped = mapToBacklogItem(backlogItem);
+            backlogItemTyped = mapDbToApiBacklogItem(backlogItem);
             abort = false;
         }
         if (!abort) {
@@ -175,7 +179,7 @@ const getNewCounterValue = async (projectId: string, backlogItemType: string) =>
             });
         }
         if (projectSettingsItem) {
-            const projectSettingsItemTyped = mapToProjectSettings(projectSettingsItem);
+            const projectSettingsItemTyped = mapDbToApiProjectSettings(projectSettingsItem);
             const counterSettings = projectSettingsItemTyped.settings.counters[entitySubtype];
             const entityNumberPrefix = counterSettings.prefix;
             const entityNumberSuffix = counterSettings.suffix;
@@ -184,7 +188,7 @@ const getNewCounterValue = async (projectId: string, backlogItemType: string) =>
                 transaction
             });
             if (counterItem) {
-                const counterItemTyped = mapToCounter(counterItem);
+                const counterItemTyped = mapDbToApiCounter(counterItem);
                 counterItemTyped.lastNumber++;
                 let counterValue = entityNumberPrefix || "";
                 counterValue += formatNumber(counterItemTyped.lastNumber, counterSettings.totalFixedLength);
@@ -318,7 +322,7 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
         if (!backlogItem) {
             respondWithNotFound(res, `Unable to find backlogitem to update with ID ${req.body.id}`);
         } else {
-            const originalBacklogItem = mapToBacklogItem(backlogItem);
+            const originalBacklogItem = mapDbToApiBacklogItem(backlogItem);
 
             await backlogItem.update(req.body);
             respondWithItem(res, backlogItem, originalBacklogItem);
@@ -345,7 +349,7 @@ export const backlogItemPatchHandler = async (req: Request, res: Response) => {
         if (!backlogItem) {
             respondWithNotFound(res, `Unable to find backlogitem to patch with ID ${queryParamItemId}`);
         } else {
-            const originalBacklogItem = mapToBacklogItem(backlogItem);
+            const originalBacklogItem = mapDbToApiBacklogItem(backlogItem);
             const invalidPatchMessage = getInvalidPatchMessage(originalBacklogItem, req.body);
             if (invalidPatchMessage) {
                 respondWithFailedValidation(res, `Unable to patch: ${invalidPatchMessage}`);

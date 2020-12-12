@@ -13,7 +13,7 @@ import {
 // utils
 import { convertDbCharToBoolean, convertDbFloatToNumber } from "../conversionUtils";
 
-export const mapToBacklogItem = (item: any): ApiBacklogItem => {
+export const mapDbToApiBacklogItem = (item: any): ApiBacklogItem => {
     if (!item) {
         return item;
     }
@@ -24,7 +24,7 @@ export const mapToBacklogItem = (item: any): ApiBacklogItem => {
     };
 };
 
-export const mapToBacklogItemRank = (item: any): ApiBacklogItemRank => {
+export const mapDbToApiBacklogItemRank = (item: any): ApiBacklogItemRank => {
     if (!item) {
         return item;
     }
@@ -33,7 +33,7 @@ export const mapToBacklogItemRank = (item: any): ApiBacklogItemRank => {
     };
 };
 
-export const mapToSprint = (item: any): ApiSprint => {
+export const mapDbToApiSprint = (item: any): ApiSprint => {
     if (!item) {
         return item;
     }
@@ -47,7 +47,7 @@ export const mapToSprint = (item: any): ApiSprint => {
     };
 };
 
-export const mapSprintBacklogToBacklogItem = (item: any): ApiBacklogItemInSprint => {
+export const mapDbSprintBacklogToApiBacklogItem = (item: any): ApiBacklogItemInSprint => {
     if (!item) {
         return item;
     }
@@ -74,7 +74,7 @@ export const mapSprintBacklogToBacklogItem = (item: any): ApiBacklogItemInSprint
     return result;
 };
 
-export const mapToSprintBacklogItem = (item: any): ApiSprintBacklogItem => {
+export const mapDbToApiSprintBacklogItem = (item: any): ApiSprintBacklogItem => {
     if (!item) {
         return item;
     }
@@ -83,7 +83,7 @@ export const mapToSprintBacklogItem = (item: any): ApiSprintBacklogItem => {
     };
 };
 
-export const mapToCounter = (item: any): ApiCounter => {
+export const mapDbToApiCounter = (item: any): ApiCounter => {
     if (!item) {
         return item;
     }
@@ -92,7 +92,7 @@ export const mapToCounter = (item: any): ApiCounter => {
     };
 };
 
-export const mapToProjectSettings = (item: any): ApiProjectSettings => {
+export const mapDbToApiProjectSettings = (item: any): ApiProjectSettings => {
     if (!item) {
         return item;
     }
@@ -101,7 +101,7 @@ export const mapToProjectSettings = (item: any): ApiProjectSettings => {
     };
 };
 
-export const mapToUserSettings = (item: any): ApiUserSettings => {
+export const mapDbToApiUserSettings = (item: any): ApiUserSettings => {
     if (!item) {
         return item;
     }

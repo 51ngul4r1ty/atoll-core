@@ -58,9 +58,8 @@ To combine the these two interfaces use:
 Switch Statements
 =================
 
-Case statements should always be enclosed in curly braces so that block scope is applied
-and variables within these blocks are scoped to the block.  This allows a variable name to
-be reused without errors being reported.
+Case statements should always be enclosed in curly braces so that block scope is applied and variables within these blocks are
+scoped to the block.  This allows a variable name to be reused without errors being reported.
 
 For example:
 ```
@@ -86,22 +85,25 @@ Import Statements
 Overview
 --------
 
-1. Imports should contain most specific import path.
+1. Imports should contain most specific import path
+  - Don't import directly from an "index.ts" file, those are intended only for exporting from @atoll/shared - see how they're used
+    in "index.ts" in the "src" folder.
+  - If, for the purpose described above, an index file is used in an import don't rely on the optional "index" file behavior, make
+    it clear that you are using an index file.  This makes it obvious that you intended to use the index file and that it will need
+    to be maintained as the way to export the subfolder's files. For example, use `export * from "./utils/index"` instead of
+    `export * from "./utils"`.
 2. Import statements should be grouped per "Import Sections" (see below).
 
 Import File Paths
 -----------------
 
-VS Code may provide options such as `module ".."` and
-`module "../reducers/rootReducer"`.  In this case
-`"../reducers/rootReducer"` should be chosen because it is
-the most specific path.
+VS Code may provide options such as `module ".."` and `module "../reducers/rootReducer"`.  In this case `"../reducers/rootReducer"`
+should be chosen because it is the most specific path.
 
 Import Sections
 ---------------
 
-Import statments should be grouped into the following commented sections (try
-to stick to this order as well):
+Import statments should be grouped into the following commented sections (try to stick to this order as well):
 
 | Section          |                                              |
 |------------------|----------------------------------------------|
@@ -118,10 +120,8 @@ to stick to this order as well):
 | interfaces/types | any project related interface or types       |
 | style            | any project related css module references    |
 
-This helps to identify inconsistencies in naming because it becomes obvious
-when you group by category.  This also helps to make it obvious when a module
-could be going beyond its single responsibility (and thereby violating SOLID
-principles).
+This helps to identify inconsistencies in naming because it becomes obvious when you group by category.  This also helps to make it
+obvious when a module could be going beyond its single responsibility (and thereby violating SOLID principles).
 
 For example:
 ```
