@@ -20,6 +20,7 @@ import { buildOptionsFromParams } from "../utils/sequelizeHelper";
 import { respondWithError, respondWithNotFound } from "../utils/responder";
 import {
     mapDbSprintBacklogToApiBacklogItem,
+    mapDbToApiBacklogItem,
     mapDbToApiSprint,
     mapDbToApiSprintBacklogItem
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
@@ -90,7 +91,16 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                     "when trying to remove backlog item from the product backlog"
             });
         } else {
-            sprintStats = await handleSprintStatUpdate(StatUpdateMode.Add, sprintId, backlogitemId, transaction);
+            const dbBacklogItem = await BacklogItemModel.findOne({ where: { id: backlogitemId }, transaction });
+            const apiBacklogItem = mapDbToApiBacklogItem(dbBacklogItem);
+            const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItem);
+            sprintStats = await handleSprintStatUpdate(
+                StatUpdateMode.Add,
+                sprintId,
+                backlogItemTyped.status,
+                backlogItemTyped.estimate,
+                transaction
+            );
         }
         if (!rolledBack) {
             await transaction.commit();
@@ -138,9 +148,9 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
             respondWithNotFound(res, `Unable to find sprint backlog item in sprint "${sprintId}" with ID "${backlogItemId}"`);
         } else {
             let sprintStats: ApiSprintStats;
-            const sprintBacklogItemTyped = mapDbSprintBacklogToApiBacklogItem(sprintBacklogItem);
-            const backlogItem = mapApiItemToBacklogItem(sprintBacklogItemTyped);
-            const result = await backlogItemRankFirstItemInserter(sprintBacklogItemTyped, transaction);
+            const apiBacklogItemTyped = mapDbSprintBacklogToApiBacklogItem(sprintBacklogItem);
+            const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItemTyped);
+            const result = await backlogItemRankFirstItemInserter(apiBacklogItemTyped, transaction);
             if (result.status !== HttpStatus.OK) {
                 await transaction.rollback();
                 rolledBack = true;
@@ -150,44 +160,20 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
                 );
             } else {
                 await SprintBacklogItemModel.destroy({ where: { sprintId, backlogitemId: backlogItemId }, transaction });
-                const dbSprint = await SprintModel.findOne({ where: { id: sprintId }, transaction });
-                const apiSprint = mapDbToApiSprint(dbSprint);
-                const sprint = mapApiItemToSprint(apiSprint);
-                const sprintStatus = determineSprintStatus(sprint.startDate, sprint.finishDate);
-                let totalsChanged = false;
-                sprintStats = {
-                    acceptedPoints: sprint.acceptedPoints,
-                    plannedPoints: sprint.plannedPoints
-                };
-                if (sprintBacklogItemTyped.estimate) {
-                    if (hasBacklogItemAtLeastBeenAccepted(backlogItem)) {
-                        totalsChanged = true;
-                        sprint.acceptedPoints -= sprintBacklogItemTyped.estimate;
-                    }
-                    if (sprintStatus === SprintStatus.NotStarted) {
-                        totalsChanged = true;
-                        sprint.plannedPoints -= sprintBacklogItemTyped.estimate;
-                    }
-                    if (totalsChanged) {
-                        const newSprint = {
-                            ...mapApiToDbSprint(apiSprint, ApiToDataAccessMapOptions.None),
-                            plannedPoints: sprint.plannedPoints,
-                            acceptedPoints: sprint.acceptedPoints
-                        };
-                        await dbSprint.update(newSprint);
-                        sprintStats = {
-                            plannedPoints: sprint.plannedPoints,
-                            acceptedPoints: sprint.acceptedPoints
-                        };
-                    }
-                }
+                sprintStats = await handleSprintStatUpdate(
+                    StatUpdateMode.Remove,
+                    sprintId,
+                    backlogItemTyped.status,
+                    backlogItemTyped.estimate,
+                    transaction
+                );
             }
             if (!rolledBack) {
                 await transaction.commit();
                 res.status(HttpStatus.OK).json({
                     status: HttpStatus.OK,
                     data: {
-                        item: sprintBacklogItemTyped,
+                        item: apiBacklogItemTyped,
                         extra: {
                             sprintStats
                         }

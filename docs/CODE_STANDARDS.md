@@ -59,7 +59,9 @@ Switch Statements
 =================
 
 Case statements should always be enclosed in curly braces so that block scope is applied and variables within these blocks are
-scoped to the block.  This allows a variable name to be reused without errors being reported.
+scoped to the block.  This has a couple of benefits: firstly, it allows a variable name to be reused without errors being reported;
+secondly, it improves alignment of case statements - try copying and pasting a case section below along case section without curly
+braces and see what it does with indentation!
 
 For example:
 ```
@@ -157,7 +159,14 @@ to `function functionName(arg1: ArgType1, arg2: ArgType2): ResultType { ... }`.
 Argument Types
 --------------
 
-Boolean types should be avoided to improve readability.  For example, `const doSomething = (convertNullToTrue: boolean)` should be
-changed to `const doSomething = (nullConversionOption: NullConversionOption)` where `NullConversionOption` is defined as an enum
-with the value `MapNullToTrue`.  This makes calling code easier to read: `doSomething(NullConversionOption.MapNullToTrue)` means
-something, as opposed to `doSomething(true)` that you would have to explore further to understand.
+1. Boolean types should be avoided to improve readability.  
+   _For example, `const doSomething = (convertNullToTrue: boolean)` should be changed to
+   `const doSomething = (nullConversionOption: NullConversionOption)` where `NullConversionOption` is defined as an enum with the
+   value `MapNullToTrue`.  This makes calling code easier to read: `doSomething(NullConversionOption.MapNullToTrue)` means
+   something, as opposed to `doSomething(true)` that you would have to explore further to understand._
+2. As arguments be careful to include full objects when only a couple of properties are needed- this limits the reusability of the
+   functions.  However, a specialized object can be introduced and exported from that same file that contains the function itself
+   if there are a lot of arguments passed into the function.
+3. Consider using an `options` argument (similar to the code style the "deno" project uses), when this applies, to contain all the
+   various "configuration" type arguments if there are many.
+

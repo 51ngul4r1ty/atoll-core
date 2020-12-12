@@ -4,6 +4,8 @@ import { Transaction } from "sequelize";
 // libraries
 import {
     ApiSprintStats,
+    BacklogItem,
+    BacklogItemStatus,
     determineSprintStatus,
     hasBacklogItemAtLeastBeenAccepted,
     mapApiItemToBacklogItem,
@@ -27,13 +29,11 @@ export enum StatUpdateMode {
 export const handleSprintStatUpdate = async (
     updateMode: StatUpdateMode,
     sprintId: string,
-    backlogItemId: string,
+    backlogItemStatus: BacklogItemStatus,
+    backlogItemEstimate: number | null,
     transaction: Transaction
 ): Promise<ApiSprintStats> => {
     let sprintStats: ApiSprintStats;
-    const dbBacklogItem = await BacklogItemModel.findOne({ where: { id: backlogItemId }, transaction });
-    const apiBacklogItem = mapDbToApiBacklogItem(dbBacklogItem);
-    const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItem);
     const dbSprint = await SprintModel.findOne({ where: { id: sprintId }, transaction });
     const apiSprint = mapDbToApiSprint(dbSprint);
     const sprint = mapApiItemToSprint(apiSprint);
@@ -44,21 +44,31 @@ export const handleSprintStatUpdate = async (
         plannedPoints: sprint.plannedPoints
     };
 
-    if (backlogItemTyped.estimate) {
-        if (hasBacklogItemAtLeastBeenAccepted(backlogItemTyped)) {
+    if (backlogItemEstimate) {
+        if (hasBacklogItemAtLeastBeenAccepted(backlogItemStatus)) {
             totalsChanged = true;
             switch (updateMode) {
-                case StatUpdateMode.Add:
-                    sprint.acceptedPoints += backlogItemTyped.estimate;
+                case StatUpdateMode.Add: {
+                    sprint.acceptedPoints += backlogItemEstimate;
                     break;
+                }
+                case StatUpdateMode.Remove: {
+                    sprint.acceptedPoints -= backlogItemEstimate;
+                    break;
+                }
             }
         }
         if (sprintStatus === SprintStatus.NotStarted) {
             totalsChanged = true;
             switch (updateMode) {
-                case StatUpdateMode.Add:
-                    sprint.plannedPoints += backlogItemTyped.estimate;
+                case StatUpdateMode.Add: {
+                    sprint.plannedPoints += backlogItemEstimate;
                     break;
+                }
+                case StatUpdateMode.Remove: {
+                    sprint.plannedPoints -= backlogItemEstimate;
+                    break;
+                }
             }
         }
         if (totalsChanged) {
