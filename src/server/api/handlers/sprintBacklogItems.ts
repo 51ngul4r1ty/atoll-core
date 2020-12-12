@@ -8,6 +8,7 @@ import {
     ApiSprintStats,
     BacklogItemStatus,
     determineSprintStatus,
+    hasBacklogItemAtLeastBeenAccepted,
     logger,
     mapApiItemToBacklogItem,
     mapApiItemToSprint,
@@ -20,6 +21,7 @@ import { buildOptionsFromParams } from "../utils/sequelizeHelper";
 import { respondWithError, respondWithNotFound } from "../utils/responder";
 import {
     mapDbSprintBacklogToApiBacklogItem,
+    mapDbToApiBacklogItem,
     mapDbToApiSprint,
     mapDbToApiSprintBacklogItem
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
@@ -78,6 +80,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
         });
         const addedSprintBacklog = await SprintBacklogItemModel.create(bodyWithId, { transaction } as CreateOptions);
         const removeProductBacklogItemResult = await removeFromProductBacklog(backlogitemId, transaction);
+        let sprintStats: ApiSprintStats;
         if (removeProductBacklogItemResult.status !== HttpStatus.OK) {
             await transaction.rollback();
             rolledBack = true;
@@ -87,13 +90,52 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                     `Error ${removeProductBacklogItemResult.message} (status ${removeProductBacklogItemResult.status}) ` +
                     "when trying to remove backlog item from the product backlog"
             });
+        } else {
+            const dbBacklogItem = await BacklogItemModel.findOne({ where: { id: backlogitemId }, transaction });
+            const apiBacklogItem = mapDbToApiBacklogItem(dbBacklogItem);
+            const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItem);
+            const dbSprint = await SprintModel.findOne({ where: { id: sprintId }, transaction });
+            const apiSprint = mapDbToApiSprint(dbSprint);
+            const sprint = mapApiItemToSprint(apiSprint);
+            const sprintStatus = determineSprintStatus(sprint.startDate, sprint.finishDate);
+            let totalsChanged = false;
+            sprintStats = {
+                acceptedPoints: sprint.acceptedPoints,
+                plannedPoints: sprint.plannedPoints
+            };
+
+            if (backlogItemTyped.estimate) {
+                if (hasBacklogItemAtLeastBeenAccepted(backlogItemTyped)) {
+                    totalsChanged = true;
+                    sprint.acceptedPoints += backlogItemTyped.estimate;
+                }
+                if (sprintStatus === SprintStatus.NotStarted) {
+                    totalsChanged = true;
+                    sprint.plannedPoints += backlogItemTyped.estimate;
+                }
+                if (totalsChanged) {
+                    const newSprint = {
+                        ...mapApiToDbSprint(apiSprint, ApiToDataAccessMapOptions.None),
+                        plannedPoints: sprint.plannedPoints,
+                        acceptedPoints: sprint.acceptedPoints
+                    };
+                    await dbSprint.update(newSprint);
+                    sprintStats = {
+                        plannedPoints: sprint.plannedPoints,
+                        acceptedPoints: sprint.acceptedPoints
+                    };
+                }
+            }
         }
         if (!rolledBack) {
             await transaction.commit();
             res.status(HttpStatus.CREATED).json({
                 status: HttpStatus.CREATED,
                 data: {
-                    item: addedSprintBacklog
+                    item: addedSprintBacklog,
+                    extra: {
+                        sprintStats
+                    }
                 }
             });
         }
@@ -153,8 +195,7 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
                     plannedPoints: sprint.plannedPoints
                 };
                 if (sprintBacklogItemTyped.estimate) {
-                    // TODO: Add function for determining this
-                    if (backlogItem.status === BacklogItemStatus.Accepted || backlogItem.status === BacklogItemStatus.Released) {
+                    if (hasBacklogItemAtLeastBeenAccepted(backlogItem)) {
                         totalsChanged = true;
                         sprint.acceptedPoints -= sprintBacklogItemTyped.estimate;
                     }
