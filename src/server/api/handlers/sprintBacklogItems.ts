@@ -4,15 +4,12 @@ import * as HttpStatus from "http-status-codes";
 import { CreateOptions, Transaction } from "sequelize";
 
 // libraries
-import {
-    ApiSprintStats,
-    determineSprintStatus,
-    hasBacklogItemAtLeastBeenAccepted,
-    logger,
-    mapApiItemToBacklogItem,
-    mapApiItemToSprint,
-    SprintStatus
-} from "@atoll/shared";
+import { ApiSprintStats, logger, mapApiItemToBacklogItem } from "@atoll/shared";
+
+// data access
+import { sequelize } from "../../dataaccess/connection";
+import { SprintBacklogItemModel } from "../../dataaccess/models/SprintBacklogItem";
+import { BacklogItemModel } from "../../dataaccess/models/BacklogItem";
 
 // utils
 import { getParamsFromRequest } from "../utils/filterHelper";
@@ -21,21 +18,13 @@ import { respondWithError, respondWithNotFound } from "../utils/responder";
 import {
     mapDbSprintBacklogToApiBacklogItem,
     mapDbToApiBacklogItem,
-    mapDbToApiSprint,
     mapDbToApiSprintBacklogItem
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { addIdToBody } from "../utils/uuidHelper";
 import { sprintBacklogItemFetcher } from "./fetchers/sprintBacklogItemFetcher";
-
-// data access
-import { sequelize } from "../../dataaccess/connection";
-import { SprintBacklogItemModel } from "../../dataaccess/models/SprintBacklogItem";
-import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
-import { BacklogItemModel } from "../../dataaccess/models/BacklogItem";
 import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
-import { SprintModel } from "../../dataaccess/models/Sprint";
-import { ApiToDataAccessMapOptions, mapApiToDbSprint } from "../../dataaccess";
 import { handleSprintStatUpdate, StatUpdateMode } from "./updaters/sprintStatUpdater";
+import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
 
 export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
