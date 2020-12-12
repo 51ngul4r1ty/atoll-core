@@ -6,7 +6,6 @@ import { CreateOptions, Transaction } from "sequelize";
 // libraries
 import {
     ApiSprintStats,
-    BacklogItemStatus,
     determineSprintStatus,
     hasBacklogItemAtLeastBeenAccepted,
     logger,
@@ -21,7 +20,6 @@ import { buildOptionsFromParams } from "../utils/sequelizeHelper";
 import { respondWithError, respondWithNotFound } from "../utils/responder";
 import {
     mapDbSprintBacklogToApiBacklogItem,
-    mapDbToApiBacklogItem,
     mapDbToApiSprint,
     mapDbToApiSprintBacklogItem
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
@@ -36,6 +34,7 @@ import { BacklogItemModel } from "../../dataaccess/models/BacklogItem";
 import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
 import { SprintModel } from "../../dataaccess/models/Sprint";
 import { ApiToDataAccessMapOptions, mapApiToDbSprint } from "../../dataaccess";
+import { handleSprintStatUpdate, StatUpdateMode } from "./updaters/sprintStatUpdater";
 
 export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
@@ -91,41 +90,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                     "when trying to remove backlog item from the product backlog"
             });
         } else {
-            const dbBacklogItem = await BacklogItemModel.findOne({ where: { id: backlogitemId }, transaction });
-            const apiBacklogItem = mapDbToApiBacklogItem(dbBacklogItem);
-            const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItem);
-            const dbSprint = await SprintModel.findOne({ where: { id: sprintId }, transaction });
-            const apiSprint = mapDbToApiSprint(dbSprint);
-            const sprint = mapApiItemToSprint(apiSprint);
-            const sprintStatus = determineSprintStatus(sprint.startDate, sprint.finishDate);
-            let totalsChanged = false;
-            sprintStats = {
-                acceptedPoints: sprint.acceptedPoints,
-                plannedPoints: sprint.plannedPoints
-            };
-
-            if (backlogItemTyped.estimate) {
-                if (hasBacklogItemAtLeastBeenAccepted(backlogItemTyped)) {
-                    totalsChanged = true;
-                    sprint.acceptedPoints += backlogItemTyped.estimate;
-                }
-                if (sprintStatus === SprintStatus.NotStarted) {
-                    totalsChanged = true;
-                    sprint.plannedPoints += backlogItemTyped.estimate;
-                }
-                if (totalsChanged) {
-                    const newSprint = {
-                        ...mapApiToDbSprint(apiSprint, ApiToDataAccessMapOptions.None),
-                        plannedPoints: sprint.plannedPoints,
-                        acceptedPoints: sprint.acceptedPoints
-                    };
-                    await dbSprint.update(newSprint);
-                    sprintStats = {
-                        plannedPoints: sprint.plannedPoints,
-                        acceptedPoints: sprint.acceptedPoints
-                    };
-                }
-            }
+            sprintStats = await handleSprintStatUpdate(StatUpdateMode.Add, sprintId, backlogitemId, transaction);
         }
         if (!rolledBack) {
             await transaction.commit();
