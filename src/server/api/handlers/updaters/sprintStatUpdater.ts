@@ -71,7 +71,10 @@ export const handleSprintStatUpdate = async (
     originalBacklogItemEstimate: number | null,
     backlogItemEstimate: number | null,
     transaction: Transaction
-): Promise<ApiSprintStats> => {
+): Promise<ApiSprintStats | null> => {
+    if (!sprintId) {
+        return null;
+    }
     let sprintStats: ApiSprintStats;
     const dbSprint = await SprintModel.findOne({ where: { id: sprintId }, transaction });
     const apiSprint = mapDbToApiSprint(dbSprint);

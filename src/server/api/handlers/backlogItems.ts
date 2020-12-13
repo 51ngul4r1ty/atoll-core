@@ -305,6 +305,8 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
 };
 
 export const backlogItemPutHandler = async (req: Request, res: Response) => {
+    const functionTag = "backlogItemPutHandler";
+    const logContext = logger.info("starting call", [functionTag]);
     const queryParamItemId = req.params.itemId;
     if (!queryParamItemId) {
         respondWithFailedValidation(res, "Item ID is required in URI path for this operation");
@@ -325,19 +327,37 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
         );
         return;
     }
+    let sprintStats: ApiSprintStats;
+    let transaction: Transaction;
     try {
+        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         const backlogItem = await BacklogItemModel.findOne({
-            where: { id: bodyItemId }
+            where: { id: bodyItemId },
+            transaction
         });
         if (!backlogItem) {
             respondWithNotFound(res, `Unable to find backlogitem to update with ID ${req.body.id}`);
         } else {
-            const originalBacklogItem = mapDbToApiBacklogItem(backlogItem);
+            const originalApiBacklogItem = mapDbToApiBacklogItem(backlogItem);
+            const newDataItem = req.body;
+            await backlogItem.update(newDataItem, { transaction });
 
-            await backlogItem.update(req.body);
-            respondWithItem(res, backlogItem, originalBacklogItem);
+            await handleResponseWithUpdatedStats(newDataItem, originalApiBacklogItem, backlogItem, res, transaction);
+        }
+        if (transaction) {
+            await transaction.commit();
+            transaction = null;
         }
     } catch (err) {
+        const errLogContext = logger.warn(`handling error "${err}"`, [functionTag], logContext);
+        if (transaction) {
+            logger.info("rolling back transaction", [functionTag], errLogContext);
+            try {
+                await transaction.rollback();
+            } catch (err) {
+                logger.warn(`roll back failed with error "${err}"`, [functionTag], errLogContext);
+            }
+        }
         respondWithError(res, err);
     }
 };
@@ -357,7 +377,6 @@ export const backlogItemPatchHandler = async (req: Request, res: Response) => {
     let sprintStats: ApiSprintStats;
     let transaction: Transaction;
     try {
-        let rolledBack = false;
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         const backlogItem = await BacklogItemModel.findOne({
             where: { id: queryParamItemId },
@@ -372,28 +391,14 @@ export const backlogItemPatchHandler = async (req: Request, res: Response) => {
                 respondWithFailedValidation(res, `Unable to patch: ${invalidPatchMessage}`);
             } else {
                 const newDataItem = getPatchedItem(originalApiBacklogItem, req.body);
-                await backlogItem.update(newDataItem);
-                const newBacklogItem = mapApiItemToBacklogItem(newDataItem);
-                const originalBacklogItem = mapApiItemToBacklogItem(originalApiBacklogItem);
-                if (
-                    originalBacklogItem.estimate !== newBacklogItem.estimate ||
-                    originalBacklogItem.status !== newBacklogItem.status
-                ) {
-                    const sprintId = await getIdForSprintContainingBacklogItem(originalBacklogItem.id, transaction);
-                    sprintStats = await handleSprintStatUpdate(
-                        sprintId,
-                        originalBacklogItem.status,
-                        newBacklogItem.status,
-                        originalBacklogItem.estimate,
-                        newBacklogItem.estimate,
-                        transaction
-                    );
-                }
-                if (!rolledBack) {
-                    await transaction.commit();
-                    respondWithItem(res, backlogItem, originalBacklogItem, { sprintStats });
-                }
+                await backlogItem.update(newDataItem, { transaction });
+
+                await handleResponseWithUpdatedStats(newDataItem, originalApiBacklogItem, backlogItem, res, transaction);
             }
+        }
+        if (transaction) {
+            await transaction.commit();
+            transaction = null;
         }
     } catch (err) {
         const errLogContext = logger.warn(`handling error "${err}"`, [functionTag], logContext);
@@ -465,4 +470,28 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
         }
         respondWithError(res, err);
     }
+};
+
+const handleResponseWithUpdatedStats = async (
+    newDataItem: ApiBacklogItem,
+    originalApiBacklogItem: ApiBacklogItem,
+    backlogItem: BacklogItemModel,
+    res: Response,
+    transaction: Transaction
+): Promise<void> => {
+    let sprintStats: ApiSprintStats;
+    const newBacklogItem = mapApiItemToBacklogItem(newDataItem);
+    const originalBacklogItem = mapApiItemToBacklogItem(originalApiBacklogItem);
+    if (originalBacklogItem.estimate !== newBacklogItem.estimate || originalBacklogItem.status !== newBacklogItem.status) {
+        const sprintId = await getIdForSprintContainingBacklogItem(originalBacklogItem.id, transaction);
+        sprintStats = await handleSprintStatUpdate(
+            sprintId,
+            originalBacklogItem.status,
+            newBacklogItem.status,
+            originalBacklogItem.estimate,
+            newBacklogItem.estimate,
+            transaction
+        );
+    }
+    respondWithItem(res, backlogItem, originalBacklogItem, sprintStats ? { sprintStats } : undefined);
 };
