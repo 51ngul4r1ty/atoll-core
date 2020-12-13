@@ -40,8 +40,11 @@ export const respondWithOk = (res: Response) => {
     res.send(responseObj);
 };
 
-export const respondWithBase = (res: Response, base: string, baseData: object, original?: object) => {
-    const responseObj = { data: { [base]: baseData }, status: HttpStatus.OK };
+export const respondWithBase = (res: Response, base: string, baseData: object, original?: object, extra?: object) => {
+    const responseObj: any = { data: { [base]: baseData }, status: HttpStatus.OK };
+    if (extra) {
+        responseObj.data.extra = extra;
+    }
     if (original) {
         res.send({ ...responseObj, meta: { original } });
     } else {
@@ -49,10 +52,10 @@ export const respondWithBase = (res: Response, base: string, baseData: object, o
     }
 };
 
-export const respondWithItem = (res: Response, data: object, original?: object) => {
-    respondWithBase(res, "item", data, original);
+export const respondWithItem = (res: Response, data: object, original?: object, extra?: object) => {
+    respondWithBase(res, "item", data, original, extra);
 };
 
-export const respondWithItems = (res: Response, data: object, original?: object) => {
-    respondWithBase(res, "items", data, original);
+export const respondWithItems = (res: Response, data: object, original?: object, extra?: object) => {
+    respondWithBase(res, "items", data, original, extra);
 };

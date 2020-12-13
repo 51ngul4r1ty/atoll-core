@@ -5,7 +5,15 @@ import * as HttpStatus from "http-status-codes";
 import { CreateOptions, Transaction } from "sequelize";
 
 // libraries
-import { getValidStatuses, isValidStatus, ApiBacklogItem, ApiBacklogItemRank } from "@atoll/shared";
+import {
+    getValidStatuses,
+    isValidStatus,
+    ApiBacklogItem,
+    ApiBacklogItemRank,
+    logger,
+    ApiSprintStats,
+    mapApiItemToBacklogItem
+} from "@atoll/shared";
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
@@ -33,6 +41,8 @@ import {
     mapDbToApiCounter,
     mapDbToApiProjectSettings
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
+import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
+import { getIdForSprintContainingBacklogItem } from "./fetchers/sprintFetcher";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -333,6 +343,8 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
 };
 
 export const backlogItemPatchHandler = async (req: Request, res: Response) => {
+    const functionTag = "backlogItemPatchHandler";
+    const logContext = logger.info("starting call", [functionTag]);
     const queryParamItemId = req.params.itemId;
     if (!queryParamItemId) {
         respondWithFailedValidation(res, "Item ID is required in URI path for this operation");
@@ -342,27 +354,60 @@ export const backlogItemPatchHandler = async (req: Request, res: Response) => {
     if (respondedWithMismatchedItemIds(res, queryParamItemId, bodyItemId)) {
         return;
     }
+    let sprintStats: ApiSprintStats;
+    let transaction: Transaction;
     try {
+        let rolledBack = false;
+        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         const backlogItem = await BacklogItemModel.findOne({
-            where: { id: queryParamItemId }
+            where: { id: queryParamItemId },
+            transaction
         });
         if (!backlogItem) {
             respondWithNotFound(res, `Unable to find backlogitem to patch with ID ${queryParamItemId}`);
         } else {
-            const originalBacklogItem = mapDbToApiBacklogItem(backlogItem);
-            const invalidPatchMessage = getInvalidPatchMessage(originalBacklogItem, req.body);
+            const originalApiBacklogItem = mapDbToApiBacklogItem(backlogItem);
+            const invalidPatchMessage = getInvalidPatchMessage(originalApiBacklogItem, req.body);
             if (invalidPatchMessage) {
                 respondWithFailedValidation(res, `Unable to patch: ${invalidPatchMessage}`);
             } else {
-                const newItem = getPatchedItem(originalBacklogItem, req.body);
-
-                await backlogItem.update(newItem);
-                respondWithItem(res, backlogItem, originalBacklogItem);
+                const newDataItem = getPatchedItem(originalApiBacklogItem, req.body);
+                await backlogItem.update(newDataItem);
+                const newBacklogItem = mapApiItemToBacklogItem(newDataItem);
+                const originalBacklogItem = mapApiItemToBacklogItem(originalApiBacklogItem);
+                if (
+                    originalBacklogItem.estimate !== newBacklogItem.estimate ||
+                    originalBacklogItem.status !== newBacklogItem.status
+                ) {
+                    const sprintId = await getIdForSprintContainingBacklogItem(originalBacklogItem.id, transaction);
+                    sprintStats = await handleSprintStatUpdate(
+                        sprintId,
+                        originalBacklogItem.status,
+                        newBacklogItem.status,
+                        originalBacklogItem.estimate,
+                        newBacklogItem.estimate,
+                        transaction
+                    );
+                }
+                if (!rolledBack) {
+                    await transaction.commit();
+                    respondWithItem(res, backlogItem, originalBacklogItem, { sprintStats });
+                }
             }
         }
     } catch (err) {
+        const errLogContext = logger.warn(`handling error "${err}"`, [functionTag], logContext);
+        if (transaction) {
+            logger.info("rolling back transaction", [functionTag], errLogContext);
+            try {
+                await transaction.rollback();
+            } catch (err) {
+                logger.warn(`roll back failed with error "${err}"`, [functionTag], errLogContext);
+            }
+        }
         respondWithError(res, err);
     }
+    logger.info("finishing call", [functionTag]);
 };
 
 export const backlogItemsReorderPostHandler = async (req: Request, res: Response) => {

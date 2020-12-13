@@ -4,7 +4,7 @@ import * as HttpStatus from "http-status-codes";
 import { CreateOptions, Transaction } from "sequelize";
 
 // libraries
-import { ApiSprintStats, logger, mapApiItemToBacklogItem } from "@atoll/shared";
+import { ApiSprintStats, BacklogItemStatus, logger, mapApiItemToBacklogItem } from "@atoll/shared";
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
@@ -23,7 +23,7 @@ import {
 import { addIdToBody } from "../utils/uuidHelper";
 import { sprintBacklogItemFetcher } from "./fetchers/sprintBacklogItemFetcher";
 import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
-import { handleSprintStatUpdate, StatUpdateMode } from "./updaters/sprintStatUpdater";
+import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
 import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
 
 export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
@@ -84,9 +84,10 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
             const apiBacklogItem = mapDbToApiBacklogItem(dbBacklogItem);
             const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItem);
             sprintStats = await handleSprintStatUpdate(
-                StatUpdateMode.Add,
                 sprintId,
+                BacklogItemStatus.None,
                 backlogItemTyped.status,
+                null,
                 backlogItemTyped.estimate,
                 transaction
             );
@@ -150,10 +151,11 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
             } else {
                 await SprintBacklogItemModel.destroy({ where: { sprintId, backlogitemId: backlogItemId }, transaction });
                 sprintStats = await handleSprintStatUpdate(
-                    StatUpdateMode.Remove,
                     sprintId,
                     backlogItemTyped.status,
+                    BacklogItemStatus.None,
                     backlogItemTyped.estimate,
+                    null,
                     transaction
                 );
             }

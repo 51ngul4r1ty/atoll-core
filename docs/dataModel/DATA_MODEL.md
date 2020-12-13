@@ -59,11 +59,42 @@ Planned vs Unplanned
 Splitting vs Continuing a Story
 -------------------------------
 
+Although both of these are referred to as splitting a story a distinction needs to be made regarding the reason for the split.
+
 It is possible that a story is not be completed in a sprint.  In that case it will need to span multiple sprints so that it can be
 continued.  Also, if the team recognizes that a story can be done in multiple parts then it can be split.  These are not the same
 thing and should be treated differently:
 - any part of a story (i.e. a task) can be allocated to a sprint individually (2+ sprints containing same story)
 - multiple stories can relate to an originating story (there's an inherent hierachy)
+
+For example,
+* We have 2 stories: "s-1" and "s-2".
+* "s-1" is a story that is "continued".
+  - "s-1" stays as one story, but "s-1" is linked to both "sprint 1" where it is started and "sprint 2" where it is continued.
+  - "s-1" has original estimate of 20.
+  - In "sprint 1" the team feels that they accomplished 60% of the work, so that means 12 points were used up in "sprint 1".
+  - In "sprint 2" 8 points remain (calculated as: 20 - 12 = 8).  
+    _This is just a guess on the team's part and it may be wrong, but this is merely used for planning purposes so it doesn't
+     matter- we need to make sure that the team doesn't over or under plan "sprint 2"._
+  - Let's say the team still got it completely wrong and the story carries over to "sprint 3",
+    and they decide that the story now has 75% work remaining, meaning 15 points.  The math
+    may not seem to add up, but the point is that we stick to the original estimate for the
+    story and never change that (so we can account for bad estimates and they'll average out
+    when forecasting future deliverables).  So, now we have:
+    - "s-1" in "sprint 1" = 8 of 20 points remaining (12 completed).
+    - "s-1" in "sprint 2" = 15 of 20 points remaining (backtracked 7 points).
+    - "s-3" in "sprint 3" = 0 of 20 points remaining (all 15 remaining completed).
+* "s-2" is a story that is divided up to work on the individual parts.
+  - The stories will be allocated new numbers "s-3", "s-4", "s-5" etc.
+  - The user is given 2 options when doing this:
+    1. Remove the original story to avoid confusion because none of the individual
+       stories represent the full work defined in the original.
+    2. Convert the original story to an epic and it will then contain the stories as
+       its children.  This isn't typically how it should be done: epics should be planned
+       first (intentionally) and they should be broken down into stories after that.
+  - The new stories should total up to the same points (but don't have to).
+  - When a UI is provided for this it will assist the user in re-allocating the work into
+    multiple stories.
 
 Tags
 ====
