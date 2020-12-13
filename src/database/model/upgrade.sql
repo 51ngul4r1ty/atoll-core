@@ -22,6 +22,12 @@ update sprintbacklogitem set "status" = 'D';
 
 alter table backlogitem alter column estimate type decimal(10, 2);
 
+alter table sprint alter column "plannedPoints" type decimal(10, 2);
+alter table sprint alter column "acceptedPoints" type decimal(10, 2);
+alter table sprint alter column "velocityPoints" type decimal(10, 2);
+alter table sprint alter column "usedSplitPoints" type decimal(10, 2);
+alter table sprint alter column "remainingSplitPoints" type decimal(10, 2);
+
 alter table backlogitem add column status char(1);
 
 alter table sprint add column "archived" char(1);
