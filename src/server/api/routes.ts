@@ -38,6 +38,7 @@ import {
     sprintBacklogItemsGetHandler,
     sprintBacklogItemPostHandler
 } from "./handlers/sprintBacklogItems";
+import { sprintUpdateStatsPostHandler } from "./handlers/sprintUpdateStats";
 
 export const router = express.Router();
 
@@ -61,6 +62,10 @@ setupRoutes(router, `/${SPRINT_RESOURCE_NAME}`, {
 setupRoutes(router, `/${SPRINT_RESOURCE_NAME}/:sprintId`, {
     patch: sprintPatchHandler,
     delete: sprintDeleteHandler
+});
+
+setupRoutes(router, `/${SPRINT_RESOURCE_NAME}/:sprintId/update-stats`, {
+    post: sprintUpdateStatsPostHandler
 });
 
 setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`, {

@@ -2,7 +2,7 @@
 import * as HttpStatus from "http-status-codes";
 
 // utils
-import { mapToUserSettings } from "../../../dataaccess/mappers";
+import { mapDbToApiUserSettings } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 // data access
 import { UserSettingsModel } from "../../../dataaccess/models/UserSettings";
@@ -33,7 +33,7 @@ export const userPreferencesFetcher = async (
                 where: { appuserId }
             });
             if (userSettingsItem) {
-                const userSettingsItemTyped = mapToUserSettings(userSettingsItem);
+                const userSettingsItemTyped = mapDbToApiUserSettings(userSettingsItem);
                 return returnWithItem(userSettingsItemTyped);
             } else {
                 return returnWithNotFound("User settings object was not found for this user");

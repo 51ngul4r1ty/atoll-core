@@ -5,7 +5,7 @@ import * as HttpStatus from "http-status-codes";
 import { ApiBacklogItem } from "@atoll/shared";
 
 // utils
-import { mapSprintBacklogToBacklogItem } from "../../../dataaccess/mappers";
+import { mapDbSprintBacklogToApiBacklogItem } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 
@@ -25,7 +25,7 @@ export const sprintBacklogItemFetcher = async (sprintId: string | null) => {
             order: [["displayindex", "ASC"]]
         });
         const items = sprintBacklogs.map((item) => {
-            const sprintBacklog = mapSprintBacklogToBacklogItem(item);
+            const sprintBacklog = mapDbSprintBacklogToApiBacklogItem(item);
             const result: ApiBacklogItem = {
                 ...sprintBacklog,
                 links: [

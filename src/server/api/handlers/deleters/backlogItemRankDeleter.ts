@@ -1,6 +1,6 @@
 // externals
 import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
-import { mapToBacklogItemRank } from "../../../dataaccess/mappers";
+import { mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import * as HttpStatus from "http-status-codes";
 import { FindOptions, InstanceDestroyOptions, InstanceUpdateOptions, Transaction } from "sequelize";
 
@@ -34,8 +34,8 @@ export const removeFromProductBacklog = async (backlogitemId: string | null, tra
                 message: `Backlog item ${backlogitemId} was found, but next item wasn't found!`
             };
         }
-        let itemData = mapToBacklogItemRank(item);
-        let itemBeforeData = mapToBacklogItemRank(itemBefore);
+        let itemData = mapDbToApiBacklogItemRank(item);
+        let itemBeforeData = mapDbToApiBacklogItemRank(itemBefore);
         const destroyOptions: InstanceDestroyOptions = buildOptionsWithTransaction(undefined, transaction);
         if (itemBeforeData.backlogitemId === null && !nextBacklogItemId) {
             // This is the first item in the list and we're telling it that nothing is after it... so we really should just remove

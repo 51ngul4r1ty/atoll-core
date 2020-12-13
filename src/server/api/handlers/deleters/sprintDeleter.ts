@@ -4,7 +4,7 @@ import { FindOptions, InstanceDestroyOptions, Transaction } from "sequelize";
 
 // utils
 import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
-import { mapToSprint } from "../../../dataaccess/mappers";
+import { mapDbToApiSprint } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 // data access
 import { SprintModel } from "../../../dataaccess/models/Sprint";
@@ -19,7 +19,7 @@ export const deleteSprint = async (sprintId: string | null, transaction?: Transa
                 message: `Sprint ${sprintId} was not found`
             };
         }
-        const sprint = mapToSprint(item);
+        const sprint = mapDbToApiSprint(item);
         const destroyOptions: InstanceDestroyOptions = buildOptionsWithTransaction(undefined, transaction);
         await item.destroy(destroyOptions);
         return {

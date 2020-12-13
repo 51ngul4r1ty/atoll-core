@@ -1,11 +1,12 @@
 // externals
 import * as HttpStatus from "http-status-codes";
+import { Transaction } from "sequelize";
 
 // libraries
 import { ApiSprint } from "@atoll/shared";
 
 // utils
-import { mapToSprint } from "../../../dataaccess/mappers";
+import { mapDbToApiSprint, mapDbToApiSprintBacklogItem } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 
@@ -14,13 +15,14 @@ import { SPRINT_RESOURCE_NAME } from "../../../resourceNames";
 
 // data access
 import { SprintModel } from "../../../dataaccess/models/Sprint";
+import { SprintBacklogItemModel } from "../../../dataaccess/models/SprintBacklogItem";
 
 export const fetchSprints = async (projectId: string | null, archived?: string | null) => {
     try {
         const options = buildOptionsFromParams({ projectId, archived });
         const sprints = await SprintModel.findAll(options);
         const items = sprints.map((item) => {
-            const sprint = mapToSprint(item);
+            const sprint = mapDbToApiSprint(item);
             const result: ApiSprint = {
                 ...sprint,
                 links: [buildSelfLink(sprint, `/api/v1/${SPRINT_RESOURCE_NAME}/`)]
@@ -39,4 +41,13 @@ export const fetchSprints = async (projectId: string | null, archived?: string |
             message: error
         };
     }
+};
+
+export const getIdForSprintContainingBacklogItem = async (
+    backlogItemId: string,
+    transaction?: Transaction
+): Promise<string | null> => {
+    const dbSprintBacklogItem = await SprintBacklogItemModel.findOne({ where: { backlogitemId: backlogItemId }, transaction });
+    const apiSprintBacklogItem = mapDbToApiSprintBacklogItem(dbSprintBacklogItem);
+    return apiSprintBacklogItem ? apiSprintBacklogItem.sprintId : null;
 };

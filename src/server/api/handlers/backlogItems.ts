@@ -5,19 +5,22 @@ import * as HttpStatus from "http-status-codes";
 import { CreateOptions, Transaction } from "sequelize";
 
 // libraries
-import { getValidStatuses, isValidStatus, ApiBacklogItem, ApiBacklogItemRank } from "@atoll/shared";
+import {
+    getValidStatuses,
+    isValidStatus,
+    ApiBacklogItem,
+    ApiBacklogItemRank,
+    logger,
+    ApiSprintStats,
+    mapApiItemToBacklogItem
+} from "@atoll/shared";
 
 // data access
-import {
-    BacklogItemModel,
-    BacklogItemRankModel,
-    CounterModel,
-    ProjectSettingsModel,
-    mapToBacklogItem,
-    mapToCounter,
-    mapToProjectSettings
-} from "../../dataaccess";
 import { sequelize } from "../../dataaccess/connection";
+import { BacklogItemModel } from "../../dataaccess/models/BacklogItem";
+import { BacklogItemRankModel } from "../../dataaccess/models/BacklogItemRank";
+import { CounterModel } from "../../dataaccess/models/Counter";
+import { ProjectSettingsModel } from "../../dataaccess/models/ProjectSettings";
 
 // utils
 import {
@@ -33,6 +36,13 @@ import { addIdToBody } from "../utils/uuidHelper";
 import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
 import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
 import { respondedWithMismatchedItemIds } from "../utils/validationResponders";
+import {
+    mapDbToApiBacklogItem,
+    mapDbToApiCounter,
+    mapDbToApiProjectSettings
+} from "../../dataaccess/mappers/dataAccessToApiMappers";
+import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
+import { getIdForSprintContainingBacklogItem } from "./fetchers/sprintFetcher";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -62,7 +72,7 @@ export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, 
             res.json({
                 status: HttpStatus.OK,
                 data: {
-                    item: mapToBacklogItem(backlogItem)
+                    item: mapDbToApiBacklogItem(backlogItem)
                 }
             });
         }
@@ -92,7 +102,7 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
         if (!backlogItem) {
             respondWithNotFound(res, `Unable to find backlogitem by primary key ${id}`);
         } else {
-            backlogItemTyped = mapToBacklogItem(backlogItem);
+            backlogItemTyped = mapDbToApiBacklogItem(backlogItem);
             abort = false;
         }
         if (!abort) {
@@ -179,7 +189,7 @@ const getNewCounterValue = async (projectId: string, backlogItemType: string) =>
             });
         }
         if (projectSettingsItem) {
-            const projectSettingsItemTyped = mapToProjectSettings(projectSettingsItem);
+            const projectSettingsItemTyped = mapDbToApiProjectSettings(projectSettingsItem);
             const counterSettings = projectSettingsItemTyped.settings.counters[entitySubtype];
             const entityNumberPrefix = counterSettings.prefix;
             const entityNumberSuffix = counterSettings.suffix;
@@ -188,7 +198,7 @@ const getNewCounterValue = async (projectId: string, backlogItemType: string) =>
                 transaction
             });
             if (counterItem) {
-                const counterItemTyped = mapToCounter(counterItem);
+                const counterItemTyped = mapDbToApiCounter(counterItem);
                 counterItemTyped.lastNumber++;
                 let counterValue = entityNumberPrefix || "";
                 counterValue += formatNumber(counterItemTyped.lastNumber, counterSettings.totalFixedLength);
@@ -295,6 +305,8 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
 };
 
 export const backlogItemPutHandler = async (req: Request, res: Response) => {
+    const functionTag = "backlogItemPutHandler";
+    const logContext = logger.info("starting call", [functionTag]);
     const queryParamItemId = req.params.itemId;
     if (!queryParamItemId) {
         respondWithFailedValidation(res, "Item ID is required in URI path for this operation");
@@ -315,24 +327,44 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
         );
         return;
     }
+    let sprintStats: ApiSprintStats;
+    let transaction: Transaction;
     try {
+        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         const backlogItem = await BacklogItemModel.findOne({
-            where: { id: bodyItemId }
+            where: { id: bodyItemId },
+            transaction
         });
         if (!backlogItem) {
             respondWithNotFound(res, `Unable to find backlogitem to update with ID ${req.body.id}`);
         } else {
-            const originalBacklogItem = mapToBacklogItem(backlogItem);
+            const originalApiBacklogItem = mapDbToApiBacklogItem(backlogItem);
+            const newDataItem = req.body;
+            await backlogItem.update(newDataItem, { transaction });
 
-            await backlogItem.update(req.body);
-            respondWithItem(res, backlogItem, originalBacklogItem);
+            await handleResponseWithUpdatedStats(newDataItem, originalApiBacklogItem, backlogItem, res, transaction);
+        }
+        if (transaction) {
+            await transaction.commit();
+            transaction = null;
         }
     } catch (err) {
+        const errLogContext = logger.warn(`handling error "${err}"`, [functionTag], logContext);
+        if (transaction) {
+            logger.info("rolling back transaction", [functionTag], errLogContext);
+            try {
+                await transaction.rollback();
+            } catch (err) {
+                logger.warn(`roll back failed with error "${err}"`, [functionTag], errLogContext);
+            }
+        }
         respondWithError(res, err);
     }
 };
 
 export const backlogItemPatchHandler = async (req: Request, res: Response) => {
+    const functionTag = "backlogItemPatchHandler";
+    const logContext = logger.info("starting call", [functionTag]);
     const queryParamItemId = req.params.itemId;
     if (!queryParamItemId) {
         respondWithFailedValidation(res, "Item ID is required in URI path for this operation");
@@ -342,27 +374,45 @@ export const backlogItemPatchHandler = async (req: Request, res: Response) => {
     if (respondedWithMismatchedItemIds(res, queryParamItemId, bodyItemId)) {
         return;
     }
+    let sprintStats: ApiSprintStats;
+    let transaction: Transaction;
     try {
+        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         const backlogItem = await BacklogItemModel.findOne({
-            where: { id: queryParamItemId }
+            where: { id: queryParamItemId },
+            transaction
         });
         if (!backlogItem) {
             respondWithNotFound(res, `Unable to find backlogitem to patch with ID ${queryParamItemId}`);
         } else {
-            const originalBacklogItem = mapToBacklogItem(backlogItem);
-            const invalidPatchMessage = getInvalidPatchMessage(originalBacklogItem, req.body);
+            const originalApiBacklogItem = mapDbToApiBacklogItem(backlogItem);
+            const invalidPatchMessage = getInvalidPatchMessage(originalApiBacklogItem, req.body);
             if (invalidPatchMessage) {
                 respondWithFailedValidation(res, `Unable to patch: ${invalidPatchMessage}`);
             } else {
-                const newItem = getPatchedItem(originalBacklogItem, req.body);
+                const newDataItem = getPatchedItem(originalApiBacklogItem, req.body);
+                await backlogItem.update(newDataItem, { transaction });
 
-                await backlogItem.update(newItem);
-                respondWithItem(res, backlogItem, originalBacklogItem);
+                await handleResponseWithUpdatedStats(newDataItem, originalApiBacklogItem, backlogItem, res, transaction);
             }
         }
+        if (transaction) {
+            await transaction.commit();
+            transaction = null;
+        }
     } catch (err) {
+        const errLogContext = logger.warn(`handling error "${err}"`, [functionTag], logContext);
+        if (transaction) {
+            logger.info("rolling back transaction", [functionTag], errLogContext);
+            try {
+                await transaction.rollback();
+            } catch (err) {
+                logger.warn(`roll back failed with error "${err}"`, [functionTag], errLogContext);
+            }
+        }
         respondWithError(res, err);
     }
+    logger.info("finishing call", [functionTag]);
 };
 
 export const backlogItemsReorderPostHandler = async (req: Request, res: Response) => {
@@ -420,4 +470,28 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
         }
         respondWithError(res, err);
     }
+};
+
+const handleResponseWithUpdatedStats = async (
+    newDataItem: ApiBacklogItem,
+    originalApiBacklogItem: ApiBacklogItem,
+    backlogItem: BacklogItemModel,
+    res: Response,
+    transaction: Transaction
+): Promise<void> => {
+    let sprintStats: ApiSprintStats;
+    const newBacklogItem = mapApiItemToBacklogItem(newDataItem);
+    const originalBacklogItem = mapApiItemToBacklogItem(originalApiBacklogItem);
+    if (originalBacklogItem.estimate !== newBacklogItem.estimate || originalBacklogItem.status !== newBacklogItem.status) {
+        const sprintId = await getIdForSprintContainingBacklogItem(originalBacklogItem.id, transaction);
+        sprintStats = await handleSprintStatUpdate(
+            sprintId,
+            originalBacklogItem.status,
+            newBacklogItem.status,
+            originalBacklogItem.estimate,
+            newBacklogItem.estimate,
+            transaction
+        );
+    }
+    respondWithItem(res, backlogItem, originalBacklogItem, sprintStats ? { sprintStats } : undefined);
 };
