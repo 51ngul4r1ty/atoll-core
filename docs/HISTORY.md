@@ -39,3 +39,6 @@ Miscellaneous Component References
 
 How to build the checkbox:
 https://webdesign.tutsplus.com/tutorials/how-to-make-custom-accessible-checkboxes-and-radio-buttons--cms-32074
+
+How to compare oldValues and newValues on React Hooks useEffect?
+https://stackoverflow.com/questions/53446020/how-to-compare-oldvalues-and-newvalues-on-react-hooks-useeffect
