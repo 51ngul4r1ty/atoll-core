@@ -31,7 +31,7 @@ import {
     respondWithItem
 } from "../utils/responder";
 import { getParamsFromRequest } from "../utils/filterHelper";
-import { backlogItemFetcher } from "./fetchers/backlogItemFetcher";
+import { backlogItemFetcher, backlogItemsFetcher, BacklogItemsResult } from "./fetchers/backlogItemFetcher";
 import { addIdToBody } from "../utils/uuidHelper";
 import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
 import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
@@ -46,7 +46,12 @@ import { getIdForSprintContainingBacklogItem } from "./fetchers/sprintFetcher";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
-    const result = await backlogItemFetcher(params.projectId);
+    let result: BacklogItemsResult;
+    if (params.projectId && params.backlogItemDisplayId) {
+        result = await backlogItemFetcher(params.projectId, params.backlogItemDisplayId);
+    } else {
+        result = await backlogItemsFetcher(params.projectId);
+    }
     if (result.status === HttpStatus.OK) {
         res.json(result);
     } else {

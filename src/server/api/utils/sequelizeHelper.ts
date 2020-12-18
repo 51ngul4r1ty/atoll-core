@@ -6,6 +6,8 @@ import { Transaction } from "sequelize";
 import { getParamsFromRequest } from "./filterHelper";
 
 export interface OptionsParams {
+    friendlyId?: string | null;
+    externalId?: string | null;
     projectId?: string | null;
     sprintId?: string | null;
     archived?: string | null;
@@ -23,6 +25,8 @@ export const addWhereClauseToOptions = (options: any, key: string, value: any) =
 
 export const buildOptionsFromParams = (params: OptionsParams) => {
     const options: any = {};
+    addWhereClauseToOptions(options, "friendlyId", params.friendlyId);
+    addWhereClauseToOptions(options, "externalId", params.externalId);
     addWhereClauseToOptions(options, "projectId", params.projectId);
     addWhereClauseToOptions(options, "sprintId", params.sprintId);
     addWhereClauseToOptions(options, "archived", params.archived);
