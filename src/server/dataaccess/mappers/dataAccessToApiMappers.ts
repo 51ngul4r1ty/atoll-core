@@ -4,6 +4,7 @@ import {
     ApiBacklogItemInSprint,
     ApiBacklogItemRank,
     ApiCounter,
+    ApiProject,
     ApiProjectSettings,
     ApiSprint,
     ApiSprintBacklogItem,
@@ -103,6 +104,15 @@ export const mapDbToApiProjectSettings = (item: any): ApiProjectSettings => {
 };
 
 export const mapDbToApiUserSettings = (item: any): ApiUserSettings => {
+    if (!item) {
+        return item;
+    }
+    return {
+        ...item.dataValues
+    };
+};
+
+export const mapDbToApiProject = (item: any): ApiProject => {
     if (!item) {
         return item;
     }
