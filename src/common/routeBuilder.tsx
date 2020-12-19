@@ -26,7 +26,11 @@ const appRoutes = (
                 <Route path="/sprint" exact component={SprintViewContainer} />
                 <Route path="/review" exact component={ReviewViewContainer} />
                 <Route path="/debug/backlog-item-rank" exact component={BacklogItemRankViewContainer} />
-                <Route path="/project/atoll/backlog-item/s-66" exact component={BacklogItemViewContainer} />
+                <Route
+                    path="/project/:projectDisplayId/backlog-item/:backlogItemDisplayId"
+                    exact
+                    component={BacklogItemViewContainer}
+                />
             </Switch>
         </AppContainer>
     </layouts.MainLayout>

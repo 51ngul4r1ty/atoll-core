@@ -39,6 +39,7 @@ import {
     sprintBacklogItemPostHandler
 } from "./handlers/sprintBacklogItems";
 import { sprintUpdateStatsPostHandler } from "./handlers/sprintUpdateStats";
+import { backlogItemViewBffGetHandler } from "./handlers/views/backlogItemViewBff";
 
 export const router = express.Router();
 
@@ -92,7 +93,9 @@ setupRoutes(router, `/${BACKLOG_ITEM_RANK_RESOURCE_NAME}/:itemId`, {
     get: backlogItemRankGetHandler
 });
 
+// bff views
 setupRoutes(router, `/bff/views/plan`, { get: planViewBffGetHandler });
+setupRoutes(router, `/bff/views/project/:projectDisplayId/backlog-item/:backlogItemDisplayId`, { get: backlogItemViewBffGetHandler });
 
 // TODO: Add options routes for these actions
 router.post("/actions/reorder-backlog-items", auth, backlogItemsReorderPostHandler);

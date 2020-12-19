@@ -21,6 +21,7 @@ export interface ParamsFromRequest {
     sprintId?: string;
     backlogItemId?: string;
     backlogItemDisplayId?: string;
+    projectDisplayId?: string;
 }
 
 export const getParamsFromRequest = (req: Request): ParamsFromRequest => {
@@ -40,6 +41,10 @@ export const getParamsFromRequest = (req: Request): ParamsFromRequest => {
     const backlogItemDisplayId = getParamFromRequest(req, "backlogItemDisplayId");
     if (backlogItemDisplayId) {
         result.backlogItemDisplayId = backlogItemDisplayId;
+    }
+    const projectDisplayId = getParamFromRequest(req, "projectDisplayId");
+    if (projectDisplayId) {
+        result.projectDisplayId = projectDisplayId;
     }
     return result;
 };
