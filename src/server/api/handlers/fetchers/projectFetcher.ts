@@ -8,6 +8,7 @@ import { ApiProject } from "@atoll/shared";
 // utils
 import { mapDbToApiProject } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildSelfLink } from "../../../utils/linkBuilder";
+import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 
 // data access
 import { ProjectModel } from "../../../dataaccess/models/Project";
@@ -51,6 +52,50 @@ export const projectByDisplayIdFetcher = async (projectDisplayId: string): Promi
             };
         };
         return getProjectsResult(projects);
+    } catch (error) {
+        return {
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: error
+        };
+    }
+};
+
+export const fetchProjects = async () => {
+    try {
+        const projects = await ProjectModel.findAll();
+        const items = projects.map((item) => {
+            const project = mapDbToApiProject(item);
+            const result: ApiProject = {
+                ...project,
+                links: [buildSelfLink(project, `/api/v1/${PROJECT_RESOURCE_NAME}/`)]
+            };
+            return result;
+        });
+        return {
+            status: HttpStatus.OK,
+            data: {
+                items
+            }
+        };
+    } catch (error) {
+        return {
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: error
+        };
+    }
+};
+
+export const fetchProject = async (projectId: string) => {
+    try {
+        const project = await ProjectModel.findByPk(projectId);
+        const projectItem = mapDbToApiProject(project);
+        const item = { ...projectItem, links: [buildSelfLink(projectItem, `/api/v1/${PROJECT_RESOURCE_NAME}/`)] };
+        return {
+            status: HttpStatus.OK,
+            data: {
+                item
+            }
+        };
     } catch (error) {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,

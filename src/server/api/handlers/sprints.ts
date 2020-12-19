@@ -1,12 +1,13 @@
 // externals
 import { Request, Response } from "express";
+import * as core from "express-serve-static-core";
 import * as HttpStatus from "http-status-codes";
 
 // data access
 import { SprintModel } from "../../dataaccess/models/Sprint";
 
 // consts/enums
-import { fetchSprints } from "./fetchers/sprintFetcher";
+import { fetchSprint, fetchSprints } from "./fetchers/sprintFetcher";
 import { deleteSprint } from "./deleters/sprintDeleter";
 
 // utils
@@ -89,11 +90,11 @@ export const sprintPatchHandler = async (req: Request, res: Response) => {
 export const sprintPostHandler = async (req: Request, res) => {
     const sprintDataObject = mapApiToDbSprint({ ...addIdToBody(req.body) });
     try {
-        const addedBacklogItem = await SprintModel.create(sprintDataObject);
+        const addedSprint = await SprintModel.create(sprintDataObject);
         res.status(HttpStatus.CREATED).json({
             status: HttpStatus.CREATED,
             data: {
-                item: addedBacklogItem
+                item: addedSprint
             }
         });
     } catch (err) {
@@ -112,5 +113,19 @@ export const sprintDeleteHandler = async (req: Request, res) => {
             message: result.message
         });
         console.log(`Unable to delete sprint: ${result.message}`);
+    }
+};
+
+export const sprintGetHandler = async (req: Request, res: Response) => {
+    const params = getParamsFromRequest(req);
+    const result = await fetchSprint(params.sprintId);
+    if (result.status === HttpStatus.OK) {
+        res.json(result);
+    } else {
+        res.status(result.status).json({
+            status: result.status,
+            message: result.message
+        });
+        console.log(`Unable to fetch sprint: ${result.message}`);
     }
 };
