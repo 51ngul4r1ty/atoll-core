@@ -50,6 +50,10 @@ BacklogItemModel.init(
         status: {
             type: DataTypes.CHAR(1),
             allowNull: true
+        },
+        acceptanceCriteria: {
+            type: DataTypes.TEXT,
+            allowNull: true
         }
     },
     {

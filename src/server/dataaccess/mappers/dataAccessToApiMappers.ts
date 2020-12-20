@@ -58,20 +58,21 @@ export const mapDbSprintBacklogToApiBacklogItem = (item: any): ApiBacklogItemInS
     };
     const backlogitem = sprintBacklogWithItems.backlogitem;
     const result = {
+        acceptanceCriteria: backlogitem.acceptanceCriteria,
+        createdAt: backlogitem.createdAt,
+        displayindex: sprintBacklogWithItems.displayindex,
+        estimate: convertDbFloatToNumber(backlogitem.estimate),
+        externalId: backlogitem.externalId,
+        friendlyId: backlogitem.friendlyId,
         id: backlogitem.id,
         projectId: backlogitem.projectId,
-        friendlyId: backlogitem.friendlyId,
-        externalId: backlogitem.externalId,
-        rolePhrase: backlogitem.rolePhrase,
-        storyPhrase: backlogitem.storyPhrase,
         reasonPhrase: backlogitem.reasonPhrase,
-        estimate: convertDbFloatToNumber(backlogitem.estimate),
+        rolePhrase: backlogitem.rolePhrase,
+        status: backlogitem.status,
+        storyPhrase: backlogitem.storyPhrase,
         type: backlogitem.type,
-        createdAt: backlogitem.createdAt,
         updatedAt: backlogitem.updatedAt,
-        version: backlogitem.version,
-        displayindex: sprintBacklogWithItems.displayindex,
-        status: backlogitem.status
+        version: backlogitem.version
     };
     return result;
 };

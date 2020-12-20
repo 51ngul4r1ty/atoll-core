@@ -36,4 +36,4 @@ alter table sprint
     alter column archived type char(1),
     alter column archived set not null;
 
-	
+alter table backlogitem add column "acceptanceCriteria" text;
