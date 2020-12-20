@@ -43,6 +43,34 @@ export const fetchSprints = async (projectId: string | null, archived?: string |
     }
 };
 
+export const fetchSprint = async (sprintId: string) => {
+    try {
+        const sprint = await SprintModel.findByPk(sprintId);
+        if (!sprint) {
+            return {
+                status: HttpStatus.NOT_FOUND,
+                message: `Unable to find sprint with ID ${sprintId}.`
+            };
+        }
+        const sprintItem = mapDbToApiSprint(sprint);
+        const item: ApiSprint = {
+            ...sprintItem,
+            links: [buildSelfLink(sprintItem, `/api/v1/${SPRINT_RESOURCE_NAME}/`)]
+        };
+        return {
+            status: HttpStatus.OK,
+            data: {
+                item
+            }
+        };
+    } catch (error) {
+        return {
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: error
+        };
+    }
+};
+
 export const getIdForSprintContainingBacklogItem = async (
     backlogItemId: string,
     transaction?: Transaction

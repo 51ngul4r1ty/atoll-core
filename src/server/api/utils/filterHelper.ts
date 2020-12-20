@@ -1,19 +1,31 @@
 import { Request } from "express";
 
-export const getParamFromRequest = (req: Request, paramKey: string) => {
+export const getParamFromRequest = (req: Request, paramKey: string): string => {
     const paramValue = req.params[paramKey];
     if (paramValue) {
         return paramValue;
     }
     const queryValue = req.query[paramKey];
     if (queryValue) {
-        return queryValue;
+        if (Array.isArray(queryValue)) {
+            return (queryValue as string[]).join(",");
+        } else {
+            return queryValue as string;
+        }
     }
     return undefined;
 };
 
-export const getParamsFromRequest = (req: Request) => {
-    const result: any = {};
+export interface ParamsFromRequest {
+    projectId?: string;
+    sprintId?: string;
+    backlogItemId?: string;
+    backlogItemDisplayId?: string;
+    projectDisplayId?: string;
+}
+
+export const getParamsFromRequest = (req: Request): ParamsFromRequest => {
+    const result: ParamsFromRequest = {};
     const sprintId = getParamFromRequest(req, "sprintId");
     if (sprintId) {
         result.sprintId = sprintId;
@@ -25,6 +37,14 @@ export const getParamsFromRequest = (req: Request) => {
     const backlogItemId = getParamFromRequest(req, "backlogItemId");
     if (backlogItemId) {
         result.backlogItemId = backlogItemId;
+    }
+    const backlogItemDisplayId = getParamFromRequest(req, "backlogItemDisplayId");
+    if (backlogItemDisplayId) {
+        result.backlogItemDisplayId = backlogItemDisplayId;
+    }
+    const projectDisplayId = getParamFromRequest(req, "projectDisplayId");
+    if (projectDisplayId) {
+        result.projectDisplayId = projectDisplayId;
     }
     return result;
 };

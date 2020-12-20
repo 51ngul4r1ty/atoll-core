@@ -8,6 +8,7 @@ import auth from "../middleware/auth";
 import {
     BACKLOG_ITEM_RANK_RESOURCE_NAME,
     BACKLOG_ITEM_RESOURCE_NAME,
+    PROJECT_RESOURCE_NAME,
     SPRINT_BACKLOG_CHILD_RESOURCE_NAME,
     SPRINT_BACKLOG_PARENT_RESOURCE_NAME,
     SPRINT_RESOURCE_NAME
@@ -23,7 +24,13 @@ import {
     backlogItemPutHandler,
     backlogItemPatchHandler
 } from "./handlers/backlogItems";
-import { sprintPostHandler, sprintsGetHandler, sprintDeleteHandler, sprintPatchHandler } from "./handlers/sprints";
+import {
+    sprintPostHandler,
+    sprintsGetHandler,
+    sprintDeleteHandler,
+    sprintPatchHandler,
+    sprintGetHandler
+} from "./handlers/sprints";
 import { backlogItemRanksGetHandler, backlogItemRankGetHandler } from "./handlers/backlogItemRanks";
 import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
@@ -39,6 +46,14 @@ import {
     sprintBacklogItemPostHandler
 } from "./handlers/sprintBacklogItems";
 import { sprintUpdateStatsPostHandler } from "./handlers/sprintUpdateStats";
+import { backlogItemViewBffGetHandler } from "./handlers/views/backlogItemViewBff";
+import {
+    projectDeleteHandler,
+    projectGetHandler,
+    projectPatchHandler,
+    projectPostHandler,
+    projectsGetHandler
+} from "./handlers/projects";
 
 export const router = express.Router();
 
@@ -54,12 +69,24 @@ setupRoutes(router, "/users/:userId/preferences", { get: userPreferencesHandler 
 
 setupRoutes(router, "/users/:userId/feature-toggles", { get: featureTogglesHandler });
 
+setupRoutes(router, `/${PROJECT_RESOURCE_NAME}`, {
+    get: projectsGetHandler,
+    post: projectPostHandler
+});
+
+setupRoutes(router, `/${PROJECT_RESOURCE_NAME}/:projectId`, {
+    get: projectGetHandler,
+    patch: projectPatchHandler,
+    delete: projectDeleteHandler
+});
+
 setupRoutes(router, `/${SPRINT_RESOURCE_NAME}`, {
     get: sprintsGetHandler,
     post: sprintPostHandler
 });
 
 setupRoutes(router, `/${SPRINT_RESOURCE_NAME}/:sprintId`, {
+    get: sprintGetHandler,
     patch: sprintPatchHandler,
     delete: sprintDeleteHandler
 });
@@ -92,7 +119,11 @@ setupRoutes(router, `/${BACKLOG_ITEM_RANK_RESOURCE_NAME}/:itemId`, {
     get: backlogItemRankGetHandler
 });
 
+// bff views
 setupRoutes(router, `/bff/views/plan`, { get: planViewBffGetHandler });
+setupRoutes(router, `/bff/views/project/:projectDisplayId/backlog-item/:backlogItemDisplayId`, {
+    get: backlogItemViewBffGetHandler
+});
 
 // TODO: Add options routes for these actions
 router.post("/actions/reorder-backlog-items", auth, backlogItemsReorderPostHandler);
