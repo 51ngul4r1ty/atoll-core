@@ -1,6 +1,6 @@
 {
   "name": "atoll",
-  "version": "0.30.0",
+  "version": "0.31.0",
   "author": {
     "name": "Kevin Berry",
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
@@ -57,7 +57,7 @@
     "setup": "ts-node ./scripts/setup.ts"
   },
   "dependencies": {
-    "@atoll/shared": "0.30.0",
+    "@atoll/shared": "0.31.0",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.19.2",
@@ -80,6 +80,7 @@
     "react-dom": "16.13.1",
     "react-helmet": "5.2.1",
     "react-i18next": "11.2.1",
+    "react-markdown": "5.0.3",
     "react-redux": "7.2.0",
     "react-router-dom": "5.1.2",
     "redux": "4.0.5",
