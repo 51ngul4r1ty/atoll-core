@@ -35,7 +35,10 @@ const client = [
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new ManifestPlugin({ fileName: "manifest.json" }),
-    new CopyWebpackPlugin([{ from: "./node_modules/@atoll/shared/dist/index.es.css", to: "shared-bundle.css" }])
+    new CopyWebpackPlugin([
+        { from: "./node_modules/@atoll/shared/dist/index.es.css", to: "shared-bundle.css" },
+        { from: "./src/assets/favicon.png", to: "favicon.png" }
+    ])
 ].filter(Boolean);
 
 const server = [

@@ -83,6 +83,10 @@ const serverRenderer: any = () => (req: express.Request & { store: Store }, res:
 
         const sharedBundleCss = res.locals.assetPath("shared-bundle.css");
         const sharedBundleCssPath = remapAssetPath(sharedBundleCss);
+        const bundleJsPath = remapAssetPath(res.locals.assetPath("bundle.js"));
+        const basePath = bundleJsPath.replace("/bundle.js", "");
+        const favIconPath = `${basePath}/favicon.png`;
+        console.log(`#################################### ${favIconPath}`);
 
         return res.send(
             "<!doctype html>" +
@@ -93,10 +97,8 @@ const serverRenderer: any = () => (req: express.Request & { store: Store }, res:
                             remapAssetPath(res.locals.assetPath("bundle.css")),
                             remapAssetPath(res.locals.assetPath("vendor.css"))
                         ]}
-                        scripts={[
-                            remapAssetPath(res.locals.assetPath("bundle.js")),
-                            remapAssetPath(res.locals.assetPath("vendor.js"))
-                        ]}
+                        scripts={[bundleJsPath, remapAssetPath(res.locals.assetPath("vendor.js"))]}
+                        favIcon={favIconPath}
                         state={state}
                         language={locale}
                         toggles={buildFeatureTogglesList(featureToggles?.toggles)}
