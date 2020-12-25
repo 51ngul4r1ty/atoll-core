@@ -84,7 +84,8 @@ const serverRenderer: any = () => (req: express.Request & { store: Store }, res:
         const sharedBundleCss = res.locals.assetPath("shared-bundle.css");
         const sharedBundleCssPath = remapAssetPath(sharedBundleCss);
         const bundleJsPath = remapAssetPath(res.locals.assetPath("bundle.js"));
-        const basePath = bundleJsPath.replace("/bundle.js", "");
+        const idx = bundleJsPath.lastIndexOf("/");
+        const basePath = idx < 0 ? bundleJsPath : bundleJsPath.substr(0, idx);
         const favIconPath = `${basePath}/favicon.png`;
 
         return res.send(
