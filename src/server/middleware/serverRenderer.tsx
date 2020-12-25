@@ -86,7 +86,6 @@ const serverRenderer: any = () => (req: express.Request & { store: Store }, res:
         const bundleJsPath = remapAssetPath(res.locals.assetPath("bundle.js"));
         const basePath = bundleJsPath.replace("/bundle.js", "");
         const favIconPath = `${basePath}/favicon.png`;
-        console.log(`#################################### ${favIconPath}`);
 
         return res.send(
             "<!doctype html>" +
