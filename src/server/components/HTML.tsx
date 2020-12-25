@@ -5,13 +5,14 @@ import Helmet from "react-helmet";
 type Props = {
     children: any;
     css: string[];
+    favIcon: string;
     language: string;
     scripts: string[];
     state: string;
     toggles: { [key: string]: boolean };
 };
 
-const HTML = ({ children, css = [], scripts = [], state = "{}", language = "", toggles = {} }: Props) => {
+const HTML = (props: Props) => {
     const head = Helmet.renderStatic();
     return (
         <html lang="">
@@ -23,7 +24,8 @@ const HTML = ({ children, css = [], scripts = [], state = "{}", language = "", t
                 {head.meta.toComponent()}
                 {head.link.toComponent()}
                 {head.script.toComponent()}
-                {css.filter(Boolean).map((href) => (
+                <link rel="icon" type="image/png" href={props.favIcon}></link>
+                {props.css.filter(Boolean).map((href) => (
                     <link key={href} rel="stylesheet" href={href} />
                 ))}
                 <script
@@ -31,14 +33,16 @@ const HTML = ({ children, css = [], scripts = [], state = "{}", language = "", t
                     dangerouslySetInnerHTML={{
                         // TODO: Add jsesc/stringify here
                         // see: https://twitter.com/HenrikJoreteg/status/1143953338284703744
-                        __html: `window.__PRELOADED_STATE__ = ${state}; window.__TOGGLES__ = ${JSON.stringify(toggles)};`
+                        __html: `window.__PRELOADED_STATE__ = ${props.state}; window.__TOGGLES__ = ${JSON.stringify(
+                            props.toggles
+                        )};`
                     }}
                 />
             </head>
             <body>
                 {/* eslint-disable-next-line react/no-danger */}
-                <div id="app" dangerouslySetInnerHTML={{ __html: children }} />
-                {scripts.filter(Boolean).map((src) => (
+                <div id="app" dangerouslySetInnerHTML={{ __html: props.children }} />
+                {props.scripts.filter(Boolean).map((src) => (
                     <script key={src} src={src} />
                 ))}
             </body>
