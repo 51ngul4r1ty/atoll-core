@@ -12,10 +12,10 @@ import {
 } from "@atoll/shared";
 
 // data access
-import { ApiToDataAccessMapOptions, BacklogItemModel, mapApiToDbSprint, SprintModel } from "../../../dataaccess";
+import { ApiToDataAccessMapOptions, mapApiToDbSprint, SprintModel } from "../../../dataaccess";
 
 // utils
-import { mapDbToApiBacklogItem, mapDbToApiSprint } from "../../../dataaccess/mappers/dataAccessToApiMappers";
+import { mapDbToApiSprint } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 enum Operation {
     None = 0,

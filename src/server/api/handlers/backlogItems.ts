@@ -6,12 +6,12 @@ import { CreateOptions, Transaction } from "sequelize";
 
 // libraries
 import {
-    getValidStatuses,
-    isValidStatus,
     ApiBacklogItem,
     ApiBacklogItemRank,
-    logger,
     ApiSprintStats,
+    getValidStatuses,
+    isValidStatus,
+    logger,
     mapApiItemToBacklogItem
 } from "@atoll/shared";
 
@@ -43,6 +43,7 @@ import {
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
 import { getIdForSprintContainingBacklogItem } from "./fetchers/sprintFetcher";
+import { getUpdatedDataItemWhenStatusChanges } from "../utils/statusChangeUtils";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -332,7 +333,6 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
         );
         return;
     }
-    let sprintStats: ApiSprintStats;
     let transaction: Transaction;
     try {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
@@ -379,7 +379,6 @@ export const backlogItemPatchHandler = async (req: Request, res: Response) => {
     if (respondedWithMismatchedItemIds(res, queryParamItemId, bodyItemId)) {
         return;
     }
-    let sprintStats: ApiSprintStats;
     let transaction: Transaction;
     try {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
@@ -395,7 +394,8 @@ export const backlogItemPatchHandler = async (req: Request, res: Response) => {
             if (invalidPatchMessage) {
                 respondWithFailedValidation(res, `Unable to patch: ${invalidPatchMessage}`);
             } else {
-                const newDataItem = getPatchedItem(originalApiBacklogItem, req.body);
+                let newDataItem = getPatchedItem(originalApiBacklogItem, req.body);
+                newDataItem = getUpdatedDataItemWhenStatusChanges(originalApiBacklogItem, newDataItem);
                 await backlogItem.update(newDataItem, { transaction });
 
                 await handleResponseWithUpdatedStats(newDataItem, originalApiBacklogItem, backlogItem, res, transaction);
