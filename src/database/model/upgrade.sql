@@ -37,3 +37,8 @@ alter table sprint
     alter column archived set not null;
 
 alter table backlogitem add column "acceptanceCriteria" text;
+
+alter table backlogitem add column "startedAt" timestamp with time zone;
+alter table backlogitem add column "finishedAt" timestamp with time zone;
+alter table backlogitem add column "acceptedAt" timestamp with time zone;
+alter table backlogitem add column "releasedAt" timestamp with time zone;
