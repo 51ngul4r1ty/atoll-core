@@ -53,6 +53,10 @@ describe("Status Change Utils", () => {
         (global as any).Date = oldDate;
     });
     describe("getUpdatedDataItemWhenStatusChanges", () => {
+        it("should handle null values correctly", () => {
+            const actual = getUpdatedDataItemWhenStatusChanges(null, {} as ApiBacklogItem);
+            expect(actual).toStrictEqual({});
+        });
         it("should handle empty objects correctly", () => {
             const actual = getUpdatedDataItemWhenStatusChanges({} as ApiBacklogItem, {} as ApiBacklogItem);
             expect(actual).toStrictEqual({});
