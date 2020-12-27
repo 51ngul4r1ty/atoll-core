@@ -3,15 +3,20 @@ import * as express from "express";
 import expressWs from "express-ws";
 import * as Ws from "ws";
 import * as TextEncodingPolyfill from "text-encoding-polyfill";
-// import * as uuidv1 from "uuid/v1";
-
 import bodyParser from "body-parser";
 import chalk from "chalk";
 import manifestHelpers from "express-manifest-helpers";
 import path from "path";
 
 // libraries
-import { configureStore, createServerHistory, storeHistoryInstance, getHistoryInstance, setAssetPortOverride } from "@atoll/shared";
+import {
+    configureStore,
+    createServerHistory,
+    storeHistoryInstance,
+    getHistoryInstance,
+    setAssetPortOverride,
+    now
+} from "@atoll/shared";
 
 // config
 import paths from "../../config/paths";
@@ -165,7 +170,7 @@ let portValue = envVarToNum(process.env.PORT) || 8500;
 
 app.listen(portValue, () => {
     console.log(`Environment PORT value: ${process.env.PORT}`);
-    console.log(`[${new Date().toISOString()}]`, chalk.blue(`App is running: http://localhost:${process.env.PORT || 8500}`));
+    console.log(`[${now().toISOString()}]`, chalk.blue(`App is running: http://localhost:${process.env.PORT || 8500}`));
 });
 
 export default app;

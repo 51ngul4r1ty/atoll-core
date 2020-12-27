@@ -14,37 +14,30 @@ const getResulApiBacklogItem = (changed: boolean, currentResult: ApiBacklogItem)
     return changed ? cloneApiBacklogItem(currentResult) : currentResult;
 };
 
-export const getUpdatedDataItemWhenStatusChanges = (
-    originalApiBacklogItem: ApiBacklogItem,
-    newDataItem: ApiBacklogItem
-): ApiBacklogItem => {
-    let result = newDataItem;
-    if (originalApiBacklogItem.status !== newDataItem.status) {
+export const getUpdatedDataItemWhenStatusChanges = (originalItem: ApiBacklogItem, newItem: ApiBacklogItem): ApiBacklogItem => {
+    let result = newItem;
+    const originalItemToUse = !originalItem ? ({} as Partial<ApiBacklogItem>) : originalItem;
+    if (originalItemToUse.status !== result.status) {
         let changed = false;
-        const prevStatusTyped = mapApiStatusToBacklogItem(originalApiBacklogItem.status);
-        const statusTyped = mapApiStatusToBacklogItem(newDataItem.status);
+        const statusTyped = mapApiStatusToBacklogItem(result.status);
         const nowIsoDateString = dateToIsoDateString(new Date());
-        const newlyAccepted = !hasBacklogItemAtLeastBeenAccepted(prevStatusTyped) && hasBacklogItemAtLeastBeenAccepted(statusTyped);
-        if (newlyAccepted && !newDataItem.acceptedAt) {
-            result = getResulApiBacklogItem(changed, newDataItem);
-            result.acceptedAt = nowIsoDateString;
-            changed = true;
-        }
-        const newlyReleased = !hasBacklogItemAtLeastBeenReleased(prevStatusTyped) && hasBacklogItemAtLeastBeenReleased(statusTyped);
-        if (newlyReleased && !newDataItem.releasedAt) {
-            result = getResulApiBacklogItem(changed, newDataItem);
+        if (hasBacklogItemAtLeastBeenReleased(statusTyped) && !result.releasedAt) {
+            result = getResulApiBacklogItem(changed, result);
             result.releasedAt = nowIsoDateString;
             changed = true;
         }
-        const newlyFinished = !hasBacklogItemAtLeastBeenFinished(prevStatusTyped) && hasBacklogItemAtLeastBeenFinished(statusTyped);
-        if (newlyFinished && !newDataItem.finishedAt) {
-            result = getResulApiBacklogItem(changed, newDataItem);
+        if (hasBacklogItemAtLeastBeenAccepted(statusTyped) && !result.acceptedAt) {
+            result = getResulApiBacklogItem(changed, result);
+            result.acceptedAt = nowIsoDateString;
+            changed = true;
+        }
+        if (hasBacklogItemAtLeastBeenFinished(statusTyped) && !result.finishedAt) {
+            result = getResulApiBacklogItem(changed, result);
             result.finishedAt = nowIsoDateString;
             changed = true;
         }
-        const newlyStarted = !hasBacklogItemAtLeastBeenStarted(prevStatusTyped) && hasBacklogItemAtLeastBeenStarted(statusTyped);
-        if (newlyStarted && !newDataItem.startedAt) {
-            result = getResulApiBacklogItem(changed, newDataItem);
+        if (hasBacklogItemAtLeastBeenStarted(statusTyped) && !result.startedAt) {
+            result = getResulApiBacklogItem(changed, result);
             result.startedAt = nowIsoDateString;
             changed = true;
         }
