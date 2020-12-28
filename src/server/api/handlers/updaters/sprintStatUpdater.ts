@@ -83,25 +83,28 @@ export const handleSprintStatUpdate = async (
     let totalsChanged = false;
     sprintStats = {
         acceptedPoints: sprint.acceptedPoints,
-        plannedPoints: sprint.plannedPoints
+        plannedPoints: sprint.plannedPoints,
+        totalPoints: sprint.totalPoints
     };
 
     if (backlogItemEstimate || originalBacklogItemEstimate) {
+        sprint.totalPoints += backlogItemEstimate - originalBacklogItemEstimate;
+        totalsChanged = backlogItemEstimate !== originalBacklogItemEstimate;
         const acceptedPointsOp = calcSprintStatAcceptedPtsOp(originalBacklogItemStatus, backlogItemStatus);
         switch (acceptedPointsOp) {
             case Operation.Add: {
                 sprint.acceptedPoints += backlogItemEstimate;
-                totalsChanged = backlogItemEstimate > 0;
+                totalsChanged = totalsChanged || backlogItemEstimate > 0;
                 break;
             }
             case Operation.Remove: {
                 sprint.acceptedPoints -= originalBacklogItemEstimate;
-                totalsChanged = originalBacklogItemEstimate > 0;
+                totalsChanged = totalsChanged || originalBacklogItemEstimate > 0;
                 break;
             }
             case Operation.Update: {
                 sprint.acceptedPoints += backlogItemEstimate - originalBacklogItemEstimate;
-                totalsChanged = backlogItemEstimate !== originalBacklogItemEstimate;
+                totalsChanged = totalsChanged || backlogItemEstimate !== originalBacklogItemEstimate;
                 break;
             }
         }
@@ -127,12 +130,14 @@ export const handleSprintStatUpdate = async (
             const newSprint = {
                 ...mapApiToDbSprint(apiSprint, ApiToDataAccessMapOptions.None),
                 plannedPoints: sprint.plannedPoints,
-                acceptedPoints: sprint.acceptedPoints
+                acceptedPoints: sprint.acceptedPoints,
+                totalPoints: sprint.totalPoints
             };
             await dbSprint.update(newSprint);
             sprintStats = {
                 plannedPoints: sprint.plannedPoints,
-                acceptedPoints: sprint.acceptedPoints
+                acceptedPoints: sprint.acceptedPoints,
+                totalPoints: sprint.totalPoints
             };
         }
     }

@@ -27,11 +27,12 @@ SprintModel.init(
         name: DataTypes.STRING(50),
         startdate: DataTypes.DATE,
         finishdate: DataTypes.DATE,
-        plannedPoints: DataTypes.INTEGER,
-        acceptedPoints: DataTypes.INTEGER,
-        velocityPoints: DataTypes.INTEGER,
-        usedSplitPoints: DataTypes.INTEGER,
-        remainingSplitPoints: DataTypes.INTEGER,
+        plannedPoints: DataTypes.DECIMAL(10, 2),
+        acceptedPoints: DataTypes.DECIMAL(10, 2),
+        velocityPoints: DataTypes.DECIMAL(10, 2),
+        usedSplitPoints: DataTypes.DECIMAL(10, 2),
+        remainingSplitPoints: DataTypes.DECIMAL(10, 2),
+        totalPoints: DataTypes.DECIMAL(10, 2),
         archived: {
             type: DataTypes.CHAR(1),
             allowNull: true
