@@ -54,7 +54,11 @@ BacklogItemModel.init(
         acceptanceCriteria: {
             type: DataTypes.TEXT,
             allowNull: true
-        }
+        },
+        startedAt: DataTypes.DATE,
+        finishedAt: DataTypes.DATE,
+        acceptedAt: DataTypes.DATE,
+        releasedAt: DataTypes.DATE
     },
     {
         modelName: "backlogitem",

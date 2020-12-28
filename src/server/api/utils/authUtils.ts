@@ -3,7 +3,7 @@ import * as jwt from "jsonwebtoken";
 import { Request } from "express";
 
 // libraries
-import { getAuthKey } from "@atoll/shared";
+import { getAuthKey, now } from "@atoll/shared";
 
 // interfaces/types
 import { AuthTokenContents } from "../../types";
@@ -40,8 +40,8 @@ export const getLoggedInAppUserId = (req: Request) => {
     if (!expirationDate) {
         return null;
     }
-    const now = new Date();
-    const stillValid = expirationDate.getTime() >= now.getTime();
+    const nowDate = now();
+    const stillValid = expirationDate.getTime() >= nowDate.getTime();
     if (!stillValid) {
         return null;
     }

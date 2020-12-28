@@ -6,12 +6,12 @@ import { CreateOptions, Transaction } from "sequelize";
 
 // libraries
 import {
-    getValidStatuses,
-    isValidStatus,
     ApiBacklogItem,
     ApiBacklogItemRank,
-    logger,
     ApiSprintStats,
+    getValidStatuses,
+    isValidStatus,
+    logger,
     mapApiItemToBacklogItem
 } from "@atoll/shared";
 
@@ -43,6 +43,7 @@ import {
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
 import { getIdForSprintContainingBacklogItem } from "./fetchers/sprintFetcher";
+import { getUpdatedDataItemWhenStatusChanges } from "../utils/statusChangeUtils";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -242,9 +243,10 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_backlogitemId_fkey" DEFERRED;', { transaction });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
-        const addedBacklogItem = await BacklogItemModel.create(bodyWithId, { transaction } as CreateOptions);
+        const newItem = getUpdatedDataItemWhenStatusChanges(null, bodyWithId);
+        const addedBacklogItem = await BacklogItemModel.create(newItem, { transaction } as CreateOptions);
         if (!prevBacklogItemId) {
-            await backlogItemRankFirstItemInserter(bodyWithId, transaction);
+            await backlogItemRankFirstItemInserter(newItem, transaction);
         } else {
             // 1. if there is a single item in database then we'll have this entry:
             //   backlogitemId=null, nextbacklogitemId=item1
@@ -270,14 +272,14 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
                 const prevBacklogItem = prevBacklogItems[0];
                 // (2) oldNextItemId = prevBacklogItem.nextbacklogitemId
                 const oldNextItemId = ((prevBacklogItem as unknown) as ApiBacklogItemRank).nextbacklogitemId;
-                // (3) update existing entry with nextbacklogitemId = bodyWithId.id
-                await prevBacklogItem.update({ nextbacklogitemId: bodyWithId.id }, { transaction });
-                // (4) add new row with backlogitemId = bodyWithId.id, nextbacklogitemId = oldNextItemId
+                // (3) update existing entry with nextbacklogitemId = newItem.id
+                await prevBacklogItem.update({ nextbacklogitemId: newItem.id }, { transaction });
+                // (4) add new row with backlogitemId = newItem.id, nextbacklogitemId = oldNextItemId
                 await BacklogItemRankModel.create(
                     {
                         ...addIdToBody({
-                            projectId: bodyWithId.projectId,
-                            backlogitemId: bodyWithId.id,
+                            projectId: newItem.projectId,
+                            backlogitemId: newItem.id,
                             nextbacklogitemId: oldNextItemId
                         })
                     },
@@ -332,7 +334,6 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
         );
         return;
     }
-    let sprintStats: ApiSprintStats;
     let transaction: Transaction;
     try {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
@@ -344,7 +345,7 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
             respondWithNotFound(res, `Unable to find backlogitem to update with ID ${req.body.id}`);
         } else {
             const originalApiBacklogItem = mapDbToApiBacklogItem(backlogItem);
-            const newDataItem = req.body;
+            const newDataItem = getUpdatedDataItemWhenStatusChanges(originalApiBacklogItem, req.body);
             await backlogItem.update(newDataItem, { transaction });
 
             await handleResponseWithUpdatedStats(newDataItem, originalApiBacklogItem, backlogItem, res, transaction);
@@ -379,7 +380,6 @@ export const backlogItemPatchHandler = async (req: Request, res: Response) => {
     if (respondedWithMismatchedItemIds(res, queryParamItemId, bodyItemId)) {
         return;
     }
-    let sprintStats: ApiSprintStats;
     let transaction: Transaction;
     try {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
@@ -395,7 +395,8 @@ export const backlogItemPatchHandler = async (req: Request, res: Response) => {
             if (invalidPatchMessage) {
                 respondWithFailedValidation(res, `Unable to patch: ${invalidPatchMessage}`);
             } else {
-                const newDataItem = getPatchedItem(originalApiBacklogItem, req.body);
+                let newDataItem = getPatchedItem(originalApiBacklogItem, req.body);
+                newDataItem = getUpdatedDataItemWhenStatusChanges(originalApiBacklogItem, newDataItem);
                 await backlogItem.update(newDataItem, { transaction });
 
                 await handleResponseWithUpdatedStats(newDataItem, originalApiBacklogItem, backlogItem, res, transaction);

@@ -53,7 +53,7 @@ export const getInvalidPatchMessage = (obj: any, fields: any) => {
     return null;
 };
 
-export const getPatchedItem = (obj: any, fields: any) => {
+export const getPatchedItem = <T>(obj: T, fields: any): T => {
     const validationResult = validatePatchObjects(obj, fields);
     if (!validationResult.valid) {
         throw new Error(getValidationFailureMessage(validationResult));
