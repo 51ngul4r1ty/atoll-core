@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import { Transaction } from "sequelize";
 
 // libraries
-import { BacklogItemStatus, mapApiStatusToBacklogItem } from "@atoll/shared";
+import { BacklogItemStatus, hasBacklogItemAtLeastBeenAccepted, mapApiStatusToBacklogItem } from "@atoll/shared";
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
@@ -38,7 +38,7 @@ export const sprintUpdateStatsPostHandler = async (req: Request, res: Response) 
                 totalPoints += sprintBacklogItemTyped.estimate;
                 plannedPoints += sprintBacklogItemTyped.estimate;
                 const status = mapApiStatusToBacklogItem(sprintBacklogItemTyped.status);
-                if (status === BacklogItemStatus.Accepted) {
+                if (hasBacklogItemAtLeastBeenAccepted(status)) {
                     acceptedPoints += sprintBacklogItemTyped.estimate;
                 }
             }
