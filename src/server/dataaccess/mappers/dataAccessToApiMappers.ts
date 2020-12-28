@@ -40,12 +40,13 @@ export const mapDbToApiSprint = (item: any): ApiSprint => {
     }
     return {
         ...item.dataValues,
-        plannedPoints: convertDbFloatToNumber(item.dataValues.plannedPoints),
         acceptedPoints: convertDbFloatToNumber(item.dataValues.acceptedPoints),
-        velocityPoints: convertDbFloatToNumber(item.dataValues.velocityPoints),
+        archived: convertDbCharToBoolean(item.dataValues.archived),
+        plannedPoints: convertDbFloatToNumber(item.dataValues.plannedPoints),
         remainingSplitPoints: convertDbFloatToNumber(item.dataValues.remainingSplitPoints),
+        totalPoints: convertDbFloatToNumber(item.dataValues.totalPoints),
         usedSplitPoints: convertDbFloatToNumber(item.dataValues.usedSplitPoints),
-        archived: convertDbCharToBoolean(item.dataValues.archived)
+        velocityPoints: convertDbFloatToNumber(item.dataValues.velocityPoints)
     };
 };
 

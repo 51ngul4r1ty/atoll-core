@@ -31,9 +31,11 @@ export const sprintUpdateStatsPostHandler = async (req: Request, res: Response) 
         });
         let plannedPoints = 0;
         let acceptedPoints = 0;
+        let totalPoints = 0;
         sprintBacklogItems.forEach((sprintBacklogItem) => {
             const sprintBacklogItemTyped = mapDbSprintBacklogToApiBacklogItem(sprintBacklogItem);
             if (sprintBacklogItemTyped.estimate) {
+                totalPoints += sprintBacklogItemTyped.estimate;
                 plannedPoints += sprintBacklogItemTyped.estimate;
                 const status = mapApiStatusToBacklogItem(sprintBacklogItemTyped.status);
                 if (status === BacklogItemStatus.Accepted) {
@@ -46,14 +48,16 @@ export const sprintUpdateStatsPostHandler = async (req: Request, res: Response) 
         const newSprint = mapApiToDbSprint(apiSprint);
         newSprint.plannedPoints = plannedPoints;
         newSprint.acceptedPoints = acceptedPoints;
+        newSprint.totalPoints = totalPoints;
         await sprint.update(newSprint);
 
         await transaction.commit();
         res.status(HttpStatus.OK).json({
             status: HttpStatus.OK,
             data: {
+                acceptedPoints,
                 plannedPoints,
-                acceptedPoints
+                totalPoints
             }
         });
     } catch (err) {
