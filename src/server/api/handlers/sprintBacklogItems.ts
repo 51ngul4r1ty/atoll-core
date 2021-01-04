@@ -21,14 +21,14 @@ import {
     mapDbToApiSprintBacklogItem
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { addIdToBody } from "../utils/uuidHelper";
-import { sprintBacklogItemFetcher } from "./fetchers/sprintBacklogItemFetcher";
+import { fetchSprintBacklogItems } from "./fetchers/sprintBacklogItemFetcher";
 import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
 import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
 import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
 
 export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
-    const result = await sprintBacklogItemFetcher(params.sprintId);
+    const result = await fetchSprintBacklogItems(params.sprintId);
     if (result.status === HttpStatus.OK) {
         res.json(result);
     } else {

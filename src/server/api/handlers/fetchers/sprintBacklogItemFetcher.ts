@@ -16,7 +16,15 @@ import { SPRINT_BACKLOG_PARENT_RESOURCE_NAME, SPRINT_BACKLOG_CHILD_RESOURCE_NAME
 import { SprintBacklogItemModel } from "../../../dataaccess/models/SprintBacklogItem";
 import { BacklogItemModel } from "../../../dataaccess/models/BacklogItem";
 
-export const sprintBacklogItemFetcher = async (sprintId: string | null) => {
+export interface FetchedSprintBacklogItems {
+    status: number;
+    message?: string;
+    data?: {
+        items: ApiBacklogItem[]
+    }
+}
+
+export const fetchSprintBacklogItems = async (sprintId: string | null): Promise<FetchedSprintBacklogItems> => {
     try {
         const options = buildOptionsFromParams({ sprintId });
         const sprintBacklogs = await SprintBacklogItemModel.findAll({
