@@ -17,3 +17,4 @@ NPM Scripts
 `test` - runs tests and enters watch mode  
 `test:ci` - for running tests without entering watch mode  
 `sync` - builds and publishes shared library code and links to it  
+`gen:react-svg` - converts an SVG asset into a themeable React component (run the script for instructions on how to use it)
