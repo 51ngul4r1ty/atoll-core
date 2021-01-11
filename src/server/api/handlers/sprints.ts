@@ -1,9 +1,12 @@
 // externals
 import { Request, Response } from "express";
-import * as core from "express-serve-static-core";
 import * as HttpStatus from "http-status-codes";
 
+// libraries
+import { logger } from "@atoll/shared";
+
 // data access
+import { sequelize } from "../../dataaccess/connection";
 import { SprintModel } from "../../dataaccess/models/Sprint";
 
 // consts/enums
@@ -18,6 +21,7 @@ import { mapApiToDbSprint, ApiToDataAccessMapOptions } from "../../dataaccess/ma
 import { mapDbToApiSprint } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { respondedWithMismatchedItemIds } from "../utils/validationResponders";
 import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
+import { Transaction } from "sequelize";
 
 export const sprintsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
@@ -98,6 +102,52 @@ export const sprintPostHandler = async (req: Request, res) => {
             }
         });
     } catch (err) {
+        respondWithError(res, err);
+    }
+};
+
+export const sprintPutHandler = async (req: Request, res) => {
+    const functionTag = "sprintPutHandler";
+    const logContext = logger.info("starting call", [functionTag]);
+    const queryParamItemId = req.params.sprintId;
+    if (!queryParamItemId) {
+        respondWithFailedValidation(res, "Item ID is required in URI path for this operation");
+        return;
+    }
+    const bodyItemId = req.body.id;
+    if (queryParamItemId != bodyItemId) {
+        respondWithFailedValidation(
+            res,
+            `Item ID in URI path (${queryParamItemId}) should match Item ID in payload (${bodyItemId})`
+        );
+        return;
+    }
+    const newDataItem = mapApiToDbSprint(req.body);
+    let transaction: Transaction;
+    try {
+        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
+        const sprint = await SprintModel.findOne({
+            where: { id: bodyItemId },
+            transaction
+        });
+        if (!sprint) {
+            if (transaction) {
+                await transaction.commit();
+                transaction = null;
+            }
+            respondWithNotFound(res, `Unable to find sprint to update with ID ${req.body.id}`);
+        } else {
+            const originalApiBacklogItem = mapDbToApiSprint(sprint);
+            await sprint.update(newDataItem, { transaction });
+            if (transaction) {
+                await transaction.commit();
+                transaction = null;
+            }
+            respondWithItem(res, newDataItem);
+        }
+        logger.info("completed call", [functionTag]);
+    } catch (err) {
+        const errLogContext = logger.warn(`handling error "${err}"`, [functionTag], logContext);
         respondWithError(res, err);
     }
 };

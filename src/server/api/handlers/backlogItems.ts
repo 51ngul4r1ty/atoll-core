@@ -342,17 +342,16 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
             transaction
         });
         if (!backlogItem) {
+            if (transaction) {
+                await transaction.commit();
+                transaction = null;
+            }
             respondWithNotFound(res, `Unable to find backlogitem to update with ID ${req.body.id}`);
         } else {
             const originalApiBacklogItem = mapDbToApiBacklogItem(backlogItem);
             const newDataItem = getUpdatedDataItemWhenStatusChanges(originalApiBacklogItem, req.body);
             await backlogItem.update(newDataItem, { transaction });
-
-            await handleResponseWithUpdatedStats(newDataItem, originalApiBacklogItem, backlogItem, res, transaction);
-        }
-        if (transaction) {
-            await transaction.commit();
-            transaction = null;
+            await handleResponseWithUpdatedStatsAndCommit(newDataItem, originalApiBacklogItem, backlogItem, res, transaction);
         }
     } catch (err) {
         const errLogContext = logger.warn(`handling error "${err}"`, [functionTag], logContext);
@@ -388,6 +387,10 @@ export const backlogItemPatchHandler = async (req: Request, res: Response) => {
             transaction
         });
         if (!backlogItem) {
+            if (transaction) {
+                await transaction.commit();
+                transaction = null;
+            }
             respondWithNotFound(res, `Unable to find backlogitem to patch with ID ${queryParamItemId}`);
         } else {
             const originalApiBacklogItem = mapDbToApiBacklogItem(backlogItem);
@@ -399,12 +402,8 @@ export const backlogItemPatchHandler = async (req: Request, res: Response) => {
                 newDataItem = getUpdatedDataItemWhenStatusChanges(originalApiBacklogItem, newDataItem);
                 await backlogItem.update(newDataItem, { transaction });
 
-                await handleResponseWithUpdatedStats(newDataItem, originalApiBacklogItem, backlogItem, res, transaction);
+                await handleResponseWithUpdatedStatsAndCommit(newDataItem, originalApiBacklogItem, backlogItem, res, transaction);
             }
-        }
-        if (transaction) {
-            await transaction.commit();
-            transaction = null;
         }
     } catch (err) {
         const errLogContext = logger.warn(`handling error "${err}"`, [functionTag], logContext);
@@ -478,7 +477,7 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
     }
 };
 
-const handleResponseWithUpdatedStats = async (
+const handleResponseWithUpdatedStatsAndCommit = async (
     newDataItem: ApiBacklogItem,
     originalApiBacklogItem: ApiBacklogItem,
     backlogItem: BacklogItemModel,
@@ -498,6 +497,10 @@ const handleResponseWithUpdatedStats = async (
             newBacklogItem.estimate,
             transaction
         );
+    }
+    if (transaction) {
+        await transaction.commit();
+        transaction = null;
     }
     respondWithItem(res, backlogItem, originalBacklogItem, sprintStats ? { sprintStats } : undefined);
 };
