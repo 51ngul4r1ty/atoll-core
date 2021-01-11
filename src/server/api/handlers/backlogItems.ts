@@ -342,17 +342,20 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
             transaction
         });
         if (!backlogItem) {
+            if (transaction) {
+                await transaction.commit();
+                transaction = null;
+            }
             respondWithNotFound(res, `Unable to find backlogitem to update with ID ${req.body.id}`);
         } else {
             const originalApiBacklogItem = mapDbToApiBacklogItem(backlogItem);
             const newDataItem = getUpdatedDataItemWhenStatusChanges(originalApiBacklogItem, req.body);
             await backlogItem.update(newDataItem, { transaction });
-
+            if (transaction) {
+                await transaction.commit();
+                transaction = null;
+            }
             await handleResponseWithUpdatedStats(newDataItem, originalApiBacklogItem, backlogItem, res, transaction);
-        }
-        if (transaction) {
-            await transaction.commit();
-            transaction = null;
         }
     } catch (err) {
         const errLogContext = logger.warn(`handling error "${err}"`, [functionTag], logContext);
