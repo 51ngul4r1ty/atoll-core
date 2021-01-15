@@ -59,6 +59,7 @@ ALTER FUNCTION public.newuuid()
 **************************************************
 **************************************************
 RUN THE APP SO THAT IT CREATES THE DATABASE TABLES
+(ATOLL_DATABASE_URL  will need to be set for this)
 **************************************************
 **************************************************
 
