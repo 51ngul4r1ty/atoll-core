@@ -10,6 +10,8 @@ const dbConfig = sharedLib.getDbConfig();
 
 if (!dbConfig) {
     console.error("Unable to retrieve database configuration - set ATOLL_DATABASE_URL for local development");
+} else {
+    console.log("Database configuration retrieved successfully.");
 }
 
 const buildOptions = () /*: Options*/ => ({
@@ -81,6 +83,10 @@ const sql = `
         '${encodeFieldForSql(updatedAt)}',
         0)
 `;
+
+console.log(
+    `Executing query to create new user.  You should see a successful message below- if you don't then something has gone wrong.`
+);
 
 const result = sequelize
     .query(sql)
