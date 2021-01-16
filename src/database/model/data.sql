@@ -1,28 +1,39 @@
-/* 1. sprints */
-insert into sprint
-	(id, "projectId", name, displayindex, startdate, finishdate, "createdAt", "updatedAt", version)
+/* 1. projects */
+
+insert into project
+	(id, name, description, "createdAt", "updatedAt")
 values
-	('0a6208192fc64a46a592e82099be473a', '8220723fed61402abb8ee5170be741cb', 'Sprint 192', 0, '2019-05-30', '2019-06-12', now(), now(), 1);
-insert into sprint
-	(id, "projectId", name, displayindex, startdate, finishdate, "createdAt", "updatedAt", version)
+	('8220723fed61402abb8ee5170be741cb', 'Pixelplace.me', 'Web app for organizing and presenting large collections of photographs', '9/10/2020', '9/10/2020');
+insert into project
+	(id, name, description, "createdAt", "updatedAt")
 values
-	('6beed46d30b343d0a7ae13b2fb4df5c8', '8220723fed61402abb8ee5170be741cb', 'Sprint 193', 1, '2019-06-13', '2019-06-26', now(), now(), 1);
+	('69a9288264964568beb5dd243dc29008', 'Atoll', 'Web app for managing projects using scrum', '9/10/2020', '9/10/2020');
+
+/* 2. sprints */
+insert into sprint
+	(id, "projectId", name, startdate, finishdate, "createdAt", "updatedAt", version)
+values
+	('0a6208192fc64a46a592e82099be473a', '8220723fed61402abb8ee5170be741cb', 'Sprint 192', '2019-05-30', '2019-06-12', now(), now(), 1);
+insert into sprint
+	(id, "projectId", name, startdate, finishdate, "createdAt", "updatedAt", version)
+values
+	('6beed46d30b343d0a7ae13b2fb4df5c8', '8220723fed61402abb8ee5170be741cb', 'Sprint 193', '2019-06-13', '2019-06-26', now(), now(), 1);
 
 insert into sprint
-	(id, name, displayindex, startdate, finishdate, "createdAt", "updatedAt", version, "projectId",
+	(id, name, startdate, finishdate, "createdAt", "updatedAt", version, "projectId",
 	"plannedPoints", "acceptedPoints", "velocityPoints", "usedSplitPoints", "remainingSplitPoints")
 values
-	('dbc625b000d64975881db9b1d3e7f093', 'Sprint 33', 33, '2020-10-04 00:00:00-04', '2020-10-18 00:00:00-04', '2020-10-11 22:42:16-04', '2020-10-11 22:42:16-04', 0, '69a9288264964568beb5dd243dc29008',
+	('dbc625b000d64975881db9b1d3e7f093', 'Sprint 33', '2020-10-04 00:00:00-04', '2020-10-18 00:00:00-04', '2020-10-11 22:42:16-04', '2020-10-11 22:42:16-04', 0, '69a9288264964568beb5dd243dc29008',
 	23, 20, 22, 3, null);
 insert into sprint
-	(id, name, displayindex, startdate, finishdate, "createdAt", "updatedAt", version, "projectId",
+	(id, name, startdate, finishdate, "createdAt", "updatedAt", version, "projectId",
 	"plannedPoints", "acceptedPoints", "velocityPoints", "usedSplitPoints", "remainingSplitPoints")
 values
-	('c5010380d64649acb02dcdf07240f644', 'Sprint 34', 34, '2020-10-18 00:00:00-04', '2020-11-01 00:00:00-04', '2020-10-11 22:42:16-04', '2020-10-11 22:42:16-04', 0, '69a9288264964568beb5dd243dc29008',
+	('c5010380d64649acb02dcdf07240f644', 'Sprint 34', '2020-10-18 00:00:00-04', '2020-11-01 00:00:00-04', '2020-10-11 22:42:16-04', '2020-10-11 22:42:16-04', 0, '69a9288264964568beb5dd243dc29008',
 	2, null, 22, null, 2);
 
 
-/* 2. backlog items */
+/* 3. backlog items */
 insert into backlogitem
 	(id, "projectId", "friendlyId", "externalId", "rolePhrase", "storyPhrase", "reasonPhrase", estimate, "type", "createdAt", "updatedAt", "version")
 values
@@ -48,7 +59,7 @@ insert into backlogitem
 values
 	('920581ae222e4fa2ab24117664cda3fb', '69a9288264964568beb5dd243dc29008', 's-1', 'B1000032', null, 'Filter seems to be taking longer & longer (investigate)', null, null, 'issue', now(), now(), 1);
 
-/* 3. backlog item rank */
+/* 4. backlog item rank */
 insert into backlogitemrank
 	(id, "projectId", "backlogitemId", "nextbacklogitemId", "createdAt", "updatedAt")
 values
@@ -85,25 +96,8 @@ values
 	('2d96969bb2754832820bd68a90286c59', '69a9288264964568beb5dd243dc29008', '920581ae222e4fa2ab24117664cda3fb', null,
 		'2020-03-15 18:17:00-05', '2020-03-15 18:17:00-05');
 
-/* 4. projects */
 
-insert into project
-	(id, name, description, "createdAt", "updatedAt")
-values
-	('8220723fed61402abb8ee5170be741cb', 'Pixelplace.me', 'Web app for organizing and presenting large collections of photographs', '9/10/2020', '9/10/2020');
-insert into project
-	(id, name, description, "createdAt", "updatedAt")
-values
-	('69a9288264964568beb5dd243dc29008', 'Atoll', 'Web app for managing projects using scrum', '9/10/2020', '9/10/2020');
-
-/* 5. users */
-insert into appuser
-	("id", "name", description, "firstName", "lastName", "passwordHash", "passwordSalt", "emailAddress", status, "lockedAt", "createdAt", "updatedAt", "version")
-values
-	('217796f6e1ab455a980263171099533f', 'test', 'description', null, null, 'cc1b9980e773604c5d090f29cb927e8e0870eb81d3d883ac1990a3abac2d53ad2edfaa438c9a9577063ab12d102f2c3d66daf2b7c893894a280b3284cdabe3f9', '040c0d737c5f70519d9274e3c5c678d3', null, 'A', null, '2020-09-23 22:15:02.634-04', '2020-09-23 22:15:02.634-04', 0);
-
-
-/* 6. settings */
+/* 5. settings */
 
 -- user settings
 
@@ -121,14 +115,14 @@ values
 	 '9/15/2020', '9/15/2020', 0);
 
 
-/* 7. counters */
+/* 6. counters */
 
 insert into counter (id, entity, "entityId", "entitySubtype", "lastNumber", "lastCounterValue", "createdAt", "updatedAt")
 	values ('d498db0f55154d5fa7482b069ab8490c', 'project', '69a9288264964568beb5dd243dc29008', 'story', 2, 's-2', '9/15/2020', '9/15/2020');
 insert into counter (id, entity, "entityId", "entitySubtype", "lastNumber", "lastCounterValue", "createdAt", "updatedAt")
 	values ('3895a6379d6d4d59b04b5e96c7a8a526', 'project', '69a9288264964568beb5dd243dc29008', 'issue', 2, 'i-2', '9/15/2020', '9/15/2020');
 
-/* 8. sprint backlog items */
+/* 7. sprint backlog items */
 
 insert into sprintbacklogitem (id, "sprintId", "backlogitemId", displayindex, "createdAt", "updatedAt", version)
 	values ('b6bc48899ae141ba8a7e4b7ffd090dec', 'c5010380d64649acb02dcdf07240f644', '920581ae222e4fa2ab24117664cda3fb',
