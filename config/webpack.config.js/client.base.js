@@ -7,6 +7,14 @@ const plugins = require("./plugins");
 
 const generateSourceMap = process.env.OMIT_SOURCEMAP === "true" ? false : true;
 
+const resolve = { ...resolvers };
+resolve.fallback = resolve.fallback || {};
+resolve.fallback.dgram = false;
+resolve.fallback.fs = false;
+resolve.fallback.net = false;
+resolve.fallback.tls = false;
+resolve.fallback.child_process = false;
+
 module.exports = {
     name: "client",
     target: "web",
@@ -22,15 +30,8 @@ module.exports = {
     module: {
         rules: clientLoaders
     },
-    resolve: { ...resolvers },
+    resolve,
     plugins: [...plugins.shared, ...plugins.client],
-    node: {
-        dgram: "empty",
-        fs: "empty",
-        net: "empty",
-        tls: "empty",
-        child_process: "empty"
-    },
     optimization: {
         minimizer: [
             new TerserPlugin({
@@ -71,13 +72,13 @@ module.exports = {
                 },
                 // Use multi-process parallel running to improve the build speed
                 // Default number of concurrent runs: os.cpus().length - 1
-                parallel: true,
+                parallel: true
                 // Enable file caching
-                cache: true,
-                sourceMap: generateSourceMap
+                //                cache: true //,
+                //                sourceMap: generateSourceMap
             })
         ],
-        namedModules: true,
+        moduleIds: "named",
         noEmitOnErrors: true,
         splitChunks: {
             cacheGroups: {

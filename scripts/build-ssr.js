@@ -48,8 +48,13 @@ const generateStaticHTML = async () => {
 };
 
 const build = async () => {
+    console.log(`removing old client build folder "${paths.clientBuild}"...`);
     rimraf.sync(paths.clientBuild);
+    console.log(`old client build folder removed.`);
+
+    console.log(`removing old server build folder "${paths.serverBuild}"...`);
     rimraf.sync(paths.serverBuild);
+    console.log(`old server build folder removed.`);
 
     const includesServer = webpackConfig.length > 1;
 
@@ -92,15 +97,27 @@ const build = async () => {
             console.log(stats.toString(clientConfig.stats));
             return;
         }
-        console.error(chalk.red(stats.compilation.errors));
+        if (!stats) {
+            console.warn(`WARNING: stats is NULL`);
+        }
+        if (error && (!stats || !stats.compilation)) {
+            console.error(`UNABLE TO REPORT ERROR WITH CHALK.RED - ERROR: ${error}`);
+        }
+        if (stats && stats.compilation) {
+            console.error(chalk.red(stats.compilation.errors));
+        }
     });
 
     // wait until client and server is compiled
     try {
+        console.log("awaiting server build completion...");
         if (includesServer) {
             await serverPromise;
         }
+        console.log("server build completed.");
+        console.log("awaiting client build completion...");
         await clientPromise;
+        console.log("client build completed.");
         // TODO: See if this is required for SSR or not
         // if (includesServer) {
         //     await generateStaticHTML();
