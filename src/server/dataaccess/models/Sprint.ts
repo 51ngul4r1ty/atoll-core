@@ -35,7 +35,7 @@ SprintModel.init(
         totalPoints: DataTypes.DECIMAL(10, 2),
         archived: {
             type: DataTypes.CHAR(1),
-            allowNull: true
+            allowNull: false
         }
     },
     {
