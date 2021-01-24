@@ -3,7 +3,7 @@ import * as jwt from "jsonwebtoken";
 import * as HttpStatus from "http-status-codes";
 
 // libraries
-import { getAuthKey, timeNow } from "@atoll/shared";
+import { getAuthKey, now } from "@atoll/shared";
 import { AuthTokenContents } from "types";
 
 export default function(req, res, next) {
@@ -37,7 +37,7 @@ export default function(req, res, next) {
     } catch (ex) {
         return res.status(HttpStatus.FORBIDDEN).send("Invalid expirated date in token.");
     }
-    const nowDate = timeNow();
+    const nowDate = now();
     const stillValid = expirationDate.getTime() >= nowDate.getTime();
     if (!stillValid) {
         return res.status(HttpStatus.FORBIDDEN).send("Token has expired.");

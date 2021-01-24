@@ -15,7 +15,7 @@ import {
     storeHistoryInstance,
     getHistoryInstance,
     setAssetPortOverride,
-    timeNow
+    now
 } from "@atoll/shared";
 
 // config
@@ -170,7 +170,7 @@ let portValue = envVarToNum(process.env.PORT) || 8500;
 
 app.listen(portValue, () => {
     console.log(`Environment PORT value: ${process.env.PORT}`);
-    console.log(`[${timeNow().toISOString()}]`, chalk.blue(`App is running: http://localhost:${process.env.PORT || 8500}`));
+    console.log(`[${now().toISOString()}]`, chalk.blue(`App is running: http://localhost:${process.env.PORT || 8500}`));
 });
 
 export default app;
