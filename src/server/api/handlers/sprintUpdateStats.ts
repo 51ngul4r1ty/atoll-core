@@ -4,11 +4,11 @@ import { Request, Response } from "express";
 import { Transaction } from "sequelize";
 
 // libraries
-import { BacklogItemStatus, hasBacklogItemAtLeastBeenAccepted, mapApiStatusToBacklogItem } from "@atoll/shared";
+import { hasBacklogItemAtLeastBeenAccepted, mapApiStatusToBacklogItem } from "@atoll/shared";
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
-import { BacklogItemModel, mapApiToDbSprint, SprintBacklogItemModel, SprintModel } from "../../dataaccess";
+import { BacklogItemDataModel, mapApiToDbSprint, SprintBacklogItemDataModel, SprintDataModel } from "../../dataaccess";
 
 // utils
 import { respondWithError } from "../utils/responder";
@@ -23,9 +23,9 @@ export const sprintUpdateStatsPostHandler = async (req: Request, res: Response) 
     let transaction: Transaction;
     try {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        const sprintBacklogItems = await SprintBacklogItemModel.findAll({
+        const sprintBacklogItems = await SprintBacklogItemDataModel.findAll({
             ...options,
-            include: [BacklogItemModel],
+            include: [BacklogItemDataModel],
             order: [["displayindex", "ASC"]],
             transaction
         });
@@ -43,7 +43,7 @@ export const sprintUpdateStatsPostHandler = async (req: Request, res: Response) 
                 }
             }
         });
-        const sprint = await SprintModel.findOne({ where: { id: sprintId }, transaction });
+        const sprint = await SprintDataModel.findOne({ where: { id: sprintId }, transaction });
         const apiSprint = mapDbToApiSprint(sprint);
         const newSprint = mapApiToDbSprint(apiSprint);
         newSprint.plannedPoints = plannedPoints;

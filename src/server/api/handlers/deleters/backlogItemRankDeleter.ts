@@ -5,12 +5,12 @@ import * as HttpStatus from "http-status-codes";
 import { FindOptions, InstanceDestroyOptions, InstanceUpdateOptions, Transaction } from "sequelize";
 
 // data access
-import { BacklogItemRankModel } from "../../../dataaccess/models/BacklogItemRank";
+import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRank";
 
 export const removeFromProductBacklog = async (backlogitemId: string | null, transaction?: Transaction) => {
     try {
         const findItemOptions: FindOptions = buildOptionsWithTransaction({ where: { backlogitemId } }, transaction);
-        const item = await BacklogItemRankModel.findOne(findItemOptions);
+        const item = await BacklogItemRankDataModel.findOne(findItemOptions);
         if (!item) {
             return {
                 status: HttpStatus.NOT_FOUND,
@@ -21,13 +21,13 @@ export const removeFromProductBacklog = async (backlogitemId: string | null, tra
             { where: { nextbacklogitemId: backlogitemId } },
             transaction
         );
-        const itemBefore = await BacklogItemRankModel.findOne(findItemBeforeOptions);
+        const itemBefore = await BacklogItemRankDataModel.findOne(findItemBeforeOptions);
         const nextBacklogItemId = (item as any)?.nextbacklogitemId;
         const findItemAfterOptions: FindOptions = buildOptionsWithTransaction(
             { where: { backlogitemId: nextBacklogItemId } },
             transaction
         );
-        const itemAfter = nextBacklogItemId ? await BacklogItemRankModel.findOne(findItemAfterOptions) : null;
+        const itemAfter = nextBacklogItemId ? await BacklogItemRankDataModel.findOne(findItemAfterOptions) : null;
         if (nextBacklogItemId && !itemAfter) {
             return {
                 status: HttpStatus.INTERNAL_SERVER_ERROR,

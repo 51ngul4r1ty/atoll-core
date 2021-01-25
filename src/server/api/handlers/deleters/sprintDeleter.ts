@@ -7,12 +7,12 @@ import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
 import { mapDbToApiSprint } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 // data access
-import { SprintModel } from "../../../dataaccess/models/Sprint";
+import { SprintDataModel } from "../../../dataaccess/models/Sprint";
 
 export const deleteSprint = async (sprintId: string | null, transaction?: Transaction) => {
     try {
         const findItemOptions: FindOptions = buildOptionsWithTransaction({ where: { id: sprintId } }, transaction);
-        const item = await SprintModel.findOne(findItemOptions);
+        const item = await SprintDataModel.findOne(findItemOptions);
         if (!item) {
             return {
                 status: HttpStatus.NOT_FOUND,

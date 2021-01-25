@@ -11,7 +11,7 @@ import { buildSelfLink } from "../../../utils/linkBuilder";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 
 // data access
-import { ProjectModel } from "../../../dataaccess/models/Project";
+import { ProjectDataModel } from "../../../dataaccess/models/Project";
 
 // consts/enums
 import { PROJECT_RESOURCE_NAME } from "../../../resourceNames";
@@ -34,7 +34,7 @@ export const projectByDisplayIdFetcher = async (projectDisplayId: string): Promi
                 }
             }
         };
-        const projects = await ProjectModel.findAll(options);
+        const projects = await ProjectDataModel.findAll(options);
         const getProjectsResult = (projects) => {
             const items = projects.map((item) => {
                 const project = mapDbToApiProject(item);
@@ -62,7 +62,7 @@ export const projectByDisplayIdFetcher = async (projectDisplayId: string): Promi
 
 export const fetchProjects = async () => {
     try {
-        const projects = await ProjectModel.findAll();
+        const projects = await ProjectDataModel.findAll();
         const items = projects.map((item) => {
             const project = mapDbToApiProject(item);
             const result: ApiProject = {
@@ -87,7 +87,7 @@ export const fetchProjects = async () => {
 
 export const fetchProject = async (projectId: string) => {
     try {
-        const project = await ProjectModel.findByPk(projectId);
+        const project = await ProjectDataModel.findByPk(projectId);
         const projectItem = mapDbToApiProject(project);
         const item = { ...projectItem, links: [buildSelfLink(projectItem, `/api/v1/${PROJECT_RESOURCE_NAME}/`)] };
         return {

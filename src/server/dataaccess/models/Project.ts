@@ -4,9 +4,9 @@ import { Model, DataTypes } from "sequelize";
 // data access
 import { sequelize } from "../connection";
 
-export class ProjectModel extends Model {}
+export class ProjectDataModel extends Model {}
 
-ProjectModel.init(
+ProjectDataModel.init(
     {
         id: {
             type: DataTypes.STRING(32),

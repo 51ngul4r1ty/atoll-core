@@ -13,23 +13,23 @@ import { buildSelfLink } from "../../../utils/linkBuilder";
 import { SPRINT_BACKLOG_PARENT_RESOURCE_NAME, SPRINT_BACKLOG_CHILD_RESOURCE_NAME } from "../../../resourceNames";
 
 // data access
-import { SprintBacklogItemModel } from "../../../dataaccess/models/SprintBacklogItem";
-import { BacklogItemModel } from "../../../dataaccess/models/BacklogItem";
+import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
+import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItem";
 
 export interface FetchedSprintBacklogItems {
     status: number;
     message?: string;
     data?: {
-        items: ApiBacklogItem[]
-    }
+        items: ApiBacklogItem[];
+    };
 }
 
 export const fetchSprintBacklogItems = async (sprintId: string | null): Promise<FetchedSprintBacklogItems> => {
     try {
         const options = buildOptionsFromParams({ sprintId });
-        const sprintBacklogs = await SprintBacklogItemModel.findAll({
+        const sprintBacklogs = await SprintBacklogItemDataModel.findAll({
             ...options,
-            include: [BacklogItemModel],
+            include: [BacklogItemDataModel],
             order: [["displayindex", "ASC"]]
         });
         const items = sprintBacklogs.map((item) => {

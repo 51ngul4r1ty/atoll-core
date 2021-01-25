@@ -4,9 +4,9 @@ import { Model, DataTypes, Deferrable } from "sequelize";
 // data access
 import { sequelize } from "../connection";
 
-export class SprintModel extends Model {}
+export class SprintDataModel extends Model {}
 
-SprintModel.init(
+SprintDataModel.init(
     {
         id: {
             type: DataTypes.STRING(32),
@@ -25,8 +25,8 @@ SprintModel.init(
             }
         },
         name: DataTypes.STRING(50),
-        startdate: DataTypes.DATE,
-        finishdate: DataTypes.DATE,
+        startdate: DataTypes.DATEONLY,
+        finishdate: DataTypes.DATEONLY,
         plannedPoints: DataTypes.DECIMAL(10, 2),
         acceptedPoints: DataTypes.DECIMAL(10, 2),
         velocityPoints: DataTypes.DECIMAL(10, 2),

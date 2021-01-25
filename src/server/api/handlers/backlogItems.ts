@@ -12,15 +12,16 @@ import {
     getValidStatuses,
     isValidStatus,
     logger,
-    mapApiItemToBacklogItem
+    mapApiItemToBacklogItem,
+    formatNumber
 } from "@atoll/shared";
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
-import { BacklogItemModel } from "../../dataaccess/models/BacklogItem";
-import { BacklogItemRankModel } from "../../dataaccess/models/BacklogItemRank";
-import { CounterModel } from "../../dataaccess/models/Counter";
-import { ProjectSettingsModel } from "../../dataaccess/models/ProjectSettings";
+import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
+import { BacklogItemRankDataModel } from "../../dataaccess/models/BacklogItemRank";
+import { CounterDataModel } from "../../dataaccess/models/Counter";
+import { ProjectSettingsDataModel } from "../../dataaccess/models/ProjectSettings";
 
 // utils
 import {
@@ -71,7 +72,7 @@ export interface BacklogItemGetParams extends core.ParamsDictionary {
 export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, res: Response) => {
     try {
         const id = req.params.itemId;
-        const backlogItem = await BacklogItemModel.findByPk(id);
+        const backlogItem = await BacklogItemDataModel.findByPk(id);
         if (!backlogItem) {
             respondWithNotFound(res, `Unable to find backlogitem by primary key ${id}`);
         } else {
@@ -104,7 +105,7 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
             respondWithFailedValidation(res, "backlog item ID is required for DELETE");
         }
         let backlogItemTyped: ApiBacklogItem = null;
-        let backlogItem: BacklogItemModel = await BacklogItemModel.findByPk(id, { transaction });
+        let backlogItem: BacklogItemDataModel = await BacklogItemDataModel.findByPk(id, { transaction });
         if (!backlogItem) {
             respondWithNotFound(res, `Unable to find backlogitem by primary key ${id}`);
         } else {
@@ -112,7 +113,7 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
             abort = false;
         }
         if (!abort) {
-            const firstLink = await BacklogItemRankModel.findOne({
+            const firstLink = await BacklogItemRankDataModel.findOne({
                 where: { nextbacklogitemId: id },
                 transaction
             });
@@ -124,11 +125,11 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
                 firstLinkTyped = (firstLink as unknown) as ApiBacklogItemRank;
             }
 
-            let secondLink: BacklogItemRankModel = null;
+            let secondLink: BacklogItemRankDataModel = null;
             let secondLinkTyped: ApiBacklogItemRank = null;
 
             if (!abort) {
-                secondLink = await BacklogItemRankModel.findOne({
+                secondLink = await BacklogItemRankDataModel.findOne({
                     where: { backlogitemId: id },
                     transaction
                 });
@@ -143,12 +144,12 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
             if (!abort) {
                 if (!firstLinkTyped.backlogitemId && !secondLinkTyped.nextbacklogitemId) {
                     // we'll end up with one null-null row, just remove it instead
-                    await BacklogItemRankModel.destroy({ where: { id: firstLinkTyped.id }, transaction });
+                    await BacklogItemRankDataModel.destroy({ where: { id: firstLinkTyped.id }, transaction });
                 } else {
                     await firstLink.update({ nextbacklogitemId: secondLinkTyped.nextbacklogitemId }, { transaction });
                 }
-                await BacklogItemRankModel.destroy({ where: { id: secondLinkTyped.id }, transaction });
-                await BacklogItemModel.destroy({ where: { id: backlogItemTyped.id }, transaction });
+                await BacklogItemRankDataModel.destroy({ where: { id: secondLinkTyped.id }, transaction });
+                await BacklogItemDataModel.destroy({ where: { id: backlogItemTyped.id }, transaction });
                 committing = true;
                 await transaction.commit();
                 respondWithItem(res, backlogItemTyped);
@@ -164,18 +165,6 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
     }
 };
 
-const formatNumber = (value: number, length: number | undefined) => {
-    if (!length) {
-        return `${value}`;
-    } else {
-        let result = `${value}`;
-        while (result.length < length) {
-            result = "0" + result;
-        }
-        return result;
-    }
-};
-
 const getNewCounterValue = async (projectId: string, backlogItemType: string) => {
     let result: string;
     const entitySubtype = backlogItemType === "story" ? "story" : "issue";
@@ -184,12 +173,12 @@ const getNewCounterValue = async (projectId: string, backlogItemType: string) =>
     try {
         let rolledBack = false;
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        let projectSettingsItem: any = await ProjectSettingsModel.findOne({
+        let projectSettingsItem: any = await ProjectSettingsDataModel.findOne({
             where: { projectId: projectId },
             transaction
         });
         if (!projectSettingsItem) {
-            projectSettingsItem = await ProjectSettingsModel.findOne({
+            projectSettingsItem = await ProjectSettingsDataModel.findOne({
                 where: { projectId: null },
                 transaction
             });
@@ -199,7 +188,7 @@ const getNewCounterValue = async (projectId: string, backlogItemType: string) =>
             const counterSettings = projectSettingsItemTyped.settings.counters[entitySubtype];
             const entityNumberPrefix = counterSettings.prefix;
             const entityNumberSuffix = counterSettings.suffix;
-            const counterItem: any = await CounterModel.findOne({
+            const counterItem: any = await CounterDataModel.findOne({
                 where: { entity: "project", entityId: projectId, entitySubtype },
                 transaction
             });
@@ -244,7 +233,7 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_backlogitemId_fkey" DEFERRED;', { transaction });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
         const newItem = getUpdatedDataItemWhenStatusChanges(null, bodyWithId);
-        const addedBacklogItem = await BacklogItemModel.create(newItem, { transaction } as CreateOptions);
+        const addedBacklogItem = await BacklogItemDataModel.create(newItem, { transaction } as CreateOptions);
         if (!prevBacklogItemId) {
             await backlogItemRankFirstItemInserter(newItem, transaction);
         } else {
@@ -257,7 +246,7 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
             //   backlogitemId=NEWITEM, nextbacklogitemId=null   (ADD "NEWITEM" entry with old "new")
             // this means:
             // (1) get entry (as prevBacklogItem) with backlogItemId = prevBacklogItemId
-            const prevBacklogItems = await BacklogItemRankModel.findAll({
+            const prevBacklogItems = await BacklogItemRankDataModel.findAll({
                 where: { backlogitemId: prevBacklogItemId },
                 transaction
             });
@@ -275,7 +264,7 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
                 // (3) update existing entry with nextbacklogitemId = newItem.id
                 await prevBacklogItem.update({ nextbacklogitemId: newItem.id }, { transaction });
                 // (4) add new row with backlogitemId = newItem.id, nextbacklogitemId = oldNextItemId
-                await BacklogItemRankModel.create(
+                await BacklogItemRankDataModel.create(
                     {
                         ...addIdToBody({
                             projectId: newItem.projectId,
@@ -337,7 +326,7 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
     let transaction: Transaction;
     try {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        const backlogItem = await BacklogItemModel.findOne({
+        const backlogItem = await BacklogItemDataModel.findOne({
             where: { id: bodyItemId },
             transaction
         });
@@ -382,7 +371,7 @@ export const backlogItemPatchHandler = async (req: Request, res: Response) => {
     let transaction: Transaction;
     try {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        const backlogItem = await BacklogItemModel.findOne({
+        const backlogItem = await BacklogItemDataModel.findOne({
             where: { id: queryParamItemId },
             transaction
         });
@@ -437,10 +426,10 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
 
         // 1. Unlink source item from old location
-        const sourceItemPrevLink = await BacklogItemRankModel.findOne({
+        const sourceItemPrevLink = await BacklogItemRankDataModel.findOne({
             where: { nextbacklogitemId: sourceItemId }
         });
-        const sourceItemNextLink = await BacklogItemRankModel.findOne({
+        const sourceItemNextLink = await BacklogItemRankDataModel.findOne({
             where: { backlogitemId: sourceItemId }
         });
         const oldNextItemId = (sourceItemNextLink as any).dataValues.nextbacklogitemId;
@@ -451,7 +440,7 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
         await sourceItemPrevLink.update({ nextbacklogitemId: oldNextItemId }, { transaction });
 
         // 2. Re-link source item in new location
-        const targetItemPrevLink = await BacklogItemRankModel.findOne({
+        const targetItemPrevLink = await BacklogItemRankDataModel.findOne({
             where: { nextbacklogitemId: targetItemId }
         });
         const targetItemPrevLinkId = (targetItemPrevLink as any).dataValues.backlogitemId;
@@ -480,7 +469,7 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
 const handleResponseWithUpdatedStatsAndCommit = async (
     newDataItem: ApiBacklogItem,
     originalApiBacklogItem: ApiBacklogItem,
-    backlogItem: BacklogItemModel,
+    backlogItem: BacklogItemDataModel,
     res: Response,
     transaction: Transaction
 ): Promise<void> => {

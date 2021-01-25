@@ -5,11 +5,11 @@ import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../connection";
 
 // other models
-import { BacklogItemModel } from "./BacklogItem";
+import { BacklogItemDataModel } from "./BacklogItem";
 
-export class BacklogItemTag extends Model {}
+export class BacklogItemTagDataModel extends Model {}
 
-BacklogItemTag.init(
+BacklogItemTagDataModel.init(
     {
         id: {
             type: DataTypes.STRING(32),
@@ -27,4 +27,4 @@ BacklogItemTag.init(
     }
 );
 
-BacklogItemTag.belongsTo(BacklogItemModel);
+BacklogItemTagDataModel.belongsTo(BacklogItemDataModel);

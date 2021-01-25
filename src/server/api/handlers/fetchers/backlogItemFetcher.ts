@@ -10,8 +10,8 @@ import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 
 // data access
-import { BacklogItemModel } from "../../../dataaccess/models/BacklogItem";
-import { BacklogItemRankModel } from "../../../dataaccess/models/BacklogItemRank";
+import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItem";
+import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRank";
 
 // consts/enums
 import { BACKLOG_ITEM_RESOURCE_NAME } from "../../../resourceNames";
@@ -27,7 +27,7 @@ export interface BacklogItemsResult {
 export const backlogItemFetcher = async (projectId: string, backlogItemDisplayId: string): Promise<BacklogItemsResult> => {
     try {
         const options = buildOptionsFromParams({ projectId, externalId: backlogItemDisplayId });
-        const backlogItems = await BacklogItemModel.findAll(options);
+        const backlogItems = await BacklogItemDataModel.findAll(options);
         const getBacklogItemsResult = (backlogItems) => {
             const items = backlogItems.map((item) => {
                 const backlogItem = mapDbToApiBacklogItem(item);
@@ -48,7 +48,7 @@ export const backlogItemFetcher = async (projectId: string, backlogItemDisplayId
             return getBacklogItemsResult(backlogItems);
         } else {
             const options = buildOptionsFromParams({ projectId, friendlyId: backlogItemDisplayId });
-            const backlogItems = await BacklogItemModel.findAll(options);
+            const backlogItems = await BacklogItemDataModel.findAll(options);
             return getBacklogItemsResult(backlogItems);
         }
     } catch (error) {
@@ -62,7 +62,7 @@ export const backlogItemFetcher = async (projectId: string, backlogItemDisplayId
 export const backlogItemsFetcher = async (projectId: string | null): Promise<BacklogItemsResult> => {
     try {
         const options = buildOptionsFromParams({ projectId });
-        const backlogItemRanks = await BacklogItemRankModel.findAll(options);
+        const backlogItemRanks = await BacklogItemRankDataModel.findAll(options);
         const rankList = new LinkedList<ApiBacklogItem>();
         if (backlogItemRanks.length) {
             const backlogItemRanksMapped = backlogItemRanks.map((item) => mapDbToApiBacklogItemRank(item));
@@ -70,7 +70,7 @@ export const backlogItemsFetcher = async (projectId: string | null): Promise<Bac
                 rankList.addInitialLink(item.backlogitemId, item.nextbacklogitemId);
             });
         }
-        const backlogItems = await BacklogItemModel.findAll(options);
+        const backlogItems = await BacklogItemDataModel.findAll(options);
         backlogItems.forEach((item) => {
             const backlogItem = mapDbToApiBacklogItem(item);
             const result: ApiBacklogItem = {

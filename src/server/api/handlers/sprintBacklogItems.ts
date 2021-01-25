@@ -8,8 +8,8 @@ import { ApiSprintStats, BacklogItemStatus, logger, mapApiItemToBacklogItem } fr
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
-import { SprintBacklogItemModel } from "../../dataaccess/models/SprintBacklogItem";
-import { BacklogItemModel } from "../../dataaccess/models/BacklogItem";
+import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklogItem";
+import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
 
 // utils
 import { getParamsFromRequest } from "../utils/filterHelper";
@@ -52,7 +52,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         let displayIndex: number;
         const options = buildOptionsFromParams({ sprintId });
-        const sprintBacklogs = await SprintBacklogItemModel.findAll({
+        const sprintBacklogs = await SprintBacklogItemDataModel.findAll({
             ...options,
             order: [["displayindex", "ASC"]]
         });
@@ -67,7 +67,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
             backlogitemId,
             displayindex: displayIndex
         });
-        const addedSprintBacklog = await SprintBacklogItemModel.create(bodyWithId, { transaction } as CreateOptions);
+        const addedSprintBacklog = await SprintBacklogItemDataModel.create(bodyWithId, { transaction } as CreateOptions);
         const removeProductBacklogItemResult = await removeFromProductBacklog(backlogitemId, transaction);
         let sprintStats: ApiSprintStats;
         if (removeProductBacklogItemResult.status !== HttpStatus.OK) {
@@ -80,7 +80,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                     "when trying to remove backlog item from the product backlog"
             });
         } else {
-            const dbBacklogItem = await BacklogItemModel.findOne({ where: { id: backlogitemId }, transaction });
+            const dbBacklogItem = await BacklogItemDataModel.findOne({ where: { id: backlogitemId }, transaction });
             const apiBacklogItem = mapDbToApiBacklogItem(dbBacklogItem);
             const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItem);
             sprintStats = await handleSprintStatUpdate(
@@ -129,9 +129,9 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
     try {
         let rolledBack = false;
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        let sprintBacklogItem = await SprintBacklogItemModel.findOne({
+        let sprintBacklogItem = await SprintBacklogItemDataModel.findOne({
             where: { sprintId, backlogitemId: backlogItemId },
-            include: [BacklogItemModel],
+            include: [BacklogItemDataModel],
             transaction
         });
         if (!sprintBacklogItem) {
@@ -149,7 +149,7 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
                     `Unable to insert new backlogitemrank entries, aborting move to product backlog for item ID ${backlogItemId}`
                 );
             } else {
-                await SprintBacklogItemModel.destroy({ where: { sprintId, backlogitemId: backlogItemId }, transaction });
+                await SprintBacklogItemDataModel.destroy({ where: { sprintId, backlogitemId: backlogItemId }, transaction });
                 sprintStats = await handleSprintStatUpdate(
                     sprintId,
                     backlogItemTyped.status,

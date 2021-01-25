@@ -4,9 +4,9 @@ import { Model, DataTypes, Deferrable } from "sequelize";
 // data access
 import { sequelize } from "../connection";
 
-export class UserSettingsModel extends Model {}
+export class UserSettingsDataModel extends Model {}
 
-UserSettingsModel.init(
+UserSettingsDataModel.init(
     {
         id: {
             type: DataTypes.STRING(32),

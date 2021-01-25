@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import * as HttpStatus from "http-status-codes";
 
 // data access
-import { ProjectModel } from "../../dataaccess/models/Project";
+import { ProjectDataModel } from "../../dataaccess/models/Project";
 
 // consts/enums
 import { fetchProject, fetchProjects } from "./fetchers/projectFetcher";
@@ -53,7 +53,7 @@ export const projectPatchHandler = async (req: Request, res: Response) => {
         const options = {
             where: { id: queryParamItemId }
         };
-        const project = await ProjectModel.findOne(options);
+        const project = await ProjectDataModel.findOne(options);
         if (!project) {
             respondWithNotFound(res, `Unable to find project to patch with ID ${queryParamItemId}`);
         } else {
@@ -75,7 +75,7 @@ export const projectPatchHandler = async (req: Request, res: Response) => {
 export const projectPostHandler = async (req: Request, res) => {
     const projectDataObject = mapApiToDbProject({ ...addIdToBody(req.body) });
     try {
-        const addedProject = await ProjectModel.create(projectDataObject);
+        const addedProject = await ProjectDataModel.create(projectDataObject);
         res.status(HttpStatus.CREATED).json({
             status: HttpStatus.CREATED,
             data: {

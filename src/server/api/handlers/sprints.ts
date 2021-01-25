@@ -7,7 +7,7 @@ import { logger } from "@atoll/shared";
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
-import { SprintModel } from "../../dataaccess/models/Sprint";
+import { SprintDataModel } from "../../dataaccess/models/Sprint";
 
 // consts/enums
 import { fetchSprint, fetchSprints } from "./fetchers/sprintFetcher";
@@ -72,7 +72,7 @@ export const sprintPatchHandler = async (req: Request, res: Response) => {
         const options = {
             where: { id: queryParamItemId }
         };
-        const sprint = await SprintModel.findOne(options);
+        const sprint = await SprintDataModel.findOne(options);
         if (!sprint) {
             respondWithNotFound(res, `Unable to find sprint to patch with ID ${queryParamItemId}`);
         } else {
@@ -94,7 +94,7 @@ export const sprintPatchHandler = async (req: Request, res: Response) => {
 export const sprintPostHandler = async (req: Request, res) => {
     const sprintDataObject = mapApiToDbSprint({ ...addIdToBody(req.body) });
     try {
-        const addedSprint = await SprintModel.create(sprintDataObject);
+        const addedSprint = await SprintDataModel.create(sprintDataObject);
         res.status(HttpStatus.CREATED).json({
             status: HttpStatus.CREATED,
             data: {
@@ -126,7 +126,7 @@ export const sprintPutHandler = async (req: Request, res) => {
     let transaction: Transaction;
     try {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        const sprint = await SprintModel.findOne({
+        const sprint = await SprintDataModel.findOne({
             where: { id: bodyItemId },
             transaction
         });

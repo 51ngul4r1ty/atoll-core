@@ -4,9 +4,9 @@ import { Model, DataTypes, Deferrable } from "sequelize";
 // data access
 import { sequelize } from "../connection";
 
-export class BacklogItemModel extends Model {}
+export class BacklogItemDataModel extends Model {}
 
-BacklogItemModel.init(
+BacklogItemDataModel.init(
     {
         id: {
             type: DataTypes.STRING(32),

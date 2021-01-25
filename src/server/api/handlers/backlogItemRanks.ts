@@ -12,7 +12,7 @@ import { respondWithNotFound } from "../utils/responder";
 import { mapDbToApiBacklogItemRank } from "../../dataaccess/mappers/dataAccessToApiMappers";
 
 // data access
-import { BacklogItemRankModel } from "../../dataaccess";
+import { BacklogItemRankDataModel } from "../../dataaccess";
 
 // consts/enums
 import { BACKLOG_ITEM_RANK_RESOURCE_NAME } from "../../resourceNames";
@@ -20,7 +20,7 @@ import { BACKLOG_ITEM_RANK_RESOURCE_NAME } from "../../resourceNames";
 export const backlogItemRanksGetHandler = async (req: Request, res: Response) => {
     try {
         const items: ApiBacklogItemRank[] = [];
-        const backlogItemRanks = await BacklogItemRankModel.findAll({});
+        const backlogItemRanks = await BacklogItemRankDataModel.findAll({});
         backlogItemRanks.forEach((item) => {
             const backlogItemRank = mapDbToApiBacklogItemRank(item);
             const result: ApiBacklogItemRank = {
@@ -51,7 +51,7 @@ export interface BacklogItemGetParams extends core.ParamsDictionary {
 export const backlogItemRankGetHandler = async (req: Request<BacklogItemGetParams>, res: Response) => {
     try {
         const id = req.params.itemId;
-        const backlogItemRank = await BacklogItemRankModel.findByPk(id);
+        const backlogItemRank = await BacklogItemRankDataModel.findByPk(id);
         if (!backlogItemRank) {
             respondWithNotFound(res, `Unable to find backlogitemrank by primary key ${id}`);
         } else {

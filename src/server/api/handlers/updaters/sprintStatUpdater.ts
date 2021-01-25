@@ -12,7 +12,7 @@ import {
 } from "@atoll/shared";
 
 // data access
-import { ApiToDataAccessMapOptions, mapApiToDbSprint, SprintModel } from "../../../dataaccess";
+import { ApiToDataAccessMapOptions, mapApiToDbSprint, SprintDataModel } from "../../../dataaccess";
 
 // utils
 import { mapDbToApiSprint } from "../../../dataaccess/mappers/dataAccessToApiMappers";
@@ -76,7 +76,7 @@ export const handleSprintStatUpdate = async (
         return null;
     }
     let sprintStats: ApiSprintStats;
-    const dbSprint = await SprintModel.findOne({ where: { id: sprintId }, transaction });
+    const dbSprint = await SprintDataModel.findOne({ where: { id: sprintId }, transaction });
     const apiSprint = mapDbToApiSprint(dbSprint);
     const sprint = mapApiItemToSprint(apiSprint);
     const sprintStatus = determineSprintStatus(sprint.startDate, sprint.finishDate);

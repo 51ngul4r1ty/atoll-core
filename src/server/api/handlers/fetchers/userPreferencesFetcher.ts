@@ -5,7 +5,7 @@ import * as HttpStatus from "http-status-codes";
 import { mapDbToApiUserSettings } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 // data access
-import { UserSettingsModel } from "../../../dataaccess/models/UserSettings";
+import { UserSettingsDataModel } from "../../../dataaccess/models/UserSettings";
 
 // interfaces/types
 import { FetcherErrorResponse } from "./types";
@@ -29,7 +29,7 @@ export const userPreferencesFetcher = async (
             );
         } else {
             const appuserId = getLoggedInAppUserId();
-            let userSettingsItem: any = await UserSettingsModel.findOne({
+            let userSettingsItem: any = await UserSettingsDataModel.findOne({
                 where: { appuserId }
             });
             if (userSettingsItem) {
