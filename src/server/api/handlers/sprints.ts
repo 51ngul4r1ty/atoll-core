@@ -1,9 +1,10 @@
 // externals
 import { Request, Response } from "express";
 import * as HttpStatus from "http-status-codes";
+import { Op } from "sequelize";
 
 // libraries
-import { logger } from "@atoll/shared";
+import { ApiSprint, logger } from "@atoll/shared";
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
@@ -106,6 +107,48 @@ export const sprintPostHandler = async (req: Request, res) => {
     }
 };
 
+export const validateSprintOverlap = async (
+    newDataItem: ApiSprint,
+    transaction: Transaction,
+    date: any,
+    res: Response,
+    functionTag: string
+) => {
+    const options = {
+        where: {
+            [Op.and]: [
+                {
+                    startdate: {
+                        [Op.lte]: date
+                    }
+                },
+                {
+                    finishdate: {
+                        [Op.gte]: date
+                    }
+                },
+                {
+                    id: {
+                        [Op.ne]: newDataItem.id
+                    }
+                }
+            ]
+        },
+        transaction
+    };
+    const existingSprintOverlappingStart = await SprintDataModel.findAll(options);
+    if (existingSprintOverlappingStart.length) {
+        const firstItem = existingSprintOverlappingStart[0] as any;
+        respondWithFailedValidation(
+            res,
+            `Unable to update sprint because it overlaps an existing sprint ${firstItem.dataValues.name}`
+        );
+        logger.warn("validation failed- sprint range overlaps", [functionTag]);
+        return false;
+    }
+    return true;
+};
+
 export const sprintPutHandler = async (req: Request, res) => {
     const functionTag = "sprintPutHandler";
     const logContext = logger.info("starting call", [functionTag]);
@@ -126,6 +169,13 @@ export const sprintPutHandler = async (req: Request, res) => {
     let transaction: Transaction;
     try {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
+        if (!(await validateSprintOverlap(newDataItem as ApiSprint, transaction, newDataItem.startdate, res, functionTag))) {
+            return;
+        }
+        if (!(await validateSprintOverlap(newDataItem as ApiSprint, transaction, newDataItem.finishdate, res, functionTag))) {
+            return;
+        }
+
         const sprint = await SprintDataModel.findOne({
             where: { id: bodyItemId },
             transaction
@@ -137,7 +187,6 @@ export const sprintPutHandler = async (req: Request, res) => {
             }
             respondWithNotFound(res, `Unable to find sprint to update with ID ${req.body.id}`);
         } else {
-            const originalApiBacklogItem = mapDbToApiSprint(sprint);
             await sprint.update(newDataItem, { transaction });
             if (transaction) {
                 await transaction.commit();
