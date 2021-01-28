@@ -166,6 +166,13 @@ export const sprintPutHandler = async (req: Request, res) => {
         return;
     }
     const newDataItem = mapApiToDbSprint(req.body);
+    if (newDataItem.startdate > newDataItem.finishdate) {
+        respondWithFailedValidation(
+            res,
+            `Start date (${newDataItem.startdate}) should come before finish date (${newDataItem.finishdate})`
+        );
+        return;
+    }
     let transaction: Transaction;
     try {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
