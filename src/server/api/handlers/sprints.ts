@@ -166,6 +166,7 @@ export const sprintPutHandler = async (req: Request, res) => {
         return;
     }
     const newDataItem = mapApiToDbSprint(req.body);
+    // TODO: Make sure this same validation happens in POST and PATCH
     if (newDataItem.startdate > newDataItem.finishdate) {
         respondWithFailedValidation(
             res,
