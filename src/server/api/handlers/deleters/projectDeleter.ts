@@ -7,12 +7,12 @@ import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
 import { mapDbToApiProject } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 // data access
-import { ProjectModel } from "../../../dataaccess/models/Project";
+import { ProjectDataModel } from "../../../dataaccess/models/Project";
 
 export const deleteProject = async (projectId: string | null, transaction?: Transaction) => {
     try {
         const findItemOptions: FindOptions = buildOptionsWithTransaction({ where: { id: projectId } }, transaction);
-        const item = await ProjectModel.findOne(findItemOptions);
+        const item = await ProjectDataModel.findOne(findItemOptions);
         if (!item) {
             return {
                 status: HttpStatus.NOT_FOUND,

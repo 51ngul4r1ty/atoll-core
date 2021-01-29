@@ -14,13 +14,13 @@ import { buildSelfLink } from "../../../utils/linkBuilder";
 import { SPRINT_RESOURCE_NAME } from "../../../resourceNames";
 
 // data access
-import { SprintModel } from "../../../dataaccess/models/Sprint";
-import { SprintBacklogItemModel } from "../../../dataaccess/models/SprintBacklogItem";
+import { SprintDataModel } from "../../../dataaccess/models/Sprint";
+import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
 
 export const fetchSprints = async (projectId: string | null, archived?: string | null) => {
     try {
         const options = buildOptionsFromParams({ projectId, archived });
-        const sprints = await SprintModel.findAll(options);
+        const sprints = await SprintDataModel.findAll(options);
         const items = sprints.map((item) => {
             const sprint = mapDbToApiSprint(item);
             const result: ApiSprint = {
@@ -45,7 +45,7 @@ export const fetchSprints = async (projectId: string | null, archived?: string |
 
 export const fetchSprint = async (sprintId: string) => {
     try {
-        const sprint = await SprintModel.findByPk(sprintId);
+        const sprint = await SprintDataModel.findByPk(sprintId);
         if (!sprint) {
             return {
                 status: HttpStatus.NOT_FOUND,
@@ -75,7 +75,7 @@ export const getIdForSprintContainingBacklogItem = async (
     backlogItemId: string,
     transaction?: Transaction
 ): Promise<string | null> => {
-    const dbSprintBacklogItem = await SprintBacklogItemModel.findOne({ where: { backlogitemId: backlogItemId }, transaction });
+    const dbSprintBacklogItem = await SprintBacklogItemDataModel.findOne({ where: { backlogitemId: backlogItemId }, transaction });
     const apiSprintBacklogItem = mapDbToApiSprintBacklogItem(dbSprintBacklogItem);
     return apiSprintBacklogItem ? apiSprintBacklogItem.sprintId : null;
 };

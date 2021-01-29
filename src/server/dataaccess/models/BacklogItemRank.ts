@@ -3,11 +3,11 @@ import { Model, DataTypes, Deferrable } from "sequelize";
 
 // data access
 import { sequelize } from "../connection";
-import { BacklogItemModel } from "./BacklogItem";
+import { BacklogItemDataModel } from "./BacklogItem";
 
-export class BacklogItemRankModel extends Model {}
+export class BacklogItemRankDataModel extends Model {}
 
-BacklogItemRankModel.init(
+BacklogItemRankDataModel.init(
     {
         id: {
             type: DataTypes.STRING(32),
@@ -63,7 +63,7 @@ BacklogItemRankModel.init(
     }
 );
 
-BacklogItemRankModel.belongsTo(BacklogItemModel);
-BacklogItemRankModel.belongsTo(BacklogItemModel, {
+BacklogItemRankDataModel.belongsTo(BacklogItemDataModel);
+BacklogItemRankDataModel.belongsTo(BacklogItemDataModel, {
     as: "nextbacklogitem"
 });

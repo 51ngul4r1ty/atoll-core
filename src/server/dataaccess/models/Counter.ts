@@ -4,9 +4,9 @@ import { Model, DataTypes } from "sequelize";
 // data access
 import { sequelize } from "../connection";
 
-export class CounterModel extends Model {}
+export class CounterDataModel extends Model {}
 
-CounterModel.init(
+CounterDataModel.init(
     {
         id: {
             type: DataTypes.STRING(32),

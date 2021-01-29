@@ -1,13 +1,14 @@
 // externals
 import { Request, Response } from "express";
 import * as HttpStatus from "http-status-codes";
+import { Op } from "sequelize";
 
 // libraries
-import { logger } from "@atoll/shared";
+import { ApiSprint, logger } from "@atoll/shared";
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
-import { SprintModel } from "../../dataaccess/models/Sprint";
+import { SprintDataModel } from "../../dataaccess/models/Sprint";
 
 // consts/enums
 import { fetchSprint, fetchSprints } from "./fetchers/sprintFetcher";
@@ -72,7 +73,7 @@ export const sprintPatchHandler = async (req: Request, res: Response) => {
         const options = {
             where: { id: queryParamItemId }
         };
-        const sprint = await SprintModel.findOne(options);
+        const sprint = await SprintDataModel.findOne(options);
         if (!sprint) {
             respondWithNotFound(res, `Unable to find sprint to patch with ID ${queryParamItemId}`);
         } else {
@@ -94,7 +95,7 @@ export const sprintPatchHandler = async (req: Request, res: Response) => {
 export const sprintPostHandler = async (req: Request, res) => {
     const sprintDataObject = mapApiToDbSprint({ ...addIdToBody(req.body) });
     try {
-        const addedSprint = await SprintModel.create(sprintDataObject);
+        const addedSprint = await SprintDataModel.create(sprintDataObject);
         res.status(HttpStatus.CREATED).json({
             status: HttpStatus.CREATED,
             data: {
@@ -104,6 +105,48 @@ export const sprintPostHandler = async (req: Request, res) => {
     } catch (err) {
         respondWithError(res, err);
     }
+};
+
+export const validateSprintOverlap = async (
+    newDataItem: ApiSprint,
+    transaction: Transaction,
+    date: any,
+    res: Response,
+    functionTag: string
+) => {
+    const options = {
+        where: {
+            [Op.and]: [
+                {
+                    startdate: {
+                        [Op.lte]: date
+                    }
+                },
+                {
+                    finishdate: {
+                        [Op.gte]: date
+                    }
+                },
+                {
+                    id: {
+                        [Op.ne]: newDataItem.id
+                    }
+                }
+            ]
+        },
+        transaction
+    };
+    const existingSprintOverlappingStart = await SprintDataModel.findAll(options);
+    if (existingSprintOverlappingStart.length) {
+        const firstItem = existingSprintOverlappingStart[0] as any;
+        respondWithFailedValidation(
+            res,
+            `Unable to update sprint because it overlaps an existing sprint ${firstItem.dataValues.name}`
+        );
+        logger.warn("validation failed- sprint range overlaps", [functionTag]);
+        return false;
+    }
+    return true;
 };
 
 export const sprintPutHandler = async (req: Request, res) => {
@@ -123,10 +166,25 @@ export const sprintPutHandler = async (req: Request, res) => {
         return;
     }
     const newDataItem = mapApiToDbSprint(req.body);
+    // TODO: Make sure this same validation happens in POST and PATCH
+    if (newDataItem.startdate > newDataItem.finishdate) {
+        respondWithFailedValidation(
+            res,
+            `Start date (${newDataItem.startdate}) should come before finish date (${newDataItem.finishdate})`
+        );
+        return;
+    }
     let transaction: Transaction;
     try {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        const sprint = await SprintModel.findOne({
+        if (!(await validateSprintOverlap(newDataItem as ApiSprint, transaction, newDataItem.startdate, res, functionTag))) {
+            return;
+        }
+        if (!(await validateSprintOverlap(newDataItem as ApiSprint, transaction, newDataItem.finishdate, res, functionTag))) {
+            return;
+        }
+
+        const sprint = await SprintDataModel.findOne({
             where: { id: bodyItemId },
             transaction
         });
@@ -137,7 +195,6 @@ export const sprintPutHandler = async (req: Request, res) => {
             }
             respondWithNotFound(res, `Unable to find sprint to update with ID ${req.body.id}`);
         } else {
-            const originalApiBacklogItem = mapDbToApiSprint(sprint);
             await sprint.update(newDataItem, { transaction });
             if (transaction) {
                 await transaction.commit();

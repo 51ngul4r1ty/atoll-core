@@ -3,11 +3,11 @@ import { Model, DataTypes, Deferrable } from "sequelize";
 
 // data access
 import { sequelize } from "../connection";
-import { BacklogItemModel } from "./BacklogItem";
+import { BacklogItemDataModel } from "./BacklogItem";
 
-export class SprintBacklogItemModel extends Model {}
+export class SprintBacklogItemDataModel extends Model {}
 
-SprintBacklogItemModel.init(
+SprintBacklogItemDataModel.init(
     {
         id: {
             type: DataTypes.STRING(32),
@@ -51,5 +51,5 @@ SprintBacklogItemModel.init(
     }
 );
 
-BacklogItemModel.hasMany(SprintBacklogItemModel, { foreignKey: "backlogitemId" });
-SprintBacklogItemModel.belongsTo(BacklogItemModel, { foreignKey: "backlogitemId" });
+BacklogItemDataModel.hasMany(SprintBacklogItemDataModel, { foreignKey: "backlogitemId" });
+SprintBacklogItemDataModel.belongsTo(BacklogItemDataModel, { foreignKey: "backlogitemId" });

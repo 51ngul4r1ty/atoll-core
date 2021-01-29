@@ -1,18 +1,20 @@
 // externals
 import * as HttpStatus from "http-status-codes";
 
+// libraries
+import { ApiUserSettings } from "@atoll/shared";
+
 // utils
 import { mapDbToApiUserSettings } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 // data access
-import { UserSettingsModel } from "../../../dataaccess/models/UserSettings";
+import { UserSettingsDataModel } from "../../../dataaccess/models/UserSettings";
 
 // interfaces/types
 import { FetcherErrorResponse } from "./types";
 
 // consts/enums
 import { ResponseItemStructure, returnWithItem, returnWithNotFound, returnWithNotImplemented } from "../../utils/returner";
-import { ApiUserSettings } from "@atoll/shared";
 
 export type UserPreferencesResponse = FetcherErrorResponse | UserPreferencesSuccessResponse;
 
@@ -29,7 +31,7 @@ export const userPreferencesFetcher = async (
             );
         } else {
             const appuserId = getLoggedInAppUserId();
-            let userSettingsItem: any = await UserSettingsModel.findOne({
+            let userSettingsItem: any = await UserSettingsDataModel.findOne({
                 where: { appuserId }
             });
             if (userSettingsItem) {

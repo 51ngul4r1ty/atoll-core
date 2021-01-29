@@ -44,3 +44,8 @@ alter table backlogitem add column "acceptedAt" timestamp with time zone;
 alter table backlogitem add column "releasedAt" timestamp with time zone;
 
 alter table sprint add column "totalPoints" decimal(10, 2);
+
+alter table sprint alter column startdate type date;
+alter table sprint alter column finishdate type date;
+
+update sprint set finishdate = finishdate - interval '1' day where startdate + interval '14' day = finishdate;

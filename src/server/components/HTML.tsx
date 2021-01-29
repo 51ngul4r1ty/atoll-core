@@ -25,6 +25,7 @@ const HTML = (props: Props) => {
                 {head.link.toComponent()}
                 {head.script.toComponent()}
                 <link rel="icon" type="image/png" href={props.favIcon}></link>
+                <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
                 {props.css.filter(Boolean).map((href) => (
                     <link key={href} rel="stylesheet" href={href} />
                 ))}

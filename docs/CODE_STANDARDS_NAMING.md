@@ -64,20 +64,22 @@ NOTE: Do not assume that components belong in an upper level folder if they cont
 Data Model Naming
 =================
 
-3 Types of Data Objects
+4 Types of Data Objects
 -----------------------
 
-1. API Data Model - the exact structure received from and sent to the Restful API.
-2. Redux State Model - the structure used for the application state.
-3. Sequelize Data Model - the structure retrieved from the database.
+1. API Data Model (response) - the exact structure received from the Restful API (e.g. dates returned as ISO Date String).
+2. API Data Model (request) - the exact structure sent to the Restful API (e.g. dates are automatically converted).
+3. Redux State Model - the structure used for the application state.
+4. Sequelize Data Model - the structure retrieved from the database.
 
-| Model Type         | Name Format   | Example     |
-|--------------------|---------------|-------------|
-| API Data Model     | Api{Entity}   | ApiSprint   |
-| Reduxe State Model | {Entity}      | Sprint      |
-| Sequelize Model    | {Entity}Model | SprintModel |
+| Model Type                | Name Format       | Example         |
+|---------------------------|-------------------|-----------------|
+| API Data Model (response) | Api{Entity}       | ApiSprint       |
+| API Data Model (request)  | {Entity}Model     | SprintModel     |
+| Reduxe State Model        | {Entity}          | Sprint          |
+| Sequelize Data Model      | {Entity}DataModel | SprintDataModel |
 
-Why We Need All 3
+Why We Need All 4
 -----------------
 
 1. Most databases have something that can be a boolean, but it may not specifically be true/false.  So, in Atoll we map boolean to
@@ -86,6 +88,7 @@ Why We Need All 3
    either the API or the data model.
 3. The API data model may return data types in a way that works best for a Restful API (for example ISO Dates) so they will need to
    be converted to their equivalent types when stored in the application state.
+4. The API request gets automatically converted (e.g. date gets converted to a different type).
 
 Technically, one could work with the API Model directly for the redux state but we favor the benefits of abstraction over a little
 extra coding.
