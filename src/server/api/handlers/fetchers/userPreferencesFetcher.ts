@@ -1,6 +1,9 @@
 // externals
 import * as HttpStatus from "http-status-codes";
 
+// libraries
+import { ApiUserSettings } from "@atoll/shared";
+
 // utils
 import { mapDbToApiUserSettings } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
@@ -12,7 +15,6 @@ import { FetcherErrorResponse } from "./types";
 
 // consts/enums
 import { ResponseItemStructure, returnWithItem, returnWithNotFound, returnWithNotImplemented } from "../../utils/returner";
-import { ApiUserSettings } from "@atoll/shared";
 
 export type UserPreferencesResponse = FetcherErrorResponse | UserPreferencesSuccessResponse;
 
