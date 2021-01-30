@@ -20,6 +20,10 @@ import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBac
 export const fetchSprints = async (projectId: string | null, archived?: string | null) => {
     try {
         const options = buildOptionsFromParams({ projectId, archived });
+        options.order = [
+            ["startdate", "ASC"],
+            ["name", "ASC"]
+        ];
         const sprints = await SprintDataModel.findAll(options);
         const items = sprints.map((item) => {
             const sprint = mapDbToApiSprint(item);
