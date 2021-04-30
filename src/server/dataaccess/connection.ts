@@ -12,6 +12,9 @@ if (!dbConfig) {
 const buildOptions = (): Options => ({
     host: dbConfig.host,
     dialect: "postgres",
+    dialectOptions: {
+        ssl: true
+    },
     pool: {
         max: 10,
         min: 0,
