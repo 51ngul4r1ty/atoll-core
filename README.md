@@ -37,7 +37,7 @@ Steps after Cloning Repo
 4. `npm run build` (if this succeeds you have all dependencies correct)
 5. Use `setup.sql` to set up "atoll" database schema.
 6. Set environment variable `ATOLL_DATABASE_URL` to "postgres://atoll:l1m3atoll@localhost:5432/atoll"
-   (use `~/.zprofile` file or equivalent).
+   and `ATOLL_DATABASE_URL` to "false" (use `~/.zprofile` file or equivalent).
 7. Set environment variable `ATOLL_AUTH_KEY` to "local-dev-test-key"
    (use `~/.zprofile` file or equivalent).
 8. Restart your system to ensure that environment variables are set correctly.
