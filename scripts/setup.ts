@@ -18,7 +18,7 @@ const buildOptions = () /*: Options*/ => ({
     host: dbConfig.host,
     dialect: "postgres",
     dialectOptions: {
-        ssl: true
+        ssl: dbConfig.useSsl
     },
     pool: {
         max: 10,
