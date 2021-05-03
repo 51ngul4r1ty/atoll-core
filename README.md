@@ -37,21 +37,23 @@ Steps after Cloning Repo
 4. `npm run build` (if this succeeds you have all dependencies correct)
 5. Use `setup.sql` to set up "atoll" database schema.
 6. Set environment variable `ATOLL_DATABASE_URL` to "postgres://atoll:l1m3atoll@localhost:5432/atoll"
-   and `ATOLL_DATABASE_USE_SSL` to "false" (use `~/.zprofile` file or equivalent).
-7. Set environment variable `ATOLL_AUTH_KEY` to "local-dev-test-key"
    (use `~/.zprofile` file or equivalent).
-8. Restart your system to ensure that environment variables are set correctly.
-9. Use `npm run setup` to set to the test account (the `data.sql` script will not run correctly if this
+7. Set environment variable `ATOLL_DATABASE_USE_SSL` to "false"
+   (use `~/.zprofile` file or equivalent).
+8. Set environment variable `ATOLL_AUTH_KEY` to "local-dev-test-key"
+   (use `~/.zprofile` file or equivalent).
+9. Restart your system to ensure that environment variables are set correctly.
+10. Use `npm run setup` to set to the test account (the `data.sql` script will not run correctly if this
    step is skipped).
-10. Use `data.sql` to set up some sample data.
-11. Use VS Code to open `atoll-core-main.code-workspace` - this will ensure that you see `atoll-core`
+11. Use `data.sql` to set up some sample data.
+12. Use VS Code to open `atoll-core-main.code-workspace` - this will ensure that you see `atoll-core`
    and `atoll-shared` folders in the editor.
-12. Install all recommended extensions in VS Code.
-13. Use VS Code's debugger to launch "App" and/or "Storybook"
+13. Install all recommended extensions in VS Code.
+14. Use VS Code's debugger to launch "App" and/or "Storybook"
    - If you prefer to use npm scripts you can use `npm start` and/or `npm run storybook`
      but you won't be able to set breakpoints in the app if you use `npm start` so we
      recommend the former approach.
-14. Use `npm test` while editing code to ensure that the tests keep passing while you
+15. Use `npm test` while editing code to ensure that the tests keep passing while you
    perform TDD coding iterations.  This will cause the tests to run every time code
    changes are saved and coverage gutters will be updated automatically (use "Watch"
    in the VS Code tray area).
