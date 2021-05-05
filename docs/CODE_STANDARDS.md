@@ -1,8 +1,9 @@
 Overview
 ========
 
-This document contains everything but naming conventions, pleas refer
-to [CODE_STANDARDS_NAMING.md](CODE_STANDARDS_NAMING.md) for these details.
+This document contains everything except:
+1) naming conventions, please refer to [CODE_STANDARDS_NAMING.md](CODE_STANDARDS_NAMING.md) for these details.
+2) test code standards, please refer to [CODE_STANDARDS_TESTS.md](CODE_STANDARDS_TESTS.md) for these details.
 
 File Purpose Comments
 =====================
