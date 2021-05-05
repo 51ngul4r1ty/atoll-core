@@ -74,7 +74,7 @@
     "history": "4.10.1",
     "http-status-codes": "1.4.0",
     "i18next": "19.0.0",
-    "immer": "5.3.6",
+    "immer": "8.0.1",
     "jsonwebtoken": "8.5.1",
     "pg": "7.18.2",
     "pg-hstore": "2.3.3",
