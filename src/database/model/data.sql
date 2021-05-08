@@ -127,3 +127,6 @@ insert into counter (id, entity, "entityId", "entitySubtype", "lastNumber", "las
 insert into sprintbacklogitem (id, "sprintId", "backlogitemId", displayindex, "createdAt", "updatedAt", version)
 	values ('b6bc48899ae141ba8a7e4b7ffd090dec', 'c5010380d64649acb02dcdf07240f644', '920581ae222e4fa2ab24117664cda3fb',
 		0, '2020-10-21 00:00:00-04', '2020-10-21 00:00:00-04', 0);
+
+/* 8. backlog item parts */
+-- TODO: Finish up with this

@@ -7,6 +7,8 @@ General
 Versioning
 ----------
 
+NOTE: This has not yet been implemented and an alternative approach may be taken when it is.
+
 **Why**: to allow audit trail, tracking changes over time, etc.
 
 **How**:
@@ -105,26 +107,26 @@ and you will be able to limit tags to specific "targets" when they extend to oth
 Ranking
 =======
 
-In order to support a very flexible ranking of items and the best possible SQL performance for queries, a ranking column,
-named "displayIndex" is used (for example, the backlog is ranked this way).  This is different from the database's native
-ranking for SQL queries because the number will always be unique (no ties).
+In order to support a very flexible ranking of items a "pointer" approach was used.  This isn't typical for SQL databases and it is
+quite challenging to work with.  Essentially, each table that supports this has a "next" entry that points to the item that follows
+it in the sequence.
 
-The "displayIndex" column is a defined as `DECIMAL(18, 8)` because this is essentially an integer value with the ability
-to insert values in between.  For example, if we insert displayIndex "1000" and then displayIndex "1001" we can insert an item
-in between these two by assigning "1000.5".  To insert between "1000" and "1000.5" just use "1000.25" etc.  With 8 decimal
-places it becomes easy to continue to insert items between other items without having to "renumber" other items.
+Main Benefits
+-------------
 
-The algorithm to re-order items is as follows:
-1. If two items are swapped (for example, 932 and 1423) just update each item to use each other's displayIndex.
-2. If an item is inserted between item 1 and item 2 then assign a new displayIndex using
-   `(item 1's displayIndex 1 + item 2's displayIndex) / 2.0`.
-3. If an item is deleted don't re-assign displayIndex values, just leave the gap
-   (for example, given a sequence like 104, 105, 106, 107, 108 and deleting displayIndex 106 will
-    result in 104, 105, 107, 108)
-4. If an item is inserted above the top item, displayIndex should be `first item's displayIndex - 1` even if the
-   number is negative.
-5. If an item is inserted below the bottom item, displayIndex should be `last item's displayIndex + 1`.
-6. If multiple items are inserted between two items then space them evenly.
+1. When changing ranking of a single item at most 3 rows need to be updated:  
+1.1. Old item before it will need to point to the old item after it.
+1.2. New item before it will need to point to it.
+1.3. Item itself will need to point to the new item after it.
+
+2. Performance for massive scale is better.
+
+Challenges
+----------
+
+1. If the logic is implemented incorrectly it is possible to end up with an endless loop in the structure.
+2. Manual updates are harder.
+3. Manual query to retrieve rows is hard to write.
 
 Project Hierarchy
 =================

@@ -45,8 +45,16 @@ alter table backlogitem add column "releasedAt" timestamp with time zone;
 
 alter table sprint add column "totalPoints" decimal(10, 2);
 
--- Atoll 0.v40.0
+-- Atoll v0.40.0
 alter table sprint alter column startdate type date;
 alter table sprint alter column finishdate type date;
 
 update sprint set finishdate = finishdate - interval '1' day where startdate + interval '14' day = finishdate;
+
+-- Atoll v0.41.0
+insert into backlogitempart
+select newuuid() as "id", substring("externalId" || '-1', 1, 30) as "externalId", id as "backlogitemId", 1 as "partIndex",
+	100.00 as "percentage", estimate as "points", "startedAt", "finishedAt", status, "createdAt", "updatedAt", "version"
+from backlogitem;
+
+-- TODO: Finish up with data migration
