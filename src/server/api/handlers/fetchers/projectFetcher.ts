@@ -8,7 +8,7 @@ import { ApiProject } from "@atoll/shared";
 // utils
 import { mapDbToApiProject } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildSelfLink } from "../../../utils/linkBuilder";
-import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
+import { getMessageFromError } from "../../utils/errorUtils";
 
 // data access
 import { ProjectDataModel } from "../../../dataaccess/models/Project";
@@ -55,7 +55,7 @@ export const projectByDisplayIdFetcher = async (projectDisplayId: string): Promi
     } catch (error) {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
+            message: getMessageFromError(error)
         };
     }
 };
@@ -80,7 +80,7 @@ export const fetchProjects = async () => {
     } catch (error) {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
+            message: getMessageFromError(error)
         };
     }
 };
@@ -99,7 +99,7 @@ export const fetchProject = async (projectId: string) => {
     } catch (error) {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
+            message: getMessageFromError(error)
         };
     }
 };

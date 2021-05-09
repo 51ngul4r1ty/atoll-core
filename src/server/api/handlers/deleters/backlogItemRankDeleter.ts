@@ -7,6 +7,9 @@ import { FindOptions, InstanceDestroyOptions, InstanceUpdateOptions, Transaction
 // data access
 import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRank";
 
+// utils
+import { getMessageFromError } from "../../utils/errorUtils";
+
 export const removeFromProductBacklog = async (backlogitemId: string | null, transaction?: Transaction) => {
     try {
         const findItemOptions: FindOptions = buildOptionsWithTransaction({ where: { backlogitemId } }, transaction);
@@ -56,7 +59,7 @@ export const removeFromProductBacklog = async (backlogitemId: string | null, tra
     } catch (error) {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
+            message: getMessageFromError(error)
         };
     }
 };

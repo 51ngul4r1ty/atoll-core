@@ -57,27 +57,37 @@ export const mapDbSprintBacklogToApiBacklogItem = (item: any): ApiBacklogItemInS
     const sprintBacklogWithItems = {
         ...item.dataValues
     };
-    const backlogitem = sprintBacklogWithItems.backlogitem;
+    const backlogitempart = sprintBacklogWithItems.backlogitempart;
+    const backlogitem = backlogitempart.backlogitem;
     const result = {
         acceptanceCriteria: backlogitem.acceptanceCriteria,
         acceptedAt: backlogitem.acceptedAt,
         createdAt: backlogitem.createdAt,
         displayindex: sprintBacklogWithItems.displayindex,
-        estimate: convertDbFloatToNumber(backlogitem.estimate),
+        estimate: convertDbFloatToNumber(backlogitempart.points),
         externalId: backlogitem.externalId,
-        finishedAt: backlogitem.finishedAt,
+        finishedAt: backlogitempart.finishedAt,
         friendlyId: backlogitem.friendlyId,
         id: backlogitem.id,
         projectId: backlogitem.projectId,
         reasonPhrase: backlogitem.reasonPhrase,
         releasedAt: backlogitem.releasedAt,
         rolePhrase: backlogitem.rolePhrase,
-        startedAt: backlogitem.startedAt,
-        status: backlogitem.status,
+        startedAt: backlogitempart.startedAt,
+        status: backlogitempart.status,
         storyPhrase: backlogitem.storyPhrase,
         type: backlogitem.type,
-        updatedAt: backlogitem.updatedAt,
-        version: backlogitem.version
+        updatedAt: backlogitempart.updatedAt,
+        version: backlogitem.version,
+        // part specific fields
+        partPercentage: convertDbFloatToNumber(backlogitem.percentage),
+        // story specific fields
+        storyEstimate: convertDbFloatToNumber(backlogitem.estimate),
+        storyStartedAt: backlogitem.startedAt,
+        storyFinishedAt: backlogitem.finishedAt,
+        storyStatus: backlogitem.status,
+        storyUpdatedAt: backlogitem.updatedAt,
+        storyVersion: backlogitem.version
     };
     return result;
 };

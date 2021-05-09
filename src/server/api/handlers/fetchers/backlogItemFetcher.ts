@@ -8,6 +8,7 @@ import { ApiBacklogItem, LinkedList } from "@atoll/shared";
 import { mapDbToApiBacklogItem, mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
+import { getMessageFromError } from "../../utils/errorUtils";
 
 // data access
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItem";
@@ -54,7 +55,7 @@ export const backlogItemFetcher = async (projectId: string, backlogItemDisplayId
     } catch (error) {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
+            message: getMessageFromError(error)
         };
     }
 };
@@ -88,7 +89,7 @@ export const backlogItemsFetcher = async (projectId: string | null): Promise<Bac
     } catch (error) {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
+            message: getMessageFromError(error)
         };
     }
 };
