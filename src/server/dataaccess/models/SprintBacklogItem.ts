@@ -3,7 +3,7 @@ import { Model, DataTypes, Deferrable } from "sequelize";
 
 // data access
 import { sequelize } from "../connection";
-import { BacklogItemDataModel } from "./BacklogItem";
+import { BacklogItemPartDataModel } from "./BacklogItemPart";
 
 export class SprintBacklogItemDataModel extends Model {}
 
@@ -26,17 +26,17 @@ SprintBacklogItemDataModel.init(
                 return this.getDataValue("sprintId");
             }
         },
-        backlogitemId: {
+        backlogitempartId: {
             type: DataTypes.STRING(32),
             allowNull: false,
             primaryKey: false,
             references: {
-                model: "backlogitem",
+                model: "backlogitempart",
                 key: "id",
                 deferrable: Deferrable.INITIALLY_DEFERRED as any
             },
             get: function() {
-                return this.getDataValue("backlogitemId");
+                return this.getDataValue("backlogitempartId");
             }
         },
         displayindex: DataTypes.INTEGER
@@ -51,5 +51,5 @@ SprintBacklogItemDataModel.init(
     }
 );
 
-BacklogItemDataModel.hasMany(SprintBacklogItemDataModel, { foreignKey: "backlogitemId" });
-SprintBacklogItemDataModel.belongsTo(BacklogItemDataModel, { foreignKey: "backlogitemId" });
+BacklogItemPartDataModel.hasMany(SprintBacklogItemDataModel, { foreignKey: "backlogitempartId" });
+SprintBacklogItemDataModel.belongsTo(BacklogItemPartDataModel, { foreignKey: "backlogitempartId" });
