@@ -59,7 +59,7 @@
     "check:prereqs": "ts-node ./scripts/check-prereqs.ts"
   },
   "dependencies": {
-    "@atoll/shared": "0.41.0-alpha.3",
+    "@atoll/shared": "0.41.0-alpha.4",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.19.2",
