@@ -25,6 +25,17 @@ export const mapDbToApiBacklogItem = (item: any): ApiBacklogItem => {
     };
 };
 
+export const mapDbToApiBacklogItemPart = (item: any): ApiBacklogItemPart => {
+    if (!item) {
+        return item;
+    }
+    return {
+        ...item.dataValues,
+        points: convertDbFloatToNumber(item.dataValues.points),
+        status: item.dataValues.status || "N"
+    };
+};
+
 export const mapDbToApiBacklogItemRank = (item: any): ApiBacklogItemRank => {
     if (!item) {
         return item;
@@ -96,8 +107,12 @@ export const mapDbToApiSprintBacklogItem = (item: any): ApiSprintBacklogItem => 
     if (!item) {
         return item;
     }
-    return {
+    const sprintBacklogItem = {
         ...item.dataValues
+    };
+    return {
+        ...item.dataValues,
+        backlogitemPartId: sprintBacklogItem.backlogitempartId
     };
 };
 

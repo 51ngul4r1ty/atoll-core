@@ -25,11 +25,13 @@ import { fetchSprintBacklogItems } from "./fetchers/sprintBacklogItemFetcher";
 import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
 import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
 import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
+import { backlogItemPartFetcher } from "./fetchers/backlogItemPartFetcher";
+import { isStatusSuccess } from "../utils/httpStatusHelper";
 
 export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
     const result = await fetchSprintBacklogItems(params.sprintId);
-    if (result.status === HttpStatus.OK) {
+    if (isStatusSuccess(result.status)) {
         res.json(result);
     } else {
         res.status(result.status).json({
@@ -45,6 +47,8 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
     const logContext = logger.info("starting call", [functionTag]);
     const params = getParamsFromRequest(req);
     const backlogitemId = req.body.backlogitemId;
+    let backlogitempartId: string | null = null;
+    let allStoryPartsAllocated = false;
     const sprintId = params.sprintId;
     let transaction: Transaction;
     try {
@@ -62,35 +66,67 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
         } else {
             displayIndex = 0;
         }
-        const bodyWithId = addIdToBody({
-            sprintId,
-            backlogitemId,
-            displayindex: displayIndex
-        });
-        const addedSprintBacklog = await SprintBacklogItemDataModel.create(bodyWithId, { transaction } as CreateOptions);
-        const removeProductBacklogItemResult = await removeFromProductBacklog(backlogitemId, transaction);
-        let sprintStats: ApiSprintStats;
-        if (removeProductBacklogItemResult.status !== HttpStatus.OK) {
+        const backlogitempartsResult = await backlogItemPartFetcher(backlogitemId);
+        if (!isStatusSuccess(backlogitempartsResult.status)) {
             await transaction.rollback();
             rolledBack = true;
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-                status: HttpStatus.INTERNAL_SERVER_ERROR,
-                message:
-                    `Error ${removeProductBacklogItemResult.message} (status ${removeProductBacklogItemResult.status}) ` +
-                    "when trying to remove backlog item from the product backlog"
-            });
+            respondWithError(res, `unable to retrieve backlog item parts for backlog item ID "${backlogitemId}"`);
         } else {
-            const dbBacklogItem = await BacklogItemDataModel.findOne({ where: { id: backlogitemId }, transaction });
-            const apiBacklogItem = mapDbToApiBacklogItem(dbBacklogItem);
-            const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItem);
-            sprintStats = await handleSprintStatUpdate(
+            const allBacklogItemParts = backlogitempartsResult.data.items;
+            const allBacklogItemPartIds = allBacklogItemParts.map((item) => item.id);
+            const options = { where: { backlogitempartId: allBacklogItemPartIds } };
+            const sprintBacklogItems = await SprintBacklogItemDataModel.findAll(options);
+            const backlogItemPartsInSprints = sprintBacklogItems.map((item) => mapDbToApiSprintBacklogItem(item));
+            let backlogItemPartIdsInSprints = {};
+            backlogItemPartsInSprints.forEach((item) => {
+                backlogItemPartIdsInSprints[item.backlogitemPartId] = item;
+            });
+            const unallocatedBacklogItemParts = allBacklogItemParts.filter((item) => !backlogItemPartIdsInSprints[item.id]);
+            if (!unallocatedBacklogItemParts.length) {
+                await transaction.rollback();
+                rolledBack = true;
+                respondWithError(res, `no unallocated backlog item parts for backlog item ID "${backlogitemId}"`);
+            } else {
+                const partToUse = unallocatedBacklogItemParts[0];
+                backlogitempartId = partToUse.id;
+                allStoryPartsAllocated = unallocatedBacklogItemParts.length === 1;
+            }
+        }
+        let addedSprintBacklog: SprintBacklogItemDataModel;
+        let sprintStats: ApiSprintStats;
+        if (!rolledBack) {
+            const bodyWithId = addIdToBody({
                 sprintId,
-                BacklogItemStatus.None,
-                backlogItemTyped.status,
-                null,
-                backlogItemTyped.estimate,
-                transaction
-            );
+                backlogitempartId,
+                displayindex: displayIndex
+            });
+            addedSprintBacklog = await SprintBacklogItemDataModel.create(bodyWithId, { transaction } as CreateOptions);
+            if (allStoryPartsAllocated) {
+                const removeProductBacklogItemResult = await removeFromProductBacklog(backlogitemId, transaction);
+                if (!isStatusSuccess(removeProductBacklogItemResult.status)) {
+                    await transaction.rollback();
+                    rolledBack = true;
+                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                        status: HttpStatus.INTERNAL_SERVER_ERROR,
+                        message:
+                            `Error ${removeProductBacklogItemResult.message} (status ${removeProductBacklogItemResult.status}) ` +
+                            "when trying to remove backlog item from the product backlog"
+                    });
+                }
+            }
+            if (!rolledBack) {
+                const dbBacklogItem = await BacklogItemDataModel.findOne({ where: { id: backlogitemId }, transaction });
+                const apiBacklogItem = mapDbToApiBacklogItem(dbBacklogItem);
+                const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItem);
+                sprintStats = await handleSprintStatUpdate(
+                    sprintId,
+                    BacklogItemStatus.None,
+                    backlogItemTyped.status,
+                    null,
+                    backlogItemTyped.estimate,
+                    transaction
+                );
+            }
         }
         if (!rolledBack) {
             await transaction.commit();
@@ -141,7 +177,7 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
             const apiBacklogItemTyped = mapDbSprintBacklogToApiBacklogItem(sprintBacklogItem);
             const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItemTyped);
             const result = await backlogItemRankFirstItemInserter(apiBacklogItemTyped, transaction);
-            if (result.status !== HttpStatus.OK) {
+            if (!isStatusSuccess(result.status)) {
                 await transaction.rollback();
                 rolledBack = true;
                 respondWithError(

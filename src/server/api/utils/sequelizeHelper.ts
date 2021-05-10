@@ -1,6 +1,6 @@
 // externals
 import { Request } from "express";
-import { Transaction } from "sequelize";
+import { FindOptions, Transaction } from "sequelize";
 
 // utils
 import { getParamsFromRequest } from "./filterHelper";
@@ -23,7 +23,7 @@ export const addWhereClauseToOptions = (options: any, key: string, value: any) =
     options.where[key] = value;
 };
 
-export const buildOptionsFromParams = (params: OptionsParams) => {
+export const buildOptionsFromParams = (params: OptionsParams): FindOptions => {
     const options: any = {};
     addWhereClauseToOptions(options, "friendlyId", params.friendlyId);
     addWhereClauseToOptions(options, "externalId", params.externalId);
