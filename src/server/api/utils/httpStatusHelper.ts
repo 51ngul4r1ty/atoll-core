@@ -26,3 +26,8 @@ export const isStatusSuccess = (status: number): boolean => {
     const statusRange = getStatusRange(status);
     return statusRange === StatusRange.Success;
 };
+
+export const isStatusServerError = (status: number): boolean => {
+    const statusRange = getStatusRange(status);
+    return statusRange === StatusRange.ServerError;
+};
