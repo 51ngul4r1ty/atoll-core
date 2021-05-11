@@ -209,11 +209,12 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
             }
         }
     } catch (err) {
+        const errLogContext = logger.warn(`handling error "${err}"`, [functionTag]);
         if (transaction) {
             try {
                 await transaction.rollback();
             } catch (err) {
-                logger.warn(`roll back failed with error "${err}"`, [functionTag]);
+                logger.warn(`roll back failed with error "${err}"`, [functionTag], errLogContext);
             }
         }
         respondWithError(res, err);
