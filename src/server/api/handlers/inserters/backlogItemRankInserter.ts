@@ -4,13 +4,19 @@ import * as HttpStatus from "http-status-codes";
 
 // utils
 import { addIdToBody } from "../../utils/uuidHelper";
-import { respondWithFailedValidation } from "../../utils/responder";
 
 // data access
 import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRank";
 import { ApiBacklogItemRank } from "@atoll/shared";
 
-export const backlogItemRankFirstItemInserter = async (bodyWithId, transaction: Transaction) => {
+export interface BacklogItemRankFirstItemInserterResult {
+    status: number;
+}
+
+export const backlogItemRankFirstItemInserter = async (
+    bodyWithId,
+    transaction: Transaction
+): Promise<BacklogItemRankFirstItemInserterResult> => {
     // inserting first item means one of 2 scenarios:
     //   1) no items in database yet (add prev = null, next = this new item + add prev = new item, next = null)
     //   2) insert before first item (update item's prev to this item, add prev = null, next = this new item)

@@ -4,11 +4,12 @@ import * as HttpStatus from "http-status-codes";
 import { CreateOptions, Transaction } from "sequelize";
 
 // libraries
-import { ApiSprintStats, BacklogItemStatus, logger, mapApiItemToBacklogItem } from "@atoll/shared";
+import { ApiBacklogItemInSprint, ApiSprintStats, BacklogItemStatus, logger, mapApiItemToBacklogItem } from "@atoll/shared";
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
 import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklogItem";
+import { BacklogItemPartDataModel } from "../../dataaccess/models/BacklogItemPart";
 import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
 
 // utils
@@ -22,7 +23,7 @@ import {
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { addIdToBody } from "../utils/uuidHelper";
 import { fetchSprintBacklogItems } from "./fetchers/sprintBacklogItemFetcher";
-import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
+import { backlogItemRankFirstItemInserter, BacklogItemRankFirstItemInserterResult } from "./inserters/backlogItemRankInserter";
 import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
 import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
 import { backlogItemPartFetcher } from "./fetchers/backlogItemPartFetcher";
@@ -79,7 +80,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
             const backlogItemPartsInSprints = sprintBacklogItems.map((item) => mapDbToApiSprintBacklogItem(item));
             let backlogItemPartIdsInSprints = {};
             backlogItemPartsInSprints.forEach((item) => {
-                backlogItemPartIdsInSprints[item.backlogitemPartId] = item;
+                backlogItemPartIdsInSprints[item.backlogitempartId] = item;
             });
             const unallocatedBacklogItemParts = allBacklogItemParts.filter((item) => !backlogItemPartIdsInSprints[item.id]);
             if (!unallocatedBacklogItemParts.length) {
@@ -159,41 +160,63 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
 export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
     const functionTag = "sprintBacklogItemDeleteHandler";
     const params = getParamsFromRequest(req);
-    const backlogItemId = params.backlogItemId;
+    const backlogitemId = params.backlogItemId;
     const sprintId = params.sprintId;
     let transaction: Transaction;
     try {
         let rolledBack = false;
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        let sprintBacklogItem = await SprintBacklogItemDataModel.findOne({
-            where: { sprintId, backlogitemId: backlogItemId },
-            include: [BacklogItemDataModel],
+        const sprintBacklogItems = await SprintBacklogItemDataModel.findAll({
+            where: { sprintId },
+            include: { all: true, nested: true },
             transaction
         });
-        if (!sprintBacklogItem) {
-            respondWithNotFound(res, `Unable to find sprint backlog item in sprint "${sprintId}" with ID "${backlogItemId}"`);
+        const matchingItems = sprintBacklogItems.filter((item) => {
+            return item.backlogitempart?.backlogitemId === backlogitemId;
+        });
+        if (!matchingItems.length) {
+            respondWithNotFound(res, `Unable to find sprint backlog item in sprint "${sprintId}" with ID "${backlogitemId}"`);
         } else {
+            let result: BacklogItemRankFirstItemInserterResult;
             let sprintStats: ApiSprintStats;
-            const apiBacklogItemTyped = mapDbSprintBacklogToApiBacklogItem(sprintBacklogItem);
-            const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItemTyped);
-            const result = await backlogItemRankFirstItemInserter(apiBacklogItemTyped, transaction);
+            let apiBacklogItemTyped: ApiBacklogItemInSprint;
+            {
+                // NOTE: If multiple items match it doesn't matter for this code because all of those items will be associated with
+                //   the same story.  All we care about is adding that story back into the product backlog (if it isn't already
+                //   there).
+                const sprintBacklogItem = matchingItems[0];
+                const apiBacklogItemTyped = mapDbSprintBacklogToApiBacklogItem(sprintBacklogItem);
+                result = await backlogItemRankFirstItemInserter(apiBacklogItemTyped, transaction);
+            }
             if (!isStatusSuccess(result.status)) {
                 await transaction.rollback();
                 rolledBack = true;
                 respondWithError(
                     res,
-                    `Unable to insert new backlogitemrank entries, aborting move to product backlog for item ID ${backlogItemId}`
+                    "Unable to insert new backlogitemrank entries, aborting move to product backlog for item part ID " +
+                        `${backlogitemId}`
                 );
             } else {
-                await SprintBacklogItemDataModel.destroy({ where: { sprintId, backlogitemId: backlogItemId }, transaction });
-                sprintStats = await handleSprintStatUpdate(
-                    sprintId,
-                    backlogItemTyped.status,
-                    BacklogItemStatus.None,
-                    backlogItemTyped.estimate,
-                    null,
-                    transaction
-                );
+                // forEach doesn't work with async, so we use for ... of instead
+                for (const sprintBacklogItem of matchingItems) {
+                    if (!rolledBack) {
+                        const backlogitempartId = sprintBacklogItem.backlogitempartId;
+                        const apiBacklogItemTyped = mapDbSprintBacklogToApiBacklogItem(sprintBacklogItem);
+                        const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItemTyped);
+                        await SprintBacklogItemDataModel.destroy({
+                            where: { sprintId, backlogitempartId },
+                            transaction
+                        });
+                        sprintStats = await handleSprintStatUpdate(
+                            sprintId,
+                            backlogItemTyped.status,
+                            BacklogItemStatus.None,
+                            backlogItemTyped.estimate,
+                            null,
+                            transaction
+                        );
+                    }
+                }
             }
             if (!rolledBack) {
                 await transaction.commit();
