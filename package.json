@@ -89,7 +89,7 @@
     "redux-devtools-extension": "2.13.8",
     "redux-thunk": "2.3.0",
     "reselect": "4.0.0",
-    "sequelize": "5.21.7",
+    "sequelize": "6.6.2",
     "text-encoding-polyfill": "0.6.7",
     "url-parse": "1.4.7",
     "uuid": "7.0.2",
@@ -173,6 +173,6 @@
     "webpack-manifest-plugin": "2.2.0",
     "webpack-node-externals": "1.7.2",
     "write-file-webpack-plugin": "4.5.1",
-    "yalc": "1.0.0-pre.35"
+    "yalc": "1.0.0-pre.53"
   }
 }
