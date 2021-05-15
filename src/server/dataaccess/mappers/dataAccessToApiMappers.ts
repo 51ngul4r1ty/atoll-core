@@ -68,8 +68,8 @@ export const mapDbSprintBacklogToApiBacklogItem = (item: any): ApiBacklogItemInS
     const sprintBacklogWithItems = {
         ...item.dataValues
     };
-    const backlogitempart = sprintBacklogWithItems.backlogitempart;
-    const backlogitem = backlogitempart.backlogitem;
+    const backlogitempart = sprintBacklogWithItems.backlogitempart?.dataValues;
+    const backlogitem = backlogitempart?.backlogitem?.dataValues;
     const result = {
         acceptanceCriteria: backlogitem.acceptanceCriteria,
         acceptedAt: backlogitem.acceptedAt,
@@ -91,7 +91,7 @@ export const mapDbSprintBacklogToApiBacklogItem = (item: any): ApiBacklogItemInS
         updatedAt: backlogitempart.updatedAt,
         version: backlogitem.version,
         // part specific fields
-        partPercentage: convertDbFloatToNumber(backlogitem.percentage),
+        partPercentage: convertDbFloatToNumber(backlogitempart.percentage),
         // story specific fields
         storyEstimate: convertDbFloatToNumber(backlogitem.estimate),
         storyStartedAt: backlogitem.startedAt,

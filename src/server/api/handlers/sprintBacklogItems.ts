@@ -9,8 +9,8 @@ import { ApiBacklogItemInSprint, ApiSprintStats, BacklogItemStatus, logger, mapA
 // data access
 import { sequelize } from "../../dataaccess/connection";
 import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklogItem";
-import { BacklogItemPartDataModel } from "../../dataaccess/models/BacklogItemPart";
 import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
+import { BacklogItemRankDataModel } from "../../dataaccess/models/BacklogItemRank";
 
 // utils
 import { getParamsFromRequest } from "../utils/filterHelper";
@@ -172,11 +172,12 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
             transaction
         });
         const matchingItems = sprintBacklogItems.filter((item) => {
-            return item.backlogitempart?.backlogitemId === backlogitemId;
+            return (item as any).backlogitempart?.backlogitemId === backlogitemId;
         });
         if (!matchingItems.length) {
             respondWithNotFound(res, `Unable to find sprint backlog item in sprint "${sprintId}" with ID "${backlogitemId}"`);
         } else {
+            let success = false;
             let result: BacklogItemRankFirstItemInserterResult;
             let sprintStats: ApiSprintStats;
             let apiBacklogItemTyped: ApiBacklogItemInSprint;
@@ -186,9 +187,20 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
                 //   there).
                 const sprintBacklogItem = matchingItems[0];
                 const apiBacklogItemTyped = mapDbSprintBacklogToApiBacklogItem(sprintBacklogItem);
-                result = await backlogItemRankFirstItemInserter(apiBacklogItemTyped, transaction);
+                const productBacklogItems = await BacklogItemRankDataModel.findAll({
+                    where: { backlogitemId },
+                    include: [],
+                    transaction
+                });
+                const itemInProductBacklog = productBacklogItems.length > 0;
+                if (itemInProductBacklog) {
+                    success = true;
+                } else {
+                    result = await backlogItemRankFirstItemInserter(apiBacklogItemTyped, transaction);
+                    success = isStatusSuccess(result.status);
+                }
             }
-            if (!isStatusSuccess(result.status)) {
+            if (!success) {
                 await transaction.rollback();
                 rolledBack = true;
                 respondWithError(
@@ -200,7 +212,7 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
                 // forEach doesn't work with async, so we use for ... of instead
                 for (const sprintBacklogItem of matchingItems) {
                     if (!rolledBack) {
-                        const backlogitempartId = sprintBacklogItem.backlogitempartId;
+                        const backlogitempartId = (sprintBacklogItem as any).backlogitempartId;
                         const apiBacklogItemTyped = mapDbSprintBacklogToApiBacklogItem(sprintBacklogItem);
                         const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItemTyped);
                         await SprintBacklogItemDataModel.destroy({
