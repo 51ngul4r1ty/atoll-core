@@ -22,6 +22,7 @@ import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
 import { BacklogItemRankDataModel } from "../../dataaccess/models/BacklogItemRank";
 import { CounterDataModel } from "../../dataaccess/models/Counter";
 import { ProjectSettingsDataModel } from "../../dataaccess/models/ProjectSettings";
+import { BacklogItemPartDataModel } from "../../dataaccess/models/BacklogItemPart";
 
 // utils
 import {
@@ -243,6 +244,25 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
                 respondWithFailedValidation(res, result.message);
             }
             rolledBack = result.rolledBack;
+        }
+        if (!rolledBack) {
+            await BacklogItemPartDataModel.create(
+                {
+                    ...addIdToBody({
+                        externalId: null,
+                        backlogitemId: bodyWithId.id,
+                        partindex: 1,
+                        percentage: 100.0,
+                        points: bodyWithId.estimate,
+                        startedAt: bodyWithId.startedAt,
+                        finishedAt: bodyWithId.finishedAt,
+                        status: bodyWithId.status
+                    })
+                },
+                {
+                    transaction
+                } as CreateOptions
+            );
         }
         if (!rolledBack) {
             await transaction.commit();
