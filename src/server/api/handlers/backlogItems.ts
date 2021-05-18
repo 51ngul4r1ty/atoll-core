@@ -144,6 +144,20 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
             }
 
             if (!abort) {
+                const backlogItemParts: BacklogItemPartDataModel[] = await BacklogItemPartDataModel.findAll({
+                    where: { backlogitemId: id },
+                    transaction
+                });
+                const backlogItemPartIds = backlogItemParts.map((backlogItemPart) => backlogItemPart.id);
+                if (!backlogItemPartIds.length) {
+                    respondWithNotFound(res, `Unable to find backlogitempart entries related to backlogitem with id = ${id}`);
+                    abort = true;
+                } else {
+                    await BacklogItemPartDataModel.destroy({ where: { id: backlogItemPartIds }, transaction });
+                }
+            }
+
+            if (!abort) {
                 if (!firstLinkTyped.backlogitemId && !secondLinkTyped.nextbacklogitemId) {
                     // we'll end up with one null-null row, just remove it instead
                     await BacklogItemRankDataModel.destroy({ where: { id: firstLinkTyped.id }, transaction });
