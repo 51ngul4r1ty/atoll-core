@@ -5,7 +5,14 @@ import { Model, DataTypes, Deferrable } from "sequelize";
 import { sequelize } from "../connection";
 import { BacklogItemPartDataModel } from "./BacklogItemPart";
 
-export class SprintBacklogItemDataModel extends Model {}
+export class SprintBacklogItemDataModel extends Model {
+    id: string;
+    sprintId: string;
+    backlogitempartId: string;
+    readonly createdAt: Date;
+    readonly updatedAt: Date;
+    readonly version: number;
+}
 
 SprintBacklogItemDataModel.init(
     {

@@ -10,6 +10,7 @@ import {
     BACKLOG_ITEM_RESOURCE_NAME,
     PROJECT_RESOURCE_NAME,
     SPRINT_BACKLOG_CHILD_RESOURCE_NAME,
+    SPRINT_BACKLOG_ITEM_PART_RESOURCE_NAME,
     SPRINT_BACKLOG_PARENT_RESOURCE_NAME,
     SPRINT_RESOURCE_NAME
 } from "../resourceNames";
@@ -37,6 +38,7 @@ import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
 import { userPreferencesHandler } from "./handlers/userPreferences";
 import { loginPostHandler, refreshTokenPostHandler } from "./handlers/auth";
+import { sprintBacklogItemPartsPostHandler } from "./handlers/sprintBacklogItemParts";
 
 // utils
 import { setupRoutes, setupNoAuthRoutes } from "./utils/routerHelper";
@@ -101,6 +103,14 @@ setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_
     get: sprintBacklogItemsGetHandler,
     post: sprintBacklogItemPostHandler
 });
+
+setupRoutes(
+    router,
+    `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}/:backlogItemId/${SPRINT_BACKLOG_ITEM_PART_RESOURCE_NAME}`,
+    {
+        post: sprintBacklogItemPartsPostHandler
+    }
+);
 
 setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}/:backlogItemId`, {
     delete: sprintBacklogItemDeleteHandler

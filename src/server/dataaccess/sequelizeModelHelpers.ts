@@ -10,13 +10,16 @@ import { Model } from "sequelize";
  */
 export default function restoreSequelizeAttributesOnClass(newTarget, self: Model): void {
     Object.keys(newTarget.rawAttributes).forEach((propertyKey: keyof Model) => {
-        Object.defineProperty(self, propertyKey, {
-            get() {
-                return self.getDataValue(propertyKey);
-            },
-            set(value) {
-                self.setDataValue(propertyKey, value);
-            }
-        });
+        // NOTE: Had to check for version and not add this to prevent the "notNull Violation: *.version cannot be null" issue
+        if (`${propertyKey}` !== "version") {
+            Object.defineProperty(self, propertyKey, {
+                get() {
+                    return self.getDataValue(propertyKey);
+                },
+                set(value) {
+                    self.setDataValue(propertyKey, value);
+                }
+            });
+        }
     });
 }

@@ -19,3 +19,4 @@ bundle-stats.json
 .yalc
 yalc.lock
 debug.log
+.DS_Store
