@@ -34,7 +34,8 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res) => {
         options.include = { all: true, nested: true };
         const sprintBacklogItems = await SprintBacklogItemDataModel.findAll({
             ...options,
-            order: [["displayindex", "ASC"]]
+            order: [["displayindex", "ASC"]],
+            transaction
         });
         if (!sprintBacklogItems.length) {
             respondWithNotFound(res, `Unable to find sprint backlog item in sprint "${sprintId}" with ID "${backlogItemId}"`);
@@ -54,11 +55,21 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res) => {
             const backlogItemPart: BacklogItemPartDataModel = (sprintBacklogItem as any).backlogitempart;
             const backlogItem: BacklogItemDataModel = (backlogItemPart as any).backlogitem;
             const percentage = 20; // Apply the default rule that there's often 20% of the work remaining (unless estimate was off)
+            const allBacklogItemParts = await BacklogItemPartDataModel.findAll({
+                where: { backlogitemId: backlogItemId },
+                transaction
+            });
+            let maxPartIndex: number = 0;
+            allBacklogItemParts.forEach((item) => {
+                if (item.partindex > maxPartIndex) {
+                    maxPartIndex = item.partindex;
+                }
+            });
             const newApiBacklogItemPart: ApiBacklogItemPart = {
                 id: null,
                 externalId: null,
                 backlogitemId: backlogItemPart.backlogitemId,
-                partindex: backlogItemPart.partindex + 1, // TODO: Iterate through other parts to get actual part number
+                partindex: maxPartIndex + 1,
                 percentage,
                 points: Math.ceil(backlogItem.estimate * (percentage / 100)),
                 startedAt: null,
