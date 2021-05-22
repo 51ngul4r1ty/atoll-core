@@ -4,6 +4,10 @@ import { Model, DataTypes, Deferrable } from "sequelize";
 // data access
 import { sequelize } from "../connection";
 import { BacklogItemPartDataModel } from "./BacklogItemPart";
+import { SprintDataModel } from "./Sprint";
+
+// utils
+import restoreSequelizeAttributesOnClass from "../sequelizeModelHelpers";
 
 export class SprintBacklogItemDataModel extends Model {
     id: string;
@@ -12,6 +16,10 @@ export class SprintBacklogItemDataModel extends Model {
     readonly createdAt: Date;
     readonly updatedAt: Date;
     readonly version: number;
+    constructor(...args) {
+        super(...args);
+        restoreSequelizeAttributesOnClass(new.target, this);
+    }
 }
 
 SprintBacklogItemDataModel.init(
@@ -29,6 +37,7 @@ SprintBacklogItemDataModel.init(
                 key: "id",
                 deferrable: Deferrable.INITIALLY_DEFERRED as any
             },
+            // TODO: Remove this - it shouldn't be needed
             get: function() {
                 return this.getDataValue("sprintId");
             }
@@ -42,6 +51,7 @@ SprintBacklogItemDataModel.init(
                 key: "id",
                 deferrable: Deferrable.INITIALLY_DEFERRED as any
             },
+            // TODO: Remove this - it shouldn't be needed
             get: function() {
                 return this.getDataValue("backlogitempartId");
             }
@@ -60,3 +70,6 @@ SprintBacklogItemDataModel.init(
 
 BacklogItemPartDataModel.hasMany(SprintBacklogItemDataModel, { foreignKey: "backlogitempartId" });
 SprintBacklogItemDataModel.belongsTo(BacklogItemPartDataModel, { foreignKey: "backlogitempartId" });
+
+SprintDataModel.hasMany(SprintBacklogItemDataModel, { foreignKey: "sprintId" });
+SprintBacklogItemDataModel.belongsTo(SprintDataModel, { foreignKey: "sprintId" });

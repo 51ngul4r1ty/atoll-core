@@ -2,6 +2,7 @@
 import {
     ApiBacklogItem,
     ApiBacklogItemInSprint,
+    ApiBacklogItemPart,
     ApiBacklogItemRank,
     ApiCounter,
     ApiProject,

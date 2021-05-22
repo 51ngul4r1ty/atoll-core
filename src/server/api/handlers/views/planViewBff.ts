@@ -11,7 +11,7 @@ import { fetchSprints } from "../fetchers/sprintFetcher";
 import { userPreferencesFetcher } from "../fetchers/userPreferencesFetcher";
 import { getLoggedInAppUserId } from "../../utils/authUtils";
 import { combineMessages, combineStatuses } from "api/utils/resultAggregator";
-import { FetchedSprintBacklogItems, fetchSprintBacklogItems } from "../fetchers/sprintBacklogItemFetcher";
+import { FetchedSprintBacklogItems, fetchSprintBacklogItemsWithLinks } from "../fetchers/sprintBacklogItemFetcher";
 
 // interfaces/types
 import { FetcherErrorResponse } from "../fetchers/types";
@@ -35,7 +35,7 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
         const expandedSprints = mappedSprints.filter((item) => item.expanded);
         if (expandedSprints.length) {
             const firstExpandedSprint = expandedSprints[0];
-            sprintBacklogItemsResult = await fetchSprintBacklogItems(firstExpandedSprint.id);
+            sprintBacklogItemsResult = await fetchSprintBacklogItemsWithLinks(firstExpandedSprint.id);
             sprintBacklogItemsStatus = sprintBacklogItemsResult.status;
             sprintBacklogItemsMessage = sprintBacklogItemsResult.message;
         }

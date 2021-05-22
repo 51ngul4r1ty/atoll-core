@@ -24,7 +24,7 @@ export interface FetchedSprintBacklogItems {
     };
 }
 
-export const fetchSprintBacklogItems = async (sprintId: string | null): Promise<FetchedSprintBacklogItems> => {
+export const fetchSprintBacklogItemsWithLinks = async (sprintId: string | null): Promise<FetchedSprintBacklogItems> => {
     try {
         const options = buildOptionsFromParams({ sprintId });
         const sprintBacklogs = await SprintBacklogItemDataModel.findAll({

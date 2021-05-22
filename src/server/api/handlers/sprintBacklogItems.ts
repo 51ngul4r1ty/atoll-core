@@ -22,7 +22,7 @@ import {
     mapDbToApiSprintBacklogItem
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { addIdToBody } from "../utils/uuidHelper";
-import { fetchSprintBacklogItems } from "./fetchers/sprintBacklogItemFetcher";
+import { fetchSprintBacklogItemsWithLinks } from "./fetchers/sprintBacklogItemFetcher";
 import { backlogItemRankFirstItemInserter, BacklogItemRankFirstItemInserterResult } from "./inserters/backlogItemRankInserter";
 import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
 import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
@@ -31,7 +31,7 @@ import { isStatusSuccess } from "../utils/httpStatusHelper";
 
 export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
-    const result = await fetchSprintBacklogItems(params.sprintId);
+    const result = await fetchSprintBacklogItemsWithLinks(params.sprintId);
     if (isStatusSuccess(result.status)) {
         res.json(result);
     } else {

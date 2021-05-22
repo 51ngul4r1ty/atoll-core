@@ -1,10 +1,31 @@
 // externals
+import restoreSequelizeAttributesOnClass from "dataaccess/sequelizeModelHelpers";
 import { Model, DataTypes, Deferrable } from "sequelize";
 
 // data access
 import { sequelize } from "../connection";
 
-export class SprintDataModel extends Model {}
+export class SprintDataModel extends Model {
+    id: string;
+    projectId: string | null;
+    name: string | null;
+    startdate: Date | null;
+    finishdata: Date | null;
+    plannedPoints: number | null;
+    acceptedPoints: number | null;
+    velocityPoints: number | null;
+    usedSplitPoints: number | null;
+    remainingSplitPoints: number | null;
+    totalPoints: number | null;
+    archived: string;
+    readonly createdAt: Date;
+    readonly updatedAt: Date;
+    readonly version: number;
+    constructor(...args) {
+        super(...args);
+        restoreSequelizeAttributesOnClass(new.target, this);
+    }
+}
 
 SprintDataModel.init(
     {
