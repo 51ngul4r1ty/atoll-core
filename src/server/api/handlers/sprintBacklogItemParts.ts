@@ -20,9 +20,9 @@ import {
     addBacklogItemPart,
     addBacklogItemPartToNextSprint,
     fetchSprintBacklogItemsWithNested,
-    getBacklogItemAndSprint
+    getBacklogItemAndSprint,
+    updateBacklogItemWithPartCount
 } from "./helpers/sprintBacklogItemPartsHelper";
-import { getSimpleUuid } from "../utils/uuidHelper";
 
 export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Response) => {
     const handlerContext = start("sprintBacklogItemPartsPostHandler", res);
@@ -48,8 +48,12 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
                 addedBacklogItemPart.id,
                 sprint.startdate
             );
+            await updateBacklogItemWithPartCount(handlerContext, backlogItemId, addedBacklogItemPart.partindex);
         }
-        await commitWithCreatedResponse(handlerContext, addedBacklogItemPart);
+        await commitWithCreatedResponse(handlerContext, {
+            backlogItemPart: addedBacklogItemPart,
+            sprintBacklogItem: addedSprintBacklogItem
+        });
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);
     }

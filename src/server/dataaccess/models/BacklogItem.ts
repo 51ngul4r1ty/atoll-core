@@ -23,6 +23,7 @@ export class BacklogItemDataModel extends Model {
     public finishedAt!: Date | null;
     public acceptedAt!: Date | null;
     public releasedAt!: Date | null;
+    public totalparts!: number | null;
     readonly createdAt!: Date;
     readonly updatedAt!: Date;
     readonly version: number;
@@ -79,6 +80,10 @@ BacklogItemDataModel.init(
         },
         acceptanceCriteria: {
             type: DataTypes.TEXT,
+            allowNull: true
+        },
+        totalparts: {
+            type: DataTypes.INTEGER,
             allowNull: true
         },
         startedAt: DataTypes.DATE,

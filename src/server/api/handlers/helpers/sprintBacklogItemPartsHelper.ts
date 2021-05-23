@@ -112,3 +112,14 @@ export const addBacklogItemPartToNextSprint = async (
     });
     return addedSprintBacklogItem;
 };
+
+export const updateBacklogItemWithPartCount = async (
+    handlerContext: HandlerContext,
+    backlogItemId: string,
+    newTotalPartCount: number
+) => {
+    await BacklogItemDataModel.update(
+        { totalparts: newTotalPartCount },
+        { where: { id: backlogItemId }, transaction: handlerContext.transactionContext.transaction }
+    );
+};
