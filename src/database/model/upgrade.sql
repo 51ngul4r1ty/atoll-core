@@ -70,3 +70,6 @@ alter table sprintbacklogitem
 alter table sprintbacklogitem alter column "backlogitempartId" varchar(32) not null;
 alter table sprintbacklogitem drop constraint "sprintbacklogitem_backlogitemId_fkey";
 alter table sprintbacklogitem drop column "backlogitemId";
+
+alter table backlogitem add column "totalparts" integer;
+update backlogitem set "totalparts" = 1;
