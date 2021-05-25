@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import * as HttpStatus from "http-status-codes";
 
 // libraries
-import { ApiBacklogItem, mapApiItemsToSprints } from "@atoll/shared";
+import { mapApiItemsToSprints } from "@atoll/shared";
 
 // utils
 import { backlogItemsFetcher } from "../fetchers/backlogItemFetcher";

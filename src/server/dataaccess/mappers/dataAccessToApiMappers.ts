@@ -1,5 +1,6 @@
 // libraries
 import {
+    cloneWithoutNested,
     ApiBacklogItem,
     ApiBacklogItemInSprint,
     ApiBacklogItemPart,
@@ -19,8 +20,9 @@ export const mapDbToApiBacklogItem = (item: any): ApiBacklogItem => {
     if (!item) {
         return item;
     }
+    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
     return {
-        ...item.dataValues,
+        ...dataValueFieldsOnly,
         estimate: convertDbFloatToNumber(item.dataValues.estimate),
         status: item.dataValues.status || "N"
     };

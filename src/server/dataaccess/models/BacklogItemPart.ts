@@ -101,3 +101,4 @@ BacklogItemPartDataModel.init(
 );
 
 BacklogItemPartDataModel.belongsTo(BacklogItemDataModel);
+BacklogItemDataModel.hasMany(BacklogItemPartDataModel, { foreignKey: "backlogitemId" });

@@ -1,12 +1,13 @@
 // externals
 import * as HttpStatus from "http-status-codes";
+import { FindOptions } from "sequelize";
 
 // libraries
 import { ApiBacklogItem, LinkedList } from "@atoll/shared";
 
 // utils
 import { mapDbToApiBacklogItem, mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
-import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
+import { addIncludeAllNestedToOptions, buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 import { getMessageFromError } from "../../utils/errorUtils";
 
@@ -16,6 +17,7 @@ import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItem
 
 // consts/enums
 import { BACKLOG_ITEM_RESOURCE_NAME } from "../../../resourceNames";
+import { BacklogItemPartDataModel, SprintBacklogItemDataModel } from "dataaccess";
 
 export interface BacklogItemsResult {
     status: number;
@@ -71,8 +73,39 @@ export const backlogItemsFetcher = async (projectId: string | null): Promise<Bac
                 rankList.addInitialLink(item.backlogitemId, item.nextbacklogitemId);
             });
         }
-        const backlogItems = await BacklogItemDataModel.findAll(options);
+        const backlogItemsOptions: FindOptions = {
+            ...options,
+            include: [
+                {
+                    model: BacklogItemPartDataModel,
+                    as: "backlogitemparts",
+                    include: [
+                        {
+                            model: SprintBacklogItemDataModel,
+                            as: "sprintbacklogitems"
+                        }
+                    ]
+                }
+            ]
+        };
+        const backlogItems = await BacklogItemDataModel.findAll(backlogItemsOptions);
         backlogItems.forEach((item) => {
+            const backlogItemParts = (item as any).backlogitemparts;
+            if (backlogItemParts.length > 1) {
+                let allocatedPartCount = 0;
+                let unallocatedPartCount = 0;
+                backlogItemParts.forEach((backlogItemPart) => {
+                    const sprintBacklogItems = backlogItemPart.sprintbacklogitems;
+                    if (!sprintBacklogItems.length) {
+                        unallocatedPartCount++;
+                    } else {
+                        sprintBacklogItems.forEach((sprintBacklogItems) => {
+                            allocatedPartCount++;
+                        });
+                    }
+                });
+                console.log(`found one: unallocated ${unallocatedPartCount} + allocated ${allocatedPartCount}`);
+            }
             const backlogItem = mapDbToApiBacklogItem(item);
             const result: ApiBacklogItem = {
                 ...backlogItem,

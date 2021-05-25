@@ -35,6 +35,20 @@ export const buildOptionsFromParams = (params: OptionsParams): FindOptions => {
     return options;
 };
 
+export const addIncludeAllNestedToOptions = (options: FindOptions): FindOptions => {
+    const result = { ...options };
+    if (options.include) {
+        throw new Error(
+            `Unexpected condition: options already had include "${options.include}" - unable to add include all,nested`
+        );
+    }
+    result.include = {
+        all: true,
+        nested: true
+    };
+    return result;
+};
+
 export const buildOptions = (req: Request) => {
     const params = getParamsFromRequest(req);
     return buildOptionsFromParams({ projectId: params.projectId });
