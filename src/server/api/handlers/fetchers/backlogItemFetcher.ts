@@ -91,22 +91,17 @@ export const backlogItemsFetcher = async (projectId: string | null): Promise<Bac
         const backlogItems = await BacklogItemDataModel.findAll(backlogItemsOptions);
         backlogItems.forEach((item) => {
             const backlogItemParts = (item as any).backlogitemparts;
+            let unallocatedParts = 0;
             if (backlogItemParts.length > 1) {
-                let allocatedPartCount = 0;
-                let unallocatedPartCount = 0;
                 backlogItemParts.forEach((backlogItemPart) => {
                     const sprintBacklogItems = backlogItemPart.sprintbacklogitems;
                     if (!sprintBacklogItems.length) {
-                        unallocatedPartCount++;
-                    } else {
-                        sprintBacklogItems.forEach((sprintBacklogItems) => {
-                            allocatedPartCount++;
-                        });
+                        unallocatedParts++;
                     }
                 });
-                console.log(`found one: unallocated ${unallocatedPartCount} + allocated ${allocatedPartCount}`);
             }
             const backlogItem = mapDbToApiBacklogItem(item);
+            backlogItem.unallocatedParts = unallocatedParts;
             const result: ApiBacklogItem = {
                 ...backlogItem,
                 links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]
