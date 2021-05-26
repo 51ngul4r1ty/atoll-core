@@ -265,7 +265,7 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
                     ...addIdToBody({
                         externalId: null,
                         backlogitemId: bodyWithId.id,
-                        partindex: 1,
+                        partIndex: 1,
                         percentage: 100.0,
                         points: bodyWithId.estimate,
                         startedAt: bodyWithId.startedAt,

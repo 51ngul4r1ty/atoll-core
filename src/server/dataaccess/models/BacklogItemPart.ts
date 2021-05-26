@@ -12,7 +12,7 @@ export class BacklogItemPartDataModel extends Model {
     public id!: string;
     public externalId!: string | null;
     public backlogitemId!: string;
-    public partindex!: number | null;
+    public partIndex!: number | null;
     public percentage!: number | null;
     public points!: number | null;
     public startedAt!: Date | null;
@@ -53,7 +53,7 @@ BacklogItemPartDataModel.init(
                 return this.getDataValue("backlogitemId");
             }
         },
-        partindex: {
+        partIndex: {
             type: DataTypes.INTEGER,
             allowNull: true
         },

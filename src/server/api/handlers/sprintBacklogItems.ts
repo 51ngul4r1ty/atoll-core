@@ -1,10 +1,18 @@
 // externals
 import { Request } from "express";
 import * as HttpStatus from "http-status-codes";
-import { CreateOptions, Transaction } from "sequelize";
+import { CreateOptions, FindOptions, Transaction } from "sequelize";
 
 // libraries
-import { ApiBacklogItemInSprint, ApiSprintStats, BacklogItemStatus, logger, mapApiItemToBacklogItem } from "@atoll/shared";
+import {
+    ApiBacklogItem,
+    ApiBacklogItemInSprint,
+    ApiBacklogItemPart,
+    ApiSprintStats,
+    BacklogItemStatus,
+    logger,
+    mapApiItemToBacklogItem
+} from "@atoll/shared";
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
@@ -59,7 +67,8 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
         const options = buildOptionsFromParams({ sprintId });
         const sprintBacklogs = await SprintBacklogItemDataModel.findAll({
             ...options,
-            order: [["displayindex", "ASC"]]
+            order: [["displayindex", "ASC"]],
+            transaction
         });
         if (sprintBacklogs && sprintBacklogs.length) {
             const lastSprintBacklogItem = mapDbToApiSprintBacklogItem(sprintBacklogs[sprintBacklogs.length - 1]);
@@ -67,7 +76,9 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
         } else {
             displayIndex = 0;
         }
-        const backlogitempartsResult = await backlogItemPartFetcher(backlogitemId);
+        const backlogitempartsResult = await backlogItemPartFetcher(backlogitemId, transaction);
+        let backlogItemPartAllocated: ApiBacklogItemPart;
+        let backlogItem: ApiBacklogItem;
         if (!isStatusSuccess(backlogitempartsResult.status)) {
             await transaction.rollback();
             rolledBack = true;
@@ -75,7 +86,10 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
         } else {
             const allBacklogItemParts = backlogitempartsResult.data.items;
             const allBacklogItemPartIds = allBacklogItemParts.map((item) => item.id);
-            const options = { where: { backlogitempartId: allBacklogItemPartIds } };
+            const options: FindOptions = {
+                where: { backlogitempartId: allBacklogItemPartIds },
+                transaction
+            };
             const sprintBacklogItems = await SprintBacklogItemDataModel.findAll(options);
             const backlogItemPartsInSprints = sprintBacklogItems.map((item) => mapDbToApiSprintBacklogItem(item));
             let backlogItemPartIdsInSprints = {};
@@ -88,8 +102,11 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                 rolledBack = true;
                 respondWithError(res, `no unallocated backlog item parts for backlog item ID "${backlogitemId}"`);
             } else {
-                const partToUse = unallocatedBacklogItemParts[0];
-                backlogitempartId = partToUse.id;
+                backlogItemPartAllocated = unallocatedBacklogItemParts[0];
+                const backlogItemId = backlogItemPartAllocated.backlogitemId;
+                const dbBacklogItem = await BacklogItemDataModel.findByPk(backlogItemId, { transaction });
+                backlogItem = mapDbToApiBacklogItem(dbBacklogItem);
+                backlogitempartId = backlogItemPartAllocated.id;
                 allStoryPartsAllocated = unallocatedBacklogItemParts.length === 1;
             }
         }
@@ -136,7 +153,9 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                 data: {
                     item: addedSprintBacklog,
                     extra: {
-                        sprintStats
+                        sprintStats,
+                        backlogItemPart: backlogItemPartAllocated,
+                        backlogItem
                     }
                 }
             });

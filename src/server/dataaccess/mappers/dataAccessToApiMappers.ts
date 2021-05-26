@@ -20,14 +20,11 @@ export const mapDbToApiBacklogItem = (item: any): ApiBacklogItem => {
     if (!item) {
         return item;
     }
-    const totalParts = item.dataValues.totalparts;
     const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
-    delete dataValueFieldsOnly.totalparts;
     return {
         ...dataValueFieldsOnly,
         estimate: convertDbFloatToNumber(item.dataValues.estimate),
-        status: item.dataValues.status || "N",
-        totalParts
+        status: item.dataValues.status || "N"
     };
 };
 
@@ -98,8 +95,8 @@ export const mapDbSprintBacklogToApiBacklogItem = (item: any): ApiBacklogItemInS
         version: backlogitem.version,
         // part specific fields
         partPercentage: convertDbFloatToNumber(backlogitempart.percentage),
-        partIndex: convertDbFloatToNumber(backlogitempart.partindex),
-        totalParts: convertDbFloatToNumber(backlogitem.totalparts),
+        partIndex: convertDbFloatToNumber(backlogitempart.partIndex),
+        totalParts: convertDbFloatToNumber(backlogitem.totalParts),
         unallocatedParts: convertDbFloatToNumber(backlogitem.unallocatedParts),
         // story specific fields
         storyEstimate: convertDbFloatToNumber(backlogitem.estimate),
@@ -116,12 +113,10 @@ export const mapDbToApiSprintBacklogItem = (item: any): ApiSprintBacklogItem => 
     if (!item) {
         return item;
     }
-    const sprintBacklogItem = {
-        ...item.dataValues
-    };
+
+    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
     return {
-        ...item.dataValues,
-        backlogitemPartId: sprintBacklogItem.backlogitempartId
+        ...dataValueFieldsOnly
     };
 };
 

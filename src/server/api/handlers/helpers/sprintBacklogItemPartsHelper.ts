@@ -57,8 +57,8 @@ export const fetchBacklogItemPartsMaxPartIndex = async (backlogItemId: string, h
     });
     let maxPartIndex: number = 0;
     allBacklogItemParts.forEach((item) => {
-        if (item.partindex > maxPartIndex) {
-            maxPartIndex = item.partindex;
+        if (item.partIndex > maxPartIndex) {
+            maxPartIndex = item.partIndex;
         }
     });
     return maxPartIndex;
@@ -71,7 +71,7 @@ export const addBacklogItemPart = async (handlerContext: HandlerContext, backlog
         id: null,
         externalId: null,
         backlogitemId: backlogItem.id,
-        partindex: maxPartIndex + 1,
+        partIndex: maxPartIndex + 1,
         percentage,
         points: Math.ceil(backlogItem.estimate * (percentage / 100)),
         startedAt: null,
@@ -119,7 +119,7 @@ export const updateBacklogItemWithPartCount = async (
     newTotalPartCount: number
 ) => {
     await BacklogItemDataModel.update(
-        { totalparts: newTotalPartCount },
+        { totalParts: newTotalPartCount },
         { where: { id: backlogItemId }, transaction: handlerContext.transactionContext.transaction }
     );
 };

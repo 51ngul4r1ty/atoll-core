@@ -1,6 +1,6 @@
 // externals
 import * as HttpStatus from "http-status-codes";
-import { FindOptions } from "sequelize";
+import { FindOptions, Transaction } from "sequelize";
 
 // libraries
 import { ApiBacklogItemPart } from "@atoll/shared";
@@ -25,9 +25,12 @@ export interface BacklogItemPartsResult {
     message?: string;
 }
 
-export const backlogItemPartFetcher = async (backlogItemId: string): Promise<BacklogItemPartsResult> => {
+export const backlogItemPartFetcher = async (backlogItemId: string, transaction?: Transaction): Promise<BacklogItemPartsResult> => {
     try {
-        const options: FindOptions = { order: [["partindex", "ASC"]] };
+        const options: FindOptions = { order: [["partIndex", "ASC"]] };
+        if (transaction) {
+            options.transaction = transaction;
+        }
         addWhereClauseToOptions(options, "backlogitemId", backlogItemId);
         const backlogItemParts = await BacklogItemPartDataModel.findAll(options);
         const getBacklogItemPartsResult = (backlogItemParts) => {

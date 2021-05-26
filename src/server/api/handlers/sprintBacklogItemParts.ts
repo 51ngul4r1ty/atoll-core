@@ -48,7 +48,7 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
                 addedBacklogItemPart.id,
                 sprint.startdate
             );
-            await updateBacklogItemWithPartCount(handlerContext, backlogItemId, addedBacklogItemPart.partindex);
+            await updateBacklogItemWithPartCount(handlerContext, backlogItemId, addedBacklogItemPart.partIndex);
         }
         await commitWithCreatedResponse(handlerContext, {
             backlogItemPart: addedBacklogItemPart,
