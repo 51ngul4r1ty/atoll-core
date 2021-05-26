@@ -64,8 +64,10 @@ NOTE: Do not assume that components belong in an upper level folder if they cont
 Data Model Naming
 =================
 
-4 Types of Data Objects
------------------------
+Entities
+--------
+
+**4 Types of Data Objects**
 
 1. API Data Model (response) - the exact structure received from the Restful API (e.g. dates returned as ISO Date String).
 2. API Data Model (request) - the exact structure sent to the Restful API (e.g. dates are automatically converted).
@@ -79,8 +81,7 @@ Data Model Naming
 | Reduxe State Model        | {Entity}          | Sprint          |
 | Sequelize Data Model      | {Entity}DataModel | SprintDataModel |
 
-Why We Need All 4
------------------
+**Why We Need All 4**
 
 1. Most databases have something that can be a boolean, but it may not specifically be true/false.  So, in Atoll we map boolean to
    char(1) - "Y" or "N" values.
@@ -92,6 +93,18 @@ Why We Need All 4
 
 Technically, one could work with the API Model directly for the redux state but we favor the benefits of abstraction over a little
 extra coding.
+
+Table Naming
+------------
+
+Table names should use only lowercase letters. For example, `backlogitempart`.
+
+Field Naming
+------------
+
+Field names are camelcased but one exception is for foreign keys.  In this case the full table name is used (all lowercase) followed
+by "Id".  For example, `backlogitempartId`.
+
 
 Redux Action Naming
 ===================
