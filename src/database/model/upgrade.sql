@@ -52,24 +52,24 @@ alter table sprint alter column finishdate type date;
 update sprint set finishdate = finishdate - interval '1' day where startdate + interval '14' day = finishdate;
 
 -- Atoll v0.41.0
+/* run `npm start` to start up app and get it to add new tables, then do the steps below to upgrade old tables */
 insert into backlogitempart
 select newuuid() as "id", substring("externalId" || '-1', 1, 30) as "externalId", id as "backlogitemId", 1 as "partIndex",
 	100.00 as "percentage", estimate as "points", "startedAt", "finishedAt", status, "createdAt", "updatedAt", "version"
 from backlogitem;
-
 alter table sprintbacklogitem add column "backlogitempartId" varchar(32);
 update sprintbacklogitem set "backlogitempartId" = bip.id
 	from backlogitempart bip join sprintbacklogitem sbi on bip."backlogitemId" = sbi."backlogitemId"
-	where sprintbacklogitem."backlogitemId" = bip."backlogitemId"
+	where sprintbacklogitem."backlogitemId" = bip."backlogitemId";
 alter table sprintbacklogitem
     add constraint "sprintbacklogitem_backlogitempartId_fkey" foreign key ("backlogitempartId")
     references backlogitempart (id) match simple
     on update cascade
 	on delete cascade
 	deferrable initially deferred;
-alter table sprintbacklogitem alter column "backlogitempartId" varchar(32) not null;
+alter table sprintbacklogitem alter column "backlogitempartId" type varchar(32) not null;
+alter table sprintbacklogitem alter column "backlogitempartId" set not null;
 alter table sprintbacklogitem drop constraint "sprintbacklogitem_backlogitemId_fkey";
 alter table sprintbacklogitem drop column "backlogitemId";
-
 alter table backlogitem add column "totalParts" integer;
 update backlogitem set "totalParts" = 1;
