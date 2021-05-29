@@ -47,21 +47,51 @@ export const beginSerializableTransaction = async (handlerContext: HandlerContex
     };
 };
 
-export const commitWithCreatedResponse = async (handlerContext: HandlerContext, addedItem) => {
+export const commitWithResponseAndStatusIfNotAborted = async (
+    handlerContext: HandlerContext,
+    status: number,
+    addedItem,
+    extra?
+) => {
     if (!hasRolledBack(handlerContext)) {
         await handlerContext.transactionContext.transaction.commit();
-        handlerContext.expressContext.res.status(HttpStatus.CREATED).json({
-            status: HttpStatus.CREATED,
-            data: {
+        if (!hasAborted(handlerContext)) {
+            const data: any = {
                 item: addedItem
+            };
+            if (extra) {
+                data.extra = extra;
             }
-        });
+            handlerContext.expressContext.res.status(status).json({
+                status,
+                data
+            });
+        }
     }
+};
+
+export const commitWithOkResponseIfNotAborted = async (handlerContext: HandlerContext, addedItem, extra?) => {
+    await commitWithResponseAndStatusIfNotAborted(handlerContext, HttpStatus.OK, addedItem, extra);
+};
+
+export const commitWithCreatedResponseIfNotAborted = async (handlerContext: HandlerContext, addedItem, extra?) => {
+    await commitWithResponseAndStatusIfNotAborted(handlerContext, HttpStatus.CREATED, addedItem, extra);
+};
+
+export const abortSilently = (handlerContext: HandlerContext) => {
+    handlerContext.transactionContext.aborted = true;
 };
 
 export const abortWithNotFoundResponse = (handlerContext: HandlerContext, message: string) => {
     respondWithNotFound(handlerContext.expressContext.res, message);
     handlerContext.transactionContext.aborted = true;
+};
+
+export const rollbackWithErrorResponse = async (handlerContext: HandlerContext, message: string) => {
+    respondWithError(handlerContext.expressContext.res, message);
+    await handlerContext.transactionContext.transaction.rollback();
+    handlerContext.transactionContext.aborted = true;
+    handlerContext.transactionContext.rolledBack = true;
 };
 
 export const handleUnexpectedErrorResponse = async (handlerContext: HandlerContext, err) => {

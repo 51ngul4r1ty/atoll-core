@@ -7,9 +7,10 @@ import { ApiBacklogItem, LinkedList } from "@atoll/shared";
 
 // utils
 import { mapDbToApiBacklogItem, mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
-import { addIncludeAllNestedToOptions, buildOptionsFromParams } from "../../utils/sequelizeHelper";
+import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 import { getMessageFromError } from "../../utils/errorUtils";
+import { buildFindOptionsIncludeForNested, computeUnallocatedParts } from "../helpers/backlogItemHelper";
 
 // data access
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItem";
@@ -17,7 +18,6 @@ import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItem
 
 // consts/enums
 import { BACKLOG_ITEM_RESOURCE_NAME } from "../../../resourceNames";
-import { BacklogItemPartDataModel, SprintBacklogItemDataModel } from "dataaccess";
 
 export interface BacklogItemsResult {
     status: number;
@@ -75,33 +75,12 @@ export const backlogItemsFetcher = async (projectId: string | null): Promise<Bac
         }
         const backlogItemsOptions: FindOptions = {
             ...options,
-            include: [
-                {
-                    model: BacklogItemPartDataModel,
-                    as: "backlogitemparts",
-                    include: [
-                        {
-                            model: SprintBacklogItemDataModel,
-                            as: "sprintbacklogitems"
-                        }
-                    ]
-                }
-            ]
+            include: buildFindOptionsIncludeForNested()
         };
         const backlogItems = await BacklogItemDataModel.findAll(backlogItemsOptions);
         backlogItems.forEach((item) => {
-            const backlogItemParts = (item as any).backlogitemparts;
-            let unallocatedParts = 0;
-            if (backlogItemParts.length > 1) {
-                backlogItemParts.forEach((backlogItemPart) => {
-                    const sprintBacklogItems = backlogItemPart.sprintbacklogitems;
-                    if (!sprintBacklogItems.length) {
-                        unallocatedParts++;
-                    }
-                });
-            }
             const backlogItem = mapDbToApiBacklogItem(item);
-            backlogItem.unallocatedParts = unallocatedParts;
+            backlogItem.unallocatedParts = computeUnallocatedParts((item as any).backlogitemparts);
             const result: ApiBacklogItem = {
                 ...backlogItem,
                 links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]

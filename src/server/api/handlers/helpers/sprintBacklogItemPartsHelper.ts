@@ -19,12 +19,11 @@ import { SprintDataModel } from "../../../dataaccess/models/Sprint";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { mapApiToDbBacklogItemPart } from "../../../dataaccess/mappers/apiToDataAccessMappers";
 import { addIdToBody, getSimpleUuid } from "../../utils/uuidHelper";
-import { mapDbToApiBacklogItem, mapDbToApiSprint } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 // interfaces/types
 import { HandlerContext } from "../utils/handlerContext";
 
-export const fetchSprintBacklogItemsWithNested = async (sprintId: string, handlerContext: HandlerContext) => {
+export const fetchSprintBacklogItemsWithNested = async (handlerContext: HandlerContext, sprintId: string) => {
     const options: FindOptions = { ...buildOptionsFromParams({ sprintId }), include: { all: true, nested: true } };
     const sprintBacklogItems = await SprintBacklogItemDataModel.findAll({
         ...options,
