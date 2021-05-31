@@ -34,6 +34,7 @@ export const mapDbToApiBacklogItemPart = (item: any): ApiBacklogItemPart => {
     }
     return {
         ...item.dataValues,
+        percentage: convertDbFloatToNumber(item.dataValues.percentage),
         points: convertDbFloatToNumber(item.dataValues.points),
         status: item.dataValues.status || "N"
     };
@@ -98,6 +99,7 @@ export const mapDbSprintBacklogToApiBacklogItem = (item: any): ApiBacklogItemInS
         partIndex: convertDbFloatToNumber(backlogitempart.partIndex),
         totalParts: convertDbFloatToNumber(backlogitem.totalParts),
         unallocatedParts: convertDbFloatToNumber(backlogitem.unallocatedParts),
+        backlogItemPartId: backlogitempart.id,
         // story specific fields
         storyEstimate: convertDbFloatToNumber(backlogitem.estimate),
         storyStartedAt: backlogitem.startedAt,

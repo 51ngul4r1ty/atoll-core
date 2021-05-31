@@ -38,13 +38,11 @@ import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
 import { backlogItemPartFetcher } from "./fetchers/backlogItemPartFetcher";
 import { isStatusSuccess } from "../utils/httpStatusHelper";
 import {
-    abortSilently,
     abortWithNotFoundResponse,
     beginSerializableTransaction,
     commitWithOkResponseIfNotAborted,
     handleUnexpectedErrorResponse,
     hasAborted,
-    hasRolledBack,
     rollbackWithErrorResponse,
     start
 } from "./utils/handlerContext";

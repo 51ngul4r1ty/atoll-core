@@ -2,7 +2,7 @@
 import * as HttpStatus from "http-status-codes";
 
 // libraries
-import { ApiBacklogItem } from "@atoll/shared";
+import { ApiBacklogItem, ApiBacklogItemInSprint } from "@atoll/shared";
 
 // utils
 import { mapDbSprintBacklogToApiBacklogItem } from "../../../dataaccess/mappers/dataAccessToApiMappers";
@@ -20,7 +20,7 @@ export interface FetchedSprintBacklogItems {
     status: number;
     message?: string;
     data?: {
-        items: ApiBacklogItem[];
+        items: ApiBacklogItemInSprint[];
     };
 }
 
