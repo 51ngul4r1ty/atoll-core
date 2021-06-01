@@ -84,7 +84,7 @@ export const addBacklogItemPart = async (handlerContext: HandlerContext, backlog
     return addedBacklogItemPart;
 };
 
-export const fetchNextSprintId = async (handlerContext: HandlerContext, currentSprintStartDate: Date): Promise<string> => {
+export const fetchNextSprint = async (handlerContext: HandlerContext, currentSprintStartDate: Date): Promise<SprintDataModel> => {
     const sprintBacklogItems = await SprintDataModel.findAll({
         where: {
             startdate: { [Op.gt]: currentSprintStartDate }
@@ -92,15 +92,21 @@ export const fetchNextSprintId = async (handlerContext: HandlerContext, currentS
         order: [["startdate", "ASC"]],
         transaction: handlerContext.transactionContext.transaction
     });
-    return sprintBacklogItems[0].id;
+    return sprintBacklogItems[0];
 };
+
+export interface AddBacklogItemPartToNextSprintResult {
+    sprintBacklogItem: SprintBacklogItemDataModel;
+    nextSprint: SprintDataModel;
+}
 
 export const addBacklogItemPartToNextSprint = async (
     handlerContext: HandlerContext,
     backlogitempartId: string,
     currentSprintStartDate: Date
-) => {
-    const nextSprintId = await fetchNextSprintId(handlerContext, currentSprintStartDate);
+): Promise<AddBacklogItemPartToNextSprintResult> => {
+    const nextSprint = await fetchNextSprint(handlerContext, currentSprintStartDate);
+    const nextSprintId = nextSprint.id;
     const newSprintBacklogItem = {
         id: getSimpleUuid(),
         sprintId: nextSprintId,
@@ -109,7 +115,10 @@ export const addBacklogItemPartToNextSprint = async (
     const addedSprintBacklogItem = await SprintBacklogItemDataModel.create(newSprintBacklogItem, {
         transaction: handlerContext.transactionContext.transaction
     });
-    return addedSprintBacklogItem;
+    return {
+        sprintBacklogItem: addedSprintBacklogItem,
+        nextSprint
+    };
 };
 
 export const updateBacklogItemWithPartCount = async (

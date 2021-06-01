@@ -9,9 +9,11 @@ import {
     ApiBacklogItemInSprint,
     ApiBacklogItemPart,
     ApiSprintStats,
+    BacklogItemPart,
     BacklogItemStatus,
     logger,
-    mapApiItemToBacklogItem
+    mapApiItemToBacklogItem,
+    mapApiItemToBacklogItemPart
 } from "@atoll/shared";
 
 // data access
@@ -28,6 +30,7 @@ import { respondWithError, respondWithNotFound } from "../utils/responder";
 import {
     mapDbSprintBacklogToApiBacklogItem,
     mapDbToApiBacklogItem,
+    mapDbToApiBacklogItemPart,
     mapDbToApiSprintBacklogItem
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { addIdToBody } from "../utils/uuidHelper";
@@ -93,7 +96,8 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
             displayIndex = 0;
         }
         const backlogitempartsResult = await backlogItemPartFetcher(backlogitemId, transaction);
-        let backlogItemPartAllocated: ApiBacklogItemPart;
+        let backlogItemPartAllocated: BacklogItemPart;
+        let apiBacklogItemPartAllocated: ApiBacklogItemPart;
         let backlogItem: ApiBacklogItem;
         if (!isStatusSuccess(backlogitempartsResult.status)) {
             await transaction.rollback();
@@ -118,7 +122,9 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                 rolledBack = true;
                 respondWithError(res, `no unallocated backlog item parts for backlog item ID "${backlogitemId}"`);
             } else {
-                backlogItemPartAllocated = unallocatedBacklogItemParts[0];
+                apiBacklogItemPartAllocated = unallocatedBacklogItemParts[0];
+                backlogItemPartAllocated = mapApiItemToBacklogItemPart(apiBacklogItemPartAllocated);
+
                 const backlogItemId = backlogItemPartAllocated.backlogitemId;
                 const dbBacklogItem = await BacklogItemDataModel.findByPk(backlogItemId, { transaction });
                 backlogItem = mapDbToApiBacklogItem(dbBacklogItem);
@@ -149,15 +155,15 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                 }
             }
             if (!rolledBack) {
-                const dbBacklogItem = await BacklogItemDataModel.findOne({ where: { id: backlogitemId }, transaction });
-                const apiBacklogItem = mapDbToApiBacklogItem(dbBacklogItem);
-                const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItem);
+                // const dbBacklogItem = await BacklogItemDataModel.findOne({ where: { id: backlogitemId }, transaction });
+                // const apiBacklogItem = mapDbToApiBacklogItem(dbBacklogItem);
+                // const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItem);
                 sprintStats = await handleSprintStatUpdate(
                     sprintId,
                     BacklogItemStatus.None,
-                    backlogItemTyped.status,
+                    backlogItemPartAllocated.status,
                     null,
-                    backlogItemTyped.estimate,
+                    backlogItemPartAllocated.points,
                     transaction
                 );
             }
@@ -170,7 +176,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                     item: addedSprintBacklog,
                     extra: {
                         sprintStats,
-                        backlogItemPart: backlogItemPartAllocated,
+                        backlogItemPart: apiBacklogItemPartAllocated,
                         backlogItem
                     }
                 }

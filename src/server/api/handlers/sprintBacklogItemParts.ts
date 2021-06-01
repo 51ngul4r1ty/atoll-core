@@ -2,11 +2,19 @@
 import { Request, Response } from "express";
 
 // libraries
-import { ApiBacklogItem, ApiBacklogItemPart, ApiSprintBacklogItem } from "@atoll/shared";
+import {
+    ApiBacklogItem,
+    ApiBacklogItemPart,
+    ApiSprintBacklogItem,
+    ApiSprintStats,
+    BacklogItemStatus,
+    determineSprintStatus,
+    mapApiItemToSprint,
+    mapApiStatusToBacklogItem
+} from "@atoll/shared";
 
 // data access
-import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklogItem";
-import { BacklogItemPartDataModel } from "../../dataaccess/models/BacklogItemPart";
+import { SprintDataModel } from "../../dataaccess/models/Sprint";
 
 // utils
 import { getParamsFromRequest } from "../utils/filterHelper";
@@ -29,8 +37,10 @@ import {
 import {
     mapDbToApiBacklogItem,
     mapDbToApiBacklogItemPart,
+    mapDbToApiSprint,
     mapDbToApiSprintBacklogItem
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
+import { buildNewSprintStats, buildSprintStatsFromApiSprint } from "./helpers/sprintStatsHelper";
 
 export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Response) => {
     const handlerContext = start("sprintBacklogItemPartsPostHandler", res);
@@ -53,25 +63,50 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
         let addedBacklogItemPart: ApiBacklogItemPart;
         let addedSprintBacklogItem: ApiSprintBacklogItem;
         let backlogItemForAddedPart: ApiBacklogItem;
+        let sprintStats: ApiSprintStats;
         if (!hasAborted(handlerContext)) {
-            const { backlogItem, sprint } = getBacklogItemAndSprint(sprintBacklogItemsWithNested, backlogItemId);
+            const { backlogItem, sprint: dbSprint } = getBacklogItemAndSprint(sprintBacklogItemsWithNested, backlogItemId);
+
             backlogItemForAddedPart = mapDbToApiBacklogItem(backlogItem);
             const backlogItemPart = await addBacklogItemPart(handlerContext, backlogItem);
             addedBacklogItemPart = mapDbToApiBacklogItemPart(backlogItemPart);
 
-            const sprintBacklogItem = await addBacklogItemPartToNextSprint(
+            const { sprintBacklogItem: dbSprintBacklogItem, nextSprint: dbNextSprint } = await addBacklogItemPartToNextSprint(
                 handlerContext,
                 addedBacklogItemPart.id,
-                sprint.startdate
+                dbSprint.startdate
             );
-            addedSprintBacklogItem = mapDbToApiSprintBacklogItem(sprintBacklogItem);
+            addedSprintBacklogItem = mapDbToApiSprintBacklogItem(dbSprintBacklogItem);
+
+            const apiNextSprint = mapDbToApiSprint(dbNextSprint);
+            const nextSprint = mapApiItemToSprint(apiNextSprint);
+
+            const nextSprintStatus = determineSprintStatus(nextSprint.startDate, nextSprint.finishDate);
+            const originalBacklogItemEstimate = 0; // adding to sprint, so no original estimate counted in this sprint
+            const originalBacklogItemStatus = BacklogItemStatus.None; // same as above, use None to indicate this
+            const backlogItemEstimate = backlogItemPart.points;
+            const backlogItemStatus = mapApiStatusToBacklogItem(backlogItemPart.status);
+            const newSprintStatsResult = buildNewSprintStats(
+                buildSprintStatsFromApiSprint(apiNextSprint),
+                nextSprintStatus,
+                originalBacklogItemEstimate,
+                originalBacklogItemStatus,
+                backlogItemEstimate,
+                backlogItemStatus
+            );
+            sprintStats = newSprintStatsResult.sprintStats;
+            await SprintDataModel.update(
+                { ...sprintStats },
+                { where: { id: nextSprint.id }, transaction: handlerContext.transactionContext.transaction }
+            );
 
             await updateBacklogItemWithPartCount(handlerContext, backlogItemId, addedBacklogItemPart.partIndex);
         }
 
         await commitWithCreatedResponseIfNotAborted(handlerContext, addedBacklogItemPart, {
             backlogItem: backlogItemForAddedPart,
-            sprintBacklogItem: addedSprintBacklogItem
+            sprintBacklogItem: addedSprintBacklogItem,
+            sprintStats
         });
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);
