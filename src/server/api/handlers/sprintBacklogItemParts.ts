@@ -30,6 +30,9 @@ import {
     mapDbToApiSprintBacklogItem
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
 
+/**
+ * Split a backlog item from current sprint into next sprint (by adding an additional part to it).
+ */
 export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Response) => {
     const handlerContext = start("sprintBacklogItemPartsPostHandler", res);
 
