@@ -2,19 +2,7 @@
 import { Request, Response } from "express";
 
 // libraries
-import {
-    ApiBacklogItem,
-    ApiBacklogItemPart,
-    ApiSprintBacklogItem,
-    ApiSprintStats,
-    BacklogItemStatus,
-    determineSprintStatus,
-    mapApiItemToSprint,
-    mapApiStatusToBacklogItem
-} from "@atoll/shared";
-
-// data access
-import { SprintDataModel } from "../../dataaccess/models/Sprint";
+import { ApiBacklogItem, ApiBacklogItemPart, ApiSprintBacklogItem, ApiSprintStats } from "@atoll/shared";
 
 // utils
 import { getParamsFromRequest } from "../utils/filterHelper";
@@ -32,7 +20,8 @@ import {
     addBacklogItemPartToNextSprint,
     fetchSprintBacklogItemsWithNested,
     getBacklogItemAndSprint,
-    updateBacklogItemWithPartCount
+    updateBacklogItemWithPartCount,
+    updateNextSprintStats
 } from "./helpers/sprintBacklogItemPartsHelper";
 import {
     mapDbToApiBacklogItem,
@@ -40,7 +29,6 @@ import {
     mapDbToApiSprint,
     mapDbToApiSprintBacklogItem
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
-import { buildNewSprintStats, buildSprintStatsFromApiSprint } from "./helpers/sprintStatsHelper";
 
 export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Response) => {
     const handlerContext = start("sprintBacklogItemPartsPostHandler", res);
@@ -69,36 +57,18 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
 
             backlogItemForAddedPart = mapDbToApiBacklogItem(backlogItem);
             const backlogItemPart = await addBacklogItemPart(handlerContext, backlogItem);
-            addedBacklogItemPart = mapDbToApiBacklogItemPart(backlogItemPart);
 
-            const { sprintBacklogItem: dbSprintBacklogItem, nextSprint: dbNextSprint } = await addBacklogItemPartToNextSprint(
+            addedBacklogItemPart = mapDbToApiBacklogItemPart(backlogItemPart);
+            const addToNextSprintResult = await addBacklogItemPartToNextSprint(
                 handlerContext,
                 addedBacklogItemPart.id,
                 dbSprint.startdate
             );
+            const { sprintBacklogItem: dbSprintBacklogItem, nextSprint: dbNextSprint } = addToNextSprintResult;
             addedSprintBacklogItem = mapDbToApiSprintBacklogItem(dbSprintBacklogItem);
 
             const apiNextSprint = mapDbToApiSprint(dbNextSprint);
-            const nextSprint = mapApiItemToSprint(apiNextSprint);
-
-            const nextSprintStatus = determineSprintStatus(nextSprint.startDate, nextSprint.finishDate);
-            const originalBacklogItemEstimate = 0; // adding to sprint, so no original estimate counted in this sprint
-            const originalBacklogItemStatus = BacklogItemStatus.None; // same as above, use None to indicate this
-            const backlogItemEstimate = backlogItemPart.points;
-            const backlogItemStatus = mapApiStatusToBacklogItem(backlogItemPart.status);
-            const newSprintStatsResult = buildNewSprintStats(
-                buildSprintStatsFromApiSprint(apiNextSprint),
-                nextSprintStatus,
-                originalBacklogItemEstimate,
-                originalBacklogItemStatus,
-                backlogItemEstimate,
-                backlogItemStatus
-            );
-            sprintStats = newSprintStatsResult.sprintStats;
-            await SprintDataModel.update(
-                { ...sprintStats },
-                { where: { id: nextSprint.id }, transaction: handlerContext.transactionContext.transaction }
-            );
+            sprintStats = await updateNextSprintStats(handlerContext, apiNextSprint, addedBacklogItemPart);
 
             await updateBacklogItemWithPartCount(handlerContext, backlogItemId, addedBacklogItemPart.partIndex);
         }

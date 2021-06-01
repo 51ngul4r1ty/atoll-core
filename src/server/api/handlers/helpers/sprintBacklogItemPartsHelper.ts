@@ -7,7 +7,15 @@
 import { FindOptions, Op } from "sequelize";
 
 // libraries
-import { ApiBacklogItem, ApiBacklogItemPart, ApiSprint } from "@atoll/shared";
+import {
+    ApiBacklogItemPart,
+    ApiSprint,
+    ApiSprintStats,
+    BacklogItemStatus,
+    determineSprintStatus,
+    mapApiItemToSprint,
+    mapApiStatusToBacklogItem
+} from "@atoll/shared";
 
 // data access
 import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPart";
@@ -22,6 +30,7 @@ import { addIdToBody, getSimpleUuid } from "../../utils/uuidHelper";
 
 // interfaces/types
 import { HandlerContext } from "../utils/handlerContext";
+import { buildNewSprintStats, buildSprintStatsFromApiSprint } from "./sprintStatsHelper";
 
 export const fetchSprintBacklogItemsWithNested = async (handlerContext: HandlerContext, sprintId: string) => {
     const options: FindOptions = { ...buildOptionsFromParams({ sprintId }), include: { all: true, nested: true } };
@@ -63,7 +72,10 @@ export const fetchBacklogItemPartsMaxPartIndex = async (backlogItemId: string, h
     return maxPartIndex;
 };
 
-export const addBacklogItemPart = async (handlerContext: HandlerContext, backlogItem: BacklogItemDataModel) => {
+export const addBacklogItemPart = async (
+    handlerContext: HandlerContext,
+    backlogItem: BacklogItemDataModel
+): Promise<BacklogItemPartDataModel> => {
     const maxPartIndex = await fetchBacklogItemPartsMaxPartIndex(backlogItem.id, handlerContext);
     const percentage = 20; // Apply the default rule that there's often 20% of the work remaining (unless estimate was off)
     const newApiBacklogItemPart: ApiBacklogItemPart = {
@@ -119,6 +131,34 @@ export const addBacklogItemPartToNextSprint = async (
         sprintBacklogItem: addedSprintBacklogItem,
         nextSprint
     };
+};
+
+export const updateNextSprintStats = async (
+    handlerContext: HandlerContext,
+    apiNextSprint: ApiSprint,
+    backlogItemPart: ApiBacklogItemPart
+): Promise<ApiSprintStats> => {
+    const nextSprint = mapApiItemToSprint(apiNextSprint);
+
+    const nextSprintStatus = determineSprintStatus(nextSprint.startDate, nextSprint.finishDate);
+    const originalBacklogItemEstimate = 0; // adding to sprint, so no original estimate counted in this sprint
+    const originalBacklogItemStatus = BacklogItemStatus.None; // same as above, use None to indicate this
+    const backlogItemEstimate = backlogItemPart.points;
+    const backlogItemStatus = mapApiStatusToBacklogItem(backlogItemPart.status);
+    const newSprintStatsResult = buildNewSprintStats(
+        buildSprintStatsFromApiSprint(apiNextSprint),
+        nextSprintStatus,
+        originalBacklogItemEstimate,
+        originalBacklogItemStatus,
+        backlogItemEstimate,
+        backlogItemStatus
+    );
+    const sprintStats = newSprintStatsResult.sprintStats;
+    await SprintDataModel.update(
+        { ...sprintStats },
+        { where: { id: nextSprint.id }, transaction: handlerContext.transactionContext.transaction }
+    );
+    return sprintStats;
 };
 
 export const updateBacklogItemWithPartCount = async (
