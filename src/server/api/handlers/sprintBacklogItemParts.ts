@@ -53,10 +53,10 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
         let backlogItemForAddedPart: ApiBacklogItem;
         let sprintStats: ApiSprintStats;
         if (!hasAborted(handlerContext)) {
-            const { backlogItem, sprint: dbSprint } = getBacklogItemAndSprint(sprintBacklogItemsWithNested, backlogItemId);
+            const { dbBacklogItem, dbSprint } = getBacklogItemAndSprint(sprintBacklogItemsWithNested, backlogItemId);
 
-            backlogItemForAddedPart = mapDbToApiBacklogItem(backlogItem);
-            const backlogItemPart = await addBacklogItemPart(handlerContext, backlogItem);
+            backlogItemForAddedPart = mapDbToApiBacklogItem(dbBacklogItem);
+            const backlogItemPart = await addBacklogItemPart(handlerContext, dbBacklogItem);
 
             addedBacklogItemPart = mapDbToApiBacklogItemPart(backlogItemPart);
             const addToNextSprintResult = await addBacklogItemPartToNextSprint(

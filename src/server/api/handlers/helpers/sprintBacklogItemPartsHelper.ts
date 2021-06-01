@@ -42,7 +42,12 @@ export const fetchSprintBacklogItemsWithNested = async (handlerContext: HandlerC
     return sprintBacklogItems;
 };
 
-export const getBacklogItemAndSprint = (sprintBacklogItemsWithNested, backlogItemId: string) => {
+export interface GetBacklogItemAndSprintResult {
+    dbBacklogItem: BacklogItemDataModel;
+    dbSprint: SprintDataModel;
+}
+
+export const getBacklogItemAndSprint = (sprintBacklogItemsWithNested, backlogItemId: string): GetBacklogItemAndSprintResult => {
     const matchingItemsWithNested = sprintBacklogItemsWithNested.filter((sprintBacklogItem) => {
         const backlogItemPart = (sprintBacklogItem as any).backlogitempart;
         if (backlogItemPart) {
@@ -53,9 +58,9 @@ export const getBacklogItemAndSprint = (sprintBacklogItemsWithNested, backlogIte
     });
     const sprintBacklogItemWithNested = matchingItemsWithNested[0];
     const backlogItemPart: BacklogItemPartDataModel = (sprintBacklogItemWithNested as any).backlogitempart;
-    const backlogItem = (backlogItemPart as any).backlogitem as BacklogItemDataModel;
-    const sprint = (sprintBacklogItemWithNested as any).sprint as SprintDataModel;
-    return { backlogItem, /* backlogItemPart,*/ sprint };
+    const dbBacklogItem = (backlogItemPart as any).backlogitem as BacklogItemDataModel;
+    const dbSprint = (sprintBacklogItemWithNested as any).sprint as SprintDataModel;
+    return { dbBacklogItem, dbSprint };
 };
 
 export const fetchBacklogItemPartsMaxPartIndex = async (backlogItemId: string, handlerContext: HandlerContext): Promise<number> => {
