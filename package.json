@@ -1,6 +1,6 @@
 {
   "name": "atoll",
-  "version": "0.40.9",
+  "version": "0.41.0",
   "author": {
     "name": "Kevin Berry",
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
@@ -59,7 +59,7 @@
     "check:prereqs": "ts-node ./scripts/check-prereqs.ts"
   },
   "dependencies": {
-    "@atoll/shared": "0.40.9",
+    "@atoll/shared": "file:.yalc/@atoll/shared",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.19.2",
@@ -89,7 +89,7 @@
     "redux-devtools-extension": "2.13.8",
     "redux-thunk": "2.3.0",
     "reselect": "4.0.0",
-    "sequelize": "5.21.7",
+    "sequelize": "6.6.2",
     "text-encoding-polyfill": "0.6.7",
     "url-parse": "1.4.7",
     "uuid": "7.0.2",
@@ -117,7 +117,6 @@
     "@types/react-helmet": "5.0.15",
     "@types/react-redux": "7.1.7",
     "@types/react-router-dom": "5.1.5",
-    "@types/sequelize": "4.28.8",
     "@types/uuid": "7.0.0",
     "@types/webpack-env": "1.15.1",
     "@types/websocket": "1.0.0",
@@ -164,7 +163,7 @@
     "stylelint-prettier": "1.1.2",
     "terser-webpack-plugin": "2.3.7",
     "ts-node": "9.1.1",
-    "typescript": "4.0.2",
+    "typescript": "4.2.4",
     "url-loader": "3.0.0",
     "webpack": "4.41.6",
     "webpack-bundle-analyzer": "3.6.0",
@@ -174,6 +173,6 @@
     "webpack-manifest-plugin": "2.2.0",
     "webpack-node-externals": "1.7.2",
     "write-file-webpack-plugin": "4.5.1",
-    "yalc": "1.0.0-pre.35"
+    "yalc": "1.0.0-pre.53"
   }
 }

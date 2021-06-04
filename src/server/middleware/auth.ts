@@ -4,7 +4,9 @@ import * as HttpStatus from "http-status-codes";
 
 // libraries
 import { getAuthKey, timeNow } from "@atoll/shared";
-import { AuthTokenContents } from "types";
+
+// interfaces/types
+import { AuthTokenContents } from "../types";
 
 export default function(req, res, next) {
     const authHeader: string = req.headers["x-auth-token"] || req.headers["authorization"];

@@ -30,7 +30,11 @@ const buildApiBacklogItem = (): ApiBacklogItem => {
         releasedAt: null,
         startedAt: null,
         status: "N", // not started
-        type: "story"
+        type: "story",
+        partIndex: 1,
+        storyEstimate: 5,
+        totalParts: 1,
+        unallocatedParts: 0
     };
     return result;
 };

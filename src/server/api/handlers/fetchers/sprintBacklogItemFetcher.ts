@@ -2,34 +2,34 @@
 import * as HttpStatus from "http-status-codes";
 
 // libraries
-import { ApiBacklogItem } from "@atoll/shared";
+import { ApiBacklogItem, ApiBacklogItemInSprint } from "@atoll/shared";
 
 // utils
 import { mapDbSprintBacklogToApiBacklogItem } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
+import { getMessageFromError } from "../../utils/errorUtils";
 
 // consts/enums
 import { SPRINT_BACKLOG_PARENT_RESOURCE_NAME, SPRINT_BACKLOG_CHILD_RESOURCE_NAME } from "../../../resourceNames";
 
 // data access
 import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
-import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItem";
 
 export interface FetchedSprintBacklogItems {
     status: number;
     message?: string;
     data?: {
-        items: ApiBacklogItem[];
+        items: ApiBacklogItemInSprint[];
     };
 }
 
-export const fetchSprintBacklogItems = async (sprintId: string | null): Promise<FetchedSprintBacklogItems> => {
+export const fetchSprintBacklogItemsWithLinks = async (sprintId: string | null): Promise<FetchedSprintBacklogItems> => {
     try {
         const options = buildOptionsFromParams({ sprintId });
         const sprintBacklogs = await SprintBacklogItemDataModel.findAll({
             ...options,
-            include: [BacklogItemDataModel],
+            include: { all: true, nested: true },
             order: [["displayindex", "ASC"]]
         });
         const items = sprintBacklogs.map((item) => {
@@ -54,7 +54,7 @@ export const fetchSprintBacklogItems = async (sprintId: string | null): Promise<
     } catch (error) {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
+            message: getMessageFromError(error)
         };
     }
 };

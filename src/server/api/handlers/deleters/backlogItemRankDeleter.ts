@@ -1,20 +1,23 @@
 // externals
-import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
-import { mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import * as HttpStatus from "http-status-codes";
 import { FindOptions, InstanceDestroyOptions, InstanceUpdateOptions, Transaction } from "sequelize";
 
 // data access
 import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRank";
 
-export const removeFromProductBacklog = async (backlogitemId: string | null, transaction?: Transaction) => {
+// utils
+import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
+import { mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
+import { getMessageFromError } from "../../utils/errorUtils";
+
+export const removeFromProductBacklog = async (backlogitemId: string, transaction?: Transaction) => {
     try {
         const findItemOptions: FindOptions = buildOptionsWithTransaction({ where: { backlogitemId } }, transaction);
         const item = await BacklogItemRankDataModel.findOne(findItemOptions);
         if (!item) {
             return {
                 status: HttpStatus.NOT_FOUND,
-                message: `Backlog item ${backlogitemId} was not found`
+                message: `Backlog item "${backlogitemId}" was not found`
             };
         }
         const findItemBeforeOptions: FindOptions = buildOptionsWithTransaction(
@@ -56,7 +59,7 @@ export const removeFromProductBacklog = async (backlogitemId: string | null, tra
     } catch (error) {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
+            message: getMessageFromError(error)
         };
     }
 };

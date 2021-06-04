@@ -19,6 +19,7 @@ import {
 // data access
 import { sequelize } from "../../dataaccess/connection";
 import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
+import { BacklogItemPartDataModel } from "../../dataaccess/models/BacklogItemPart";
 import { BacklogItemRankDataModel } from "../../dataaccess/models/BacklogItemRank";
 import { CounterDataModel } from "../../dataaccess/models/Counter";
 import { ProjectSettingsDataModel } from "../../dataaccess/models/ProjectSettings";
@@ -35,7 +36,7 @@ import { getParamsFromRequest } from "../utils/filterHelper";
 import { backlogItemFetcher, backlogItemsFetcher, BacklogItemsResult } from "./fetchers/backlogItemFetcher";
 import { addIdToBody } from "../utils/uuidHelper";
 import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
-import { backlogItemRankFirstItemInserter } from "./inserters/backlogItemRankInserter";
+import { backlogItemRankFirstItemInserter, backlogItemRankSubsequentItemInserter } from "./inserters/backlogItemRankInserter";
 import { respondedWithMismatchedItemIds } from "../utils/validationResponders";
 import {
     mapDbToApiBacklogItem,
@@ -45,6 +46,7 @@ import {
 import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
 import { getIdForSprintContainingBacklogItem } from "./fetchers/sprintFetcher";
 import { getUpdatedDataItemWhenStatusChanges } from "../utils/statusChangeUtils";
+import { getMessageFromError } from "../utils/errorUtils";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -86,7 +88,7 @@ export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, 
     } catch (error) {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
+            message: getMessageFromError(error)
         });
         console.log(`Unable to fetch backlog item: ${error}`);
     }
@@ -138,6 +140,20 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
                     abort = true;
                 } else {
                     secondLinkTyped = (secondLink as unknown) as ApiBacklogItemRank;
+                }
+            }
+
+            if (!abort) {
+                const backlogItemParts: BacklogItemPartDataModel[] = await BacklogItemPartDataModel.findAll({
+                    where: { backlogitemId: id },
+                    transaction
+                });
+                const backlogItemPartIds = backlogItemParts.map((backlogItemPart) => backlogItemPart.id);
+                if (!backlogItemPartIds.length) {
+                    respondWithNotFound(res, `Unable to find backlogitempart entries related to backlogitem with id = ${id}`);
+                    abort = true;
+                } else {
+                    await BacklogItemPartDataModel.destroy({ where: { id: backlogItemPartIds }, transaction });
                 }
             }
 
@@ -237,51 +253,30 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         if (!prevBacklogItemId) {
             await backlogItemRankFirstItemInserter(newItem, transaction);
         } else {
-            // 1. if there is a single item in database then we'll have this entry:
-            //   backlogitemId=null, nextbacklogitemId=item1
-            //   backlogitemId=item1, nextbacklogitemId=null
-            // in this example, prevBacklogItemId will be item1, so we must end up with:
-            //   backlogitemId=null, nextbacklogitemId=item1     (NO CHANGE)
-            //   backlogitemId=item1, nextbacklogitemId=NEWITEM  (UPDATE "item1" entry to have new "next")
-            //   backlogitemId=NEWITEM, nextbacklogitemId=null   (ADD "NEWITEM" entry with old "new")
-            // this means:
-            // (1) get entry (as prevBacklogItem) with backlogItemId = prevBacklogItemId
-            const prevBacklogItems = await BacklogItemRankDataModel.findAll({
-                where: { backlogitemId: prevBacklogItemId },
-                transaction
-            });
-            if (!prevBacklogItems.length) {
-                respondWithFailedValidation(
-                    res,
-                    `Invalid previous backlog item - can't find entries with ID ${prevBacklogItemId} in database`
-                );
-                await transaction.rollback();
-                rolledBack = true;
-            } else {
-                const prevBacklogItem = prevBacklogItems[0];
-                // (2) oldNextItemId = prevBacklogItem.nextbacklogitemId
-                const oldNextItemId = ((prevBacklogItem as unknown) as ApiBacklogItemRank).nextbacklogitemId;
-                // (3) update existing entry with nextbacklogitemId = newItem.id
-                await prevBacklogItem.update({ nextbacklogitemId: newItem.id }, { transaction });
-                // (4) add new row with backlogitemId = newItem.id, nextbacklogitemId = oldNextItemId
-                await BacklogItemRankDataModel.create(
-                    {
-                        ...addIdToBody({
-                            projectId: newItem.projectId,
-                            backlogitemId: newItem.id,
-                            nextbacklogitemId: oldNextItemId
-                        })
-                    },
-                    {
-                        transaction
-                    } as CreateOptions
-                );
+            const result = await backlogItemRankSubsequentItemInserter(newItem, transaction, prevBacklogItemId);
+            if (result.status !== HttpStatus.OK) {
+                respondWithFailedValidation(res, result.message);
             }
-            // TODO: Write unit tests to try and mimick this and test that the logic handles it as well:
-            // 2. if there are multiple items in database then we'll have these entries:
-            // backlogitemId=null, nextbacklogitemId=item1
-            // backlogitemId=item1, nextbacklogitemId=item2
-            // backlogitemId=item2, nextbacklogitemId=null
+            rolledBack = result.rolledBack;
+        }
+        if (!rolledBack) {
+            await BacklogItemPartDataModel.create(
+                {
+                    ...addIdToBody({
+                        externalId: null,
+                        backlogitemId: bodyWithId.id,
+                        partIndex: 1,
+                        percentage: 100.0,
+                        points: bodyWithId.estimate,
+                        startedAt: bodyWithId.startedAt,
+                        finishedAt: bodyWithId.finishedAt,
+                        status: bodyWithId.status
+                    })
+                },
+                {
+                    transaction
+                } as CreateOptions
+            );
         }
         if (!rolledBack) {
             await transaction.commit();

@@ -5,6 +5,7 @@ import { FindOptions, InstanceDestroyOptions, Transaction } from "sequelize";
 // utils
 import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
 import { mapDbToApiProject } from "../../../dataaccess/mappers/dataAccessToApiMappers";
+import { getMessageFromError } from "../../utils/errorUtils";
 
 // data access
 import { ProjectDataModel } from "../../../dataaccess/models/Project";
@@ -31,7 +32,7 @@ export const deleteProject = async (projectId: string | null, transaction?: Tran
     } catch (error) {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
+            message: getMessageFromError(error)
         };
     }
 };

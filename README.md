@@ -11,7 +11,12 @@ If you're interested in getting a detailed explanation of the various parts of t
 want to start with the "Other Docs" section below.  If not, and you just want to get going as quickly
 as possible then you're in the right section.
 
-Everyone contributing to this repo should read this document: [IMPORTANT.md](docs/IMPORTANT.md)
+Everyone contributing to this repo should read this document before doing anything: [IMPORTANT.md](docs/IMPORTANT.md)
+
+For specialized instructions (to save you time trying to do various things): [HOWTO.md](docs/HOWTO.md)
+
+Many code standards and conventions can be picked up from existing patterns in the code but it is advisable to use this resource as
+well: [CODE_STANDARDS.md](docs/CODE_STANDARDS.md)
 
 Tools Used
 ----------
@@ -87,4 +92,4 @@ README.md                                     - this document is intended as the
 [GLOSSARY.md](docs/GLOSSARY.md)               - glossary specific to this project.  
 [ISSUES_RESOLVED.md](docs/ISSUES_RESOLVED.md) - this may be useful if you're running into problems.  
 [DATA_MODEL.md](docs/dataModel/DATA_MODEL.md) - mapping the requirements to the data model.  
-
+[PROCESS.md](docs/PROCESS.md)                 - the index document for processes that should be followed.

@@ -9,6 +9,7 @@ import { ApiSprint } from "@atoll/shared";
 import { mapDbToApiSprint, mapDbToApiSprintBacklogItem } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
+import { getMessageFromError } from "../../utils/errorUtils";
 
 // consts/enums
 import { SPRINT_RESOURCE_NAME } from "../../../resourceNames";
@@ -42,7 +43,7 @@ export const fetchSprints = async (projectId: string | null, archived?: string |
     } catch (error) {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
+            message: getMessageFromError(error)
         };
     }
 };
@@ -70,7 +71,7 @@ export const fetchSprint = async (sprintId: string) => {
     } catch (error) {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
+            message: getMessageFromError(error)
         };
     }
 };

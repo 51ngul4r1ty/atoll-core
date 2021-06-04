@@ -55,6 +55,11 @@ To combine the these two interfaces use:
 `ComponentNameStateProps` can be used for `mapStateToProps`
 `ComponentNameDispatchProps` can be used for `mapDispatchToProps`
 
+Button Components
+-----------------
+
+A base component called SimpleButton should be used when deriving specialized buttons.  There's a `cleanPassthroughProps` function
+that should be used for passing properties from the specialized button to the contained SimpleButton instance.
 
 Switch Statements
 =================
@@ -148,6 +153,7 @@ import { IntlProvider } from "@atoll/shared";
 // layouts
 import { layouts } from "@atoll/shared";
 ```
+
 Functions
 =========
 
@@ -171,3 +177,38 @@ Argument Types
 3. Consider using an `options` argument (similar to the code style the "deno" project uses), when this applies, to contain all the
    various "configuration" type arguments if there are many.
 
+
+Interfaces/Types
+================
+
+Extending Interfaces
+--------------------
+
+General guidance when extending interfaces:
+
+1. Keep hierarchy as shallow as possible- this may mean that you need to refactor at some point when
+   the hierarchy has grown and there are unnecessary intermediary types that can be removed.
+
+2. When inheriting the type structure, duplicate it for readability:
+
+For example:
+```
+export interface SprintStats {
+    sprintStats: ApiSprintStats;
+}
+
+export interface SprintBacklogItemSuccessPayloadExtra extends SprintStats {
+    sprintStats: ApiSprintStats;
+    backlogItem: ApiBacklogItem;
+    backlogItemPart: ApiBacklogItemPart;
+}
+
+export interface MoveBacklogItemToBacklogSuccessPayloadExtra extends SprintStats {
+    sprintStats: ApiSprintStats;
+    backlogItem: ApiBacklogItem;
+}
+```
+
+See how each extended type includes everything from the ancestor?  This may seem redudant
+but it is for readability.  Other languages don't allow this, but TypeScript does.  If you
+don't do it this way it is harder to see, at a glance, what the full type structure is.

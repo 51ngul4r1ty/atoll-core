@@ -1,37 +1,27 @@
 {
-    "compilerOptions": {
-        "incremental": false,
-        "module": "esnext",
-        "target": "es5",
-        "lib": [
-            "dom",
-            "dom.iterable",
-            "esnext"
-        ],
-        "sourceMap": true,
-        "allowJs": true,
-        "jsx": "react",
-        "moduleResolution": "node",
-        "skipLibCheck": true,
-        "esModuleInterop": true,
-        "allowSyntheticDefaultImports": true,
-        "baseUrl": "./src",
-        "strict": false,
-        "forceConsistentCasingInFileNames": true,
-        "resolveJsonModule": true,
-        "noEmit": true,
-        "strictNullChecks": false,
-        "noUnusedLocals": false,
-        "noUnusedParameters": false,
-        "paths": {
-            "*": [
-                "client/*",
-                "server/*",
-                "*"
-            ]
-        }
-    },
-    "include": [
-        "src"
-    ]
+  "compilerOptions": {
+    "incremental": false,
+    "module": "esnext",
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "sourceMap": true,
+    "allowJs": true,
+    "jsx": "react",
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./src",
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "strictNullChecks": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "paths": {
+      "*": ["client/*", "server/*", "*"]
+    }
+  },
+  "include": ["src"]
 }

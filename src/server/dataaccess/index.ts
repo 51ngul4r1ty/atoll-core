@@ -1,5 +1,6 @@
 export * from "./models/AppUser";
 export * from "./models/BacklogItem";
+export * from "./models/BacklogItemPart";
 export * from "./models/BacklogItemRank";
 export * from "./models/BacklogItemTag";
 export * from "./models/Counter";

@@ -5,7 +5,7 @@ import * as jwt from "jsonwebtoken";
 import { getAuthKey, addMinutes, getAuthTokenExpirationMinutes } from "@atoll/shared";
 
 // interfaces/types
-import { AuthTokenContents, Role, RefreshTokenContents } from "types";
+import { AuthTokenContents, Role, RefreshTokenContents } from "../../types";
 
 export const buildAuthToken = (userId: string, username: string, role: Role) => {
     const authKey = getAuthKey();
