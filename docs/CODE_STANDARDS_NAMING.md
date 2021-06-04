@@ -102,7 +102,7 @@ Table names should use only lowercase letters. For example, `backlogitempart`.
 Field Naming
 ------------
 
-Field names are camelcased but one exception is for foreign keys.  In this case the full table name is used (all lowercase) followed
+Field names are camelCased but one exception is for foreign keys.  In this case the full table name is used (all lowercase) followed
 by "Id".  For example, `backlogitempartId`.
 
 
