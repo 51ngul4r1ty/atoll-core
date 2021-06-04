@@ -160,8 +160,15 @@ export const updateNextSprintStats = async (
     );
     const sprintStats = newSprintStatsResult.sprintStats;
     await SprintDataModel.update(
-        { ...sprintStats },
-        { where: { id: nextSprint.id }, transaction: handlerContext.transactionContext.transaction }
+        {
+            ...sprintStats
+        },
+        {
+            where: {
+                id: nextSprint.id
+            },
+            transaction: handlerContext.transactionContext.transaction
+        }
     );
     return sprintStats;
 };
@@ -172,7 +179,14 @@ export const updateBacklogItemWithPartCount = async (
     newTotalPartCount: number
 ) => {
     await BacklogItemDataModel.update(
-        { totalParts: newTotalPartCount },
-        { where: { id: backlogItemId }, transaction: handlerContext.transactionContext.transaction }
+        {
+            totalParts: newTotalPartCount
+        },
+        {
+            where: {
+                id: backlogItemId
+            },
+            transaction: handlerContext.transactionContext.transaction
+        }
     );
 };
