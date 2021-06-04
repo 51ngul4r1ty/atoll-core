@@ -58,7 +58,7 @@ To combine the these two interfaces use:
 Button Components
 -----------------
 
-A base component called SimpleButton should be used when derived specialized buttons.  There's a `cleanPassthroughProps` function
+A base component called SimpleButton should be used when deriving specialized buttons.  There's a `cleanPassthroughProps` function
 that should be used for passing properties from the specialized button to the contained SimpleButton instance.
 
 Switch Statements
