@@ -19,10 +19,10 @@ import {
 // data access
 import { sequelize } from "../../dataaccess/connection";
 import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
+import { BacklogItemPartDataModel } from "../../dataaccess/models/BacklogItemPart";
 import { BacklogItemRankDataModel } from "../../dataaccess/models/BacklogItemRank";
 import { CounterDataModel } from "../../dataaccess/models/Counter";
 import { ProjectSettingsDataModel } from "../../dataaccess/models/ProjectSettings";
-import { BacklogItemPartDataModel } from "../../dataaccess/models/BacklogItemPart";
 
 // utils
 import {
