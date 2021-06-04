@@ -1,14 +1,14 @@
 // externals
-import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
-import { mapDbToApiBacklogItem, mapDbToApiBacklogItemPart } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import * as HttpStatus from "http-status-codes";
-import { FindOptions, InstanceDestroyOptions, Transaction } from "sequelize";
+import { FindOptions, Transaction } from "sequelize";
 
 // data access
 import { BacklogItemDataModel, BacklogItemPartDataModel } from "dataaccess";
 
 // utils
+import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
 import { getMessageFromError } from "../../utils/errorUtils";
+import { mapDbToApiBacklogItem, mapDbToApiBacklogItemPart } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 export enum LastPartRemovalOptions {
     Disallow = 1,
