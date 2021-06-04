@@ -11,29 +11,16 @@ import {
     ApiSprintStats,
     BacklogItemPart,
     BacklogItemStatus,
-    logger,
-    mapApiItemToBacklogItem,
     mapApiItemToBacklogItemPart
 } from "@atoll/shared";
 
 // data access
-import { sequelize } from "../../dataaccess/connection";
 import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklogItem";
 import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
-import { BacklogItemRankDataModel } from "../../dataaccess/models/BacklogItemRank";
-import { BacklogItemPartDataModel } from "../../dataaccess/models/BacklogItemPart";
 
 // utils
 import { getParamsFromRequest } from "../utils/filterHelper";
-import { buildOptionsFromParams } from "../utils/sequelizeHelper";
-import { respondWithError, respondWithNotFound } from "../utils/responder";
-import {
-    mapDbSprintBacklogToApiBacklogItem,
-    mapDbToApiBacklogItem,
-    mapDbToApiBacklogItemPart,
-    mapDbToApiSprintBacklogItem
-} from "../../dataaccess/mappers/dataAccessToApiMappers";
-import { addIdToBody } from "../utils/uuidHelper";
+import { mapDbSprintBacklogToApiBacklogItem } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { fetchSprintBacklogItemsWithLinks } from "./fetchers/sprintBacklogItemFetcher";
 import { backlogItemRankFirstItemInserter, BacklogItemRankFirstItemInserterResult } from "./inserters/backlogItemRankInserter";
 import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
@@ -43,18 +30,30 @@ import { isStatusSuccess } from "../utils/httpStatusHelper";
 import {
     abortWithNotFoundResponse,
     beginSerializableTransaction,
+    commitWithCreatedResponseIfNotAborted,
     commitWithOkResponseIfNotAborted,
+    finish,
     handleUnexpectedErrorResponse,
     hasAborted,
+    hasRolledBack,
     rollbackWithErrorResponse,
     start
 } from "./utils/handlerContext";
 import { buildFindOptionsIncludeForNested, computeUnallocatedParts } from "./helpers/backlogItemHelper";
 import {
+    allocateBacklogItemToSprint,
+    determineNextSprintIndex,
+    fetchAssociatedBacklogItemWithParts,
+    fetchSprintBacklogItems,
     fetchSprintBacklogItemsForBacklogItemWithNested,
+    fetchAllocatedAndUnallocatedBacklogItemParts,
     isItemInProductBacklog,
-    removeSprintBacklogItemAndUpdateStats
+    removeSprintBacklogItemAndUpdateStats,
+    ApiBacklogItemPartWithSprintId
 } from "./helpers/sprintBacklogItemHelper";
+import { LastPartRemovalOptions, removeUnallocatedBacklogItemPart } from "./deleters/backlogItemPartDeleter";
+import { fetchSprint } from "./fetchers/sprintFetcher";
+import { buildSprintStatsFromApiSprint } from "./helpers/sprintStatsHelper";
 
 export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
@@ -71,131 +70,138 @@ export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
 };
 
 export const sprintBacklogItemPostHandler = async (req: Request, res) => {
-    const functionTag = "sprintBacklogItemPostHandler";
-    const logContext = logger.info("starting call", [functionTag]);
+    const handlerContext = start("sprintBacklogItemPostHandler", res);
+
     const params = getParamsFromRequest(req);
     const backlogitemId = req.body.backlogitemId;
-    let backlogitempartId: string | null = null;
-    let allStoryPartsAllocated = false;
     const sprintId = params.sprintId;
-    let transaction: Transaction;
+
+    let allocatedBacklogItemPartId: string | null = null;
+    let allStoryPartsAllocated = false;
     try {
-        let rolledBack = false;
-        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        let displayIndex: number;
-        const options = buildOptionsFromParams({ sprintId });
-        const sprintBacklogs = await SprintBacklogItemDataModel.findAll({
-            ...options,
-            order: [["displayindex", "ASC"]],
-            transaction
-        });
-        if (sprintBacklogs && sprintBacklogs.length) {
-            const lastSprintBacklogItem = mapDbToApiSprintBacklogItem(sprintBacklogs[sprintBacklogs.length - 1]);
-            displayIndex = lastSprintBacklogItem.displayindex + 1;
-        } else {
-            displayIndex = 0;
-        }
-        const backlogitempartsResult = await backlogItemPartFetcher(backlogitemId, transaction);
+        await beginSerializableTransaction(handlerContext);
+
+        const sprintBacklogs = await fetchSprintBacklogItems(handlerContext, sprintId);
+
+        const displayIndex = determineNextSprintIndex(sprintBacklogs);
+
+        const backlogitempartsResult = await backlogItemPartFetcher(backlogitemId, handlerContext.transactionContext.transaction);
         let backlogItemPartAllocated: BacklogItemPart;
         let apiBacklogItemPartAllocated: ApiBacklogItemPart;
         let backlogItem: ApiBacklogItem;
         if (!isStatusSuccess(backlogitempartsResult.status)) {
-            await transaction.rollback();
-            rolledBack = true;
-            respondWithError(res, `unable to retrieve backlog item parts for backlog item ID "${backlogitemId}"`);
-        } else {
+            rollbackWithErrorResponse(
+                handlerContext,
+                `unable to retrieve backlog item parts for backlog item ID "${backlogitemId}"`
+            );
+        }
+        let joinSplitParts = false;
+        let partsWithAllocationInfo: ApiBacklogItemPartWithSprintId[];
+        if (!hasRolledBack(handlerContext)) {
             const allBacklogItemParts = backlogitempartsResult.data.items;
-            const allBacklogItemPartIds = allBacklogItemParts.map((item) => item.id);
-            const options: FindOptions = {
-                where: { backlogitempartId: allBacklogItemPartIds },
-                transaction
-            };
-            const sprintBacklogItems = await SprintBacklogItemDataModel.findAll(options);
-            const backlogItemPartsInSprints = sprintBacklogItems.map((item) => mapDbToApiSprintBacklogItem(item));
-            let backlogItemPartIdsInSprints = {};
-            backlogItemPartsInSprints.forEach((item) => {
-                backlogItemPartIdsInSprints[item.backlogitempartId] = item;
-            });
-            const unallocatedBacklogItemParts = allBacklogItemParts.filter((item) => !backlogItemPartIdsInSprints[item.id]);
+
+            partsWithAllocationInfo = await fetchAllocatedAndUnallocatedBacklogItemParts(handlerContext, allBacklogItemParts);
+            const unallocatedBacklogItemParts = partsWithAllocationInfo.filter((item) => !item.sprintId);
             if (!unallocatedBacklogItemParts.length) {
-                await transaction.rollback();
-                rolledBack = true;
-                respondWithError(res, `no unallocated backlog item parts for backlog item ID "${backlogitemId}"`);
-            } else {
+                rollbackWithErrorResponse(
+                    handlerContext,
+                    `no unallocated backlog item parts for backlog item ID "${backlogitemId}"`
+                );
+                allStoryPartsAllocated = false;
+            }
+            if (!hasRolledBack(handlerContext)) {
+                const allocatedBacklogItemParts = partsWithAllocationInfo.filter((item) => !!item.sprintId);
+                const alreadyAllocatedToNextSprint = allocatedBacklogItemParts.filter((item) => item.sprintId === sprintId);
+                if (alreadyAllocatedToNextSprint.length > 0) {
+                    joinSplitParts = true;
+                }
+
+                allStoryPartsAllocated = unallocatedBacklogItemParts.length === 1;
                 apiBacklogItemPartAllocated = unallocatedBacklogItemParts[0];
                 backlogItemPartAllocated = mapApiItemToBacklogItemPart(apiBacklogItemPartAllocated);
-
-                const backlogItemId = backlogItemPartAllocated.backlogitemId;
-                const dbBacklogItem = await BacklogItemDataModel.findByPk(backlogItemId, { transaction });
-                backlogItem = mapDbToApiBacklogItem(dbBacklogItem);
-                backlogitempartId = backlogItemPartAllocated.id;
-                allStoryPartsAllocated = unallocatedBacklogItemParts.length === 1;
+                allocatedBacklogItemPartId = backlogItemPartAllocated.id;
             }
         }
         let addedSprintBacklog: SprintBacklogItemDataModel;
         let sprintStats: ApiSprintStats;
-        if (!rolledBack) {
-            const bodyWithId = addIdToBody({
-                sprintId,
-                backlogitempartId,
-                displayindex: displayIndex
-            });
-            addedSprintBacklog = await SprintBacklogItemDataModel.create(bodyWithId, { transaction } as CreateOptions);
-            if (allStoryPartsAllocated) {
-                const removeProductBacklogItemResult = await removeFromProductBacklog(backlogitemId, transaction);
-                if (!isStatusSuccess(removeProductBacklogItemResult.status)) {
-                    await transaction.rollback();
-                    rolledBack = true;
-                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-                        status: HttpStatus.INTERNAL_SERVER_ERROR,
-                        message:
-                            `Error ${removeProductBacklogItemResult.message} (status ${removeProductBacklogItemResult.status}) ` +
-                            "when trying to remove backlog item from the product backlog"
-                    });
+        if (!hasRolledBack(handlerContext)) {
+            if (joinSplitParts) {
+                const removePartResult = await removeUnallocatedBacklogItemPart(
+                    allocatedBacklogItemPartId,
+                    LastPartRemovalOptions.Disallow,
+                    handlerContext.transactionContext.transaction
+                );
+                if (removePartResult.status !== HttpStatus.OK) {
+                    rollbackWithErrorResponse(handlerContext, removePartResult.message);
                 }
-            }
-            if (!rolledBack) {
-                // const dbBacklogItem = await BacklogItemDataModel.findOne({ where: { id: backlogitemId }, transaction });
-                // const apiBacklogItem = mapDbToApiBacklogItem(dbBacklogItem);
-                // const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItem);
-                sprintStats = await handleSprintStatUpdate(
+            } else {
+                addedSprintBacklog = await allocateBacklogItemToSprint(
+                    handlerContext,
                     sprintId,
-                    BacklogItemStatus.None,
-                    backlogItemPartAllocated.status,
-                    null,
-                    backlogItemPartAllocated.points,
-                    transaction
+                    allocatedBacklogItemPartId,
+                    displayIndex
                 );
             }
-        }
-        if (!rolledBack) {
-            await transaction.commit();
-            res.status(HttpStatus.CREATED).json({
-                status: HttpStatus.CREATED,
-                data: {
-                    item: addedSprintBacklog,
-                    extra: {
-                        sprintStats,
-                        backlogItemPart: apiBacklogItemPartAllocated,
-                        backlogItem
-                    }
+            if (!hasRolledBack(handlerContext) && allStoryPartsAllocated) {
+                const removeProductBacklogItemResult = await removeFromProductBacklog(
+                    backlogitemId,
+                    handlerContext.transactionContext.transaction
+                );
+                if (!isStatusSuccess(removeProductBacklogItemResult.status)) {
+                    rollbackWithErrorResponse(
+                        handlerContext,
+                        `Error ${removeProductBacklogItemResult.message} (status ${removeProductBacklogItemResult.status}) ` +
+                            "when trying to remove backlog item from the product backlog"
+                    );
                 }
-            });
-        }
-    } catch (err) {
-        const errLogContext = logger.warn(`handling error "${err}"`, [functionTag], logContext);
-        if (transaction) {
-            logger.info("rolling back transaction", [functionTag], errLogContext);
-            try {
-                await transaction.rollback();
-            } catch (err) {
-                logger.warn(`roll back failed with error "${err}"`, [functionTag], errLogContext);
+            }
+            if (!hasRolledBack(handlerContext)) {
+                if (joinSplitParts) {
+                    const fetchSprintResult = await fetchSprint(sprintId);
+                    if (!isStatusSuccess(fetchSprintResult.status)) {
+                        rollbackWithErrorResponse(
+                            handlerContext,
+                            `Error ${fetchSprintResult.message} (status ${fetchSprintResult.status}) ` +
+                                `when trying to fetch sprint with id "${sprintId}"`
+                        );
+                    } else {
+                        sprintStats = buildSprintStatsFromApiSprint(fetchSprintResult.data.item);
+                    }
+                } else {
+                    sprintStats = await handleSprintStatUpdate(
+                        sprintId,
+                        BacklogItemStatus.None,
+                        backlogItemPartAllocated.status,
+                        null,
+                        backlogItemPartAllocated.points,
+                        handlerContext.transactionContext.transaction
+                    );
+                }
             }
         }
-        respondWithError(res, err);
-        logger.info(`handling error ${err}`, [functionTag], logContext);
+        if (!hasRolledBack(handlerContext)) {
+            backlogItem = await fetchAssociatedBacklogItemWithParts(handlerContext, backlogItemPartAllocated.backlogitemId);
+            if (joinSplitParts) {
+                // nothing was added, so 200 status is appropriate
+                // (it combined the "added" part into an existing part in the sprint)
+                await commitWithOkResponseIfNotAborted(handlerContext, addedSprintBacklog, {
+                    sprintStats,
+                    backlogItemPart: apiBacklogItemPartAllocated,
+                    backlogItem
+                });
+            } else {
+                // a new entry was added, so 201 status is appropriate
+                await commitWithCreatedResponseIfNotAborted(handlerContext, addedSprintBacklog, {
+                    sprintStats,
+                    backlogItemPart: apiBacklogItemPartAllocated,
+                    backlogItem
+                });
+            }
+        }
+    } catch (err) {
+        await handleUnexpectedErrorResponse(handlerContext, err);
     }
-    logger.info("finishing call", [functionTag]);
+    finish(handlerContext);
 };
 
 export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
@@ -267,8 +273,6 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
                 }
                 firstApiBacklogItemTyped.unallocatedParts += matchingItems.length;
             }
-            // BUSY HERE:
-            // 1) Add tech debt story to refactor all handlers to use the new pattern.
             await commitWithOkResponseIfNotAborted(handlerContext, apiBacklogItemTyped, {
                 sprintStats,
                 backlogItem: firstApiBacklogItemTyped

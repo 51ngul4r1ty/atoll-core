@@ -10,7 +10,8 @@ import {
     ApiProjectSettings,
     ApiSprint,
     ApiSprintBacklogItem,
-    ApiUserSettings
+    ApiUserSettings,
+    ApiBacklogItemWithParts
 } from "@atoll/shared";
 
 // utils
@@ -28,24 +29,45 @@ export const mapDbToApiBacklogItem = (item: any): ApiBacklogItem => {
     };
 };
 
+export const mapDbToApiBacklogItemWithParts = (item: any): ApiBacklogItemWithParts => {
+    if (!item) {
+        return item;
+    }
+    let backlogItemParts: ApiBacklogItemPart[] = item.dataValues.backlogitemparts.map((itemDataValues) =>
+        mapDbDataValuesToApiBacklogItemPart(itemDataValues)
+    );
+    let result: ApiBacklogItemWithParts = {
+        ...mapDbToApiBacklogItem(item),
+        backlogItemParts
+    };
+    return result;
+};
+
+export const mapDbDataValuesToApiBacklogItemPart = (itemDataValues: any): ApiBacklogItemPart => {
+    const dataValueFieldsOnly = cloneWithoutNested(itemDataValues);
+    delete dataValueFieldsOnly.isNewRecord;
+    return {
+        ...dataValueFieldsOnly,
+        percentage: convertDbFloatToNumber(itemDataValues.percentage),
+        points: convertDbFloatToNumber(itemDataValues.points),
+        status: itemDataValues.status || "N"
+    };
+};
+
 export const mapDbToApiBacklogItemPart = (item: any): ApiBacklogItemPart => {
     if (!item) {
         return item;
     }
-    return {
-        ...item.dataValues,
-        percentage: convertDbFloatToNumber(item.dataValues.percentage),
-        points: convertDbFloatToNumber(item.dataValues.points),
-        status: item.dataValues.status || "N"
-    };
+    return mapDbDataValuesToApiBacklogItemPart(item.dataValues);
 };
 
 export const mapDbToApiBacklogItemRank = (item: any): ApiBacklogItemRank => {
     if (!item) {
         return item;
     }
+    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
     return {
-        ...item.dataValues
+        ...dataValueFieldsOnly
     };
 };
 
@@ -53,8 +75,9 @@ export const mapDbToApiSprint = (item: any): ApiSprint => {
     if (!item) {
         return item;
     }
+    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
     return {
-        ...item.dataValues,
+        ...dataValueFieldsOnly,
         acceptedPoints: convertDbFloatToNumber(item.dataValues.acceptedPoints),
         archived: convertDbCharToBoolean(item.dataValues.archived),
         plannedPoints: convertDbFloatToNumber(item.dataValues.plannedPoints),
@@ -126,8 +149,9 @@ export const mapDbToApiCounter = (item: any): ApiCounter => {
     if (!item) {
         return item;
     }
+    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
     return {
-        ...item.dataValues
+        ...dataValueFieldsOnly
     };
 };
 
@@ -135,8 +159,9 @@ export const mapDbToApiProjectSettings = (item: any): ApiProjectSettings => {
     if (!item) {
         return item;
     }
+    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
     return {
-        ...item.dataValues
+        ...dataValueFieldsOnly
     };
 };
 
@@ -144,8 +169,10 @@ export const mapDbToApiUserSettings = (item: any): ApiUserSettings => {
     if (!item) {
         return item;
     }
+    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
     return {
-        ...item.dataValues
+        ...dataValueFieldsOnly,
+        settings: cloneWithoutNested(item.dataValues.settings)
     };
 };
 
@@ -153,7 +180,8 @@ export const mapDbToApiProject = (item: any): ApiProject => {
     if (!item) {
         return item;
     }
+    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
     return {
-        ...item.dataValues
+        ...dataValueFieldsOnly
     };
 };

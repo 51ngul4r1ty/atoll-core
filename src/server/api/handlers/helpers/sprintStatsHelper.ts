@@ -1,21 +1,18 @@
 // libraries
 import { ApiSprint, ApiSprintStats, BacklogItemStatus, hasBacklogItemAtLeastBeenAccepted, SprintStatus } from "@atoll/shared";
 
-// utils
-import { mapApiToDbSprint } from "../../../dataaccess/mappers/apiToDataAccessMappers";
-
-export const buildSprintStatsFromApiSprint = (sprint: ApiSprint): ApiSprintStats => ({
-    acceptedPoints: sprint.acceptedPoints,
-    plannedPoints: sprint.plannedPoints,
-    totalPoints: sprint.totalPoints
-});
-
 export enum Operation {
     None = 0,
     Add = 1,
     Remove = 2,
     Update = 3
 }
+
+export const buildSprintStatsFromApiSprint = (sprint: ApiSprint): ApiSprintStats => ({
+    acceptedPoints: sprint.acceptedPoints,
+    plannedPoints: sprint.plannedPoints,
+    totalPoints: sprint.totalPoints
+});
 
 export const calcSprintStatAcceptedPtsOp = (oldStatus: BacklogItemStatus, newStatus: BacklogItemStatus): Operation => {
     let op = Operation.None;

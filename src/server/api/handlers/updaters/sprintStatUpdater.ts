@@ -2,20 +2,14 @@
 import { Transaction } from "sequelize";
 
 // libraries
-import { ApiSprintStats, BacklogItemStatus, determineSprintStatus, mapApiItemToSprint, SprintStatus } from "@atoll/shared";
+import { ApiSprintStats, BacklogItemStatus, determineSprintStatus, mapApiItemToSprint } from "@atoll/shared";
 
 // data access
 import { ApiToDataAccessMapOptions, mapApiToDbSprint, SprintDataModel } from "../../../dataaccess";
 
 // utils
 import { mapDbToApiSprint } from "../../../dataaccess/mappers/dataAccessToApiMappers";
-import {
-    buildNewSprintStats,
-    buildSprintStatsFromApiSprint,
-    calcSprintStatAcceptedPtsOp,
-    calcSprintStatPlanningPtsOp,
-    Operation
-} from "../helpers/sprintStatsHelper";
+import { buildNewSprintStats, buildSprintStatsFromApiSprint } from "../helpers/sprintStatsHelper";
 
 export const handleSprintStatUpdate = async (
     sprintId: string,
