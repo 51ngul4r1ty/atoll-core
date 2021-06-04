@@ -11,6 +11,8 @@ General
 2. Look for console.log messages (logger util can use them but elsewhere they should
    be avoided).
 3. Look for debugger statements.
+4. Look for a header comment that explains the purpose of the file- all new files should have this and ideally any modified
+   files should have one added.
 
 Database Code
 -------------
