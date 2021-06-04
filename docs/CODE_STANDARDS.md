@@ -193,7 +193,6 @@ General guidance when extending interfaces:
 
 For example:
 ```
-// DOCUMENT THIS
 export interface SprintStats {
     sprintStats: ApiSprintStats;
 }
