@@ -8,8 +8,10 @@ import { getAuthKey } from "@atoll/shared";
 
 // interfaces/types
 import { ROLE_USER, RefreshTokenContents } from "../../types";
-import { buildAuthToken, buildRefreshToken } from "api/utils/tokenHelper";
-import { getSimpleUuid } from "api/utils/uuidHelper";
+
+// utils
+import { buildAuthToken, buildRefreshToken } from "../utils/tokenHelper";
+import { getSimpleUuid } from "../utils/uuidHelper";
 
 export const loginPostHandler = async (req: Request, res: Response) => {
     const username = req.body?.username;

@@ -1,16 +1,12 @@
 // externals
-import { respondWithError, respondWithNotFound } from "api/utils/responder";
-import { combineMessages, combineStatuses } from "api/utils/resultAggregator";
 import { Request, Response } from "express";
 import * as HttpStatus from "http-status-codes";
 
 // utils
-import { getLoggedInAppUserId } from "../../utils/authUtils";
+import { respondWithError, respondWithNotFound } from "../../utils/responder";
 import { getParamsFromRequest } from "../../utils/filterHelper";
 import { backlogItemFetcher } from "../fetchers/backlogItemFetcher";
 import { projectByDisplayIdFetcher } from "../fetchers/projectFetcher";
-import { FetcherErrorResponse } from "../fetchers/types";
-import { userPreferencesFetcher, UserPreferencesSuccessResponse } from "../fetchers/userPreferencesFetcher";
 
 export const backlogItemViewBffGetHandler = async (req: Request, res: Response) => {
     // const userPreferencesResult = await userPreferencesFetcher("{self}", () => getLoggedInAppUserId(req));

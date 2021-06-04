@@ -20,7 +20,7 @@ Table backlogitempart as BIP {
     id varchar(32) [pk]
     externalId varchar(30)
     backlogitemId varchar(32)
-    partindex int
+    partIndex int
     percentage decimal(10,2)
     points decimal(10,2)
     startedAt timestamp

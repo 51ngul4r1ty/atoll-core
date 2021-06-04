@@ -1,17 +1,40 @@
 // externals
 import { Model, DataTypes, Deferrable } from "sequelize";
 
+// utils
+import restoreSequelizeAttributesOnClass from "../sequelizeModelHelpers";
+
 // data access
 import { sequelize } from "../connection";
 import { BacklogItemDataModel } from "./BacklogItem";
 
-export class BacklogItemPartDataModel extends Model {}
+export class BacklogItemPartDataModel extends Model {
+    public id!: string;
+    public externalId!: string | null;
+    public backlogitemId!: string;
+    public partIndex!: number | null;
+    public percentage!: number | null;
+    public points!: number | null;
+    public startedAt!: Date | null;
+    public finishedAt!: Date | null;
+    public status: string | null;
+    public readonly createdAt!: Date;
+    public readonly updatedAt!: Date;
+    public readonly version: number;
+    constructor(...args) {
+        super(...args);
+        restoreSequelizeAttributesOnClass(new.target, this);
+    }
+}
 
 BacklogItemPartDataModel.init(
     {
         id: {
             type: DataTypes.STRING(32),
-            primaryKey: true
+            primaryKey: true,
+            get: function() {
+                return this.getDataValue("id");
+            }
         },
         externalId: {
             type: DataTypes.STRING(30),
@@ -30,7 +53,7 @@ BacklogItemPartDataModel.init(
                 return this.getDataValue("backlogitemId");
             }
         },
-        partindex: {
+        partIndex: {
             type: DataTypes.INTEGER,
             allowNull: true
         },
@@ -53,6 +76,18 @@ BacklogItemPartDataModel.init(
         status: {
             type: DataTypes.CHAR(1),
             allowNull: true
+        },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false
+        },
+        updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false
+        },
+        version: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         }
     },
     {
@@ -66,3 +101,4 @@ BacklogItemPartDataModel.init(
 );
 
 BacklogItemPartDataModel.belongsTo(BacklogItemDataModel);
+BacklogItemDataModel.hasMany(BacklogItemPartDataModel, { foreignKey: "backlogitemId" });

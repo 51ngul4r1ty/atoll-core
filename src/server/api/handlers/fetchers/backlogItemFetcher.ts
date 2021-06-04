@@ -1,5 +1,6 @@
 // externals
 import * as HttpStatus from "http-status-codes";
+import { FindOptions } from "sequelize";
 
 // libraries
 import { ApiBacklogItem, LinkedList } from "@atoll/shared";
@@ -9,6 +10,7 @@ import { mapDbToApiBacklogItem, mapDbToApiBacklogItemRank } from "../../../dataa
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 import { getMessageFromError } from "../../utils/errorUtils";
+import { buildFindOptionsIncludeForNested, computeUnallocatedParts } from "../helpers/backlogItemHelper";
 
 // data access
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItem";
@@ -71,9 +73,14 @@ export const backlogItemsFetcher = async (projectId: string | null): Promise<Bac
                 rankList.addInitialLink(item.backlogitemId, item.nextbacklogitemId);
             });
         }
-        const backlogItems = await BacklogItemDataModel.findAll(options);
+        const backlogItemsOptions: FindOptions = {
+            ...options,
+            include: buildFindOptionsIncludeForNested()
+        };
+        const backlogItems = await BacklogItemDataModel.findAll(backlogItemsOptions);
         backlogItems.forEach((item) => {
             const backlogItem = mapDbToApiBacklogItem(item);
+            backlogItem.unallocatedParts = computeUnallocatedParts((item as any).backlogitemparts);
             const result: ApiBacklogItem = {
                 ...backlogItem,
                 links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]
