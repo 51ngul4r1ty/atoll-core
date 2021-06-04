@@ -18,6 +18,7 @@ import {
 
 // data access
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItem";
+import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPart";
 import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRank";
 import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
 
@@ -27,14 +28,12 @@ import { HandlerContext } from "../utils/handlerContext";
 // utils
 import {
     mapDbSprintBacklogToApiBacklogItem,
-    mapDbToApiBacklogItem,
     mapDbToApiBacklogItemWithParts,
     mapDbToApiSprintBacklogItem
 } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { handleSprintStatUpdate } from "../updaters/sprintStatUpdater";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { addIdToBody } from "../../utils/uuidHelper";
-import { BacklogItemPartDataModel } from "dataaccess/models/BacklogItemPart";
 
 export const fetchSprintBacklogItemsForBacklogItemWithNested = async (
     handlerContext: HandlerContext,

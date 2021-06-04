@@ -3,7 +3,8 @@ import * as HttpStatus from "http-status-codes";
 import { FindOptions, Transaction } from "sequelize";
 
 // data access
-import { BacklogItemDataModel, BacklogItemPartDataModel } from "dataaccess";
+import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItem";
+import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPart";
 
 // utils
 import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
