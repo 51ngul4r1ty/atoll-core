@@ -10,7 +10,7 @@ import { backlogItemsFetcher } from "../fetchers/backlogItemFetcher";
 import { fetchSprints } from "../fetchers/sprintFetcher";
 import { userPreferencesFetcher } from "../fetchers/userPreferencesFetcher";
 import { getLoggedInAppUserId } from "../../utils/authUtils";
-import { combineMessages, combineStatuses } from "api/utils/resultAggregator";
+import { combineMessages, combineStatuses } from "../../utils/resultAggregator";
 import { FetchedSprintBacklogItems, fetchSprintBacklogItemsWithLinks } from "../fetchers/sprintBacklogItemFetcher";
 
 // interfaces/types
