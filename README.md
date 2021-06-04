@@ -92,4 +92,4 @@ README.md                                     - this document is intended as the
 [GLOSSARY.md](docs/GLOSSARY.md)               - glossary specific to this project.  
 [ISSUES_RESOLVED.md](docs/ISSUES_RESOLVED.md) - this may be useful if you're running into problems.  
 [DATA_MODEL.md](docs/dataModel/DATA_MODEL.md) - mapping the requirements to the data model.  
-
+[PROCESS.md](docs/PROCESS.md)                 - the index document for processes that should be followed.
