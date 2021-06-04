@@ -211,5 +211,4 @@ export interface MoveBacklogItemToBacklogSuccessPayloadExtra extends SprintStats
 
 See how each extended type includes everything from the ancestor?  This may seem redudant
 but it is for readability.  Other languages don't allow this, but TypeScript does.  If you
-don't do it this way you may find it harder to see what the full type's definition looks
-like.
+don't do it this way it is harder to see, at a glance, what the full type structure is.
