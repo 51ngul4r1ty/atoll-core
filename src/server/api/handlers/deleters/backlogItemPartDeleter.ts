@@ -10,6 +10,7 @@ import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItem
 import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
 import { getMessageFromError } from "../../utils/errorUtils";
 import { mapDbToApiBacklogItem, mapDbToApiBacklogItemPart } from "../../../dataaccess/mappers/dataAccessToApiMappers";
+import { commitWithOkResponseIfNotAborted } from "../utils/handlerContext";
 
 export enum LastPartRemovalOptions {
     Disallow = 1,
@@ -19,6 +20,9 @@ export enum LastPartRemovalOptions {
 /**
  * Removes a backlog item part that hasn't been allocated to a sprint.  The foreign key constraint should prevent deletion of an
  * allocated backlog item, but regardless, this function is not intended for use with allocated backlog item parts.
+ *
+ * NOTE: Calling code is responsible for transaction handling (begin & commit).
+ *
  * @param backlogItemPartId
  * @param lastPartRemovalOptions
  * @param transaction
