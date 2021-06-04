@@ -82,7 +82,7 @@ export const removeUnallocatedBacklogItemPart = async (
         }
         for (const peerItem of peerItems) {
             if (peerItem.partIndex > item.partIndex) {
-                await peerItem.update({ partIndex: peerItem.partIndex - 1 });
+                await peerItem.update({ partIndex: peerItem.partIndex - 1 }, { transaction });
             }
         }
         return {
