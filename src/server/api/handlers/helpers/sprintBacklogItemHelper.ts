@@ -1,9 +1,13 @@
+/**
+ * Purpose: To offload individual steps in the sprintBacklogItem handler.
+ * Reason to change: Data model / logic changes related to the sprint backlogitem API endpoints.
+ */
+
 // externals
 import { CreateOptions, FindOptions } from "sequelize";
 
 // libraries
 import {
-    ApiBacklogItem,
     ApiBacklogItemPart,
     ApiBacklogItemWithParts,
     ApiSprintBacklogItem,

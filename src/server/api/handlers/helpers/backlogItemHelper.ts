@@ -1,3 +1,8 @@
+/**
+ * Purpose: To offload individual steps in the backlogItem handler.
+ * Reason to change: Data model / logic changes related to the backlogitem API endpoints.
+ */
+
 // interfaces/types
 import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPart";
 import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";

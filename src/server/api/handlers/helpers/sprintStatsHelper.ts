@@ -1,3 +1,10 @@
+/**
+ * Purpose: To break the rules for all other helpers- they're supposed to serve the needs of one handler, but this one seemed to
+ *   make sense as a helper nonetheless.  To serve the purpose of offloading logic from any of the handlers that do something with
+ *   sprint stats.  It is still fairly limited in scope for this reason.
+ * Reason to change: Data model / logic changes related to the sprint stats (for any related endpoints).
+ */
+
 // libraries
 import { ApiSprint, ApiSprintStats, BacklogItemStatus, hasBacklogItemAtLeastBeenAccepted, SprintStatus } from "@atoll/shared";
 
