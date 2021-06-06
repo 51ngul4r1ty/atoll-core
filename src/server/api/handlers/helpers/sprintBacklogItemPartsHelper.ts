@@ -8,6 +8,7 @@ import { FindOptions, Op } from "sequelize";
 
 // libraries
 import {
+    ApiBacklogItem,
     ApiBacklogItemPart,
     ApiSprint,
     ApiSprintStats,
@@ -141,20 +142,25 @@ export const addBacklogItemPartToNextSprint = async (
 export const updateNextSprintStats = async (
     handlerContext: HandlerContext,
     apiNextSprint: ApiSprint,
+    backlogItem: ApiBacklogItem,
     backlogItemPart: ApiBacklogItemPart
 ): Promise<ApiSprintStats> => {
     const nextSprint = mapApiItemToSprint(apiNextSprint);
 
     const nextSprintStatus = determineSprintStatus(nextSprint.startDate, nextSprint.finishDate);
-    const originalBacklogItemEstimate = 0; // adding to sprint, so no original estimate counted in this sprint
+    const originalBacklogItemPartEstimate = null; // adding to sprint, so no original estimate counted in this sprint for part
+    const originalBacklogItemEstimate = null; // adding to sprint, so no original estimate counted in this sprint for story
     const originalBacklogItemStatus = BacklogItemStatus.None; // same as above, use None to indicate this
-    const backlogItemEstimate = backlogItemPart.points;
+    const backlogItemPartEstimate = backlogItemPart.points;
+    const backlogItemEstimate = backlogItem.estimate;
     const backlogItemStatus = mapApiStatusToBacklogItem(backlogItemPart.status);
     const newSprintStatsResult = buildNewSprintStats(
         buildSprintStatsFromApiSprint(apiNextSprint),
         nextSprintStatus,
+        originalBacklogItemPartEstimate,
         originalBacklogItemEstimate,
         originalBacklogItemStatus,
+        backlogItemPartEstimate,
         backlogItemEstimate,
         backlogItemStatus
     );

@@ -92,6 +92,11 @@ export const abortWithFailedValidationResponse = (handlerContext: HandlerContext
     handlerContext.transactionContext.aborted = true;
 };
 
+export const abortWithErrorResponse = (handlerContext: HandlerContext, message: string) => {
+    respondWithError(handlerContext.expressContext.res, message);
+    handlerContext.transactionContext.aborted = true;
+};
+
 export const rollbackWithErrorResponse = async (handlerContext: HandlerContext, message: string) => {
     respondWithError(handlerContext.expressContext.res, message);
     await handlerContext.transactionContext.transaction.rollback();

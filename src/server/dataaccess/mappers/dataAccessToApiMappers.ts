@@ -88,7 +88,7 @@ export const mapDbToApiSprint = (item: any): ApiSprint => {
     };
 };
 
-export const mapDbSprintBacklogToApiBacklogItem = (item: any): ApiBacklogItemInSprint => {
+export const mapDbSprintBacklogToApiBacklogItemInSprint = (item: any): ApiBacklogItemInSprint => {
     if (!item) {
         return item;
     }

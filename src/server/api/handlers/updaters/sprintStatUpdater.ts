@@ -15,7 +15,9 @@ export const handleSprintStatUpdate = async (
     sprintId: string,
     originalBacklogItemStatus: BacklogItemStatus,
     backlogItemStatus: BacklogItemStatus,
+    originalBacklogItemPartEstimate: number | null,
     originalBacklogItemEstimate: number | null,
+    backlogItemPartEstimate: number | null,
     backlogItemEstimate: number | null,
     transaction: Transaction
 ): Promise<ApiSprintStats | null> => {
@@ -29,12 +31,14 @@ export const handleSprintStatUpdate = async (
     const sprintStatus = determineSprintStatus(sprint.startDate, sprint.finishDate);
     sprintStats = buildSprintStatsFromApiSprint(apiSprint);
 
-    if (backlogItemEstimate || originalBacklogItemEstimate) {
+    if (backlogItemPartEstimate || originalBacklogItemPartEstimate) {
         const newSprintStatsResult = buildNewSprintStats(
             sprintStats,
             sprintStatus,
+            originalBacklogItemPartEstimate,
             originalBacklogItemEstimate,
             originalBacklogItemStatus,
+            backlogItemPartEstimate,
             backlogItemEstimate,
             backlogItemStatus
         );

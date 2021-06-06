@@ -6,6 +6,7 @@ import { /* CreateOptions, */ Transaction } from "sequelize";
 
 // libraries
 import {
+    ApiBacklogItem,
     ApiBacklogItemPart,
     ApiSprintStats,
     //     ApiBacklogItemPart,
@@ -39,17 +40,20 @@ import {
 } from "../utils/responder";
 import { respondedWithMismatchedItemIds } from "../utils/validationResponders";
 import {
+    abortWithErrorResponse,
     abortWithNotFoundResponse,
     beginSerializableTransaction,
     finish,
     handleUnexpectedErrorResponse,
+    hasAborted,
     start
 } from "./utils/handlerContext";
-import { mapDbToApiBacklogItemPart } from "dataaccess/mappers/dataAccessToApiMappers";
+import { mapDbToApiBacklogItem, mapDbToApiBacklogItemPart } from "dataaccess/mappers/dataAccessToApiMappers";
 import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
 import { getUpdatedBacklogItemPartWhenStatusChanges } from "../utils/statusChangeUtils";
 import { getIdForSprintContainingBacklogItemPart } from "./fetchers/sprintFetcher";
 import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
+import { BacklogItemDataModel } from "dataaccess/models/BacklogItem";
 // import { getParamsFromRequest } from "../utils/filterHelper";
 // import { backlogItemFetcher, backlogItemsFetcher, BacklogItemsResult } from "./fetchers/backlogItemFetcher";
 // import { addIdToBody } from "../utils/uuidHelper";
@@ -369,9 +373,6 @@ import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
 //     }
 // };
 
-// ... BUSY HERE ...
-// TODO: There's still an issue regarding acceptance of split stories - it currently takes
-//       the part's estimate (part.points) and sets that to the accepted points - but that's incorrect
 export const backlogItemPartPatchHandler = async (req: Request, res: Response) => {
     const handlerContext = start("backlogItemPartPatchHandler", res);
 
@@ -388,29 +389,47 @@ export const backlogItemPartPatchHandler = async (req: Request, res: Response) =
     }
     try {
         await beginSerializableTransaction(handlerContext);
-        const backlogItemPart = await BacklogItemPartDataModel.findOne({
+        const dbBacklogItemPart = await BacklogItemPartDataModel.findOne({
             where: { id: queryParamItemId },
             transaction: handlerContext.transactionContext.transaction
         });
-        if (!backlogItemPart) {
-            abortWithNotFoundResponse(handlerContext, `Unable to find backlogitem to patch with ID ${queryParamItemId}`);
-        } else {
-            const originalApiBacklogItemPart = mapDbToApiBacklogItemPart(backlogItemPart);
-            const invalidPatchMessage = getInvalidPatchMessage(originalApiBacklogItemPart, req.body);
-            if (invalidPatchMessage) {
-                respondWithFailedValidation(res, `Unable to patch: ${invalidPatchMessage}`);
-            } else {
-                let newDataItem = getPatchedItem(originalApiBacklogItemPart, req.body);
-                newDataItem = getUpdatedBacklogItemPartWhenStatusChanges(originalApiBacklogItemPart, newDataItem);
-                await backlogItemPart.update(newDataItem, { transaction: handlerContext.transactionContext.transaction });
-
-                await handleResponseWithUpdatedStatsAndCommit(
-                    newDataItem,
-                    originalApiBacklogItemPart,
-                    backlogItemPart,
-                    res,
-                    handlerContext.transactionContext.transaction
+        if (!dbBacklogItemPart) {
+            abortWithNotFoundResponse(handlerContext, `Unable to find backlogitempart to patch with ID ${queryParamItemId}`);
+        }
+        if (!hasAborted(handlerContext)) {
+            const backlogItemId = dbBacklogItemPart.backlogitemId;
+            const dbBacklogItem = await BacklogItemDataModel.findOne({
+                where: { id: backlogItemId },
+                transaction: handlerContext.transactionContext.transaction
+            });
+            if (!dbBacklogItem) {
+                abortWithErrorResponse(
+                    handlerContext,
+                    `Unable to find backlogitem with ID ${backlogItemId}, ` +
+                        `needed to patch backlogitempart with ID ${queryParamItemId}`
                 );
+            }
+            const apiBacklogItem = mapDbToApiBacklogItem(dbBacklogItem);
+
+            if (!hasAborted(handlerContext)) {
+                const originalApiBacklogItemPart = mapDbToApiBacklogItemPart(dbBacklogItemPart);
+                const invalidPatchMessage = getInvalidPatchMessage(originalApiBacklogItemPart, req.body);
+                if (invalidPatchMessage) {
+                    respondWithFailedValidation(res, `Unable to patch: ${invalidPatchMessage}`);
+                } else {
+                    let newDataItem = getPatchedItem(originalApiBacklogItemPart, req.body);
+                    newDataItem = getUpdatedBacklogItemPartWhenStatusChanges(originalApiBacklogItemPart, newDataItem);
+                    await dbBacklogItemPart.update(newDataItem, { transaction: handlerContext.transactionContext.transaction });
+
+                    await handleResponseWithUpdatedStatsAndCommit(
+                        newDataItem,
+                        originalApiBacklogItemPart,
+                        dbBacklogItemPart,
+                        apiBacklogItem,
+                        res,
+                        handlerContext.transactionContext.transaction
+                    );
+                }
             }
         }
     } catch (err) {
@@ -480,6 +499,7 @@ const handleResponseWithUpdatedStatsAndCommit = async (
     newApiBacklogItemPart: ApiBacklogItemPart,
     originalApiBacklogItemPart: ApiBacklogItemPart,
     dbBacklogItemPart: BacklogItemPartDataModel,
+    apiBacklogItem: ApiBacklogItem,
     res: Response,
     transaction: Transaction
 ): Promise<void> => {
@@ -491,12 +511,16 @@ const handleResponseWithUpdatedStatsAndCommit = async (
         originalBacklogItemPart.status !== newBacklogItemPart.status
     ) {
         const sprintId = await getIdForSprintContainingBacklogItemPart(originalBacklogItemPart.id, transaction);
+        const originalBacklogItemEstimate = apiBacklogItem.estimate;
+        const backlogItemEstimate = apiBacklogItem.estimate;
         sprintStats = await handleSprintStatUpdate(
             sprintId,
             originalBacklogItemPart.status,
             newBacklogItemPart.status,
             originalBacklogItemPart.points,
+            originalBacklogItemEstimate,
             newBacklogItemPart.points,
+            backlogItemEstimate,
             transaction
         );
     }

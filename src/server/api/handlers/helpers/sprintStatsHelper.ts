@@ -69,47 +69,53 @@ export interface NewSprintStatsResult {
 export const buildNewSprintStats = (
     existingSprintStats: ApiSprintStats,
     sprintStatus: SprintStatus,
-    originalBacklogItemEstimate: number,
+    originalBacklogItemPartEstimate: number | null,
+    originalBacklogItemEstimate: number | null,
     originalBacklogItemStatus: BacklogItemStatus,
-    backlogItemEstimate: number,
+    backlogItemPartEstimate: number | null,
+    backlogItemEstimate: number | null,
     backlogItemStatus: BacklogItemStatus
 ): NewSprintStatsResult => {
+    const backlogItemPartEstimateToUse = backlogItemPartEstimate || 0;
+    const backlogItemEstimateToUse = backlogItemEstimate || 0;
+    const originalBacklogItemPartEstimateToUse = originalBacklogItemPartEstimate || 0;
+    const originalBacklogItemEstimateToUse = originalBacklogItemEstimate || 0;
     const newSprintStats = { ...existingSprintStats };
-    newSprintStats.totalPoints += backlogItemEstimate - originalBacklogItemEstimate;
-    let totalsChanged = backlogItemEstimate !== originalBacklogItemEstimate;
+    newSprintStats.totalPoints += backlogItemPartEstimateToUse - originalBacklogItemPartEstimateToUse;
+    let totalsChanged = backlogItemPartEstimateToUse !== originalBacklogItemPartEstimateToUse;
     const acceptedPointsOp = calcSprintStatAcceptedPtsOp(originalBacklogItemStatus, backlogItemStatus);
     switch (acceptedPointsOp) {
         case Operation.Add: {
-            newSprintStats.acceptedPoints += backlogItemEstimate;
-            totalsChanged = totalsChanged || backlogItemEstimate > 0;
+            newSprintStats.acceptedPoints += backlogItemEstimateToUse; // business rule: add story's estimate to accepted
+            totalsChanged = totalsChanged || backlogItemEstimateToUse > 0;
             break;
         }
         case Operation.Remove: {
-            newSprintStats.acceptedPoints -= originalBacklogItemEstimate;
-            totalsChanged = totalsChanged || originalBacklogItemEstimate > 0;
+            newSprintStats.acceptedPoints -= originalBacklogItemEstimateToUse; // business rule: remove story's estimate from accepted
+            totalsChanged = totalsChanged || originalBacklogItemEstimateToUse > 0;
             break;
         }
         case Operation.Update: {
-            newSprintStats.acceptedPoints += backlogItemEstimate - originalBacklogItemEstimate;
-            totalsChanged = totalsChanged || backlogItemEstimate !== originalBacklogItemEstimate;
+            newSprintStats.acceptedPoints += backlogItemEstimateToUse - originalBacklogItemEstimateToUse;
+            totalsChanged = totalsChanged || backlogItemEstimateToUse !== originalBacklogItemEstimateToUse;
             break;
         }
     }
     const planningPointsOp = calcSprintStatPlanningPtsOp(sprintStatus, originalBacklogItemStatus, backlogItemStatus);
     switch (planningPointsOp) {
         case Operation.Add: {
-            newSprintStats.plannedPoints += backlogItemEstimate;
-            totalsChanged = totalsChanged || backlogItemEstimate > 0;
+            newSprintStats.plannedPoints += backlogItemPartEstimateToUse; // business rule: planning total uses part points, not estimate
+            totalsChanged = totalsChanged || backlogItemPartEstimateToUse > 0;
             break;
         }
         case Operation.Remove: {
-            newSprintStats.plannedPoints -= originalBacklogItemEstimate;
-            totalsChanged = totalsChanged || originalBacklogItemEstimate > 0;
+            newSprintStats.plannedPoints -= originalBacklogItemPartEstimateToUse; // business rule: see above
+            totalsChanged = totalsChanged || originalBacklogItemPartEstimateToUse > 0;
             break;
         }
         case Operation.Update: {
-            newSprintStats.plannedPoints += backlogItemEstimate - originalBacklogItemEstimate;
-            totalsChanged = totalsChanged || backlogItemEstimate !== originalBacklogItemEstimate;
+            newSprintStats.plannedPoints += backlogItemPartEstimateToUse - originalBacklogItemPartEstimateToUse;
+            totalsChanged = totalsChanged || backlogItemPartEstimateToUse !== originalBacklogItemPartEstimateToUse;
             break;
         }
     }

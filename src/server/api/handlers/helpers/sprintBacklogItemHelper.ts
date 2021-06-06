@@ -27,7 +27,7 @@ import { HandlerContext } from "../utils/handlerContext";
 
 // utils
 import {
-    mapDbSprintBacklogToApiBacklogItem,
+    mapDbSprintBacklogToApiBacklogItemInSprint,
     mapDbToApiBacklogItemWithParts,
     mapDbToApiSprintBacklogItem
 } from "../../../dataaccess/mappers/dataAccessToApiMappers";
@@ -68,8 +68,8 @@ export const removeSprintBacklogItemAndUpdateStats = async (
     sprintStats: ApiSprintStats
 ): Promise<ApiSprintStats> => {
     const backlogitempartId = (sprintBacklogItemWithNested as any).backlogitempartId;
-    const apiBacklogItemTyped = mapDbSprintBacklogToApiBacklogItem(sprintBacklogItemWithNested);
-    const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItemTyped);
+    const apiBacklogItemInSprint = mapDbSprintBacklogToApiBacklogItemInSprint(sprintBacklogItemWithNested);
+    const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItemInSprint);
     await SprintBacklogItemDataModel.destroy({
         where: { sprintId, backlogitempartId },
         transaction: handlerContext.transactionContext.transaction
@@ -79,6 +79,8 @@ export const removeSprintBacklogItemAndUpdateStats = async (
         backlogItemTyped.status,
         BacklogItemStatus.None,
         backlogItemTyped.estimate,
+        apiBacklogItemInSprint.storyEstimate,
+        null,
         null,
         handlerContext.transactionContext.transaction
     );
