@@ -1,7 +1,6 @@
 // externals
 import { Request } from "express";
 import * as HttpStatus from "http-status-codes";
-import { CreateOptions, FindOptions, Transaction } from "sequelize";
 
 // libraries
 import {

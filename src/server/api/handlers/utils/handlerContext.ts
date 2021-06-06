@@ -10,7 +10,7 @@ import { logger, LoggingContext } from "@atoll/shared";
 import { sequelize } from "../../../dataaccess/connection";
 
 // utils
-import { respondWithError, respondWithNotFound } from "../../../api/utils/responder";
+import { respondWithError, respondWithFailedValidation, respondWithNotFound } from "../../../api/utils/responder";
 
 export interface HandlerTransactionContext {
     transaction: Transaction;
@@ -84,6 +84,11 @@ export const abortSilently = (handlerContext: HandlerContext) => {
 
 export const abortWithNotFoundResponse = (handlerContext: HandlerContext, message: string) => {
     respondWithNotFound(handlerContext.expressContext.res, message);
+    handlerContext.transactionContext.aborted = true;
+};
+
+export const abortWithFailedValidationResponse = (handlerContext: HandlerContext, message: string) => {
+    respondWithFailedValidation(handlerContext.expressContext.res, message);
     handlerContext.transactionContext.aborted = true;
 };
 

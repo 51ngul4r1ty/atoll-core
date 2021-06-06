@@ -6,6 +6,7 @@ import auth from "../middleware/auth";
 
 // consts/enums
 import {
+    BACKLOG_ITEM_PART_RESOURCE_NAME,
     BACKLOG_ITEM_RANK_RESOURCE_NAME,
     BACKLOG_ITEM_RESOURCE_NAME,
     PROJECT_RESOURCE_NAME,
@@ -21,9 +22,9 @@ import {
     backlogItemsGetHandler,
     backlogItemsPostHandler,
     backlogItemsReorderPostHandler,
-    backlogItemGetHandler,
-    backlogItemPutHandler,
-    backlogItemPatchHandler
+    backlogItemGetHandler // ,
+    // backlogItemPutHandler,
+    // backlogItemPatchHandler
 } from "./handlers/backlogItems";
 import {
     sprintPostHandler,
@@ -57,6 +58,7 @@ import {
     projectPostHandler,
     projectsGetHandler
 } from "./handlers/projects";
+import { backlogItemPartPatchHandler } from "./handlers/backlogItemParts";
 
 export const router = express.Router();
 
@@ -120,9 +122,13 @@ setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}`, { get: backlogItemsGetHand
 
 setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}/:itemId`, {
     get: backlogItemGetHandler,
-    put: backlogItemPutHandler,
-    patch: backlogItemPatchHandler,
+    // put: backlogItemPutHandler,
+    // patch: backlogItemPatchHandler,
     delete: backlogItemsDeleteHandler
+});
+
+setupRoutes(router, `/${BACKLOG_ITEM_PART_RESOURCE_NAME}/:itemId`, {
+    patch: backlogItemPartPatchHandler
 });
 
 setupRoutes(router, `/${BACKLOG_ITEM_RANK_RESOURCE_NAME}`, { get: backlogItemRanksGetHandler });

@@ -2,17 +2,27 @@
 import { Request, Response } from "express";
 
 // libraries
-import { ApiBacklogItem, ApiBacklogItemPart, ApiSprintBacklogItem, ApiSprintStats } from "@atoll/shared";
+import {
+    ApiBacklogItem,
+    ApiBacklogItemPart,
+    ApiSprintBacklogItem,
+    ApiSprintStats,
+    BacklogItemStatus,
+    hasBacklogItemAtMostBeenInProgress,
+    mapApiItemToBacklogItem
+} from "@atoll/shared";
 
 // utils
 import { getParamsFromRequest } from "../utils/filterHelper";
 import {
+    abortWithFailedValidationResponse,
     abortWithNotFoundResponse,
     beginSerializableTransaction,
     commitWithCreatedResponseIfNotAborted,
     finish,
     handleUnexpectedErrorResponse,
     hasAborted,
+    rollbackWithErrorResponse,
     start
 } from "./utils/handlerContext";
 import {
@@ -53,31 +63,41 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
 
         let addedBacklogItemPart: ApiBacklogItemPart;
         let addedSprintBacklogItem: ApiSprintBacklogItem;
-        let backlogItemForAddedPart: ApiBacklogItem;
+        let apiBacklogItemForAddedPart: ApiBacklogItem;
         let sprintStats: ApiSprintStats;
         if (!hasAborted(handlerContext)) {
             const { dbBacklogItem, dbSprint } = getBacklogItemAndSprint(sprintBacklogItemsWithNested, backlogItemId);
 
-            backlogItemForAddedPart = mapDbToApiBacklogItem(dbBacklogItem);
-            const backlogItemPart = await addBacklogItemPart(handlerContext, dbBacklogItem);
+            apiBacklogItemForAddedPart = mapDbToApiBacklogItem(dbBacklogItem);
+            const backlogItemForAddedPart = mapApiItemToBacklogItem(apiBacklogItemForAddedPart);
 
-            addedBacklogItemPart = mapDbToApiBacklogItemPart(backlogItemPart);
-            const addToNextSprintResult = await addBacklogItemPartToNextSprint(
-                handlerContext,
-                addedBacklogItemPart.id,
-                dbSprint.startdate
-            );
-            const { sprintBacklogItem: dbSprintBacklogItem, nextSprint: dbNextSprint } = addToNextSprintResult;
-            addedSprintBacklogItem = mapDbToApiSprintBacklogItem(dbSprintBacklogItem);
+            if (!hasBacklogItemAtMostBeenInProgress(backlogItemForAddedPart.status)) {
+                abortWithFailedValidationResponse(
+                    handlerContext,
+                    `Unable to split backlog item with ID "${backlogItemId}" that's in ` +
+                        `a "${apiBacklogItemForAddedPart.status}" status`
+                );
+            } else {
+                const backlogItemPart = await addBacklogItemPart(handlerContext, dbBacklogItem);
 
-            const apiNextSprint = mapDbToApiSprint(dbNextSprint);
-            sprintStats = await updateNextSprintStats(handlerContext, apiNextSprint, addedBacklogItemPart);
+                addedBacklogItemPart = mapDbToApiBacklogItemPart(backlogItemPart);
+                const addToNextSprintResult = await addBacklogItemPartToNextSprint(
+                    handlerContext,
+                    addedBacklogItemPart.id,
+                    dbSprint.startdate
+                );
+                const { sprintBacklogItem: dbSprintBacklogItem, nextSprint: dbNextSprint } = addToNextSprintResult;
+                addedSprintBacklogItem = mapDbToApiSprintBacklogItem(dbSprintBacklogItem);
 
-            await updateBacklogItemWithPartCount(handlerContext, backlogItemId, addedBacklogItemPart.partIndex);
+                const apiNextSprint = mapDbToApiSprint(dbNextSprint);
+                sprintStats = await updateNextSprintStats(handlerContext, apiNextSprint, addedBacklogItemPart);
+
+                await updateBacklogItemWithPartCount(handlerContext, backlogItemId, addedBacklogItemPart.partIndex);
+            }
         }
 
         await commitWithCreatedResponseIfNotAborted(handlerContext, addedBacklogItemPart, {
-            backlogItem: backlogItemForAddedPart,
+            backlogItem: apiBacklogItemForAddedPart,
             sprintBacklogItem: addedSprintBacklogItem,
             sprintStats
         });

@@ -76,11 +76,23 @@ export const fetchSprint = async (sprintId: string) => {
     }
 };
 
-export const getIdForSprintContainingBacklogItem = async (
-    backlogItemId: string,
+// export const getIdForSprintContainingBacklogItem = async (
+//     backlogItemId: string,
+//     transaction?: Transaction
+// ): Promise<string | null> => {
+//     const dbSprintBacklogItem = await SprintBacklogItemDataModel.findOne({ where: { backlogitemId: backlogItemId }, transaction });
+//     const apiSprintBacklogItem = mapDbToApiSprintBacklogItem(dbSprintBacklogItem);
+//     return apiSprintBacklogItem ? apiSprintBacklogItem.sprintId : null;
+// };
+
+export const getIdForSprintContainingBacklogItemPart = async (
+    backlogItemPartId: string,
     transaction?: Transaction
 ): Promise<string | null> => {
-    const dbSprintBacklogItem = await SprintBacklogItemDataModel.findOne({ where: { backlogitemId: backlogItemId }, transaction });
+    const dbSprintBacklogItem = await SprintBacklogItemDataModel.findOne({
+        where: { backlogitempartId: backlogItemPartId },
+        transaction
+    });
     const apiSprintBacklogItem = mapDbToApiSprintBacklogItem(dbSprintBacklogItem);
     return apiSprintBacklogItem ? apiSprintBacklogItem.sprintId : null;
 };
