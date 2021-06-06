@@ -484,16 +484,19 @@ const handleResponseWithUpdatedStatsAndCommit = async (
     transaction: Transaction
 ): Promise<void> => {
     let sprintStats: ApiSprintStats;
-    const newBacklogItem = mapApiItemToBacklogItemPart(newApiBacklogItemPart);
+    const newBacklogItemPart = mapApiItemToBacklogItemPart(newApiBacklogItemPart);
     const originalBacklogItemPart = mapApiItemToBacklogItemPart(originalApiBacklogItemPart);
-    if (originalBacklogItemPart.points !== newBacklogItem.points || originalBacklogItemPart.status !== newBacklogItem.status) {
+    if (
+        originalBacklogItemPart.points !== newBacklogItemPart.points ||
+        originalBacklogItemPart.status !== newBacklogItemPart.status
+    ) {
         const sprintId = await getIdForSprintContainingBacklogItemPart(originalBacklogItemPart.id, transaction);
         sprintStats = await handleSprintStatUpdate(
             sprintId,
             originalBacklogItemPart.status,
-            newBacklogItem.status,
+            newBacklogItemPart.status,
             originalBacklogItemPart.points,
-            newBacklogItem.points,
+            newBacklogItemPart.points,
             transaction
         );
     }
