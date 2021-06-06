@@ -402,7 +402,6 @@ export const backlogItemPartPatchHandler = async (req: Request, res: Response) =
             } else {
                 let newDataItem = getPatchedItem(originalApiBacklogItemPart, req.body);
                 newDataItem = getUpdatedBacklogItemPartWhenStatusChanges(originalApiBacklogItemPart, newDataItem);
-                // ... BUSY HERE ...
                 await backlogItemPart.update(newDataItem, { transaction: handlerContext.transactionContext.transaction });
 
                 await handleResponseWithUpdatedStatsAndCommit(
