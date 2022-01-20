@@ -119,6 +119,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                 apiBacklogItemPartAllocated = unallocatedBacklogItemParts[0];
                 backlogItemPartAllocated = mapApiItemToBacklogItemPart(apiBacklogItemPartAllocated);
                 allocatedBacklogItemPartId = backlogItemPartAllocated.id;
+                backlogItem = await fetchAssociatedBacklogItemWithParts(handlerContext, backlogItemPartAllocated.backlogitemId);
             }
         }
         let addedSprintBacklog: SprintBacklogItemDataModel;
@@ -181,22 +182,18 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
             }
         }
         if (!hasRolledBack(handlerContext)) {
-            backlogItem = await fetchAssociatedBacklogItemWithParts(handlerContext, backlogItemPartAllocated.backlogitemId);
+            const extra = {
+                sprintStats,
+                backlogItemPart: apiBacklogItemPartAllocated,
+                backlogItem
+            };
             if (joinSplitParts) {
                 // nothing was added, so 200 status is appropriate
                 // (it combined the "added" part into an existing part in the sprint)
-                await commitWithOkResponseIfNotAborted(handlerContext, addedSprintBacklog, {
-                    sprintStats,
-                    backlogItemPart: apiBacklogItemPartAllocated,
-                    backlogItem
-                });
+                await commitWithOkResponseIfNotAborted(handlerContext, addedSprintBacklog, extra);
             } else {
                 // a new entry was added, so 201 status is appropriate
-                await commitWithCreatedResponseIfNotAborted(handlerContext, addedSprintBacklog, {
-                    sprintStats,
-                    backlogItemPart: apiBacklogItemPartAllocated,
-                    backlogItem
-                });
+                await commitWithCreatedResponseIfNotAborted(handlerContext, addedSprintBacklog, extra);
             }
         }
     } catch (err) {
