@@ -122,7 +122,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                 backlogItem = await fetchAssociatedBacklogItemWithParts(handlerContext, backlogItemPartAllocated.backlogitemId);
             }
         }
-        let addedSprintBacklog: SprintBacklogItemDataModel;
+        let addedSprintBacklogItem: SprintBacklogItemDataModel;
         let sprintStats: ApiSprintStats;
         if (!hasRolledBack(handlerContext)) {
             if (joinSplitParts) {
@@ -135,7 +135,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                     rollbackWithErrorResponse(handlerContext, removePartResult.message);
                 }
             } else {
-                addedSprintBacklog = await allocateBacklogItemToSprint(
+                addedSprintBacklogItem = await allocateBacklogItemToSprint(
                     handlerContext,
                     sprintId,
                     allocatedBacklogItemPartId,
@@ -190,10 +190,10 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
             if (joinSplitParts) {
                 // nothing was added, so 200 status is appropriate
                 // (it combined the "added" part into an existing part in the sprint)
-                await commitWithOkResponseIfNotAborted(handlerContext, addedSprintBacklog, extra);
+                await commitWithOkResponseIfNotAborted(handlerContext, addedSprintBacklogItem, extra);
             } else {
                 // a new entry was added, so 201 status is appropriate
-                await commitWithCreatedResponseIfNotAborted(handlerContext, addedSprintBacklog, extra);
+                await commitWithCreatedResponseIfNotAborted(handlerContext, addedSprintBacklogItem, extra);
             }
         }
     } catch (err) {
@@ -271,10 +271,11 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
                 }
                 firstApiBacklogItemTyped.unallocatedParts += matchingItems.length;
             }
-            await commitWithOkResponseIfNotAborted(handlerContext, apiBacklogItemTyped, {
+            const extra = {
                 sprintStats,
                 backlogItem: firstApiBacklogItemTyped
-            });
+            };
+            await commitWithOkResponseIfNotAborted(handlerContext, apiBacklogItemTyped, extra);
         }
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);
