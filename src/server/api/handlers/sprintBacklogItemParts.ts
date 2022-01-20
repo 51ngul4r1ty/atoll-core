@@ -90,7 +90,12 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
                 addedSprintBacklogItem = mapDbToApiSprintBacklogItem(dbSprintBacklogItem);
 
                 const apiNextSprint = mapDbToApiSprint(dbNextSprint);
-                sprintStats = await updateNextSprintStats(handlerContext, apiNextSprint, addedBacklogItemPart);
+                sprintStats = await updateNextSprintStats(
+                    handlerContext,
+                    apiNextSprint,
+                    apiBacklogItemForAddedPart,
+                    addedBacklogItemPart
+                );
 
                 await updateBacklogItemWithPartCount(handlerContext, backlogItemId, addedBacklogItemPart.partIndex);
             }
