@@ -24,7 +24,6 @@ export class BacklogItemDataModel extends Model {
     public acceptedAt!: Date | null;
     public releasedAt!: Date | null;
     public totalParts!: number | null;
-    public unallocatedPoints!: number | null;
     readonly createdAt!: Date;
     readonly updatedAt!: Date;
     readonly version: number;
@@ -84,10 +83,6 @@ BacklogItemDataModel.init(
             allowNull: true
         },
         totalParts: {
-            type: DataTypes.INTEGER,
-            allowNull: true
-        },
-        unallocatedPoints: {
             type: DataTypes.INTEGER,
             allowNull: true
         },

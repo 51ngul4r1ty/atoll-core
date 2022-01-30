@@ -73,6 +73,3 @@ alter table sprintbacklogitem drop constraint "sprintbacklogitem_backlogitemId_f
 alter table sprintbacklogitem drop column "backlogitemId";
 alter table backlogitem add column "totalParts" integer;
 update backlogitem set "totalParts" = 1;
-
--- Atoll v0.41.1
-alter table backlogitem add column "unallocatedPoints" decimal(10, 2);
