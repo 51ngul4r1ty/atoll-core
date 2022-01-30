@@ -38,7 +38,7 @@ import {
     rollbackWithErrorResponse,
     start
 } from "./utils/handlerContext";
-import { buildFindOptionsIncludeForNested, computeUnallocatedParts } from "./helpers/backlogItemHelper";
+import { buildFindOptionsIncludeForNested, computeUnallocatedParts, computeUnallocatedPoints } from "./helpers/backlogItemHelper";
 import {
     allocateBacklogItemToSprint,
     determineNextSprintIndex,
@@ -255,7 +255,9 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
                 );
             } else {
                 const backlogItem = backlogItems[0];
-                firstApiBacklogItemTyped.unallocatedParts = computeUnallocatedParts((backlogItem as any).backlogitemparts);
+                const backlogItemParts = (backlogItem as any).backlogitemparts;
+                firstApiBacklogItemTyped.unallocatedParts = computeUnallocatedParts(backlogItemParts);
+                firstApiBacklogItemTyped.unallocatedPoints = computeUnallocatedPoints(backlogItem, backlogItemParts);
             }
             if (!hasAborted(handlerContext)) {
                 // forEach doesn't work with async, so we use for ... of instead

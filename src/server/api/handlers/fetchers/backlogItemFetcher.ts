@@ -10,7 +10,7 @@ import { mapDbToApiBacklogItem, mapDbToApiBacklogItemRank } from "../../../dataa
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 import { getMessageFromError } from "../../utils/errorUtils";
-import { buildFindOptionsIncludeForNested, computeUnallocatedParts } from "../helpers/backlogItemHelper";
+import { buildFindOptionsIncludeForNested, computeUnallocatedParts, computeUnallocatedPoints } from "../helpers/backlogItemHelper";
 
 // data access
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItem";
@@ -79,8 +79,12 @@ export const backlogItemsFetcher = async (projectId: string | null): Promise<Bac
         };
         const backlogItems = await BacklogItemDataModel.findAll(backlogItemsOptions);
         backlogItems.forEach((item) => {
+            if ((item as any).dataValues.externalId === "gh-227") {
+                console.log(`---------------------- ${(item as any).dataValues.externalId} -----------------------`);
+            }
             const backlogItem = mapDbToApiBacklogItem(item);
             backlogItem.unallocatedParts = computeUnallocatedParts((item as any).backlogitemparts);
+            backlogItem.unallocatedPoints = computeUnallocatedPoints(item, (item as any).backlogitemparts);
             const result: ApiBacklogItem = {
                 ...backlogItem,
                 links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]

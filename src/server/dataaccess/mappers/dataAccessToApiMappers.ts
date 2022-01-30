@@ -22,9 +22,32 @@ export const mapDbToApiBacklogItem = (item: any): ApiBacklogItem => {
         return item;
     }
     const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
+    // let estimate = 0;
+    // let hasSprintBacklogItems: boolean;
+    // if ("backlogitemparts" in item) {
+    //     hasSprintBacklogItems = true;
+    //     (item as any).backlogitemparts?.forEach((part) => {
+    //         if ("sprintbacklogitems" in part) {
+    //             if (!part.sprintbacklogitems?.length) {
+    //                 estimate += convertDbFloatToNumber(part.points);
+    //             }
+    //         } else {
+    //             hasSprintBacklogItems = false;
+    //         }
+    //     });
+    // } else {
+    //     hasSprintBacklogItems = false;
+    // }
+    const storyEstimate = convertDbFloatToNumber(item.dataValues.estimate);
+    const remainingPoints = convertDbFloatToNumber(item.dataValues.remainingPoints);
+    const unallocatedPoints = convertDbFloatToNumber(item.dataValues.unallocatedPoints);
     return {
         ...dataValueFieldsOnly,
-        estimate: convertDbFloatToNumber(item.dataValues.estimate),
+        //        estimate: hasSprintBacklogItems ? estimate : storyEstimate,
+        estimate: storyEstimate,
+        remainingPoints,
+        storyEstimate,
+        unallocatedPoints,
         status: item.dataValues.status || "N"
     };
 };
@@ -122,6 +145,7 @@ export const mapDbSprintBacklogToApiBacklogItemInSprint = (item: any): ApiBacklo
         partIndex: convertDbFloatToNumber(backlogitempart.partIndex),
         totalParts: convertDbFloatToNumber(backlogitem.totalParts),
         unallocatedParts: convertDbFloatToNumber(backlogitem.unallocatedParts),
+        unallocatedPoints: convertDbFloatToNumber(backlogitem.unallocatedPoints),
         backlogItemPartId: backlogitempart.id,
         // story specific fields
         storyEstimate: convertDbFloatToNumber(backlogitem.estimate),
