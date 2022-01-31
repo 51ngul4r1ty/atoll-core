@@ -79,9 +79,6 @@ export const backlogItemsFetcher = async (projectId: string | null): Promise<Bac
         };
         const backlogItems = await BacklogItemDataModel.findAll(backlogItemsOptions);
         backlogItems.forEach((item) => {
-            if ((item as any).dataValues.externalId === "gh-227") {
-                console.log(`---------------------- ${(item as any).dataValues.externalId} -----------------------`);
-            }
             const backlogItem = mapDbToApiBacklogItem(item);
             backlogItem.unallocatedParts = computeUnallocatedParts((item as any).backlogitemparts);
             backlogItem.unallocatedPoints = computeUnallocatedPoints(item, (item as any).backlogitemparts);
