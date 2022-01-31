@@ -119,7 +119,6 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                 apiBacklogItemPartAllocated = unallocatedBacklogItemParts[0];
                 backlogItemPartAllocated = mapApiItemToBacklogItemPart(apiBacklogItemPartAllocated);
                 allocatedBacklogItemPartId = backlogItemPartAllocated.id;
-                backlogItem = await fetchAssociatedBacklogItemWithParts(handlerContext, backlogItemPartAllocated.backlogitemId);
             }
         }
         let addedSprintBacklogItem: SprintBacklogItemDataModel;
@@ -156,6 +155,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                 }
             }
             if (!hasRolledBack(handlerContext)) {
+                backlogItem = await fetchAssociatedBacklogItemWithParts(handlerContext, backlogitemId);
                 if (joinSplitParts) {
                     const fetchSprintResult = await fetchSprint(sprintId);
                     if (!isStatusSuccess(fetchSprintResult.status)) {

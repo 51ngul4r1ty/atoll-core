@@ -34,6 +34,7 @@ import {
 import { handleSprintStatUpdate } from "../updaters/sprintStatUpdater";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { addIdToBody } from "../../utils/uuidHelper";
+import { buildFindOptionsIncludeForNested, computeUnallocatedPoints } from "./backlogItemHelper";
 
 export const fetchSprintBacklogItemsForBacklogItemWithNested = async (
     handlerContext: HandlerContext,
@@ -146,15 +147,15 @@ export const fetchAssociatedBacklogItemWithParts = async (
     backlogItemId: string
 ): Promise<ApiBacklogItemWithParts> => {
     const dbBacklogItemWithParts = await BacklogItemDataModel.findByPk(backlogItemId, {
-        include: [
-            {
-                model: BacklogItemPartDataModel,
-                as: "backlogitemparts"
-            }
-        ],
+        include: buildFindOptionsIncludeForNested(),
         transaction: handlerContext.transactionContext.transaction
     });
+    console.log("$$$$$$$$$$$$$$$$$$$$$$$$$", dbBacklogItemWithParts);
+    const backlogItemParts = (dbBacklogItemWithParts as any).dataValues.backlogitemparts as any;
     const backlogItem = mapDbToApiBacklogItemWithParts(dbBacklogItemWithParts);
+    console.log(`&&&&&&&&&&&&&&&&&&&&&&&&& length = ${backlogItemParts?.length}`);
+    backlogItem.unallocatedPoints = computeUnallocatedPoints(dbBacklogItemWithParts, backlogItemParts);
+    console.log(`&&&&&&&&&&&&&&&&&&&&&&&&& unallocatedPoints = ${backlogItem.unallocatedPoints}`);
     return backlogItem;
 };
 
