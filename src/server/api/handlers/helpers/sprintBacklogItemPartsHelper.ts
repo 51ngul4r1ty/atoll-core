@@ -32,6 +32,11 @@ import { addIdToBody, getSimpleUuid } from "../../utils/uuidHelper";
 // interfaces/types
 import { HandlerContext } from "../utils/handlerContext";
 import { buildNewSprintStats, buildSprintStatsFromApiSprint } from "./sprintStatsHelper";
+import {
+    fetchAssociatedBacklogItemWithParts,
+    fetchSprintBacklogItemPartByItemId,
+    fetchSprintBacklogItemsPartByItemId
+} from "./sprintBacklogItemHelper";
 
 export const fetchSprintBacklogItemsWithNested = async (handlerContext: HandlerContext, sprintId: string) => {
     const options: FindOptions = { ...buildOptionsFromParams({ sprintId }), include: { all: true, nested: true } };
@@ -48,7 +53,14 @@ export interface GetBacklogItemAndSprintResult {
     dbSprint: SprintDataModel;
 }
 
-export const getBacklogItemAndSprint = (sprintBacklogItemsWithNested, backlogItemId: string): GetBacklogItemAndSprintResult => {
+/**
+ * Finds Backlog Item in DB Sprint Backlog Items list.
+ * @returns dbBacklogItem and dbSprint
+ */
+export const filterAndReturnDbBacklogItemAndSprint = (
+    sprintBacklogItemsWithNested,
+    backlogItemId: string
+): GetBacklogItemAndSprintResult => {
     const matchingItemsWithNested = sprintBacklogItemsWithNested.filter((sprintBacklogItem) => {
         const backlogItemPart = (sprintBacklogItem as any).backlogitempart;
         if (backlogItemPart) {
@@ -103,6 +115,9 @@ export const addBacklogItemPart = async (
 };
 
 export const fetchNextSprint = async (handlerContext: HandlerContext, currentSprintStartDate: Date): Promise<SprintDataModel> => {
+    if (!currentSprintStartDate) {
+        throw new Error("fetchNextSprint called without providing currentSprintStartDate!");
+    }
     const sprintBacklogItems = await SprintDataModel.findAll({
         where: {
             startdate: { [Op.gt]: currentSprintStartDate }
@@ -120,16 +135,26 @@ export interface AddBacklogItemPartToNextSprintResult {
 
 export const addBacklogItemPartToNextSprint = async (
     handlerContext: HandlerContext,
+    backlogitemId: string,
     backlogitempartId: string,
     currentSprintStartDate: Date
 ): Promise<AddBacklogItemPartToNextSprintResult> => {
     const nextSprint = await fetchNextSprint(handlerContext, currentSprintStartDate);
     const nextSprintId = nextSprint.id;
+    const backlogItemParts = await fetchSprintBacklogItemsPartByItemId(handlerContext, nextSprintId, backlogitemId);
+    if (backlogItemParts.length > 0) {
+        throw new Error(
+            `Unable to add backlog item part to next sprint because parts already exist ` +
+                `for the same backlog item ID ${backlogitemId}`
+        );
+    }
+    console.log("%%%%%%%%%%%%%%%%%%% 4");
     const newSprintBacklogItem = {
         id: getSimpleUuid(),
         sprintId: nextSprintId,
         backlogitempartId: backlogitempartId
     };
+    console.log("%%%%%%%%%%%%%%%%%%% 5");
     const addedSprintBacklogItem = await SprintBacklogItemDataModel.create(newSprintBacklogItem, {
         transaction: handlerContext.transactionContext.transaction
     });

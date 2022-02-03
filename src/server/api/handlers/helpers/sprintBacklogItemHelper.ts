@@ -28,6 +28,7 @@ import { HandlerContext } from "../utils/handlerContext";
 // utils
 import {
     mapDbSprintBacklogToApiBacklogItemInSprint,
+    mapDbToApiBacklogItemPart,
     mapDbToApiBacklogItemWithParts,
     mapDbToApiSprintBacklogItem
 } from "../../../dataaccess/mappers/dataAccessToApiMappers";
@@ -150,13 +151,37 @@ export const fetchAssociatedBacklogItemWithParts = async (
         include: buildFindOptionsIncludeForNested(),
         transaction: handlerContext.transactionContext.transaction
     });
-    console.log("$$$$$$$$$$$$$$$$$$$$$$$$$", dbBacklogItemWithParts);
     const backlogItemParts = (dbBacklogItemWithParts as any).dataValues.backlogitemparts as any;
     const backlogItem = mapDbToApiBacklogItemWithParts(dbBacklogItemWithParts);
-    console.log(`&&&&&&&&&&&&&&&&&&&&&&&&& length = ${backlogItemParts?.length}`);
     backlogItem.unallocatedPoints = computeUnallocatedPoints(dbBacklogItemWithParts, backlogItemParts);
-    console.log(`&&&&&&&&&&&&&&&&&&&&&&&&& unallocatedPoints = ${backlogItem.unallocatedPoints}`);
     return backlogItem;
+};
+
+/**
+ * Uses backlogItemId to find a matching backlogItemParts in the specified sprint.
+ */
+export const fetchSprintBacklogItemsPartByItemId = async (
+    handlerContext: HandlerContext,
+    sprintId: string,
+    backlogItemId: string
+): Promise<ApiBacklogItemPart[]> => {
+    const dbBacklogItemPartsWithSprintItems = await BacklogItemPartDataModel.findAll({
+        where: { backlogitemId: backlogItemId },
+        include: [
+            {
+                model: SprintBacklogItemDataModel,
+                as: "sprintbacklogitems",
+                where: { sprintId }
+            }
+        ],
+        transaction: handlerContext.transactionContext.transaction
+    });
+    if (dbBacklogItemPartsWithSprintItems.length === 0) {
+        return [];
+    } else {
+        const backlogItemParts = dbBacklogItemPartsWithSprintItems.map((item) => mapDbToApiBacklogItemPart(item));
+        return backlogItemParts;
+    }
 };
 
 export const allocateBacklogItemToSprint = async (
