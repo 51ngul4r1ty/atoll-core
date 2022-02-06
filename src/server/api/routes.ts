@@ -106,6 +106,10 @@ setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_
     post: sprintBacklogItemPostHandler
 });
 
+setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}/:backlogItemId`, {
+    delete: sprintBacklogItemDeleteHandler
+});
+
 setupRoutes(
     router,
     `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}/:backlogItemId/${SPRINT_BACKLOG_ITEM_PART_RESOURCE_NAME}`,
@@ -113,10 +117,6 @@ setupRoutes(
         post: sprintBacklogItemPartsPostHandler
     }
 );
-
-setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}/:backlogItemId`, {
-    delete: sprintBacklogItemDeleteHandler
-});
 
 setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}`, { get: backlogItemsGetHandler, post: backlogItemsPostHandler });
 
