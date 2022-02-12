@@ -33,6 +33,11 @@ Reducers
 
 Types related to the data structure that the reducer stores in the state tree should be exported from the reducer itself.
 
+Middleware
+==========
+
+Middleware should have `next(action);` as the first line to ensure that state is updated frist.
+
 Components
 ==========
 
@@ -212,3 +217,23 @@ export interface MoveBacklogItemToBacklogSuccessPayloadExtra extends SprintStats
 See how each extended type includes everything from the ancestor?  This may seem redudant
 but it is for readability.  Other languages don't allow this, but TypeScript does.  If you
 don't do it this way it is harder to see, at a glance, what the full type structure is.
+
+Action Types
+------------
+
+Make sure to extend the action type from redux's `Action` so that it can be used in a switch statement in the middleware.
+
+**Action Creator Code**
+
+```
+// externals
+import { Action } from "redux";
+
+...
+
+export type ApiPostSprintBacklogItemSuccessAction = Action<typeof ActionTypes.API_POST_SPRINT_BACKLOG_ITEM_SUCCESS> & {
+    payload: ApiPostSprintBacklogItemSuccessActionPayload;
+    meta: ApiActionMetaDataRequestMeta<{}, MetaActionParams>;
+};
+
+```

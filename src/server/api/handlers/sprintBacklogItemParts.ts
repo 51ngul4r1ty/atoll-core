@@ -7,8 +7,8 @@ import {
     ApiBacklogItemPart,
     ApiSprintBacklogItem,
     ApiSprintStats,
-    BacklogItemStatus,
     hasBacklogItemAtMostBeenInProgress,
+    isoDateStringToDate,
     mapApiItemToBacklogItem
 } from "@atoll/shared";
 
@@ -22,7 +22,6 @@ import {
     finish,
     handleUnexpectedErrorResponse,
     hasAborted,
-    rollbackWithErrorResponse,
     start
 } from "./utils/handlerContext";
 import {
@@ -90,7 +89,7 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
                     handlerContext,
                     addedBacklogItemPart.backlogitemId,
                     addedBacklogItemPart.id,
-                    dbSprint.startdate
+                    isoDateStringToDate(dbSprint.startdate)
                 );
                 const { sprintBacklogItem: dbSprintBacklogItem, nextSprint: dbNextSprint } = addToNextSprintResult;
                 addedSprintBacklogItem = mapDbToApiSprintBacklogItem(dbSprintBacklogItem);
