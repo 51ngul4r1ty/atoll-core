@@ -227,7 +227,7 @@ Make sure to extend the action type from redux's `Action` so that it can be used
 
 ```
 // externals
-import { Action } from "redux";
+import type { Action } from "redux";
 
 ...
 
