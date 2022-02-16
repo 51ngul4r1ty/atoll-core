@@ -22,28 +22,11 @@ export const mapDbToApiBacklogItem = (item: any): ApiBacklogItem => {
         return item;
     }
     const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
-    // let estimate = 0;
-    // let hasSprintBacklogItems: boolean;
-    // if ("backlogitemparts" in item) {
-    //     hasSprintBacklogItems = true;
-    //     (item as any).backlogitemparts?.forEach((part) => {
-    //         if ("sprintbacklogitems" in part) {
-    //             if (!part.sprintbacklogitems?.length) {
-    //                 estimate += convertDbFloatToNumber(part.points);
-    //             }
-    //         } else {
-    //             hasSprintBacklogItems = false;
-    //         }
-    //     });
-    // } else {
-    //     hasSprintBacklogItems = false;
-    // }
     const storyEstimate = convertDbFloatToNumber(item.dataValues.estimate);
     const remainingPoints = convertDbFloatToNumber(item.dataValues.remainingPoints);
     const unallocatedPoints = convertDbFloatToNumber(item.dataValues.unallocatedPoints);
     return {
         ...dataValueFieldsOnly,
-        //        estimate: hasSprintBacklogItems ? estimate : storyEstimate,
         estimate: storyEstimate,
         remainingPoints,
         storyEstimate,
