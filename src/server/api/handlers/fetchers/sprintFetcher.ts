@@ -1,14 +1,14 @@
 // externals
 import * as HttpStatus from "http-status-codes";
-import { Transaction } from "sequelize";
+import { FindOptions, Op, Transaction } from "sequelize";
 
 // libraries
-import { ApiSprint } from "@atoll/shared";
+import { ApiSprint, isoDateStringToDate, Link } from "@atoll/shared";
 
 // utils
 import { mapDbToApiSprint, mapDbToApiSprintBacklogItem } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
-import { buildSelfLink } from "../../../utils/linkBuilder";
+import { buildLink, buildSelfLink } from "../../../utils/linkBuilder";
 import { getMessageFromError } from "../../utils/errorUtils";
 
 // consts/enums
@@ -18,6 +18,9 @@ import { SPRINT_RESOURCE_NAME } from "../../../resourceNames";
 import { SprintDataModel } from "../../../dataaccess/models/Sprint";
 import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
 
+// interfaces/types
+import type { HandlerContext } from "../utils/handlerContext";
+
 export const fetchSprints = async (projectId: string | null, archived?: string | null) => {
     try {
         const options = buildOptionsFromParams({ projectId, archived });
@@ -26,13 +29,20 @@ export const fetchSprints = async (projectId: string | null, archived?: string |
             ["name", "ASC"]
         ];
         const sprints = await SprintDataModel.findAll(options);
-        const items = sprints.map((item) => {
-            const sprint = mapDbToApiSprint(item);
-            const result: ApiSprint = {
-                ...sprint,
-                links: [buildSelfLink(sprint, `/api/v1/${SPRINT_RESOURCE_NAME}/`)]
+        const items: ApiSprint[] = [];
+        let lastSprint: ApiSprint;
+        const resourceBasePath = `/api/v1/${SPRINT_RESOURCE_NAME}/`;
+        sprints.forEach((item) => {
+            const sprintWithoutLinks = mapDbToApiSprint(item);
+            const sprint: ApiSprint = {
+                ...sprintWithoutLinks,
+                links: [buildSelfLink(sprintWithoutLinks, resourceBasePath)]
             };
-            return result;
+            if (lastSprint) {
+                lastSprint.links!.push(buildLink(sprint, resourceBasePath, "next"));
+            }
+            lastSprint = sprint;
+            items.push(sprint);
         });
         return {
             status: HttpStatus.OK,
@@ -49,6 +59,7 @@ export const fetchSprints = async (projectId: string | null, archived?: string |
 };
 
 export const fetchSprint = async (sprintId: string) => {
+    const handlerContext = null;
     try {
         const sprint = await SprintDataModel.findByPk(sprintId);
         if (!sprint) {
@@ -58,9 +69,16 @@ export const fetchSprint = async (sprintId: string) => {
             };
         }
         const sprintItem = mapDbToApiSprint(sprint);
+        const nextSprint = await fetchNextSprint(handlerContext, isoDateStringToDate(sprintItem.startdate));
+        const resourceBasePath = `/api/v1/${SPRINT_RESOURCE_NAME}/`;
+        const links: Link[] = [buildSelfLink(sprintItem, resourceBasePath)];
+        if (nextSprint) {
+            const nextSprintItem = mapDbToApiSprint(nextSprint);
+            links.push(buildLink(nextSprintItem, resourceBasePath, "next"));
+        }
         const item: ApiSprint = {
             ...sprintItem,
-            links: [buildSelfLink(sprintItem, `/api/v1/${SPRINT_RESOURCE_NAME}/`)]
+            links
         };
         return {
             status: HttpStatus.OK,
@@ -76,14 +94,32 @@ export const fetchSprint = async (sprintId: string) => {
     }
 };
 
-// export const getIdForSprintContainingBacklogItem = async (
-//     backlogItemId: string,
-//     transaction?: Transaction
-// ): Promise<string | null> => {
-//     const dbSprintBacklogItem = await SprintBacklogItemDataModel.findOne({ where: { backlogitemId: backlogItemId }, transaction });
-//     const apiSprintBacklogItem = mapDbToApiSprintBacklogItem(dbSprintBacklogItem);
-//     return apiSprintBacklogItem ? apiSprintBacklogItem.sprintId : null;
-// };
+export const fetchNextSprint = async (
+    handlerContext: HandlerContext | null,
+    currentSprintStartDate: Date
+): Promise<SprintDataModel | null> => {
+    if (!currentSprintStartDate) {
+        throw new Error("fetchNextSprint called without providing currentSprintStartDate!");
+    }
+    if (!(currentSprintStartDate instanceof Date)) {
+        throw new Error("fetchNextSprint called with currentSprintStartDate that is not a Date!");
+    }
+    const options: FindOptions = {
+        where: {
+            startdate: { [Op.gte]: currentSprintStartDate }
+        },
+        order: [["startdate", "ASC"]],
+        limit: 2
+    };
+    if (handlerContext) {
+        options.transaction = handlerContext.transactionContext.transaction;
+    }
+    const sprintItems = await SprintDataModel.findAll(options);
+    if (sprintItems.length === 0) {
+        throw new Error(`fetchNextSprint unable to find sprint with date provided: ${currentSprintStartDate}`);
+    }
+    return sprintItems.length > 1 ? sprintItems[1] : null;
+};
 
 export const getIdForSprintContainingBacklogItemPart = async (
     backlogItemPartId: string,

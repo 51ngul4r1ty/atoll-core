@@ -22,6 +22,7 @@ export class SprintBacklogItemDataModel extends Model {
     }
 }
 
+// TODO: Rename this SprintBacklogItemPartDataModel (because sprint used to contain backlog items, but now contains parts)
 SprintBacklogItemDataModel.init(
     {
         id: {
@@ -38,7 +39,7 @@ SprintBacklogItemDataModel.init(
                 deferrable: Deferrable.INITIALLY_DEFERRED as any
             },
             // TODO: Remove this - it shouldn't be needed
-            get: function() {
+            get: function () {
                 return this.getDataValue("sprintId");
             }
         },
@@ -52,7 +53,7 @@ SprintBacklogItemDataModel.init(
                 deferrable: Deferrable.INITIALLY_DEFERRED as any
             },
             // TODO: Remove this - it shouldn't be needed
-            get: function() {
+            get: function () {
                 return this.getDataValue("backlogitempartId");
             }
         },

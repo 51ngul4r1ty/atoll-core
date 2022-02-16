@@ -7,8 +7,8 @@ import {
     ApiBacklogItemPart,
     ApiSprintBacklogItem,
     ApiSprintStats,
-    BacklogItemStatus,
     hasBacklogItemAtMostBeenInProgress,
+    isoDateStringToDate,
     mapApiItemToBacklogItem
 } from "@atoll/shared";
 
@@ -22,14 +22,13 @@ import {
     finish,
     handleUnexpectedErrorResponse,
     hasAborted,
-    rollbackWithErrorResponse,
     start
 } from "./utils/handlerContext";
 import {
     addBacklogItemPart,
     addBacklogItemPartToNextSprint,
     fetchSprintBacklogItemsWithNested,
-    getBacklogItemAndSprint,
+    filterAndReturnDbBacklogItemAndSprint,
     updateBacklogItemWithPartCount,
     updateNextSprintStats
 } from "./helpers/sprintBacklogItemPartsHelper";
@@ -42,22 +41,25 @@ import {
 
 /**
  * Split a backlog item from current sprint into next sprint (by adding an additional part to it).
+ * @param req request containing source sprint ID and backlog item ID
+ * @param res bject to return restful response
  */
 export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Response) => {
     const handlerContext = start("sprintBacklogItemPartsPostHandler", res);
 
     const params = getParamsFromRequest(req);
     const backlogItemId = params.backlogItemId;
-    const sprintId = params.sprintId;
+    const sourceSprintId = params.sprintId;
 
     try {
         await beginSerializableTransaction(handlerContext);
 
-        const sprintBacklogItemsWithNested = await fetchSprintBacklogItemsWithNested(handlerContext, sprintId);
+        const sprintBacklogItemsWithNested = await fetchSprintBacklogItemsWithNested(handlerContext, sourceSprintId);
         if (!sprintBacklogItemsWithNested.length) {
             abortWithNotFoundResponse(
                 handlerContext,
-                `Unable to find sprint with ID "${sprintId}" never mind the backlog item with ID "${backlogItemId}" in that sprint!`
+                `Unable to find sprint with ID "${sourceSprintId}" never mind the backlog item with ID ` +
+                    `"${backlogItemId}" in that sprint!`
             );
         }
 
@@ -66,7 +68,7 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
         let apiBacklogItemForAddedPart: ApiBacklogItem;
         let sprintStats: ApiSprintStats;
         if (!hasAborted(handlerContext)) {
-            const { dbBacklogItem, dbSprint } = getBacklogItemAndSprint(sprintBacklogItemsWithNested, backlogItemId);
+            const { dbBacklogItem, dbSprint } = filterAndReturnDbBacklogItemAndSprint(sprintBacklogItemsWithNested, backlogItemId);
 
             apiBacklogItemForAddedPart = mapDbToApiBacklogItem(dbBacklogItem);
             const backlogItemForAddedPart = mapApiItemToBacklogItem(apiBacklogItemForAddedPart);
@@ -81,10 +83,13 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
                 const backlogItemPart = await addBacklogItemPart(handlerContext, dbBacklogItem);
 
                 addedBacklogItemPart = mapDbToApiBacklogItemPart(backlogItemPart);
+                // TODO: Add a check in this code to ensure that a backlogItemPart is not added to a sprint that already contains
+                // a part split from the same backlogItem.
                 const addToNextSprintResult = await addBacklogItemPartToNextSprint(
                     handlerContext,
+                    addedBacklogItemPart.backlogitemId,
                     addedBacklogItemPart.id,
-                    dbSprint.startdate
+                    isoDateStringToDate(dbSprint.startdate)
                 );
                 const { sprintBacklogItem: dbSprintBacklogItem, nextSprint: dbNextSprint } = addToNextSprintResult;
                 addedSprintBacklogItem = mapDbToApiSprintBacklogItem(dbSprintBacklogItem);

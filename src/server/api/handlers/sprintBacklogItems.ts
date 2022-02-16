@@ -38,7 +38,7 @@ import {
     rollbackWithErrorResponse,
     start
 } from "./utils/handlerContext";
-import { buildFindOptionsIncludeForNested, computeUnallocatedParts } from "./helpers/backlogItemHelper";
+import { buildFindOptionsIncludeForNested, computeUnallocatedParts, computeUnallocatedPoints } from "./helpers/backlogItemHelper";
 import {
     allocateBacklogItemToSprint,
     determineNextSprintIndex,
@@ -119,7 +119,6 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                 apiBacklogItemPartAllocated = unallocatedBacklogItemParts[0];
                 backlogItemPartAllocated = mapApiItemToBacklogItemPart(apiBacklogItemPartAllocated);
                 allocatedBacklogItemPartId = backlogItemPartAllocated.id;
-                backlogItem = await fetchAssociatedBacklogItemWithParts(handlerContext, backlogItemPartAllocated.backlogitemId);
             }
         }
         let addedSprintBacklogItem: SprintBacklogItemDataModel;
@@ -156,6 +155,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                 }
             }
             if (!hasRolledBack(handlerContext)) {
+                backlogItem = await fetchAssociatedBacklogItemWithParts(handlerContext, backlogitemId);
                 if (joinSplitParts) {
                     const fetchSprintResult = await fetchSprint(sprintId);
                     if (!isStatusSuccess(fetchSprintResult.status)) {
@@ -255,7 +255,9 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
                 );
             } else {
                 const backlogItem = backlogItems[0];
-                firstApiBacklogItemTyped.unallocatedParts = computeUnallocatedParts((backlogItem as any).backlogitemparts);
+                const backlogItemParts = (backlogItem as any).backlogitemparts;
+                firstApiBacklogItemTyped.unallocatedParts = computeUnallocatedParts(backlogItemParts);
+                firstApiBacklogItemTyped.unallocatedPoints = computeUnallocatedPoints(backlogItem, backlogItemParts);
             }
             if (!hasAborted(handlerContext)) {
                 // forEach doesn't work with async, so we use for ... of instead

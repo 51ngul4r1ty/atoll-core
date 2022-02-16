@@ -1,6 +1,6 @@
 {
   "name": "atoll",
-  "version": "0.41.0",
+  "version": "0.41.1",
   "author": {
     "name": "Kevin Berry",
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
@@ -151,7 +151,7 @@
     "postcss-import": "12.0.1",
     "postcss-loader": "3.0.0",
     "postcss-nested": "4.2.1",
-    "prettier": "1.19.1",
+    "prettier": "2.5.1",
     "react-dev-utils": "10.2.0",
     "redux-mock-store": "1.5.4",
     "regenerator-runtime": "0.13.3",

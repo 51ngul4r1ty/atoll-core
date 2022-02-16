@@ -22,9 +22,8 @@ import {
     backlogItemsGetHandler,
     backlogItemsPostHandler,
     backlogItemsReorderPostHandler,
-    backlogItemGetHandler // ,
-    // backlogItemPutHandler,
-    // backlogItemPatchHandler
+    backlogItemGetHandler,
+    backlogItemPutHandler
 } from "./handlers/backlogItems";
 import {
     sprintPostHandler,
@@ -106,6 +105,10 @@ setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_
     post: sprintBacklogItemPostHandler
 });
 
+setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}/:backlogItemId`, {
+    delete: sprintBacklogItemDeleteHandler
+});
+
 setupRoutes(
     router,
     `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}/:backlogItemId/${SPRINT_BACKLOG_ITEM_PART_RESOURCE_NAME}`,
@@ -114,16 +117,11 @@ setupRoutes(
     }
 );
 
-setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}/:backlogItemId`, {
-    delete: sprintBacklogItemDeleteHandler
-});
-
 setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}`, { get: backlogItemsGetHandler, post: backlogItemsPostHandler });
 
 setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}/:itemId`, {
     get: backlogItemGetHandler,
-    // put: backlogItemPutHandler,
-    // patch: backlogItemPatchHandler,
+    put: backlogItemPutHandler,
     delete: backlogItemsDeleteHandler
 });
 

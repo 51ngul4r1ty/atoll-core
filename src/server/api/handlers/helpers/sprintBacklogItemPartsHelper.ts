@@ -4,7 +4,7 @@
  */
 
 // externals
-import { FindOptions, Op } from "sequelize";
+import { FindOptions } from "sequelize";
 
 // libraries
 import {
@@ -24,14 +24,16 @@ import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItem";
 import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
 import { SprintDataModel } from "../../../dataaccess/models/Sprint";
 
+// interfaces/types
+import { HandlerContext } from "../utils/handlerContext";
+
 // utils
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { mapApiToDbBacklogItemPart } from "../../../dataaccess/mappers/apiToDataAccessMappers";
 import { addIdToBody, getSimpleUuid } from "../../utils/uuidHelper";
-
-// interfaces/types
-import { HandlerContext } from "../utils/handlerContext";
 import { buildNewSprintStats, buildSprintStatsFromApiSprint } from "./sprintStatsHelper";
+import { fetchSprintBacklogItemsPartByItemId } from "./sprintBacklogItemHelper";
+import { fetchNextSprint } from "../fetchers/sprintFetcher";
 
 export const fetchSprintBacklogItemsWithNested = async (handlerContext: HandlerContext, sprintId: string) => {
     const options: FindOptions = { ...buildOptionsFromParams({ sprintId }), include: { all: true, nested: true } };
@@ -48,7 +50,14 @@ export interface GetBacklogItemAndSprintResult {
     dbSprint: SprintDataModel;
 }
 
-export const getBacklogItemAndSprint = (sprintBacklogItemsWithNested, backlogItemId: string): GetBacklogItemAndSprintResult => {
+/**
+ * Finds Backlog Item in DB Sprint Backlog Items list.
+ * @returns dbBacklogItem and dbSprint
+ */
+export const filterAndReturnDbBacklogItemAndSprint = (
+    sprintBacklogItemsWithNested,
+    backlogItemId: string
+): GetBacklogItemAndSprintResult => {
     const matchingItemsWithNested = sprintBacklogItemsWithNested.filter((sprintBacklogItem) => {
         const backlogItemPart = (sprintBacklogItem as any).backlogitempart;
         if (backlogItemPart) {
@@ -102,17 +111,6 @@ export const addBacklogItemPart = async (
     return addedBacklogItemPart;
 };
 
-export const fetchNextSprint = async (handlerContext: HandlerContext, currentSprintStartDate: Date): Promise<SprintDataModel> => {
-    const sprintBacklogItems = await SprintDataModel.findAll({
-        where: {
-            startdate: { [Op.gt]: currentSprintStartDate }
-        },
-        order: [["startdate", "ASC"]],
-        transaction: handlerContext.transactionContext.transaction
-    });
-    return sprintBacklogItems[0];
-};
-
 export interface AddBacklogItemPartToNextSprintResult {
     sprintBacklogItem: SprintBacklogItemDataModel;
     nextSprint: SprintDataModel;
@@ -120,11 +118,19 @@ export interface AddBacklogItemPartToNextSprintResult {
 
 export const addBacklogItemPartToNextSprint = async (
     handlerContext: HandlerContext,
+    backlogitemId: string,
     backlogitempartId: string,
     currentSprintStartDate: Date
 ): Promise<AddBacklogItemPartToNextSprintResult> => {
     const nextSprint = await fetchNextSprint(handlerContext, currentSprintStartDate);
     const nextSprintId = nextSprint.id;
+    const backlogItemParts = await fetchSprintBacklogItemsPartByItemId(handlerContext, nextSprintId, backlogitemId);
+    if (backlogItemParts.length > 0) {
+        throw new Error(
+            `Unable to add backlog item part to next sprint because parts already exist ` +
+                `for the same backlog item ID ${backlogitemId}`
+        );
+    }
     const newSprintBacklogItem = {
         id: getSimpleUuid(),
         sprintId: nextSprintId,

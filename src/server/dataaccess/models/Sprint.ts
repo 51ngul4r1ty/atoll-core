@@ -11,8 +11,8 @@ export class SprintDataModel extends Model {
     id: string;
     projectId: string | null;
     name: string | null;
-    startdate: Date | null;
-    finishdata: Date | null;
+    startdate: string | null; // DATEONLY is returned as a string
+    finishdata: string | null; // DATEONLY is returned as a string
     plannedPoints: number | null;
     acceptedPoints: number | null;
     velocityPoints: number | null;
@@ -43,7 +43,7 @@ SprintDataModel.init(
                 key: "id",
                 deferrable: Deferrable.INITIALLY_DEFERRED as any
             },
-            get: function() {
+            get: function () {
                 return this.getDataValue("projectId");
             }
         },

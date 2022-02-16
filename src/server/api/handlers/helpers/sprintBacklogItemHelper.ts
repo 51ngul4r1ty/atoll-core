@@ -28,12 +28,14 @@ import { HandlerContext } from "../utils/handlerContext";
 // utils
 import {
     mapDbSprintBacklogToApiBacklogItemInSprint,
+    mapDbToApiBacklogItemPart,
     mapDbToApiBacklogItemWithParts,
     mapDbToApiSprintBacklogItem
 } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { handleSprintStatUpdate } from "../updaters/sprintStatUpdater";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { addIdToBody } from "../../utils/uuidHelper";
+import { buildFindOptionsIncludeForNested, computeUnallocatedPoints } from "./backlogItemHelper";
 
 export const fetchSprintBacklogItemsForBacklogItemWithNested = async (
     handlerContext: HandlerContext,
@@ -146,16 +148,40 @@ export const fetchAssociatedBacklogItemWithParts = async (
     backlogItemId: string
 ): Promise<ApiBacklogItemWithParts> => {
     const dbBacklogItemWithParts = await BacklogItemDataModel.findByPk(backlogItemId, {
+        include: buildFindOptionsIncludeForNested(),
+        transaction: handlerContext.transactionContext.transaction
+    });
+    const backlogItemParts = (dbBacklogItemWithParts as any).dataValues.backlogitemparts as any;
+    const backlogItem = mapDbToApiBacklogItemWithParts(dbBacklogItemWithParts);
+    backlogItem.unallocatedPoints = computeUnallocatedPoints(dbBacklogItemWithParts, backlogItemParts);
+    return backlogItem;
+};
+
+/**
+ * Uses backlogItemId to find a matching backlogItemParts in the specified sprint.
+ */
+export const fetchSprintBacklogItemsPartByItemId = async (
+    handlerContext: HandlerContext,
+    sprintId: string,
+    backlogItemId: string
+): Promise<ApiBacklogItemPart[]> => {
+    const dbBacklogItemPartsWithSprintItems = await BacklogItemPartDataModel.findAll({
+        where: { backlogitemId: backlogItemId },
         include: [
             {
-                model: BacklogItemPartDataModel,
-                as: "backlogitemparts"
+                model: SprintBacklogItemDataModel,
+                as: "sprintbacklogitems",
+                where: { sprintId }
             }
         ],
         transaction: handlerContext.transactionContext.transaction
     });
-    const backlogItem = mapDbToApiBacklogItemWithParts(dbBacklogItemWithParts);
-    return backlogItem;
+    if (dbBacklogItemPartsWithSprintItems.length === 0) {
+        return [];
+    } else {
+        const backlogItemParts = dbBacklogItemPartsWithSprintItems.map((item) => mapDbToApiBacklogItemPart(item));
+        return backlogItemParts;
+    }
 };
 
 export const allocateBacklogItemToSprint = async (
