@@ -21,6 +21,7 @@
         "typescript.tsdk": "atoll-core\\node_modules\\typescript\\lib",
         "deno.import_intellisense_origins": {
             "https://deno.land": true
-        }
+        },
+        "jest.jestCommandLine": "node_modules/.bin/jest"
     }
 }
