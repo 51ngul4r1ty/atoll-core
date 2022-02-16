@@ -22,9 +22,8 @@ import {
     backlogItemsGetHandler,
     backlogItemsPostHandler,
     backlogItemsReorderPostHandler,
-    backlogItemGetHandler // ,
-    // backlogItemPutHandler,
-    // backlogItemPatchHandler
+    backlogItemGetHandler,
+    backlogItemPutHandler
 } from "./handlers/backlogItems";
 import {
     sprintPostHandler,
@@ -122,8 +121,7 @@ setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}`, { get: backlogItemsGetHand
 
 setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}/:itemId`, {
     get: backlogItemGetHandler,
-    // put: backlogItemPutHandler,
-    // patch: backlogItemPatchHandler,
+    put: backlogItemPutHandler,
     delete: backlogItemsDeleteHandler
 });
 
