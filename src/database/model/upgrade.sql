@@ -73,3 +73,10 @@ alter table sprintbacklogitem drop constraint "sprintbacklogitem_backlogitemId_f
 alter table sprintbacklogitem drop column "backlogitemId";
 alter table backlogitem add column "totalParts" integer;
 update backlogitem set "totalParts" = 1;
+
+-- Atoll v0.41.1
+-- alter table backlogitem add column "unallocatedPoints" decimal(10, 2);
+-- alter table backlogitem drop column "unallocatedPoints";
+-- update backlogitemPart set "points" = 4.0, "percentage" = 80.0 where id = 'dbcc54f533724c758dab840b99c641b6';
+-- update backlogitem set "unallocatedPoints" = 4.0 where "externalId" = 'gh-227';
+

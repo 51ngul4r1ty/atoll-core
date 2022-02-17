@@ -1,6 +1,7 @@
 /* STEP 1:
 
 1. Set up the "atoll" role
+  (first time use only- if you are setting up another database on the same server instance you can skip this)
 
 CREATE ROLE atoll WITH
 	LOGIN
@@ -63,6 +64,9 @@ RUN THE APP SO THAT IT CREATES THE DATABASE TABLES
 **************************************************
 **************************************************
 
+NOTE: If you see "Database & tables created!" output in the console window then
+  you've successfully completed this step.
+
 */
 
 /* STEP 4:
@@ -72,4 +76,3 @@ In the "atoll" database modify the created tables with these SQL commands
 */
 
 /* Nothing here yet, but in future there may be SQL statements needed */
-	
