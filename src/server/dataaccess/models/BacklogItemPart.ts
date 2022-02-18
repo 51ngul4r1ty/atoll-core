@@ -32,7 +32,7 @@ BacklogItemPartDataModel.init(
         id: {
             type: DataTypes.STRING(32),
             primaryKey: true,
-            get: function() {
+            get: function () {
                 return this.getDataValue("id");
             }
         },
@@ -42,6 +42,7 @@ BacklogItemPartDataModel.init(
         },
         backlogitemId: {
             type: DataTypes.STRING(32),
+            allowNull: false,
             primaryKey: false,
             references: {
                 model: "backlogitem",
@@ -49,7 +50,7 @@ BacklogItemPartDataModel.init(
                 // TODO: Find out why it was defined this way:
                 deferrable: Deferrable.INITIALLY_DEFERRED as any
             },
-            get: function() {
+            get: function () {
                 return this.getDataValue("backlogitemId");
             }
         },
