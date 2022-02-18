@@ -14,7 +14,10 @@ import { BacklogItemDataModel, mapApiToDbSprint, SprintBacklogItemDataModel, Spr
 import { respondWithError } from "../utils/responder";
 import { buildOptionsFromParams } from "../utils/sequelizeHelper";
 import { getParamsFromRequest } from "../utils/filterHelper";
-import { mapDbSprintBacklogToApiBacklogItemInSprint, mapDbToApiSprint } from "../../dataaccess/mappers/dataAccessToApiMappers";
+import {
+    mapDbSprintBacklogWithNestedToApiBacklogItemInSprint,
+    mapDbToApiSprint
+} from "../../dataaccess/mappers/dataAccessToApiMappers";
 
 export const sprintUpdateStatsPostHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -33,7 +36,7 @@ export const sprintUpdateStatsPostHandler = async (req: Request, res: Response) 
         let acceptedPoints = 0;
         let totalPoints = 0;
         sprintBacklogItems.forEach((sprintBacklogItem) => {
-            const sprintBacklogItemTyped = mapDbSprintBacklogToApiBacklogItemInSprint(sprintBacklogItem);
+            const sprintBacklogItemTyped = mapDbSprintBacklogWithNestedToApiBacklogItemInSprint(sprintBacklogItem);
             if (sprintBacklogItemTyped.estimate) {
                 totalPoints += sprintBacklogItemTyped.estimate;
                 plannedPoints += sprintBacklogItemTyped.estimate;

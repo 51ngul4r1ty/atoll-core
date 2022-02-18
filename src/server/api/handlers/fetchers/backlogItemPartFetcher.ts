@@ -8,11 +8,17 @@ import { ApiBacklogItemPart } from "@atoll/shared";
 // utils
 import { mapDbToApiBacklogItemPart } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { addWhereClauseToOptions } from "../../utils/sequelizeHelper";
-// import { buildSelfLink } from "../../../utils/linkBuilder";
+import { buildSelfLink } from "utils/linkBuilder";
 import { getMessageFromError } from "../../utils/errorUtils";
 
 // data access
 import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPart";
+import {
+    BACKLOG_ITEM_PART_RESOURCE_NAME,
+    SPRINT_BACKLOG_CHILD_RESOURCE_NAME,
+    SPRINT_BACKLOG_PARENT_RESOURCE_NAME,
+    SPRINT_RESOURCE_NAME
+} from "resourceNames";
 
 // // consts/enums
 // import { BACKLOG_ITEM_PART_RESOURCE_NAME } from "../../../resourceNames";
@@ -38,9 +44,12 @@ export const backlogItemPartFetcher = async (backlogItemId: string, transaction?
                 const backlogItemPart = mapDbToApiBacklogItemPart(item);
                 const result: ApiBacklogItemPart = {
                     ...backlogItemPart,
-                    links: []
-                    // TODO: Add link later
-                    // links: [buildSelfLink(backlogItemPart, `/api/v1/${BACKLOG_ITEM_PART_RESOURCE_NAME}/`)]
+                    links: [
+                        buildSelfLink(
+                            backlogItemPart,
+                            `/api/v1/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/${item.sprintId}/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`
+                        )
+                    ]
                 };
                 return result;
             });

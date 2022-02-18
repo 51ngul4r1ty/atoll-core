@@ -19,7 +19,10 @@ import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
 
 // utils
 import { getParamsFromRequest } from "../utils/filterHelper";
-import { mapDbSprintBacklogToApiBacklogItemInSprint } from "../../dataaccess/mappers/dataAccessToApiMappers";
+import {
+    mapDbSprintBacklogWithNestedToApiBacklogItemInSprint,
+    mapDbToApiSprintBacklogItem
+} from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { fetchSprintBacklogItemsWithLinks } from "./fetchers/sprintBacklogItemFetcher";
 import { backlogItemRankFirstItemInserter, BacklogItemRankFirstItemInserterResult } from "./inserters/backlogItemRankInserter";
 import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
@@ -121,7 +124,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                 allocatedBacklogItemPartId = backlogItemPartAllocated.id;
             }
         }
-        let addedSprintBacklogItem: SprintBacklogItemDataModel;
+        let addedDbSprintBacklogItem: SprintBacklogItemDataModel;
         let sprintStats: ApiSprintStats;
         if (!hasRolledBack(handlerContext)) {
             if (joinSplitParts) {
@@ -134,7 +137,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                     rollbackWithErrorResponse(handlerContext, removePartResult.message);
                 }
             } else {
-                addedSprintBacklogItem = await allocateBacklogItemToSprint(
+                addedDbSprintBacklogItem = await allocateBacklogItemToSprint(
                     handlerContext,
                     sprintId,
                     allocatedBacklogItemPartId,
@@ -187,6 +190,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                 backlogItemPart: apiBacklogItemPartAllocated,
                 backlogItem
             };
+            const addedSprintBacklogItem = mapDbToApiSprintBacklogItem(addedDbSprintBacklogItem);
             if (joinSplitParts) {
                 // nothing was added, so 200 status is appropriate
                 // (it combined the "added" part into an existing part in the sprint)
@@ -223,7 +227,7 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
             //   the same story.  All we care about is adding that story back into the product backlog (if it isn't already
             //   there).
             const firstSprintBacklogItem = matchingItems[0];
-            const firstApiBacklogItemTyped = mapDbSprintBacklogToApiBacklogItemInSprint(firstSprintBacklogItem);
+            const firstApiBacklogItemTyped = mapDbSprintBacklogWithNestedToApiBacklogItemInSprint(firstSprintBacklogItem);
             let result: BacklogItemRankFirstItemInserterResult;
             let sprintStats: ApiSprintStats;
             let apiBacklogItemTyped: ApiBacklogItemInSprint;

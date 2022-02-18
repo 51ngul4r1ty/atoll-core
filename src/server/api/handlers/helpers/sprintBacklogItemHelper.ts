@@ -27,7 +27,7 @@ import { HandlerContext } from "../utils/handlerContext";
 
 // utils
 import {
-    mapDbSprintBacklogToApiBacklogItemInSprint,
+    mapDbSprintBacklogWithNestedToApiBacklogItemInSprint,
     mapDbToApiBacklogItemPart,
     mapDbToApiBacklogItemWithParts,
     mapDbToApiSprintBacklogItem
@@ -70,7 +70,7 @@ export const removeSprintBacklogItemAndUpdateStats = async (
     sprintStats: ApiSprintStats
 ): Promise<ApiSprintStats> => {
     const backlogitempartId = (sprintBacklogItemWithNested as any).backlogitempartId;
-    const apiBacklogItemInSprint = mapDbSprintBacklogToApiBacklogItemInSprint(sprintBacklogItemWithNested);
+    const apiBacklogItemInSprint = mapDbSprintBacklogWithNestedToApiBacklogItemInSprint(sprintBacklogItemWithNested);
     const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItemInSprint);
     await SprintBacklogItemDataModel.destroy({
         where: { sprintId, backlogitempartId },
@@ -184,12 +184,16 @@ export const fetchSprintBacklogItemsPartByItemId = async (
     }
 };
 
+/**
+ * Allocates the backlog item to the sprint.
+ * @returns Database model sprint backlog object.
+ */
 export const allocateBacklogItemToSprint = async (
     handlerContext: HandlerContext,
     sprintId: string,
     backlogItemPartId: string,
     displayIndex: number
-) => {
+): Promise<SprintBacklogItemDataModel> => {
     const bodyWithId = addIdToBody({
         sprintId,
         backlogitempartId: backlogItemPartId,

@@ -28,12 +28,12 @@ export const fetchSprints = async (projectId: string | null, archived?: string |
             ["startdate", "ASC"],
             ["name", "ASC"]
         ];
-        const sprints = await SprintDataModel.findAll(options);
+        const dbSprints = await SprintDataModel.findAll(options);
         const items: ApiSprint[] = [];
         let lastSprint: ApiSprint;
         const resourceBasePath = `/api/v1/${SPRINT_RESOURCE_NAME}/`;
-        sprints.forEach((item) => {
-            const sprintWithoutLinks = mapDbToApiSprint(item);
+        dbSprints.forEach((dbSprint) => {
+            const sprintWithoutLinks = mapDbToApiSprint(dbSprint);
             const sprint: ApiSprint = {
                 ...sprintWithoutLinks,
                 links: [buildSelfLink(sprintWithoutLinks, resourceBasePath)]
