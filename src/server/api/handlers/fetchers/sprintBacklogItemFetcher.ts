@@ -25,8 +25,8 @@ import {
     mapDbBacklogPartsWithSprintItemsToApiBacklogItemInSprint,
     mapDbSprintBacklogWithNestedToApiBacklogItemInSprint
 } from "../../../dataaccess/mappers/dataAccessToApiMappers";
-import { BacklogItemPartDataModel } from "dataaccess/models/BacklogItemPart";
-import { BacklogItemDataModel } from "dataaccess/models/BacklogItem";
+import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPart";
+import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItem";
 
 export type FetchedSprintBacklogItems = RestApiCollectionResult<ApiBacklogItemInSprint>;
 export type FetchedSprintBacklogItem = RestApiItemResult<ApiBacklogItemInSprint>;

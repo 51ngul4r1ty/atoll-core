@@ -18,7 +18,7 @@ import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklo
 import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
 
 // consts/enums
-import { SPRINT_BACKLOG_CHILD_RESOURCE_NAME, SPRINT_BACKLOG_PARENT_RESOURCE_NAME } from "resourceNames";
+import { SPRINT_BACKLOG_CHILD_RESOURCE_NAME, SPRINT_BACKLOG_PARENT_RESOURCE_NAME } from "../../resourceNames";
 
 // utils
 import { getParamsFromRequest } from "../utils/filterHelper";
