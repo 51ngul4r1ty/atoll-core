@@ -7,8 +7,8 @@ import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItem
 
 // utils
 import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
+import { buildResponseFromCatchError, buildResponseWithItem } from "../../utils/responseBuilder";
 import { mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
-import { getMessageFromError } from "../../utils/errorUtils";
 
 export const removeFromProductBacklog = async (backlogitemId: string, transaction?: Transaction) => {
     try {
@@ -50,16 +50,8 @@ export const removeFromProductBacklog = async (backlogitemId: string, transactio
             await itemBefore.update({ nextbacklogitemId: nextBacklogItemId }, updateOptions);
         }
         await item.destroy(destroyOptions);
-        return {
-            status: HttpStatus.OK,
-            data: {
-                item: itemData
-            }
-        };
+        return buildResponseWithItem(itemData);
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        };
+        return buildResponseFromCatchError(error);
     }
 };

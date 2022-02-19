@@ -5,12 +5,6 @@ import { FindOptions, Op, Transaction } from "sequelize";
 // libraries
 import { ApiSprint, isoDateStringToDate, Link } from "@atoll/shared";
 
-// utils
-import { mapDbToApiSprint, mapDbToApiSprintBacklogItem } from "../../../dataaccess/mappers/dataAccessToApiMappers";
-import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
-import { buildLink, buildSelfLink } from "../../../utils/linkBuilder";
-import { getMessageFromError } from "../../utils/errorUtils";
-
 // consts/enums
 import { SPRINT_RESOURCE_NAME } from "../../../resourceNames";
 
@@ -20,6 +14,12 @@ import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBac
 
 // interfaces/types
 import type { HandlerContext } from "../utils/handlerContext";
+
+// utils
+import { buildLink, buildSelfLink } from "../../../utils/linkBuilder";
+import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
+import { buildResponseFromCatchError, buildResponseWithItem, buildResponseWithItems } from "../../utils/responseBuilder";
+import { mapDbToApiSprint, mapDbToApiSprintBacklogItem } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 export const fetchSprints = async (projectId: string | null, archived?: string | null) => {
     try {
@@ -44,17 +44,9 @@ export const fetchSprints = async (projectId: string | null, archived?: string |
             lastSprint = sprint;
             items.push(sprint);
         });
-        return {
-            status: HttpStatus.OK,
-            data: {
-                items
-            }
-        };
+        return buildResponseWithItems(items);
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        };
+        return buildResponseFromCatchError(error);
     }
 };
 
@@ -80,17 +72,9 @@ export const fetchSprint = async (sprintId: string) => {
             ...sprintItem,
             links
         };
-        return {
-            status: HttpStatus.OK,
-            data: {
-                item
-            }
-        };
+        return buildResponseWithItem(item);
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        };
+        return buildResponseFromCatchError(error);
     }
 };
 

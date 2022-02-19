@@ -1,4 +1,8 @@
+// libraries
 import { APPLICATION_JSON, Link } from "@atoll/shared";
+
+// utils
+import { buildResponseWithItems } from "../utils/responseBuilder";
 
 import * as fs from "fs";
 import * as path from "path";
@@ -137,10 +141,5 @@ export const rootHandler = function (req, res) {
         }
     ];
 
-    res.json({
-        status: 200,
-        data: {
-            items
-        }
-    });
+    res.json(buildResponseWithItems(items));
 };

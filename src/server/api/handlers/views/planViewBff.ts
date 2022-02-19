@@ -1,21 +1,21 @@
 // externals
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import * as HttpStatus from "http-status-codes";
 
 // libraries
 import { mapApiItemsToSprints } from "@atoll/shared";
 
+// interfaces/types
+import type { UserPreferencesSuccessResponse } from "../fetchers/userPreferencesFetcher";
+
 // utils
 import { backlogItemsFetcher } from "../fetchers/backlogItemFetcher";
-import { fetchSprints } from "../fetchers/sprintFetcher";
-import { userPreferencesFetcher } from "../fetchers/userPreferencesFetcher";
-import { getLoggedInAppUserId } from "../../utils/authUtils";
+import { buildResponseWithData, RestApiCollectionResult, RestApiErrorResult } from "../../utils/responseBuilder";
 import { combineMessages, combineStatuses } from "../../utils/resultAggregator";
-import { FetchedSprintBacklogItems, fetchSprintBacklogItemsWithLinks } from "../fetchers/sprintBacklogItemFetcher";
-
-// interfaces/types
-import { FetcherErrorResponse } from "../fetchers/types";
-import { UserPreferencesSuccessResponse } from "../fetchers/userPreferencesFetcher";
+import { fetchSprints } from "../fetchers/sprintFetcher";
+import { fetchSprintBacklogItemsWithLinks, FetchedSprintBacklogItems } from "../fetchers/sprintBacklogItemFetcher";
+import { getLoggedInAppUserId } from "../../utils/authUtils";
+import { userPreferencesFetcher } from "../fetchers/userPreferencesFetcher";
 
 export const planViewBffGetHandler = async (req: Request, res: Response) => {
     const userPreferencesResult = await userPreferencesFetcher("{self}", () => getLoggedInAppUserId(req));
@@ -26,7 +26,8 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
         backlogItemsFetcher(selectedProjectId),
         fetchSprints(selectedProjectId, archived)
     ]);
-    let sprints = sprintsResult.data?.items;
+    const sprintsSuccessResult = sprintsResult as RestApiCollectionResult<any>;
+    let sprints = sprintsSuccessResult.data ? sprintsSuccessResult.data?.items : [];
     let sprintBacklogItemsResult: FetchedSprintBacklogItems;
     let sprintBacklogItemsStatus = HttpStatus.OK;
     let sprintBacklogItemsMessage = "";
@@ -46,15 +47,14 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
         userPreferencesResult.status === HttpStatus.OK &&
         sprintBacklogItemsStatus === HttpStatus.OK
     ) {
-        res.json({
-            status: HttpStatus.OK,
-            data: {
+        res.json(
+            buildResponseWithData({
                 backlogItems: backlogItemsResult.data?.items,
                 sprints,
                 sprintBacklogItems: sprintBacklogItemsResult?.data?.items,
                 userPreferences: (userPreferencesResult as UserPreferencesSuccessResponse).data?.item
-            }
-        });
+            })
+        );
     } else {
         res.status(backlogItemsResult.status).json({
             status: combineStatuses(
@@ -67,7 +67,7 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
                 backlogItemsResult.message,
                 backlogItemsResult.message,
                 sprintBacklogItemsMessage,
-                (userPreferencesResult as FetcherErrorResponse).message
+                (userPreferencesResult as RestApiErrorResult).message
             )
         });
         // TODO: Use logging utils

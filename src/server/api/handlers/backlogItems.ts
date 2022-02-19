@@ -42,7 +42,7 @@ import {
     mapDbToApiProjectSettings
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { getUpdatedBacklogItemWhenStatusChanges } from "../utils/statusChangeUtils";
-import { getMessageFromError } from "../utils/errorUtils";
+import { buildResponseFromCatchError } from "../utils/responseBuilder";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -82,10 +82,8 @@ export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, 
             });
         }
     } catch (error) {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        });
+        const errorResponse = buildResponseFromCatchError(error);
+        res.status(errorResponse.status).json(errorResponse);
         console.log(`Unable to fetch backlog item: ${error}`);
     }
 };

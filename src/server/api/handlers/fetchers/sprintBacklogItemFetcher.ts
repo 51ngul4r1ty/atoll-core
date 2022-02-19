@@ -4,17 +4,17 @@ import * as HttpStatus from "http-status-codes";
 // libraries
 import { ApiBacklogItemInSprint } from "@atoll/shared";
 
-// utils
-import { mapDbSprintBacklogWithNestedToApiBacklogItemInSprint } from "../../../dataaccess/mappers/dataAccessToApiMappers";
-import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
-import { buildSelfLink } from "../../../utils/linkBuilder";
-import { getMessageFromError } from "../../utils/errorUtils";
-
 // consts/enums
 import { SPRINT_BACKLOG_PARENT_RESOURCE_NAME, SPRINT_BACKLOG_CHILD_RESOURCE_NAME } from "../../../resourceNames";
 
 // data access
 import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
+
+// utils
+import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
+import { buildResponseFromCatchError, buildResponseWithItem, buildResponseWithItems } from "../../utils/responseBuilder";
+import { buildSelfLink } from "../../../utils/linkBuilder";
+import { mapDbSprintBacklogWithNestedToApiBacklogItemInSprint } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 export interface FetchedSprintBacklogItems {
     status: number;
@@ -34,28 +34,11 @@ export const fetchSprintBacklogItemsWithLinks = async (sprintId: string | null):
         });
         const items = sprintBacklogs.map((item) => {
             const sprintBacklog = mapDbSprintBacklogWithNestedToApiBacklogItemInSprint(item);
-            const result: ApiBacklogItemInSprint = {
-                ...sprintBacklog,
-                links: [
-                    buildSelfLink(
-                        sprintBacklog,
-                        `/api/v1/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/${sprintId}/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`
-                    )
-                ]
-            };
-            return result;
+            return buildBacklogItemPartForResponse(sprintId, sprintBacklog);
         });
-        return {
-            status: HttpStatus.OK,
-            data: {
-                items
-            }
-        };
+        return buildResponseWithItems(items);
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        };
+        return buildResponseFromCatchError(error);
     }
 };
 
@@ -67,7 +50,7 @@ export interface FetchedSprintBacklogItem {
     };
 }
 
-export const fetchSprintBacklogItemWithLinks = async (
+export const fetchSprintBacklogItemPartWithLinks = async (
     sprintId: string | null,
     backlogItemPartId: string | null
 ): Promise<FetchedSprintBacklogItem> => {
@@ -89,25 +72,24 @@ export const fetchSprintBacklogItemWithLinks = async (
             };
         }
         const sprintBacklog = mapDbSprintBacklogWithNestedToApiBacklogItemInSprint(sprintBacklogItems[0]);
-        const item: ApiBacklogItemInSprint = {
-            ...sprintBacklog,
-            links: [
-                buildSelfLink(
-                    sprintBacklog,
-                    `/api/v1/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/${sprintId}/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`
-                )
-            ]
-        };
-        return {
-            status: HttpStatus.OK,
-            data: {
-                item
-            }
-        };
+        const item = buildBacklogItemPartForResponse(sprintId, sprintBacklog);
+        return buildResponseWithItem(item);
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        };
+        return buildResponseFromCatchError(error);
     }
+};
+
+export const buildBacklogItemPartForResponse = (
+    sprintId: string,
+    sprintBacklog: ApiBacklogItemInSprint
+): ApiBacklogItemInSprint => {
+    return {
+        ...sprintBacklog,
+        links: [
+            buildSelfLink(
+                sprintBacklog,
+                `/api/v1/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/${sprintId}/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`
+            )
+        ]
+    };
 };

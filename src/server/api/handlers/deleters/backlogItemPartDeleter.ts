@@ -8,9 +8,8 @@ import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItem
 
 // utils
 import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
-import { getMessageFromError } from "../../utils/errorUtils";
+import { buildResponseFromCatchError, buildResponseWithItem } from "../../utils/responseBuilder";
 import { mapDbToApiBacklogItem, mapDbToApiBacklogItemPart } from "../../../dataaccess/mappers/dataAccessToApiMappers";
-import { commitWithOkResponseIfNotAborted } from "../utils/handlerContext";
 
 export enum LastPartRemovalOptions {
     Disallow = 1,
@@ -89,19 +88,11 @@ export const removeUnallocatedBacklogItemPart = async (
                 await peerItem.update({ partIndex: peerItem.partIndex - 1 }, { transaction });
             }
         }
-        return {
-            status: HttpStatus.OK,
-            data: {
-                item: itemData
-            },
-            extra: {
-                backlogItem
-            }
+        const extra = {
+            backlogItem
         };
+        return buildResponseWithItem(itemData, extra);
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        };
+        return buildResponseFromCatchError(error);
     }
 };

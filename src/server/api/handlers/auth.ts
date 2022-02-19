@@ -12,6 +12,7 @@ import { ROLE_USER, RefreshTokenContents } from "../../types";
 // utils
 import { buildAuthToken, buildRefreshToken } from "../utils/tokenHelper";
 import { getSimpleUuid } from "../utils/uuidHelper";
+import { buildResponseWithItem } from "../utils/responseBuilder";
 
 export const loginPostHandler = async (req: Request, res: Response) => {
     const username = req.body?.username;
@@ -68,15 +69,12 @@ export const refreshTokenPostHandler = async (req: Request, res: Response) => {
             return res.status(HttpStatus.FORBIDDEN).send("Invalid refresh token.");
         }
 
-        res.status(HttpStatus.OK).send({
-            status: HttpStatus.OK,
-            data: {
-                item: {
-                    authToken: buildAuthToken("217796f6e1ab455a980263171099533f", decoded.username, ROLE_USER),
-                    refreshToken: buildRefreshToken("217796f6e1ab455a980263171099533f", decoded.username, decoded.refreshTokenId)
-                }
-            }
+        const responseWithItem = buildResponseWithItem({
+            authToken: buildAuthToken("217796f6e1ab455a980263171099533f", decoded.username, ROLE_USER),
+            refreshToken: buildRefreshToken("217796f6e1ab455a980263171099533f", decoded.username, decoded.refreshTokenId)
         });
+        res.status(responseWithItem.status).send(responseWithItem);
+
         return;
     } catch (err) {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).send("An unknown error occurred while generating an auth token");

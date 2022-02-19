@@ -1,16 +1,8 @@
 // externals
-import * as HttpStatus from "http-status-codes";
 import { FindOptions } from "sequelize";
 
 // libraries
 import { ApiBacklogItem, LinkedList } from "@atoll/shared";
-
-// utils
-import { mapDbToApiBacklogItem, mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
-import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
-import { buildSelfLink } from "../../../utils/linkBuilder";
-import { getMessageFromError } from "../../utils/errorUtils";
-import { buildFindOptionsIncludeForNested, computeUnallocatedParts, computeUnallocatedPoints } from "../helpers/backlogItemHelper";
 
 // data access
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItem";
@@ -18,6 +10,13 @@ import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItem
 
 // consts/enums
 import { BACKLOG_ITEM_RESOURCE_NAME } from "../../../resourceNames";
+
+// utils
+import { mapDbToApiBacklogItem, mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
+import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
+import { buildSelfLink } from "../../../utils/linkBuilder";
+import { buildFindOptionsIncludeForNested, computeUnallocatedParts, computeUnallocatedPoints } from "../helpers/backlogItemHelper";
+import { buildResponseFromCatchError, buildResponseWithItems } from "../../utils/responseBuilder";
 
 export interface BacklogItemsResult {
     status: number;
@@ -40,12 +39,7 @@ export const backlogItemFetcher = async (projectId: string, backlogItemDisplayId
                 };
                 return result;
             });
-            return {
-                status: HttpStatus.OK,
-                data: {
-                    items
-                }
-            };
+            return buildResponseWithItems(items);
         };
         if (backlogItems.length >= 1) {
             return getBacklogItemsResult(backlogItems);
@@ -55,10 +49,7 @@ export const backlogItemFetcher = async (projectId: string, backlogItemDisplayId
             return getBacklogItemsResult(backlogItems);
         }
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        };
+        return buildResponseFromCatchError(error);
     }
 };
 
@@ -88,16 +79,8 @@ export const backlogItemsFetcher = async (projectId: string | null): Promise<Bac
             };
             rankList.addItemData(result.id, result);
         });
-        return {
-            status: HttpStatus.OK,
-            data: {
-                items: rankList.toArray()
-            }
-        };
+        buildResponseWithItems(rankList.toArray());
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        };
+        return buildResponseFromCatchError(error);
     }
 };

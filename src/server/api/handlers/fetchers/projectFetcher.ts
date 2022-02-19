@@ -5,16 +5,16 @@ import { Op } from "sequelize";
 // libraries
 import { ApiProject } from "@atoll/shared";
 
-// utils
-import { mapDbToApiProject } from "../../../dataaccess/mappers/dataAccessToApiMappers";
-import { buildSelfLink } from "../../../utils/linkBuilder";
-import { getMessageFromError } from "../../utils/errorUtils";
-
 // data access
 import { ProjectDataModel } from "../../../dataaccess/models/Project";
 
 // consts/enums
 import { PROJECT_RESOURCE_NAME } from "../../../resourceNames";
+
+// utils
+import { buildResponseFromCatchError, buildResponseWithItem, buildResponseWithItems } from "../../utils/responseBuilder";
+import { buildSelfLink } from "../../../utils/linkBuilder";
+import { mapDbToApiProject } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 export interface ProjectsResult {
     status: number;
@@ -53,10 +53,7 @@ export const projectByDisplayIdFetcher = async (projectDisplayId: string): Promi
         };
         return getProjectsResult(projects);
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        };
+        return buildResponseFromCatchError(error);
     }
 };
 
@@ -71,17 +68,9 @@ export const fetchProjects = async () => {
             };
             return result;
         });
-        return {
-            status: HttpStatus.OK,
-            data: {
-                items
-            }
-        };
+        return buildResponseWithItems(items);
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        };
+        return buildResponseFromCatchError(error);
     }
 };
 
@@ -90,16 +79,8 @@ export const fetchProject = async (projectId: string) => {
         const project = await ProjectDataModel.findByPk(projectId);
         const projectItem = mapDbToApiProject(project);
         const item = { ...projectItem, links: [buildSelfLink(projectItem, `/api/v1/${PROJECT_RESOURCE_NAME}/`)] };
-        return {
-            status: HttpStatus.OK,
-            data: {
-                item
-            }
-        };
+        return buildResponseWithItem(item);
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        };
+        return buildResponseFromCatchError(error);
     }
 };

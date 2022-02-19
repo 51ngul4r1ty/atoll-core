@@ -11,13 +11,14 @@ import { sequelize } from "../../dataaccess/connection";
 import { BacklogItemDataModel, mapApiToDbSprint, SprintBacklogItemDataModel, SprintDataModel } from "../../dataaccess";
 
 // utils
-import { respondWithError } from "../utils/responder";
 import { buildOptionsFromParams } from "../utils/sequelizeHelper";
+import { buildResponseWithData } from "../utils/responseBuilder";
 import { getParamsFromRequest } from "../utils/filterHelper";
 import {
     mapDbSprintBacklogWithNestedToApiBacklogItemInSprint,
     mapDbToApiSprint
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
+import { respondWithError } from "../utils/responder";
 
 export const sprintUpdateStatsPostHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -55,14 +56,12 @@ export const sprintUpdateStatsPostHandler = async (req: Request, res: Response) 
         await sprint.update(newSprint);
 
         await transaction.commit();
-        res.status(HttpStatus.OK).json({
-            status: HttpStatus.OK,
-            data: {
-                acceptedPoints,
-                plannedPoints,
-                totalPoints
-            }
+        const response = buildResponseWithData({
+            acceptedPoints,
+            plannedPoints,
+            totalPoints
         });
+        res.status(response.status).json(response);
     } catch (err) {
         if (transaction) {
             await transaction.rollback();

@@ -6,18 +6,15 @@ import { ApiUserSettings } from "@atoll/shared";
 
 // utils
 import { mapDbToApiUserSettings } from "../../../dataaccess/mappers/dataAccessToApiMappers";
-import { getMessageFromError } from "../../utils/errorUtils";
 
 // data access
 import { UserSettingsDataModel } from "../../../dataaccess/models/UserSettings";
 
-// interfaces/types
-import { FetcherErrorResponse } from "./types";
-
 // consts/enums
+import { buildResponseFromCatchError, RestApiErrorResult } from "../../utils/responseBuilder";
 import { ResponseItemStructure, returnWithItem, returnWithNotFound, returnWithNotImplemented } from "../../utils/returner";
 
-export type UserPreferencesResponse = FetcherErrorResponse | UserPreferencesSuccessResponse;
+export type UserPreferencesResponse = RestApiErrorResult | UserPreferencesSuccessResponse;
 
 export type UserPreferencesSuccessResponse = ResponseItemStructure<ApiUserSettings>;
 
@@ -43,9 +40,6 @@ export const userPreferencesFetcher = async (
             }
         }
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        } as FetcherErrorResponse;
+        return buildResponseFromCatchError(error);
     }
 };

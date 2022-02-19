@@ -6,17 +6,17 @@ import * as HttpStatus from "http-status-codes";
 // libraries
 import { ApiBacklogItemRank } from "@atoll/shared";
 
-// utils
-import { buildSelfLink } from "../../utils/linkBuilder";
-import { respondWithNotFound } from "../utils/responder";
-import { mapDbToApiBacklogItemRank } from "../../dataaccess/mappers/dataAccessToApiMappers";
-import { getMessageFromError } from "../utils/errorUtils";
-
 // data access
 import { BacklogItemRankDataModel } from "../../dataaccess";
 
 // consts/enums
 import { BACKLOG_ITEM_RANK_RESOURCE_NAME } from "../../resourceNames";
+
+// utils
+import { buildSelfLink } from "../../utils/linkBuilder";
+import { respondWithNotFound } from "../utils/responder";
+import { mapDbToApiBacklogItemRank } from "../../dataaccess/mappers/dataAccessToApiMappers";
+import { buildResponseFromCatchError, buildResponseWithItems } from "../utils/responseBuilder";
 
 export const backlogItemRanksGetHandler = async (req: Request, res: Response) => {
     try {
@@ -30,17 +30,10 @@ export const backlogItemRanksGetHandler = async (req: Request, res: Response) =>
             };
             items.push(result);
         });
-        res.json({
-            status: HttpStatus.OK,
-            data: {
-                items
-            }
-        });
+        res.json(buildResponseWithItems(items));
     } catch (error) {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        });
+        const errorResponse = buildResponseFromCatchError(error);
+        res.status(errorResponse.status).json(errorResponse);
         console.log(`Unable to fetch backlog item ranks: ${error}`);
     }
 };
@@ -64,10 +57,8 @@ export const backlogItemRankGetHandler = async (req: Request<BacklogItemGetParam
             });
         }
     } catch (error) {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        });
+        const errorResponse = buildResponseFromCatchError(error);
+        res.status(errorResponse.status).json(errorResponse);
         console.log(`Unable to fetch backlog item rank: ${error}`);
     }
 };
