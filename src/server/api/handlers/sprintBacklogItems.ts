@@ -17,6 +17,9 @@ import {
 import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklogItem";
 import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
 
+// consts/enums
+import { SPRINT_BACKLOG_CHILD_RESOURCE_NAME, SPRINT_BACKLOG_PARENT_RESOURCE_NAME } from "resourceNames";
+
 // utils
 import { getParamsFromRequest } from "../utils/filterHelper";
 import {
@@ -56,6 +59,7 @@ import {
 import { LastPartRemovalOptions, removeUnallocatedBacklogItemPart } from "./deleters/backlogItemPartDeleter";
 import { fetchSprint } from "./fetchers/sprintFetcher";
 import { buildSprintStatsFromApiSprint } from "./helpers/sprintStatsHelper";
+import { buildSelfLink } from "utils/linkBuilder";
 
 export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
@@ -190,7 +194,14 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                 backlogItemPart: apiBacklogItemPartAllocated,
                 backlogItem
             };
-            const addedSprintBacklogItem = mapDbToApiSprintBacklogItem(addedDbSprintBacklogItem);
+            const addedItemWithoutLinks = mapDbToApiSprintBacklogItem(addedDbSprintBacklogItem);
+            const resourceBasePath =
+                `/api/v1/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/${addedItemWithoutLinks.sprintId}` +
+                `/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`;
+            const addedSprintBacklogItem = {
+                ...addedItemWithoutLinks,
+                links: [buildSelfLink(addedItemWithoutLinks, resourceBasePath)]
+            };
             if (joinSplitParts) {
                 // nothing was added, so 200 status is appropriate
                 // (it combined the "added" part into an existing part in the sprint)
