@@ -5,33 +5,29 @@ import { FindOptions, Transaction } from "sequelize";
 // libraries
 import { ApiBacklogItemPart } from "@atoll/shared";
 
-// utils
-import { mapDbToApiBacklogItemPart } from "../../../dataaccess/mappers/dataAccessToApiMappers";
-import { addWhereClauseToOptions } from "../../utils/sequelizeHelper";
-import { buildSelfLink } from "utils/linkBuilder";
-import { getMessageFromError } from "../../utils/errorUtils";
-
 // data access
 import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPart";
+
+// consts/enums
+import { SPRINT_BACKLOG_CHILD_RESOURCE_NAME, SPRINT_BACKLOG_PARENT_RESOURCE_NAME } from "../../../resourceNames";
+
+// utils
+import { addWhereClauseToOptions } from "../../utils/sequelizeHelper";
 import {
-    BACKLOG_ITEM_PART_RESOURCE_NAME,
-    SPRINT_BACKLOG_CHILD_RESOURCE_NAME,
-    SPRINT_BACKLOG_PARENT_RESOURCE_NAME,
-    SPRINT_RESOURCE_NAME
-} from "resourceNames";
+    buildResponseFromCatchError,
+    buildResponseWithItems,
+    RestApiCollectionResult,
+    RestApiErrorResult
+} from "../../utils/responseBuilder";
+import { buildSelfLink } from "../../../utils/linkBuilder";
+import { mapDbToApiBacklogItemPart } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
-// // consts/enums
-// import { BACKLOG_ITEM_PART_RESOURCE_NAME } from "../../../resourceNames";
+export type BacklogItemPartsResult = RestApiCollectionResult<ApiBacklogItemPart>;
 
-export interface BacklogItemPartsResult {
-    status: number;
-    data?: {
-        items: ApiBacklogItemPart[];
-    };
-    message?: string;
-}
-
-export const backlogItemPartFetcher = async (backlogItemId: string, transaction?: Transaction): Promise<BacklogItemPartsResult> => {
+export const backlogItemPartFetcher = async (
+    backlogItemId: string,
+    transaction?: Transaction
+): Promise<BacklogItemPartsResult | RestApiErrorResult> => {
     try {
         const options: FindOptions = { order: [["partIndex", "ASC"]] };
         if (transaction) {
@@ -53,18 +49,10 @@ export const backlogItemPartFetcher = async (backlogItemId: string, transaction?
                 };
                 return result;
             });
-            return {
-                status: HttpStatus.OK,
-                data: {
-                    items
-                }
-            };
+            return buildResponseWithItems(items);
         };
         return getBacklogItemPartsResult(backlogItemParts);
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: getMessageFromError(error)
-        };
+        return buildResponseFromCatchError(error);
     }
 };
