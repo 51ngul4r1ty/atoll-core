@@ -12,19 +12,28 @@ import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBac
 
 // utils
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
-import { buildResponseFromCatchError, buildResponseWithItem, buildResponseWithItems } from "../../utils/responseBuilder";
+import {
+    buildResponseFromCatchError,
+    buildResponseWithItem,
+    buildResponseWithItems,
+    RestApiCollectionResult,
+    RestApiErrorResult,
+    RestApiItemResult
+} from "../../utils/responseBuilder";
 import { buildSelfLink } from "../../../utils/linkBuilder";
-import { mapDbSprintBacklogWithNestedToApiBacklogItemInSprint } from "../../../dataaccess/mappers/dataAccessToApiMappers";
+import {
+    mapDbBacklogPartsWithSprintItemsToApiBacklogItemInSprint,
+    mapDbSprintBacklogWithNestedToApiBacklogItemInSprint
+} from "../../../dataaccess/mappers/dataAccessToApiMappers";
+import { BacklogItemPartDataModel } from "dataaccess/models/BacklogItemPart";
+import { BacklogItemDataModel } from "dataaccess/models/BacklogItem";
 
-export interface FetchedSprintBacklogItems {
-    status: number;
-    message?: string;
-    data?: {
-        items: ApiBacklogItemInSprint[];
-    };
-}
+export type FetchedSprintBacklogItems = RestApiCollectionResult<ApiBacklogItemInSprint>;
+export type FetchedSprintBacklogItem = RestApiItemResult<ApiBacklogItemInSprint>;
 
-export const fetchSprintBacklogItemsWithLinks = async (sprintId: string | null): Promise<FetchedSprintBacklogItems> => {
+export const fetchSprintBacklogItemsWithLinks = async (
+    sprintId: string | null
+): Promise<FetchedSprintBacklogItems | RestApiErrorResult> => {
     try {
         const options = buildOptionsFromParams({ sprintId });
         const sprintBacklogs = await SprintBacklogItemDataModel.findAll({
@@ -42,18 +51,51 @@ export const fetchSprintBacklogItemsWithLinks = async (sprintId: string | null):
     }
 };
 
-export interface FetchedSprintBacklogItem {
-    status: number;
-    message?: string;
-    data?: {
-        item: ApiBacklogItemInSprint;
-    };
-}
+export const fetchSprintBacklogItemWithLinks = async (
+    sprintId: string | null,
+    backlogItemId: string | null
+): Promise<FetchedSprintBacklogItem | RestApiErrorResult> => {
+    try {
+        const options = {
+            where: { backlogitemId: backlogItemId },
+            include: [
+                {
+                    model: SprintBacklogItemDataModel,
+                    as: "sprintbacklogitems",
+                    where: { sprintId }
+                },
+                {
+                    model: BacklogItemDataModel,
+                    as: "backlogitem",
+                    where: { id: backlogItemId }
+                }
+            ]
+        };
+        const dbBacklogItemPartsWithSprintItems = await BacklogItemPartDataModel.findAll(options);
+
+        if (!dbBacklogItemPartsWithSprintItems.length) {
+            return {
+                status: HttpStatus.NOT_FOUND
+            };
+        }
+        if (dbBacklogItemPartsWithSprintItems.length > 1) {
+            return {
+                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                message: `Multiple matches for Backog Item ID ${backlogItemId}`
+            };
+        }
+        const sprintBacklog = mapDbBacklogPartsWithSprintItemsToApiBacklogItemInSprint(dbBacklogItemPartsWithSprintItems[0]);
+        const item = buildBacklogItemPartForResponse(sprintId, sprintBacklog);
+        return buildResponseWithItem(item);
+    } catch (error) {
+        return buildResponseFromCatchError(error);
+    }
+};
 
 export const fetchSprintBacklogItemPartWithLinks = async (
     sprintId: string | null,
     backlogItemPartId: string | null
-): Promise<FetchedSprintBacklogItem> => {
+): Promise<FetchedSprintBacklogItem | RestApiErrorResult> => {
     try {
         const options = buildOptionsFromParams({ sprintId, backlogitempartId: backlogItemPartId });
         const sprintBacklogItems = await SprintBacklogItemDataModel.findAll({

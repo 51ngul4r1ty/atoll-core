@@ -141,6 +141,53 @@ export const mapDbSprintBacklogWithNestedToApiBacklogItemInSprint = (item: any):
     return result;
 };
 
+export const mapDbBacklogPartsWithSprintItemsToApiBacklogItemInSprint = (item: any): ApiBacklogItemInSprint => {
+    if (!item) {
+        return item;
+    }
+    const partsWithSprintItems = {
+        ...item.dataValues
+    };
+    const backlogitem = partsWithSprintItems?.backlogitem?.dataValues;
+    const sprintbacklogitem = partsWithSprintItems?.sprintbacklogitems?.[0]?.dataValues;
+    const result: ApiBacklogItemInSprint = {
+        acceptanceCriteria: backlogitem.acceptanceCriteria,
+        acceptedAt: backlogitem.acceptedAt,
+        createdAt: backlogitem.createdAt,
+        displayindex: sprintbacklogitem.displayindex,
+        estimate: convertDbFloatToNumber(partsWithSprintItems.points),
+        externalId: backlogitem.externalId,
+        finishedAt: partsWithSprintItems.finishedAt,
+        friendlyId: backlogitem.friendlyId,
+        id: backlogitem.id,
+        projectId: backlogitem.projectId,
+        reasonPhrase: backlogitem.reasonPhrase,
+        releasedAt: backlogitem.releasedAt,
+        rolePhrase: backlogitem.rolePhrase,
+        startedAt: partsWithSprintItems.startedAt,
+        status: partsWithSprintItems.status,
+        storyPhrase: backlogitem.storyPhrase,
+        type: backlogitem.type,
+        updatedAt: partsWithSprintItems.updatedAt,
+        version: backlogitem.version,
+        // part specific fields
+        partPercentage: convertDbFloatToNumber(partsWithSprintItems.percentage),
+        partIndex: convertDbFloatToNumber(partsWithSprintItems.partIndex),
+        totalParts: convertDbFloatToNumber(backlogitem.totalParts),
+        unallocatedParts: convertDbFloatToNumber(backlogitem.unallocatedParts),
+        unallocatedPoints: convertDbFloatToNumber(backlogitem.unallocatedPoints),
+        backlogItemPartId: partsWithSprintItems.id,
+        // story specific fields
+        storyEstimate: convertDbFloatToNumber(backlogitem.estimate),
+        storyStartedAt: backlogitem.startedAt,
+        storyFinishedAt: backlogitem.finishedAt,
+        storyStatus: backlogitem.status,
+        storyUpdatedAt: backlogitem.updatedAt,
+        storyVersion: backlogitem.version
+    };
+    return result;
+};
+
 export const mapDbToApiSprintBacklogItem = (item: any): ApiSprintBacklogItem => {
     if (!item) {
         return item;

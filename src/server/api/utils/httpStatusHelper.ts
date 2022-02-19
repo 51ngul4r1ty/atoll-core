@@ -22,12 +22,14 @@ export const getStatusRange = (status: number): StatusRange => {
     }
 };
 
-export const isStatusSuccess = (status: number): boolean => {
+export const isStatusClientError = (status: number): boolean => {
     const statusRange = getStatusRange(status);
-    return statusRange === StatusRange.Success;
+    return statusRange === StatusRange.ClientError;
 };
 
 export const isStatusServerError = (status: number): boolean => {
     const statusRange = getStatusRange(status);
     return statusRange === StatusRange.ServerError;
 };
+
+export const isStatusError = (status: number): boolean => isStatusClientError(status) || isStatusServerError(status);

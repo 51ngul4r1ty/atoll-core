@@ -3,6 +3,7 @@ import * as HttpStatus from "http-status-codes";
 
 // utils
 import { getMessageFromError } from "./errorUtils";
+import { isStatusError } from "./httpStatusHelper";
 
 export type RestApiErrorResult = {
     status: number;
@@ -88,9 +89,8 @@ export const buildResponseFromCatchError = (error: Error): RestApiErrorResult =>
     return buildInternalServerErrorResponse(getMessageFromError(error));
 };
 
-export const isRestApiErrorResult = (response: RestApiBaseResult<any> | RestApiErrorResult): response is RestApiErrorResult => {
-    return response.status >= 400;
-};
+export const isRestApiErrorResult = (response: RestApiBaseResult<any> | RestApiErrorResult): response is RestApiErrorResult =>
+    isStatusError(response.status);
 
 /**
  * A type guard that returns whether this result represents a successful item result or not.

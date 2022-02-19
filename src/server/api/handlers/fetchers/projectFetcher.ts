@@ -26,7 +26,6 @@ export interface ProjectsResult {
 
 export const projectByDisplayIdFetcher = async (projectDisplayId: string): Promise<ProjectsResult> => {
     try {
-        // const options = buildOptionsFromParams({ externalId: projectDisplayId });
         const options = {
             where: {
                 name: {
