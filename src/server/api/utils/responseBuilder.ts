@@ -87,3 +87,27 @@ export const buildInternalServerErrorResponse = (message: string): RestApiErrorR
 export const buildResponseFromCatchError = (error: Error): RestApiErrorResult => {
     return buildInternalServerErrorResponse(getMessageFromError(error));
 };
+
+export const isRestApiErrorResult = (response: RestApiBaseResult<any> | RestApiErrorResult): response is RestApiErrorResult => {
+    return response.status >= 400;
+};
+
+/**
+ * A type guard that returns whether this result represents a successful item result or not.
+ * @returns true if successful result, false if error result
+ */
+export const isRestApiItemResult = <T, U = undefined>(
+    response: RestApiItemResult<T, U> | RestApiErrorResult
+): response is RestApiItemResult<T, U> => {
+    return !isRestApiErrorResult(response);
+};
+
+/**
+ * A type guard that returns whether this result represents a successful collection result or not.
+ * @returns true if successful result, false if error result
+ */
+export const isRestApiCollectionResult = <T, U = undefined>(
+    response: RestApiCollectionResult<T, U> | RestApiErrorResult
+): response is RestApiCollectionResult<T, U> => {
+    return !isRestApiErrorResult(response);
+};
