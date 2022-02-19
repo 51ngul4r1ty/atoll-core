@@ -13,6 +13,7 @@ import {
     SPRINT_BACKLOG_CHILD_RESOURCE_NAME,
     SPRINT_BACKLOG_ITEM_PART_RESOURCE_NAME,
     SPRINT_BACKLOG_PARENT_RESOURCE_NAME,
+    SPRINT_BACKLOG_PART_CHILD_RESOURCE_NAME,
     SPRINT_RESOURCE_NAME
 } from "../resourceNames";
 
@@ -46,7 +47,8 @@ import { planViewBffGetHandler } from "./handlers/views/planViewBff";
 import {
     sprintBacklogItemDeleteHandler,
     sprintBacklogItemsGetHandler,
-    sprintBacklogItemPostHandler
+    sprintBacklogItemPostHandler,
+    sprintBacklogItemPartGetHandler
 } from "./handlers/sprintBacklogItems";
 import { sprintUpdateStatsPostHandler } from "./handlers/sprintUpdateStats";
 import { backlogItemViewBffGetHandler } from "./handlers/views/backlogItemViewBff";
@@ -106,8 +108,17 @@ setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_
 });
 
 setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}/:backlogItemId`, {
+    get: sprintBacklogItemPartGetHandler,
     delete: sprintBacklogItemDeleteHandler
 });
+
+setupRoutes(
+    router,
+    `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_PART_CHILD_RESOURCE_NAME}/:backlogItemPartId`,
+    {
+        get: sprintBacklogItemPartGetHandler
+    }
+);
 
 setupRoutes(
     router,

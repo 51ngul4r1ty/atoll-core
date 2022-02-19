@@ -12,6 +12,7 @@ export interface OptionsParams {
     sprintId?: string | null;
     archived?: string | null;
     backlogitemId?: string | null;
+    backlogitempartId?: string | null;
 }
 
 export const addWhereClauseToOptions = (options: any, key: string, value: any) => {
@@ -31,6 +32,7 @@ export const buildOptionsFromParams = (params: OptionsParams): FindOptions => {
     addWhereClauseToOptions(options, "projectId", params.projectId);
     addWhereClauseToOptions(options, "sprintId", params.sprintId);
     addWhereClauseToOptions(options, "backlogitemId", params.backlogitemId);
+    addWhereClauseToOptions(options, "backlogitempartId", params.backlogitempartId);
     addWhereClauseToOptions(options, "archived", params.archived);
     return options;
 };

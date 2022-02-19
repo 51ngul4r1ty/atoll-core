@@ -2,7 +2,7 @@
 import * as HttpStatus from "http-status-codes";
 
 // libraries
-import { ApiBacklogItem, ApiBacklogItemInSprint } from "@atoll/shared";
+import { ApiBacklogItemInSprint } from "@atoll/shared";
 
 // utils
 import { mapDbSprintBacklogWithNestedToApiBacklogItemInSprint } from "../../../dataaccess/mappers/dataAccessToApiMappers";
@@ -49,6 +49,59 @@ export const fetchSprintBacklogItemsWithLinks = async (sprintId: string | null):
             status: HttpStatus.OK,
             data: {
                 items
+            }
+        };
+    } catch (error) {
+        return {
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: getMessageFromError(error)
+        };
+    }
+};
+
+export interface FetchedSprintBacklogItem {
+    status: number;
+    message?: string;
+    data?: {
+        item: ApiBacklogItemInSprint;
+    };
+}
+
+export const fetchSprintBacklogItemWithLinks = async (
+    sprintId: string | null,
+    backlogItemPartId: string | null
+): Promise<FetchedSprintBacklogItem> => {
+    try {
+        const options = buildOptionsFromParams({ sprintId, backlogitempartId: backlogItemPartId });
+        const sprintBacklogItems = await SprintBacklogItemDataModel.findAll({
+            ...options,
+            include: { all: true, nested: true }
+        });
+        if (!sprintBacklogItems.length) {
+            return {
+                status: HttpStatus.NOT_FOUND
+            };
+        }
+        if (sprintBacklogItems.length > 1) {
+            return {
+                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                message: `Multiple matches for Backog Item Part ID ${backlogItemPartId}`
+            };
+        }
+        const sprintBacklog = mapDbSprintBacklogWithNestedToApiBacklogItemInSprint(sprintBacklogItems[0]);
+        const item: ApiBacklogItemInSprint = {
+            ...sprintBacklog,
+            links: [
+                buildSelfLink(
+                    sprintBacklog,
+                    `/api/v1/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/${sprintId}/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`
+                )
+            ]
+        };
+        return {
+            status: HttpStatus.OK,
+            data: {
+                item
             }
         };
     } catch (error) {

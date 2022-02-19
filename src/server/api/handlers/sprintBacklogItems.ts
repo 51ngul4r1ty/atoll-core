@@ -18,7 +18,11 @@ import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklo
 import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
 
 // consts/enums
-import { SPRINT_BACKLOG_CHILD_RESOURCE_NAME, SPRINT_BACKLOG_PARENT_RESOURCE_NAME } from "resourceNames";
+import {
+    SPRINT_BACKLOG_CHILD_RESOURCE_NAME,
+    SPRINT_BACKLOG_PARENT_RESOURCE_NAME,
+    SPRINT_BACKLOG_PART_CHILD_RESOURCE_NAME
+} from "resourceNames";
 
 // utils
 import { getParamsFromRequest } from "../utils/filterHelper";
@@ -26,7 +30,7 @@ import {
     mapDbSprintBacklogWithNestedToApiBacklogItemInSprint,
     mapDbToApiSprintBacklogItem
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
-import { fetchSprintBacklogItemsWithLinks } from "./fetchers/sprintBacklogItemFetcher";
+import { fetchSprintBacklogItemsWithLinks, fetchSprintBacklogItemWithLinks } from "./fetchers/sprintBacklogItemFetcher";
 import { backlogItemRankFirstItemInserter, BacklogItemRankFirstItemInserterResult } from "./inserters/backlogItemRankInserter";
 import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
 import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
@@ -59,7 +63,7 @@ import {
 import { LastPartRemovalOptions, removeUnallocatedBacklogItemPart } from "./deleters/backlogItemPartDeleter";
 import { fetchSprint } from "./fetchers/sprintFetcher";
 import { buildSprintStatsFromApiSprint } from "./helpers/sprintStatsHelper";
-import { buildSelfLink } from "utils/linkBuilder";
+import { buildChldSelfLink } from "../../utils/linkBuilder";
 
 export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
@@ -72,6 +76,20 @@ export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
             message: result.message
         });
         console.log(`Unable to fetch sprintBacklogItems: ${result.message}`);
+    }
+};
+
+export const sprintBacklogItemPartGetHandler = async (req: Request, res) => {
+    const params = getParamsFromRequest(req);
+    const result = await fetchSprintBacklogItemWithLinks(params.sprintId, params.backlogItemPartId);
+    if (isStatusSuccess(result.status)) {
+        res.json(result);
+    } else {
+        res.status(result.status).json({
+            status: result.status,
+            message: result.message
+        });
+        console.log(`Unable to fetch sprintBacklogItemPart: ${result.message}`);
     }
 };
 
@@ -197,10 +215,10 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
             const addedItemWithoutLinks = mapDbToApiSprintBacklogItem(addedDbSprintBacklogItem);
             const resourceBasePath =
                 `/api/v1/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/${addedItemWithoutLinks.sprintId}` +
-                `/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`;
+                `/${SPRINT_BACKLOG_PART_CHILD_RESOURCE_NAME}`;
             const addedSprintBacklogItem = {
                 ...addedItemWithoutLinks,
-                links: [buildSelfLink(addedItemWithoutLinks, resourceBasePath)]
+                links: [buildChldSelfLink(addedItemWithoutLinks.backlogitempartId, resourceBasePath)]
             };
             if (joinSplitParts) {
                 // nothing was added, so 200 status is appropriate
