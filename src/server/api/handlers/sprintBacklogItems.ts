@@ -1,12 +1,12 @@
 // externals
 import { Request } from "express";
-import * as HttpStatus from "http-status-codes";
 
 // libraries
 import {
     ApiBacklogItem,
     ApiBacklogItemInSprint,
     ApiBacklogItemPart,
+    ApiSprint,
     ApiSprintStats,
     BacklogItemPart,
     BacklogItemStatus,
@@ -18,11 +18,7 @@ import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklo
 import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
 
 // consts/enums
-import {
-    SPRINT_BACKLOG_CHILD_RESOURCE_NAME,
-    SPRINT_BACKLOG_PARENT_RESOURCE_NAME,
-    SPRINT_BACKLOG_PART_CHILD_RESOURCE_NAME
-} from "resourceNames";
+import { SPRINT_BACKLOG_PARENT_RESOURCE_NAME, SPRINT_BACKLOG_PART_CHILD_RESOURCE_NAME } from "resourceNames";
 
 // utils
 import { getParamsFromRequest } from "../utils/filterHelper";
@@ -30,11 +26,11 @@ import {
     mapDbSprintBacklogWithNestedToApiBacklogItemInSprint,
     mapDbToApiSprintBacklogItem
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
-import { fetchSprintBacklogItemsWithLinks, fetchSprintBacklogItemWithLinks } from "./fetchers/sprintBacklogItemFetcher";
+import { fetchSprintBacklogItemsWithLinks, fetchSprintBacklogItemPartWithLinks } from "./fetchers/sprintBacklogItemFetcher";
 import { backlogItemRankFirstItemInserter, BacklogItemRankFirstItemInserterResult } from "./inserters/backlogItemRankInserter";
 import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
 import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
-import { backlogItemPartFetcher } from "./fetchers/backlogItemPartFetcher";
+import { backlogItemPartFetcher, BacklogItemPartsResult } from "./fetchers/backlogItemPartFetcher";
 import { isStatusSuccess } from "../utils/httpStatusHelper";
 import {
     abortWithNotFoundResponse,
@@ -64,6 +60,7 @@ import { LastPartRemovalOptions, removeUnallocatedBacklogItemPart } from "./dele
 import { fetchSprint } from "./fetchers/sprintFetcher";
 import { buildSprintStatsFromApiSprint } from "./helpers/sprintStatsHelper";
 import { buildChldSelfLink } from "../../utils/linkBuilder";
+import { isRestApiErrorResult, isRestApiItemResult } from "../utils/responseBuilder";
 
 export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
@@ -81,7 +78,7 @@ export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
 
 export const sprintBacklogItemPartGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
-    const result = await fetchSprintBacklogItemWithLinks(params.sprintId, params.backlogItemPartId);
+    const result = await fetchSprintBacklogItemPartWithLinks(params.sprintId, params.backlogItemPartId);
     if (isStatusSuccess(result.status)) {
         res.json(result);
     } else {
@@ -119,10 +116,11 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                 `unable to retrieve backlog item parts for backlog item ID "${backlogitemId}"`
             );
         }
+        const backlogitempartsSuccessResult = backlogitempartsResult as BacklogItemPartsResult;
         let joinSplitParts = false;
         let partsWithAllocationInfo: ApiBacklogItemPartWithSprintId[];
         if (!hasRolledBack(handlerContext)) {
-            const allBacklogItemParts = backlogitempartsResult.data.items;
+            const allBacklogItemParts = backlogitempartsSuccessResult.data.items;
 
             partsWithAllocationInfo = await fetchAllocatedAndUnallocatedBacklogItemParts(handlerContext, allBacklogItemParts);
             const unallocatedBacklogItemParts = partsWithAllocationInfo.filter((item) => !item.sprintId);
@@ -155,7 +153,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                     LastPartRemovalOptions.Disallow,
                     handlerContext.transactionContext.transaction
                 );
-                if (removePartResult.status !== HttpStatus.OK) {
+                if (isRestApiErrorResult(removePartResult)) {
                     rollbackWithErrorResponse(handlerContext, removePartResult.message);
                 }
             } else {
@@ -183,7 +181,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
                 backlogItem = await fetchAssociatedBacklogItemWithParts(handlerContext, backlogitemId);
                 if (joinSplitParts) {
                     const fetchSprintResult = await fetchSprint(sprintId);
-                    if (!isStatusSuccess(fetchSprintResult.status)) {
+                    if (!isRestApiItemResult<ApiSprint>(fetchSprintResult)) {
                         rollbackWithErrorResponse(
                             handlerContext,
                             `Error ${fetchSprintResult.message} (status ${fetchSprintResult.status}) ` +
