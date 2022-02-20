@@ -141,7 +141,7 @@ export const buildResponseFromCatchError = (error: Error | string): RestApiError
 };
 
 export const isRestApiErrorResult = (response: RestApiBaseResult<any> | RestApiErrorResult): response is RestApiErrorResult =>
-    isStatusError(response.status);
+    isStatusError(response?.status);
 
 /**
  * A type guard that returns whether this result represents a successful item result or not.

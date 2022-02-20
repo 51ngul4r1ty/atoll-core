@@ -6,8 +6,11 @@ export enum StatusRange {
     ServerError = 5
 }
 
-export const getStatusRange = (status: number): StatusRange => {
-    if (status < 200) {
+export const getStatusRange = (status: number | undefined): StatusRange => {
+    if (!status) {
+        // treat as status 200
+        return StatusRange.Success;
+    } else if (status < 200) {
         return StatusRange.Info;
     } else if (status < 300) {
         return StatusRange.Success;
@@ -22,14 +25,14 @@ export const getStatusRange = (status: number): StatusRange => {
     }
 };
 
-export const isStatusClientError = (status: number): boolean => {
+export const isStatusClientError = (status: number | undefined): boolean => {
     const statusRange = getStatusRange(status);
     return statusRange === StatusRange.ClientError;
 };
 
-export const isStatusServerError = (status: number): boolean => {
+export const isStatusServerError = (status: number | undefined): boolean => {
     const statusRange = getStatusRange(status);
     return statusRange === StatusRange.ServerError;
 };
 
-export const isStatusError = (status: number): boolean => isStatusClientError(status) || isStatusServerError(status);
+export const isStatusError = (status: number | undefined): boolean => isStatusClientError(status) || isStatusServerError(status);

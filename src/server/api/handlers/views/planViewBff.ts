@@ -13,6 +13,9 @@ import { backlogItemsFetcher } from "../fetchers/backlogItemFetcher";
 import {
     buildResponseFromCatchError,
     buildResponseWithData,
+    isRestApiCollectionResult,
+    isRestApiErrorResult,
+    isRestApiItemResult,
     RestApiCollectionResult,
     RestApiErrorResult
 } from "../../utils/responseBuilder";
@@ -49,18 +52,16 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
             }
         }
         if (
-            backlogItemsResult.status === HttpStatus.OK &&
-            sprintsResult.status === HttpStatus.OK &&
-            userPreferencesResult.status === HttpStatus.OK &&
-            sprintBacklogItemsStatus === HttpStatus.OK
+            isRestApiCollectionResult(backlogItemsResult) &&
+            isRestApiCollectionResult(sprintsResult) &&
+            isRestApiItemResult(userPreferencesResult) &&
+            isRestApiCollectionResult(sprintBacklogItemsResult)
         ) {
-            // TODO: Switch this over to use type guards instead
-            const sprintBacklogItemsSuccessResult = sprintBacklogItemsResult as FetchedSprintBacklogItems;
             res.json(
                 buildResponseWithData({
                     backlogItems: backlogItemsResult.data?.items,
                     sprints,
-                    sprintBacklogItems: sprintBacklogItemsSuccessResult?.data?.items,
+                    sprintBacklogItems: sprintBacklogItemsResult?.data?.items,
                     userPreferences: (userPreferencesResult as UserPreferencesSuccessResponse).data?.item
                 })
             );
