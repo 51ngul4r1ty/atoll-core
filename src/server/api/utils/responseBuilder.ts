@@ -5,20 +5,26 @@ import * as HttpStatus from "http-status-codes";
 import { getMessageFromError } from "./errorUtils";
 import { isStatusError } from "./httpStatusHelper";
 
-export type RestApiErrorResult = {
+export type RestApiStatusAndMessageOnly = {
     status: number;
     message?: string;
 };
 
-export type RestApiBaseResult<T, U = undefined> = {
+export type RestApiErrorResult = RestApiStatusAndMessageOnly;
+
+export type RestApiBaseResult<T, U = undefined, V = undefined> = {
     status: number;
     data: T;
     extra?: U;
+    meta?: V;
     message?: string;
 };
 
 export type RestApiDataResult<T, U = undefined> = RestApiBaseResult<T, U>;
-export type RestApiItemResult<T, U = undefined> = RestApiBaseResult<{ item: T }, U>;
+/**
+ * NOTE: extra embedded in the "data" node is a legacy construct and will be removed in future.
+ */
+export type RestApiItemResult<T, U = undefined, V = undefined> = RestApiBaseResult<{ item: T; extra?: any }, U, V>;
 export type RestApiCollectionResult<T, U = undefined> = RestApiBaseResult<{ items: T[] }, U>;
 
 export const buildResponseWithData = <T, U = undefined>(data: T, extra?: U, message?: string): RestApiDataResult<T, U> => {
@@ -55,20 +61,65 @@ export const buildResponseWithItems = <T, U = undefined>(
     return result;
 };
 
-export const buildResponseWithItem = <T, U = undefined>(item: T, extra?: U, message?: string): RestApiItemResult<T, U> => {
-    const result: RestApiItemResult<T, U> = {
+export type BuildResponseOptions = {
+    embedExtraInDataObj: boolean;
+};
+
+export const DEFAULT_BUILD_RESPONSE_OPTIONS: BuildResponseOptions = {
+    embedExtraInDataObj: false
+};
+
+export const buildResponseWithItem = <T, U = undefined, V = undefined>(
+    item: T,
+    extra?: U,
+    meta?: V,
+    message?: string,
+    options: BuildResponseOptions = DEFAULT_BUILD_RESPONSE_OPTIONS
+): RestApiItemResult<T, U, V> => {
+    const result: RestApiItemResult<T, U, V> = {
         status: HttpStatus.OK,
         data: {
             item
         }
     };
     if (extra) {
-        result.extra = extra;
+        if (options.embedExtraInDataObj) {
+            result.data.extra = extra;
+        } else {
+            result.extra = extra;
+        }
+    }
+    if (meta) {
+        result.meta = meta;
     }
     if (message) {
         result.message = message;
     }
     return result;
+};
+
+export const buildOkResponse = (message?: string): RestApiStatusAndMessageOnly => {
+    const result: RestApiStatusAndMessageOnly = {
+        status: HttpStatus.OK
+    };
+    if (message) {
+        result.message = message;
+    }
+    return result;
+};
+
+export const buildNotImplementedResponse = (message?: string): RestApiErrorResult => {
+    return {
+        status: HttpStatus.NOT_IMPLEMENTED,
+        message
+    };
+};
+
+export const buildBadRequestResponse = (message?: string): RestApiErrorResult => {
+    return {
+        status: HttpStatus.BAD_REQUEST,
+        message
+    };
 };
 
 export const buildNotFoundResponse = (message?: string): RestApiErrorResult => {
@@ -85,7 +136,7 @@ export const buildInternalServerErrorResponse = (message: string): RestApiErrorR
     };
 };
 
-export const buildResponseFromCatchError = (error: Error): RestApiErrorResult => {
+export const buildResponseFromCatchError = (error: Error | string): RestApiErrorResult => {
     return buildInternalServerErrorResponse(getMessageFromError(error));
 };
 

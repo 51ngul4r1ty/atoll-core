@@ -11,12 +11,19 @@ import { mapDbToApiUserSettings } from "../../../dataaccess/mappers/dataAccessTo
 import { UserSettingsDataModel } from "../../../dataaccess/models/UserSettings";
 
 // consts/enums
-import { buildResponseFromCatchError, RestApiErrorResult } from "../../utils/responseBuilder";
-import { ResponseItemStructure, returnWithItem, returnWithNotFound, returnWithNotImplemented } from "../../utils/returner";
+import {
+    buildNotFoundResponse,
+    buildNotImplementedResponse,
+    buildResponseFromCatchError,
+    buildResponseWithItem,
+    RestApiErrorResult,
+    RestApiItemResult
+} from "../../utils/responseBuilder";
+// import { ResponseItemStructure, returnWithItem, returnWithNotFound, returnWithNotImplemented } from "../../utils/returner";
 
 export type UserPreferencesResponse = RestApiErrorResult | UserPreferencesSuccessResponse;
 
-export type UserPreferencesSuccessResponse = ResponseItemStructure<ApiUserSettings>;
+export type UserPreferencesSuccessResponse = RestApiItemResult<ApiUserSettings, undefined, { original: ApiUserSettings }>;
 
 export const userPreferencesFetcher = async (
     userId: string | null,
@@ -24,7 +31,7 @@ export const userPreferencesFetcher = async (
 ): Promise<UserPreferencesResponse> => {
     try {
         if (userId !== "{self}") {
-            return returnWithNotImplemented(
+            return buildNotImplementedResponse(
                 "This endpoint is intended as an admin endpoint, so a typical user would not be able to use it."
             );
         } else {
@@ -34,9 +41,9 @@ export const userPreferencesFetcher = async (
             });
             if (userSettingsItem) {
                 const userSettingsItemTyped = mapDbToApiUserSettings(userSettingsItem);
-                return returnWithItem(userSettingsItemTyped);
+                return buildResponseWithItem(userSettingsItemTyped);
             } else {
-                return returnWithNotFound("User settings object was not found for this user");
+                return buildNotFoundResponse("User settings object was not found for this user");
             }
         }
     } catch (error) {

@@ -43,6 +43,7 @@ import {
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { getUpdatedBacklogItemWhenStatusChanges } from "../utils/statusChangeUtils";
 import { buildResponseFromCatchError } from "../utils/responseBuilder";
+import { logError } from "./utils/serverLogger";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -84,7 +85,7 @@ export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, 
     } catch (error) {
         const errorResponse = buildResponseFromCatchError(error);
         res.status(errorResponse.status).json(errorResponse);
-        console.log(`Unable to fetch backlog item: ${error}`);
+        logError(`Unable to fetch backlog item: ${error}`);
     }
 };
 

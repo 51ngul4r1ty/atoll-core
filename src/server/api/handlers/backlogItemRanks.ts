@@ -17,6 +17,7 @@ import { buildSelfLink } from "../../utils/linkBuilder";
 import { respondWithNotFound } from "../utils/responder";
 import { mapDbToApiBacklogItemRank } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildResponseFromCatchError, buildResponseWithItems } from "../utils/responseBuilder";
+import { logError } from "./utils/serverLogger";
 
 export const backlogItemRanksGetHandler = async (req: Request, res: Response) => {
     try {
@@ -34,7 +35,7 @@ export const backlogItemRanksGetHandler = async (req: Request, res: Response) =>
     } catch (error) {
         const errorResponse = buildResponseFromCatchError(error);
         res.status(errorResponse.status).json(errorResponse);
-        console.log(`Unable to fetch backlog item ranks: ${error}`);
+        logError(`Unable to fetch backlog item ranks: ${error}`);
     }
 };
 
@@ -59,6 +60,6 @@ export const backlogItemRankGetHandler = async (req: Request<BacklogItemGetParam
     } catch (error) {
         const errorResponse = buildResponseFromCatchError(error);
         res.status(errorResponse.status).json(errorResponse);
-        console.log(`Unable to fetch backlog item rank: ${error}`);
+        logError(`Unable to fetch backlog item rank: ${error}`);
     }
 };

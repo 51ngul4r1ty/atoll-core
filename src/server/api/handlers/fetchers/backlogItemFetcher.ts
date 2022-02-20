@@ -79,7 +79,7 @@ export const backlogItemsFetcher = async (projectId: string | null): Promise<Bac
             };
             rankList.addItemData(result.id, result);
         });
-        buildResponseWithItems(rankList.toArray());
+        return buildResponseWithItems(rankList.toArray());
     } catch (error) {
         return buildResponseFromCatchError(error);
     }

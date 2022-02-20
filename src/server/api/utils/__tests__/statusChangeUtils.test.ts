@@ -34,7 +34,8 @@ const buildApiBacklogItem = (): ApiBacklogItem => {
         partIndex: 1,
         storyEstimate: 5,
         totalParts: 1,
-        unallocatedParts: 0
+        unallocatedParts: 0,
+        unallocatedPoints: undefined
     };
     return result;
 };
