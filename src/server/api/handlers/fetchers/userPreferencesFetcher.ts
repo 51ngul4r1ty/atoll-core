@@ -19,7 +19,6 @@ import {
     RestApiErrorResult,
     RestApiItemResult
 } from "../../utils/responseBuilder";
-// import { ResponseItemStructure, returnWithItem, returnWithNotFound, returnWithNotImplemented } from "../../utils/returner";
 
 export type UserPreferencesResponse = RestApiErrorResult | UserPreferencesSuccessResponse;
 
