@@ -242,7 +242,8 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_backlogitemId_fkey" DEFERRED;', { transaction });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
-        const newItem = getUpdatedBacklogItemWhenStatusChanges(null, bodyWithId);
+        const updateBacklogItemPartResult = getUpdatedBacklogItemWhenStatusChanges(null, bodyWithId);
+        const newItem = updateBacklogItemPartResult.backlogItem;
         const addedBacklogItem = await BacklogItemDataModel.create(newItem, { transaction } as CreateOptions);
         if (!prevBacklogItemId) {
             await backlogItemRankFirstItemInserter(newItem, transaction);
@@ -327,7 +328,8 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
             respondWithNotFound(res, `Unable to find backlogitem to update with ID ${req.body.id}`);
         } else {
             const originalApiBacklogItem = mapDbToApiBacklogItem(backlogItem);
-            const newDataItem = getUpdatedBacklogItemWhenStatusChanges(originalApiBacklogItem, req.body);
+            const updateBacklogItemResult = getUpdatedBacklogItemWhenStatusChanges(originalApiBacklogItem, req.body);
+            const newDataItem = updateBacklogItemResult.changed ? backlogItem : updateBacklogItemResult.backlogItem;
             await backlogItem.update(newDataItem, { transaction });
             await handleResponseAndCommit(originalApiBacklogItem, backlogItem, res, transaction);
         }

@@ -6,26 +6,28 @@ import { Transaction } from "sequelize";
 import { ApiBacklogItem, ApiBacklogItemPart, ApiSprintStats, mapApiItemToBacklogItemPart } from "@atoll/shared";
 
 // data access
-import { BacklogItemPartDataModel } from "dataaccess/models/BacklogItemPart";
+import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
+import { BacklogItemPartDataModel } from "../../dataaccess/models/BacklogItemPart";
 
 // utils
-import { respondWithFailedValidation, respondWithItem } from "../utils/responder";
+import { buildResponseWithItem } from "../utils/responseBuilder";
+import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
+import { getUpdatedBacklogItemPartWhenStatusChanges, getUpdatedBacklogItemWhenStatusChanges } from "../utils/statusChangeUtils";
+import { getIdForSprintContainingBacklogItemPart } from "./fetchers/sprintFetcher";
+import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
+import { mapDbToApiBacklogItem, mapDbToApiBacklogItemPart } from "../../dataaccess/mappers/dataAccessToApiMappers";
+import { respondWithFailedValidation, respondWithObj } from "../utils/responder";
 import { respondedWithMismatchedItemIds } from "../utils/validationResponders";
 import {
     abortWithErrorResponse,
     abortWithNotFoundResponse,
     beginSerializableTransaction,
     finish,
+    HandlerContext,
     handleUnexpectedErrorResponse,
     hasAborted,
     start
 } from "./utils/handlerContext";
-import { mapDbToApiBacklogItem, mapDbToApiBacklogItemPart } from "dataaccess/mappers/dataAccessToApiMappers";
-import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
-import { getUpdatedBacklogItemPartWhenStatusChanges } from "../utils/statusChangeUtils";
-import { getIdForSprintContainingBacklogItemPart } from "./fetchers/sprintFetcher";
-import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
-import { BacklogItemDataModel } from "dataaccess/models/BacklogItem";
 
 export const backlogItemPartPatchHandler = async (req: Request, res: Response) => {
     const handlerContext = start("backlogItemPartPatchHandler", res);
@@ -63,7 +65,7 @@ export const backlogItemPartPatchHandler = async (req: Request, res: Response) =
                         `needed to patch backlogitempart with ID ${queryParamItemId}`
                 );
             }
-            const apiBacklogItem = mapDbToApiBacklogItem(dbBacklogItem);
+            const originalApiBacklogItem = mapDbToApiBacklogItem(dbBacklogItem);
 
             if (!hasAborted(handlerContext)) {
                 const originalApiBacklogItemPart = mapDbToApiBacklogItemPart(dbBacklogItemPart);
@@ -71,15 +73,20 @@ export const backlogItemPartPatchHandler = async (req: Request, res: Response) =
                 if (invalidPatchMessage) {
                     respondWithFailedValidation(res, `Unable to patch: ${invalidPatchMessage}`);
                 } else {
-                    let newDataItem = getPatchedItem(originalApiBacklogItemPart, req.body);
-                    newDataItem = getUpdatedBacklogItemPartWhenStatusChanges(originalApiBacklogItemPart, newDataItem);
-                    await dbBacklogItemPart.update(newDataItem, { transaction: handlerContext.transactionContext.transaction });
+                    const newDataItemPart = await patchBacklogItemPart(
+                        handlerContext,
+                        req.body,
+                        originalApiBacklogItemPart,
+                        dbBacklogItemPart
+                    );
+
+                    const newDataItem = await patchBacklogItem(handlerContext, req.body, originalApiBacklogItem, dbBacklogItem);
 
                     await handleResponseWithUpdatedStatsAndCommit(
-                        newDataItem,
+                        newDataItemPart,
                         originalApiBacklogItemPart,
-                        dbBacklogItemPart,
-                        apiBacklogItem,
+                        newDataItem,
+                        originalApiBacklogItem,
                         res,
                         handlerContext.transactionContext.transaction
                     );
@@ -92,11 +99,44 @@ export const backlogItemPartPatchHandler = async (req: Request, res: Response) =
     finish(handlerContext);
 };
 
+const patchBacklogItemPart = async (
+    handlerContext: HandlerContext,
+    reqBody: any,
+    originalApiBacklogItemPart: ApiBacklogItemPart,
+    dbBacklogItemPart: BacklogItemPartDataModel
+) => {
+    let newDataItemPart = getPatchedItem(originalApiBacklogItemPart, reqBody);
+    const updateBacklogItemPartResult = getUpdatedBacklogItemPartWhenStatusChanges(originalApiBacklogItemPart, newDataItemPart);
+    newDataItemPart = updateBacklogItemPartResult.changed ? updateBacklogItemPartResult.backlogItemPart : newDataItemPart;
+    await dbBacklogItemPart.update(newDataItemPart, { transaction: handlerContext.transactionContext.transaction });
+    return mapDbToApiBacklogItemPart(dbBacklogItemPart);
+};
+
+const patchBacklogItem = async (
+    handlerContext: HandlerContext,
+    reqBody: any,
+    originalApiBacklogItem: ApiBacklogItem,
+    dbBacklogItem: BacklogItemDataModel
+) => {
+    let newDataItem: ApiBacklogItem;
+    let result: ApiBacklogItem;
+    if (reqBody.status) {
+        newDataItem = getPatchedItem(originalApiBacklogItem, { status: reqBody.status });
+        const updateBacklogItemResult = getUpdatedBacklogItemWhenStatusChanges(originalApiBacklogItem, newDataItem);
+        newDataItem = updateBacklogItemResult.changed ? updateBacklogItemResult.backlogItem : newDataItem;
+        await dbBacklogItem.update(newDataItem, {
+            transaction: handlerContext.transactionContext.transaction
+        });
+        result = mapDbToApiBacklogItem(dbBacklogItem);
+    }
+    return result;
+};
+
 const handleResponseWithUpdatedStatsAndCommit = async (
     newApiBacklogItemPart: ApiBacklogItemPart,
     originalApiBacklogItemPart: ApiBacklogItemPart,
-    dbBacklogItemPart: BacklogItemPartDataModel,
-    apiBacklogItem: ApiBacklogItem,
+    newApiBacklogItem: ApiBacklogItem,
+    originalApiBacklogItem: ApiBacklogItem,
     res: Response,
     transaction: Transaction
 ): Promise<void> => {
@@ -108,8 +148,8 @@ const handleResponseWithUpdatedStatsAndCommit = async (
         originalBacklogItemPart.status !== newBacklogItemPart.status
     ) {
         const sprintId = await getIdForSprintContainingBacklogItemPart(originalBacklogItemPart.id, transaction);
-        const originalBacklogItemEstimate = apiBacklogItem.estimate;
-        const backlogItemEstimate = apiBacklogItem.estimate;
+        const originalBacklogItemEstimate = originalApiBacklogItem.estimate;
+        const backlogItemEstimate = originalApiBacklogItem.estimate;
         sprintStats = await handleSprintStatUpdate(
             sprintId,
             originalBacklogItemPart.status,
@@ -125,5 +165,7 @@ const handleResponseWithUpdatedStatsAndCommit = async (
         await transaction.commit();
         transaction = null;
     }
-    respondWithItem(res, dbBacklogItemPart, originalBacklogItemPart, sprintStats ? { sprintStats } : undefined);
+    const extra = sprintStats ? { sprintStats, backlogItem: newApiBacklogItem } : { backlogItem: newApiBacklogItem };
+    const meta = originalBacklogItemPart ? { original: originalBacklogItemPart } : undefined;
+    respondWithObj(res, buildResponseWithItem(newApiBacklogItemPart, extra, meta));
 };
