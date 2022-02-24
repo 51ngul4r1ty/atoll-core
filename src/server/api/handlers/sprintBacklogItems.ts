@@ -1,5 +1,5 @@
 // externals
-import { Request } from "express";
+import { Request, Response } from "express";
 
 // libraries
 import {
@@ -65,7 +65,7 @@ import { buildSprintStatsFromApiSprint } from "./helpers/sprintStatsHelper";
 import { buildChldSelfLink } from "../../utils/linkBuilder";
 import { isRestApiErrorResult, isRestApiItemResult } from "../utils/responseBuilder";
 
-export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
+export const sprintBacklogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
     const result = await fetchSprintBacklogItemsWithLinks(params.sprintId);
     if (isRestApiItemResult(result)) {
@@ -76,7 +76,7 @@ export const sprintBacklogItemsGetHandler = async (req: Request, res) => {
     }
 };
 
-export const sprintBacklogItemGetHandler = async (req: Request, res) => {
+export const sprintBacklogItemGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
     const result = await fetchSprintBacklogItemWithLinks(params.sprintId, params.backlogItemId);
     if (isRestApiItemResult(result)) {
@@ -87,7 +87,7 @@ export const sprintBacklogItemGetHandler = async (req: Request, res) => {
     }
 };
 
-export const sprintBacklogItemPartGetHandler = async (req: Request, res) => {
+export const sprintBacklogItemPartGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
     const result = await fetchSprintBacklogItemPartWithLinks(params.sprintId, params.backlogItemPartId);
     if (isRestApiItemResult(result)) {
@@ -98,7 +98,7 @@ export const sprintBacklogItemPartGetHandler = async (req: Request, res) => {
     }
 };
 
-export const sprintBacklogItemPostHandler = async (req: Request, res) => {
+export const sprintBacklogItemPostHandler = async (req: Request, res: Response) => {
     const handlerContext = start("sprintBacklogItemPostHandler", res);
 
     const params = getParamsFromRequest(req);
@@ -241,7 +241,12 @@ export const sprintBacklogItemPostHandler = async (req: Request, res) => {
     finish(handlerContext);
 };
 
-export const sprintBacklogItemDeleteHandler = async (req: Request, res) => {
+/**
+ * Remove an sprint backlog item part from a sprint (i.e. make it an "unallocated part").
+ * @param req request with backlogItemId and sprintId as params
+ * @param res
+ */
+export const sprintBacklogItemDeleteHandler = async (req: Request, res: Response) => {
     const handlerContext = start("sprintBacklogItemDeleteHandler", res);
 
     const params = getParamsFromRequest(req);
