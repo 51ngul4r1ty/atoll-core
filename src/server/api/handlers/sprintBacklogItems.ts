@@ -286,23 +286,6 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res: Response
                     );
                 }
             }
-            const backlogItems = await BacklogItemDataModel.findAll({
-                where: { id: backlogitemId },
-                include: buildFindOptionsIncludeForNested()
-            });
-            if (backlogItems.length !== 1) {
-                await rollbackWithErrorResponse(
-                    handlerContext,
-                    "Unable to insert new backlogitemrank entries, aborting move to product backlog for item part ID " +
-                        `${backlogitemId}` +
-                        ` (reason: expected 1 matching backlog item to match ID above, but ${backlogItems.length} matched)`
-                );
-            } else {
-                const backlogItem = backlogItems[0];
-                const backlogItemParts = (backlogItem as any).backlogitemparts;
-                firstApiBacklogItemTyped.unallocatedParts = computeUnallocatedParts(backlogItemParts);
-                firstApiBacklogItemTyped.unallocatedPoints = computeUnallocatedPoints(backlogItem, backlogItemParts);
-            }
             if (!hasAborted(handlerContext)) {
                 // forEach doesn't work with async, so we use for ... of instead
                 for (const sprintBacklogItem of matchingItems) {
@@ -316,6 +299,25 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res: Response
                     }
                 }
                 firstApiBacklogItemTyped.unallocatedParts += matchingItems.length;
+
+                const backlogItems = await BacklogItemDataModel.findAll({
+                    where: { id: backlogitemId },
+                    include: buildFindOptionsIncludeForNested(),
+                    transaction: handlerContext.transactionContext.transaction
+                });
+                if (backlogItems.length !== 1) {
+                    await rollbackWithErrorResponse(
+                        handlerContext,
+                        "Unable to insert new backlogitemrank entries, aborting move to product backlog for item part ID " +
+                            `${backlogitemId}` +
+                            ` (reason: expected 1 matching backlog item to match ID above, but ${backlogItems.length} matched)`
+                    );
+                } else {
+                    const backlogItem = backlogItems[0];
+                    const backlogItemParts = (backlogItem as any).backlogitemparts;
+                    firstApiBacklogItemTyped.unallocatedParts = computeUnallocatedParts(backlogItemParts);
+                    firstApiBacklogItemTyped.unallocatedPoints = computeUnallocatedPoints(backlogItem, backlogItemParts);
+                }
             }
             const extra = {
                 sprintStats,
