@@ -61,20 +61,11 @@ export const buildResponseWithItems = <T, U = undefined>(
     return result;
 };
 
-export type BuildResponseOptions = {
-    embedExtraInDataObj: boolean;
-};
-
-export const DEFAULT_BUILD_RESPONSE_OPTIONS: BuildResponseOptions = {
-    embedExtraInDataObj: false
-};
-
 export const buildResponseWithItem = <T, U = undefined, V = undefined>(
     item: T,
     extra?: U,
     meta?: V,
-    message?: string,
-    options: BuildResponseOptions = DEFAULT_BUILD_RESPONSE_OPTIONS
+    message?: string
 ): RestApiItemResult<T, U, V> => {
     const result: RestApiItemResult<T, U, V> = {
         status: HttpStatus.OK,
@@ -83,11 +74,7 @@ export const buildResponseWithItem = <T, U = undefined, V = undefined>(
         }
     };
     if (extra) {
-        if (options.embedExtraInDataObj) {
-            result.data.extra = extra;
-        } else {
-            result.extra = extra;
-        }
+        result.data.extra = extra;
     }
     if (meta) {
         result.meta = meta;
