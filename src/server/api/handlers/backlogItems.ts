@@ -18,11 +18,11 @@ import {
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
-import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
-import { BacklogItemPartDataModel } from "../../dataaccess/models/BacklogItemPart";
-import { BacklogItemRankDataModel } from "../../dataaccess/models/BacklogItemRank";
-import { CounterDataModel } from "../../dataaccess/models/Counter";
-import { ProjectSettingsDataModel } from "../../dataaccess/models/ProjectSettings";
+import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItemDataModel";
+import { BacklogItemPartDataModel } from "../../dataaccess/models/BacklogItemPartDataModel";
+import { BacklogItemRankDataModel } from "../../dataaccess/models/BacklogItemRankDataModel";
+import { CounterDataModel } from "../../dataaccess/models/CounterDataModel";
+import { ProjectSettingsDataModel } from "../../dataaccess/models/ProjectSettingsDataModel";
 
 // utils
 import {
@@ -30,10 +30,11 @@ import {
     respondWithNotFound,
     respondWithError,
     respondWithOk,
-    respondWithItem
+    respondWithItem,
+    respondWithObj
 } from "../utils/responder";
 import { getParamsFromRequest } from "../utils/filterHelper";
-import { backlogItemFetcher, backlogItemsFetcher, BacklogItemsResult } from "./fetchers/backlogItemFetcher";
+import { fetchBacklogItem, fetchBacklogItems, BacklogItemsResult, fetchBacklogItemById } from "./fetchers/backlogItemFetcher";
 import { addIdToBody } from "../utils/uuidHelper";
 import { backlogItemRankFirstItemInserter, backlogItemRankSubsequentItemInserter } from "./inserters/backlogItemRankInserter";
 import {
@@ -42,16 +43,24 @@ import {
     mapDbToApiProjectSettings
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { getUpdatedBacklogItemWhenStatusChanges } from "../utils/statusChangeUtils";
-import { buildResponseFromCatchError } from "../utils/responseBuilder";
+import {
+    buildInternalServerErrorResponse,
+    buildResponseFromCatchError,
+    buildResponseWithItem,
+    isRestApiCollectionResult,
+    isRestApiErrorResult,
+    RestApiErrorResult
+} from "../utils/responseBuilder";
 import { logError } from "./utils/serverLogger";
+import { fetchSprintsForBacklogItem, FetchSprintsForBacklogItemResult } from "./fetchers/sprintFetcher";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
     let result: BacklogItemsResult;
     if (params.projectId && params.backlogItemDisplayId) {
-        result = await backlogItemFetcher(params.projectId, params.backlogItemDisplayId);
+        result = await fetchBacklogItem(params.projectId, params.backlogItemDisplayId);
     } else {
-        result = await backlogItemsFetcher(params.projectId);
+        result = await fetchBacklogItems(params.projectId);
     }
     if (result.status === HttpStatus.OK) {
         res.json(result);
@@ -75,12 +84,35 @@ export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, 
         if (!backlogItem) {
             respondWithNotFound(res, `Unable to find backlogitem by primary key ${id}`);
         } else {
-            res.json({
-                status: HttpStatus.OK,
-                data: {
-                    item: mapDbToApiBacklogItem(backlogItem)
-                }
-            });
+            const item = mapDbToApiBacklogItem(backlogItem);
+            const productBacklogItem = await fetchBacklogItemById(id);
+            let inProductBacklog: boolean;
+            if (productBacklogItem.status === HttpStatus.OK) {
+                inProductBacklog = true;
+            } else if (productBacklogItem.status === HttpStatus.NOT_FOUND) {
+                inProductBacklog = false;
+            } else {
+                const error = `Unable to fetch product backlog item by ID ${id}: ${productBacklogItem.message}`;
+                const errorResponse = buildInternalServerErrorResponse(error);
+                res.status(errorResponse.status).json(errorResponse);
+                logError(error);
+                return;
+            }
+            const sprintsResult: FetchSprintsForBacklogItemResult | RestApiErrorResult = await fetchSprintsForBacklogItem(id);
+            if (!isRestApiCollectionResult(sprintsResult)) {
+                const error = `Error retrieving sprints for backlog item ID ${id}: ${sprintsResult.message}`;
+                const errorResponse = buildInternalServerErrorResponse(error);
+                res.status(errorResponse.status).json(errorResponse);
+                logError(error);
+            } else {
+                const sprintIds = sprintsResult.data.items.map((item) => item.id);
+                const extra = {
+                    inProductBacklog,
+                    sprintIds
+                };
+                const responseObj = buildResponseWithItem(item, extra);
+                respondWithObj(res, responseObj);
+            }
         }
     } catch (error) {
         const errorResponse = buildResponseFromCatchError(error);

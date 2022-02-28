@@ -1,14 +1,14 @@
-export * from "./models/AppUser";
-export * from "./models/BacklogItem";
-export * from "./models/BacklogItemPart";
-export * from "./models/BacklogItemRank";
-export * from "./models/BacklogItemTag";
-export * from "./models/Counter";
-export * from "./models/Project";
-export * from "./models/ProjectSettings";
-export * from "./models/Sprint";
+export * from "./models/AppUserDataModel";
+export * from "./models/BacklogItemDataModel";
+export * from "./models/BacklogItemPartDataModel";
+export * from "./models/BacklogItemRankDataModel";
+export * from "./models/BacklogItemTagDataModel";
+export * from "./models/CounterDataModel";
+export * from "./models/ProjectDataModel";
+export * from "./models/ProjectSettingsDataModel";
+export * from "./models/SprintDataModel";
 export * from "./models/SprintBacklogItem";
-export * from "./models/UserSettings";
+export * from "./models/UserSettingsDataModel";
 export * from "./mappers/apiToDataAccessMappers";
 
 // data access

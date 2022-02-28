@@ -17,9 +17,9 @@ import {
 } from "@atoll/shared";
 
 // data access
-import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItem";
-import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPart";
-import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRank";
+import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
+import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
+import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRankDataModel";
 import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
 
 // interfaces/types

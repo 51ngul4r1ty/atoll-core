@@ -3,7 +3,7 @@ import * as HttpStatus from "http-status-codes";
 import { FindOptions, InstanceDestroyOptions, InstanceUpdateOptions, Transaction } from "sequelize";
 
 // data access
-import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRank";
+import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRankDataModel";
 
 // utils
 import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";

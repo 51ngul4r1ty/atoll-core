@@ -3,7 +3,7 @@ import * as HttpStatus from "http-status-codes";
 import { FindOptions, InstanceDestroyOptions, Transaction } from "sequelize";
 
 // data access
-import { SprintDataModel } from "../../../dataaccess/models/Sprint";
+import { SprintDataModel } from "../../../dataaccess/models/SprintDataModel";
 
 // utils
 import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";

@@ -3,8 +3,8 @@ import { Model, DataTypes, Deferrable } from "sequelize";
 
 // data access
 import { sequelize } from "../connection";
-import { BacklogItemPartDataModel } from "./BacklogItemPart";
-import { SprintDataModel } from "./Sprint";
+import { BacklogItemPartDataModel } from "./BacklogItemPartDataModel";
+import { SprintDataModel } from "./SprintDataModel";
 
 // utils
 import restoreSequelizeAttributesOnClass from "../sequelizeModelHelpers";

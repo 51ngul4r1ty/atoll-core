@@ -3,14 +3,15 @@ import * as HttpStatus from "http-status-codes";
 import { FindOptions, Op, Transaction } from "sequelize";
 
 // libraries
-import { ApiSprint, isoDateStringToDate, Link } from "@atoll/shared";
+import { ApiSprint, ApiSprintBacklogItem, isoDateStringToDate, Link } from "@atoll/shared";
 
 // consts/enums
 import { SPRINT_RESOURCE_NAME } from "../../../resourceNames";
 
 // data access
-import { SprintDataModel } from "../../../dataaccess/models/Sprint";
+import { SprintDataModel } from "../../../dataaccess/models/SprintDataModel";
 import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
+import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
 
 // interfaces/types
 import type { HandlerContext } from "../utils/handlerContext";
@@ -18,7 +19,13 @@ import type { HandlerContext } from "../utils/handlerContext";
 // utils
 import { buildLink, buildSelfLink } from "../../../utils/linkBuilder";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
-import { buildResponseFromCatchError, buildResponseWithItem, buildResponseWithItems } from "../../utils/responseBuilder";
+import {
+    buildResponseFromCatchError,
+    buildResponseWithItem,
+    buildResponseWithItems,
+    RestApiCollectionResult,
+    RestApiErrorResult
+} from "../../utils/responseBuilder";
 import { mapDbToApiSprint, mapDbToApiSprintBacklogItem } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 export const fetchSprints = async (projectId: string | null, archived?: string | null) => {
@@ -115,4 +122,44 @@ export const getIdForSprintContainingBacklogItemPart = async (
     });
     const apiSprintBacklogItem = mapDbToApiSprintBacklogItem(dbSprintBacklogItem);
     return apiSprintBacklogItem ? apiSprintBacklogItem.sprintId : null;
+};
+
+export type FetchSprintsForBacklogItemResult = RestApiCollectionResult<ApiSprint>;
+
+export const fetchSprintsForBacklogItem = async (
+    backlogItemId: string | null
+): Promise<FetchSprintsForBacklogItemResult | RestApiErrorResult> => {
+    try {
+        const backlogItemPartAlias = "backlogitempart";
+        const sprintAlias = "sprint";
+        const options = {
+            include: [
+                {
+                    model: BacklogItemPartDataModel,
+                    as: backlogItemPartAlias,
+                    where: { backlogitemId: backlogItemId }
+                },
+                {
+                    model: SprintDataModel,
+                    as: sprintAlias
+                }
+            ]
+        };
+        const dbSbisWithSprintAndBacklogItem = await SprintBacklogItemDataModel.findAll(options);
+        const items: ApiSprint[] = [];
+        const sprintResourceBasePath = `/api/v1/${SPRINT_RESOURCE_NAME}/`;
+        dbSbisWithSprintAndBacklogItem.forEach((dbSbiWithSprintAndBacklogItem) => {
+            const dbSprint = dbSbiWithSprintAndBacklogItem[sprintAlias];
+            const sprintWithoutLinks = mapDbToApiSprint(dbSprint);
+            const sprint: ApiSprint = {
+                ...sprintWithoutLinks,
+                links: [buildSelfLink(sprintWithoutLinks, sprintResourceBasePath)]
+            };
+            items.push(sprint);
+        });
+
+        return buildResponseWithItems(items);
+    } catch (error) {
+        return buildResponseFromCatchError(error);
+    }
 };

@@ -6,7 +6,7 @@ import restoreSequelizeAttributesOnClass from "../sequelizeModelHelpers";
 
 // data access
 import { sequelize } from "../connection";
-import { BacklogItemDataModel } from "./BacklogItem";
+import { BacklogItemDataModel } from "./BacklogItemDataModel";
 
 export class BacklogItemPartDataModel extends Model {
     public id!: string;

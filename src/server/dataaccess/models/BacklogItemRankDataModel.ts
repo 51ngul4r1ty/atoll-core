@@ -3,7 +3,7 @@ import { Model, DataTypes, Deferrable } from "sequelize";
 
 // data access
 import { sequelize } from "../connection";
-import { BacklogItemDataModel } from "./BacklogItem";
+import { BacklogItemDataModel } from "./BacklogItemDataModel";
 
 export class BacklogItemRankDataModel extends Model {}
 
@@ -22,7 +22,7 @@ BacklogItemRankDataModel.init(
                 // TODO: Find out why it was defined this way:
                 deferrable: Deferrable.INITIALLY_DEFERRED as any
             },
-            get: function() {
+            get: function () {
                 return this.getDataValue("projectId");
             }
         },
@@ -35,7 +35,7 @@ BacklogItemRankDataModel.init(
                 // TODO: Find out why it was defined this way:
                 deferrable: Deferrable.INITIALLY_DEFERRED as any
             },
-            get: function() {
+            get: function () {
                 return this.getDataValue("backlogitemId");
             }
         },
@@ -48,7 +48,7 @@ BacklogItemRankDataModel.init(
                 // TODO: Find out why it was defined this way:
                 deferrable: Deferrable.INITIALLY_DEFERRED as any
             },
-            get: function() {
+            get: function () {
                 return this.getDataValue("nextbacklogitemId");
             }
         }

@@ -15,7 +15,7 @@ import {
 
 // data access
 import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklogItem";
-import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
+import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItemDataModel";
 
 // consts/enums
 import { SPRINT_BACKLOG_CHILD_RESOURCE_NAME, SPRINT_BACKLOG_PARENT_RESOURCE_NAME } from "../../resourceNames";

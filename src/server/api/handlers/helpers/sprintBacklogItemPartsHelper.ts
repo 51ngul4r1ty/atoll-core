@@ -19,10 +19,10 @@ import {
 } from "@atoll/shared";
 
 // data access
-import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPart";
-import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItem";
+import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
+import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
 import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
-import { SprintDataModel } from "../../../dataaccess/models/Sprint";
+import { SprintDataModel } from "../../../dataaccess/models/SprintDataModel";
 
 // interfaces/types
 import { HandlerContext } from "../utils/handlerContext";

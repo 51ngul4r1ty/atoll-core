@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import * as HttpStatus from "http-status-codes";
 
 // data access
-import { ProjectDataModel } from "../../dataaccess/models/Project";
+import { ProjectDataModel } from "../../dataaccess/models/ProjectDataModel";
 
 // consts/enums
 import { fetchProject, fetchProjects } from "./fetchers/projectFetcher";

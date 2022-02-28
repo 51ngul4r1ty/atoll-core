@@ -8,7 +8,7 @@ import { ApiUserSettings } from "@atoll/shared";
 import { mapDbToApiUserSettings } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 // data access
-import { UserSettingsDataModel } from "../../../dataaccess/models/UserSettings";
+import { UserSettingsDataModel } from "../../../dataaccess/models/UserSettingsDataModel";
 
 // consts/enums
 import {

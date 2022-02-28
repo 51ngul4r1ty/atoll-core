@@ -6,7 +6,7 @@ import { Op } from "sequelize";
 import { ApiProject } from "@atoll/shared";
 
 // data access
-import { ProjectDataModel } from "../../../dataaccess/models/Project";
+import { ProjectDataModel } from "../../../dataaccess/models/ProjectDataModel";
 
 // consts/enums
 import { PROJECT_RESOURCE_NAME } from "../../../resourceNames";

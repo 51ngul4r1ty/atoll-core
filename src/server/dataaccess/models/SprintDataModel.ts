@@ -5,7 +5,7 @@ import { Model, DataTypes, Deferrable } from "sequelize";
 import { sequelize } from "../connection";
 
 // utils
-import restoreSequelizeAttributesOnClass from "../../dataaccess/sequelizeModelHelpers";
+import restoreSequelizeAttributesOnClass from "../sequelizeModelHelpers";
 
 export class SprintDataModel extends Model {
     id: string;

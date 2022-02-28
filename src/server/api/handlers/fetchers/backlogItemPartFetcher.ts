@@ -6,7 +6,7 @@ import { FindOptions, Transaction } from "sequelize";
 import { ApiBacklogItemPart } from "@atoll/shared";
 
 // data access
-import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPart";
+import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
 
 // consts/enums
 import { SPRINT_BACKLOG_CHILD_RESOURCE_NAME, SPRINT_BACKLOG_PARENT_RESOURCE_NAME } from "../../../resourceNames";

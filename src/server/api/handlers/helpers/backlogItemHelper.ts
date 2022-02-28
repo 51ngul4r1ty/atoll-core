@@ -5,7 +5,7 @@
 
 // interfaces/types
 import { BacklogItemDataModel } from "../../../dataaccess";
-import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPart";
+import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
 import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
 
 // utils

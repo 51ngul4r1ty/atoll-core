@@ -9,12 +9,11 @@ import { mapApiItemsToSprints } from "@atoll/shared";
 import type { UserPreferencesSuccessResponse } from "../fetchers/userPreferencesFetcher";
 
 // utils
-import { backlogItemsFetcher } from "../fetchers/backlogItemFetcher";
+import { fetchBacklogItems } from "../fetchers/backlogItemFetcher";
 import {
     buildResponseFromCatchError,
     buildResponseWithData,
     isRestApiCollectionResult,
-    isRestApiErrorResult,
     isRestApiItemResult,
     RestApiCollectionResult,
     RestApiErrorResult
@@ -33,7 +32,7 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
 
         const archived = "N";
         let [backlogItemsResult, sprintsResult] = await Promise.all([
-            backlogItemsFetcher(selectedProjectId),
+            fetchBacklogItems(selectedProjectId),
             fetchSprints(selectedProjectId, archived)
         ]);
         const sprintsSuccessResult = sprintsResult as RestApiCollectionResult<any>;

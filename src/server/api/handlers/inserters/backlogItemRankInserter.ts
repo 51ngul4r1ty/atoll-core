@@ -6,7 +6,7 @@ import * as HttpStatus from "http-status-codes";
 import { addIdToBody } from "../../utils/uuidHelper";
 
 // data access
-import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRank";
+import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRankDataModel";
 import { ApiBacklogItemRank } from "@atoll/shared";
 
 export interface BacklogItemRankFirstItemInserterResult {
@@ -69,7 +69,7 @@ export const backlogItemRankSubsequentItemInserter = async (newItem, transaction
     } else {
         const prevBacklogItem = prevBacklogItems[0];
         // (2) oldNextItemId = prevBacklogItem.nextbacklogitemId
-        const oldNextItemId = ((prevBacklogItem as unknown) as ApiBacklogItemRank).nextbacklogitemId;
+        const oldNextItemId = (prevBacklogItem as unknown as ApiBacklogItemRank).nextbacklogitemId;
         // (3) update existing entry with nextbacklogitemId = newItem.id
         await prevBacklogItem.update({ nextbacklogitemId: newItem.id }, { transaction });
         // (4) add new row with backlogitemId = newItem.id, nextbacklogitemId = oldNextItemId

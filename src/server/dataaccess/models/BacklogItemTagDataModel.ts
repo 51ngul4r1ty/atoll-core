@@ -5,7 +5,7 @@ import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../connection";
 
 // other models
-import { BacklogItemDataModel } from "./BacklogItem";
+import { BacklogItemDataModel } from "./BacklogItemDataModel";
 
 export class BacklogItemTagDataModel extends Model {}
 

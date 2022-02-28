@@ -6,8 +6,8 @@ import { Transaction } from "sequelize";
 import { ApiBacklogItem, ApiBacklogItemPart, ApiSprintStats, mapApiItemToBacklogItemPart } from "@atoll/shared";
 
 // data access
-import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItem";
-import { BacklogItemPartDataModel } from "../../dataaccess/models/BacklogItemPart";
+import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItemDataModel";
+import { BacklogItemPartDataModel } from "../../dataaccess/models/BacklogItemPartDataModel";
 
 // utils
 import { buildResponseWithItem } from "../utils/responseBuilder";
