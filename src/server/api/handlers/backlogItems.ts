@@ -34,7 +34,13 @@ import {
     respondWithObj
 } from "../utils/responder";
 import { getParamsFromRequest } from "../utils/filterHelper";
-import { fetchBacklogItem, fetchBacklogItems, BacklogItemsResult, fetchBacklogItemById } from "./fetchers/backlogItemFetcher";
+import {
+    fetchBacklogItemsByDisplayId,
+    fetchBacklogItems,
+    BacklogItemsResult,
+    fetchProductBacklogItemById,
+    fetchBacklogItem
+} from "./fetchers/backlogItemFetcher";
 import { addIdToBody } from "../utils/uuidHelper";
 import { backlogItemRankFirstItemInserter, backlogItemRankSubsequentItemInserter } from "./inserters/backlogItemRankInserter";
 import {
@@ -49,16 +55,22 @@ import {
     buildResponseWithItem,
     isRestApiCollectionResult,
     isRestApiErrorResult,
-    RestApiErrorResult
+    isRestApiItemResult,
+    RestApiStatusAndMessageOnly
 } from "../utils/responseBuilder";
 import { logError } from "./utils/serverLogger";
-import { fetchSprintsForBacklogItem, FetchSprintsForBacklogItemResult } from "./fetchers/sprintFetcher";
+
+// interfaces/types
+import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklogItem";
+import { fetchSprintsForBacklogItem } from "./fetchers/sprintFetcher";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
-    let result: BacklogItemsResult;
+    let result: BacklogItemsResult | RestApiStatusAndMessageOnly;
     if (params.projectId && params.backlogItemDisplayId) {
-        result = await fetchBacklogItem(params.projectId, params.backlogItemDisplayId);
+        // TODO: It seems that this function doesn't return exactly the same data structure - it is missing unallocatedPoints
+        //   and unallocatedParts - I think?
+        result = await fetchBacklogItemsByDisplayId(params.projectId, params.backlogItemDisplayId);
     } else {
         result = await fetchBacklogItems(params.projectId);
     }
@@ -79,13 +91,29 @@ export interface BacklogItemGetParams extends core.ParamsDictionary {
 
 export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, res: Response) => {
     try {
+        // TODO: Switch over to using a "fetch" util to get this data consistently across all endpoints.
+        // NOTE: I was in the middle of fixing this and it seems that it really should be standard data that's returned by a
+        //   fetcher that all callers can use... so it shouldn't be implemented right here like I was doing.  I will also need
+        //   to fix the other endpoints to use the same fetcher and resolve the single vs multiple item fetcher calls as well.
         const id = req.params.itemId;
-        const backlogItem = await BacklogItemDataModel.findByPk(id);
-        if (!backlogItem) {
-            respondWithNotFound(res, `Unable to find backlogitem by primary key ${id}`);
-        } else {
-            const item = mapDbToApiBacklogItem(backlogItem);
-            const productBacklogItem = await fetchBacklogItemById(id);
+        const backlogItemFetchResult = await fetchBacklogItem(id);
+        // const backlogItem = await BacklogItemDataModel.findByPk(id, {
+        //     include: {
+        //         model: BacklogItemPartDataModel,
+        //         as: "backlogitemparts",
+        //         include: [
+        //             {
+        //                 model: SprintBacklogItemDataModel,
+        //                 as: "sprintbacklogitems"
+        //             }
+        //         ]
+        //     }
+        // });
+        if (backlogItemFetchResult.status === HttpStatus.NOT_FOUND) {
+            respondWithNotFound(res, backlogItemFetchResult.message);
+        } else if (isRestApiItemResult(backlogItemFetchResult)) {
+            const item = backlogItemFetchResult.data.item;
+            const productBacklogItem = await fetchProductBacklogItemById(id);
             let inProductBacklog: boolean;
             if (productBacklogItem.status === HttpStatus.OK) {
                 inProductBacklog = true;
@@ -98,7 +126,7 @@ export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, 
                 logError(error);
                 return;
             }
-            const sprintsResult: FetchSprintsForBacklogItemResult | RestApiErrorResult = await fetchSprintsForBacklogItem(id);
+            const sprintsResult = await fetchSprintsForBacklogItem(id);
             if (!isRestApiCollectionResult(sprintsResult)) {
                 const error = `Error retrieving sprints for backlog item ID ${id}: ${sprintsResult.message}`;
                 const errorResponse = buildInternalServerErrorResponse(error);
@@ -113,6 +141,8 @@ export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, 
                 const responseObj = buildResponseWithItem(item, extra);
                 respondWithObj(res, responseObj);
             }
+        } else {
+            res.status(backlogItemFetchResult.status).json(backlogItemFetchResult.message);
         }
     } catch (error) {
         const errorResponse = buildResponseFromCatchError(error);

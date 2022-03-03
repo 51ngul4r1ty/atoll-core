@@ -35,7 +35,7 @@ import {
 import { handleSprintStatUpdate } from "../updaters/sprintStatUpdater";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { addIdToBody } from "../../utils/uuidHelper";
-import { buildFindOptionsIncludeForNested, computeUnallocatedPoints } from "./backlogItemHelper";
+import { buildFindOptionsIncludeForNested, computeUnallocatedPointsUsingDbObjs } from "./backlogItemHelper";
 
 export const fetchSprintBacklogItemsForBacklogItemWithNested = async (
     handlerContext: HandlerContext,
@@ -153,7 +153,7 @@ export const fetchAssociatedBacklogItemWithParts = async (
     });
     const backlogItemParts = (dbBacklogItemWithParts as any).dataValues.backlogitemparts as any;
     const backlogItem = mapDbToApiBacklogItemWithParts(dbBacklogItemWithParts);
-    backlogItem.unallocatedPoints = computeUnallocatedPoints(dbBacklogItemWithParts, backlogItemParts);
+    backlogItem.unallocatedPoints = computeUnallocatedPointsUsingDbObjs(dbBacklogItemWithParts, backlogItemParts);
     return backlogItem;
 };
 

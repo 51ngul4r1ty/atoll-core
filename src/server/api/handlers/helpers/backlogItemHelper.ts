@@ -11,10 +11,13 @@ import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBac
 // utils
 import { convertDbFloatToNumber } from "../../../dataaccess/conversionUtils";
 
-export const computeUnallocatedParts = (backlogItemPartsWithNested: BacklogItemPartDataModel[]): number => {
+export const computeUnallocatedParts = (dbBacklogItemPartsWithNested: BacklogItemPartDataModel[]): number => {
+    if (!dbBacklogItemPartsWithNested) {
+        throw new Error("it is not possible to compute unallocated parts from an undefined input");
+    }
     let unallocatedParts = 0;
-    if (backlogItemPartsWithNested.length > 1) {
-        backlogItemPartsWithNested.forEach((backlogItemPart) => {
+    if (dbBacklogItemPartsWithNested.length > 1) {
+        dbBacklogItemPartsWithNested.forEach((backlogItemPart) => {
             const sprintBacklogItems = (backlogItemPart as any).sprintbacklogitems;
             if (!sprintBacklogItems.length) {
                 unallocatedParts++;
@@ -24,15 +27,15 @@ export const computeUnallocatedParts = (backlogItemPartsWithNested: BacklogItemP
     return unallocatedParts;
 };
 
-export const computeUnallocatedPoints = (
-    backlogItem: BacklogItemDataModel,
-    backlogItemPartsWithNested: BacklogItemPartDataModel[]
+export const computeUnallocatedPointsUsingDbObjs = (
+    dbBacklogItem: BacklogItemDataModel,
+    dbBacklogItemPartsWithNested: BacklogItemPartDataModel[]
 ): number => {
     let foundFirstUnallocatedPart = false;
-    let result = convertDbFloatToNumber(backlogItem.estimate);
-    const totalItems = backlogItemPartsWithNested.length;
+    let result = convertDbFloatToNumber(dbBacklogItem.estimate);
+    const totalItems = dbBacklogItemPartsWithNested.length;
     if (totalItems > 1) {
-        backlogItemPartsWithNested.forEach((backlogItemPart) => {
+        dbBacklogItemPartsWithNested.forEach((backlogItemPart) => {
             const sprintBacklogItems = (backlogItemPart as any).sprintbacklogitems;
             const isUnallocatedItem = !sprintBacklogItems.length;
             if (isUnallocatedItem && !foundFirstUnallocatedPart) {

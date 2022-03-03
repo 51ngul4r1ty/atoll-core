@@ -15,7 +15,11 @@ import { BACKLOG_ITEM_RESOURCE_NAME } from "../../../resourceNames";
 import { mapDbToApiBacklogItem, mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
-import { buildFindOptionsIncludeForNested, computeUnallocatedParts, computeUnallocatedPoints } from "../helpers/backlogItemHelper";
+import {
+    buildFindOptionsIncludeForNested,
+    computeUnallocatedParts,
+    computeUnallocatedPointsUsingDbObjs
+} from "../helpers/backlogItemHelper";
 import {
     buildInternalServerErrorResponse,
     buildNotFoundResponse,
@@ -23,30 +27,75 @@ import {
     buildResponseWithItem,
     buildResponseWithItems,
     RestApiCollectionResult,
-    RestApiErrorResult
+    RestApiErrorResult,
+    RestApiItemResult
 } from "../../utils/responseBuilder";
 
-export type BacklogItemResult = RestApiCollectionResult<ApiBacklogItem>;
+// TODO: Fix the name here - item vs items??
+export type ProductBacklogItemResult = RestApiCollectionResult<ApiBacklogItem>;
 
-export interface BacklogItemsResult {
-    status: number;
-    data?: {
-        items: any[];
+export type BacklogItemsResult = RestApiCollectionResult<ApiBacklogItem>;
+// TODO: Clean this up if the type above works ^^^
+// export type BacklogItemsResult = {
+//     status: number;
+//     data?: {
+//         items: ApiBacklogItem[];
+//     };
+//     message?: string;
+// };
+
+export type BacklogItemResult = RestApiItemResult<ApiBacklogItem>;
+
+const buildApiItemFromDbItemWithParts = (dbItemWithParts: BacklogItemDataModel): ApiBacklogItem => {
+    const backlogItem = mapDbToApiBacklogItem(dbItemWithParts);
+    const dbBacklogItemParts = (dbItemWithParts as any).backlogitemparts;
+    backlogItem.unallocatedParts = computeUnallocatedParts(dbBacklogItemParts);
+    backlogItem.unallocatedPoints = computeUnallocatedPointsUsingDbObjs(dbItemWithParts, dbBacklogItemParts);
+    const result: ApiBacklogItem = {
+        ...backlogItem,
+        links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]
     };
-    message?: string;
-}
+    return result;
+};
 
-export const fetchBacklogItem = async (projectId: string, backlogItemDisplayId: string): Promise<BacklogItemsResult> => {
+export type BacklogItemParams = {
+    projectId?: string;
+    externalId?: string;
+};
+
+export const buildFindOptionsForBacklogItems = (params: BacklogItemParams): FindOptions => {
+    const options = buildOptionsFromParams(params);
+    const backlogItemsOptions: FindOptions = {
+        ...options,
+        include: buildFindOptionsIncludeForNested()
+    };
+    return backlogItemsOptions;
+};
+
+export const fetchBacklogItem = async (backlogItemId: string): Promise<BacklogItemResult | RestApiErrorResult> => {
     try {
-        const options = buildOptionsFromParams({ projectId, externalId: backlogItemDisplayId });
-        const backlogItems = await BacklogItemDataModel.findAll(options);
+        const backlogItemsOptions = buildFindOptionsForBacklogItems({});
+        const dbBacklogItem = await BacklogItemDataModel.findByPk(backlogItemId, backlogItemsOptions);
+        if (!dbBacklogItem) {
+            return buildNotFoundResponse(`Unable to find backlog item by ID ${backlogItemId}`);
+        }
+        const item = buildApiItemFromDbItemWithParts(dbBacklogItem);
+        return buildResponseWithItem(item);
+    } catch (error) {
+        return buildResponseFromCatchError(error);
+    }
+};
+
+export const fetchBacklogItemsByDisplayId = async (
+    projectId: string,
+    backlogItemDisplayId: string
+): Promise<BacklogItemsResult | RestApiErrorResult> => {
+    try {
+        const backlogItemsOptions = buildFindOptionsForBacklogItems({ projectId, externalId: backlogItemDisplayId });
+        const backlogItems = await BacklogItemDataModel.findAll(backlogItemsOptions);
         const getBacklogItemsResult = (backlogItems) => {
-            const items = backlogItems.map((item) => {
-                const backlogItem = mapDbToApiBacklogItem(item);
-                const result: ApiBacklogItem = {
-                    ...backlogItem,
-                    links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]
-                };
+            const items: ApiBacklogItem[] = backlogItems.map((item) => {
+                const result = buildApiItemFromDbItemWithParts(item);
                 return result;
             });
             return buildResponseWithItems(items);
@@ -63,9 +112,10 @@ export const fetchBacklogItem = async (projectId: string, backlogItemDisplayId: 
     }
 };
 
-export const fetchBacklogItems = async (projectId: string | null): Promise<BacklogItemsResult> => {
+export const fetchBacklogItems = async (projectId: string | null): Promise<BacklogItemsResult | RestApiErrorResult> => {
     try {
-        const options = buildOptionsFromParams({ projectId });
+        const params = { projectId };
+        const options = buildOptionsFromParams(params);
         const backlogItemRanks = await BacklogItemRankDataModel.findAll(options);
         const rankList = new LinkedList<ApiBacklogItem>();
         if (backlogItemRanks.length) {
@@ -74,19 +124,10 @@ export const fetchBacklogItems = async (projectId: string | null): Promise<Backl
                 rankList.addInitialLink(item.backlogitemId, item.nextbacklogitemId);
             });
         }
-        const backlogItemsOptions: FindOptions = {
-            ...options,
-            include: buildFindOptionsIncludeForNested()
-        };
+        const backlogItemsOptions = buildFindOptionsForBacklogItems(params);
         const backlogItems = await BacklogItemDataModel.findAll(backlogItemsOptions);
         backlogItems.forEach((item) => {
-            const backlogItem = mapDbToApiBacklogItem(item);
-            backlogItem.unallocatedParts = computeUnallocatedParts((item as any).backlogitemparts);
-            backlogItem.unallocatedPoints = computeUnallocatedPoints(item, (item as any).backlogitemparts);
-            const result: ApiBacklogItem = {
-                ...backlogItem,
-                links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]
-            };
+            const result = buildApiItemFromDbItemWithParts(item);
             rankList.addItemData(result.id, result);
         });
         return buildResponseWithItems(rankList.toArray());
@@ -95,7 +136,13 @@ export const fetchBacklogItems = async (projectId: string | null): Promise<Backl
     }
 };
 
-export const fetchBacklogItemById = async (backlogItemId: string): Promise<BacklogItemResult | RestApiErrorResult> => {
+/**
+ * Looks for the item in the product backlog - even if the work item itself exists it must be present in the product backlog
+ * specifically for this function to return it.
+ */
+export const fetchProductBacklogItemById = async (
+    backlogItemId: string
+): Promise<ProductBacklogItemResult | RestApiErrorResult> => {
     try {
         const options = buildOptionsFromParams({ backlogitemId: backlogItemId });
         const backlogItemRanks = await BacklogItemRankDataModel.findAll(options);
@@ -113,7 +160,7 @@ export const fetchBacklogItemById = async (backlogItemId: string): Promise<Backl
         const backlogItem = mapDbToApiBacklogItem(dbBacklogItem);
         const dbBacklogItemParts = dbBacklogItem[backlogItemPartsAlias];
         backlogItem.unallocatedParts = computeUnallocatedParts(dbBacklogItemParts);
-        backlogItem.unallocatedPoints = computeUnallocatedPoints(dbBacklogItem, dbBacklogItemParts);
+        backlogItem.unallocatedPoints = computeUnallocatedPointsUsingDbObjs(dbBacklogItem, dbBacklogItemParts);
         const item: ApiBacklogItem = {
             ...backlogItem,
             links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]

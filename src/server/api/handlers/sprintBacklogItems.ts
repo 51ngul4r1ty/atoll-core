@@ -47,7 +47,11 @@ import {
     rollbackWithErrorResponse,
     start
 } from "./utils/handlerContext";
-import { buildFindOptionsIncludeForNested, computeUnallocatedParts, computeUnallocatedPoints } from "./helpers/backlogItemHelper";
+import {
+    buildFindOptionsIncludeForNested,
+    computeUnallocatedParts,
+    computeUnallocatedPointsUsingDbObjs
+} from "./helpers/backlogItemHelper";
 import {
     allocateBacklogItemToSprint,
     determineNextSprintIndex,
@@ -316,7 +320,7 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res: Response
                     const backlogItem = backlogItems[0];
                     const backlogItemParts = (backlogItem as any).backlogitemparts;
                     firstApiBacklogItemTyped.unallocatedParts = computeUnallocatedParts(backlogItemParts);
-                    firstApiBacklogItemTyped.unallocatedPoints = computeUnallocatedPoints(backlogItem, backlogItemParts);
+                    firstApiBacklogItemTyped.unallocatedPoints = computeUnallocatedPointsUsingDbObjs(backlogItem, backlogItemParts);
                 }
             }
             const extra = {

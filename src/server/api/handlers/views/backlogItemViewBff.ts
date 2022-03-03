@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import * as HttpStatus from "http-status-codes";
 
 // utils
-import { fetchBacklogItem } from "../fetchers/backlogItemFetcher";
+import { fetchBacklogItemsByDisplayId } from "../fetchers/backlogItemFetcher";
 import { buildResponseWithItems } from "../../utils/responseBuilder";
 import { getParamsFromRequest } from "../../utils/filterHelper";
 import { projectByDisplayIdFetcher } from "../fetchers/projectFetcher";
@@ -25,7 +25,7 @@ export const backlogItemViewBffGetHandler = async (req: Request, res: Response) 
         selectedProjectId = project.data.items[0].id;
     }
 
-    const backlogItemResult = await fetchBacklogItem(selectedProjectId, backlogItemDisplayId);
+    const backlogItemResult = await fetchBacklogItemsByDisplayId(selectedProjectId, backlogItemDisplayId);
 
     if (backlogItemResult.status === HttpStatus.OK) {
         res.json(buildResponseWithItems(backlogItemResult.data?.items));
