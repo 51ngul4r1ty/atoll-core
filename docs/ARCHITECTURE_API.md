@@ -52,6 +52,9 @@ should always be used instead of `item`.
 `extra` is optional and is provided when data from other entities may be useful to the caller.  
 For example, a POST to the "sprint backlog items" endpoint returns the added sprint backlog item as `item`, while `sprintStats`, `backlogItemPart` and `backlogItem` are returned as part of `extra`.
 
+NOTE: In general it should be possible to rely on `item` and `items` data models remaining consistent across endpoints.  If extra
+data needs to be returned for one endpoint it should be included in the `extra` part of the response.
+
 Stages
 ======
 

@@ -12,6 +12,25 @@ NOTE: If you're looking for information about using the API "framework"
 
 Atoll's API should follow a true RESTful API pattern, including the use of HATEOAS.
 
+Endpoints
+---------
+
+1. The API base path is `/api`.
+2. The version is also included in the path `/api/v{n}` (starting with `v1`).  
+   _This was done to ensure that logging that includes a URL makes it very obvious what version
+   was used by a client (for example).  A modern choice involving the use of headers may support
+   other use-cases but there's no need for those in Atoll at this time._
+3. Base-level collection resources fall into 3 categories:  
+   i) Actions that are more RPC style (these should be the exception- there are none at time of
+     writing) will be named like this `/api/v1/actions/do-something`  
+   ii) Resources are named as plural nouns separated by dashes if multiple words are involved,
+     for example, `/api/v1/work-items`  
+   iii) BFF endpoints are named with a `bff` base path, for example, `/api/v1/bff/views/plan`
+4. Item level endpoints are available for the collections, for example, `/api/v1/sprints/{id}`.  
+   _These endpoints differ from the collection endpoints by returning more detail than the
+   collection resource itself- logic that may be too expensive to perform when retrieving
+   the full list of items._
+
 Use of HATEOAS
 --------------
 
