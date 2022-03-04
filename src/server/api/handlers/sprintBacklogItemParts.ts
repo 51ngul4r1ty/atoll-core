@@ -7,7 +7,7 @@ import {
     ApiBacklogItemPart,
     ApiSprintBacklogItem,
     ApiSprintStats,
-    hasBacklogItemAtMostBeenInProgress,
+    hasBacklogItemAtMostBeenDone,
     isoDateStringToDate,
     mapApiItemToBacklogItem
 } from "@atoll/shared";
@@ -73,7 +73,7 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
             apiBacklogItemForAddedPart = mapDbToApiBacklogItem(dbBacklogItem);
             const backlogItemForAddedPart = mapApiItemToBacklogItem(apiBacklogItemForAddedPart);
 
-            if (!hasBacklogItemAtMostBeenInProgress(backlogItemForAddedPart.status)) {
+            if (!hasBacklogItemAtMostBeenDone(backlogItemForAddedPart.status)) {
                 abortWithFailedValidationResponse(
                     handlerContext,
                     `Unable to split backlog item with ID "${backlogItemId}" that's in ` +

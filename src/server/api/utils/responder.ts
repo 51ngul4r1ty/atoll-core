@@ -5,8 +5,6 @@
 // externals
 import { logDebug, logError } from "api/handlers/utils/serverLogger";
 import { Response } from "express";
-import * as HttpStatus from "http-status-codes";
-import { getMessageFromError, getStackFromError } from "./errorUtils";
 
 // utils
 import {
@@ -15,8 +13,10 @@ import {
     buildNotImplementedResponse,
     buildOkResponse,
     buildResponseFromCatchError,
-    buildResponseWithItem
+    buildResponseWithItem,
+    RestApiStatusAndMessageOnly
 } from "./responseBuilder";
+import { getStackFromError } from "./errorUtils";
 
 export const respondWithNotImplemented = (res: Response, message: string) => {
     const responseObj = buildNotImplementedResponse(message);
@@ -58,6 +58,10 @@ export const respondWithObj = (res: Response, responseObj: any) => {
     } else {
         res.send(responseObj);
     }
+};
+
+export const respondWithMessage = (res: Response, responseObj: RestApiStatusAndMessageOnly) => {
+    res.status(responseObj.status).send(responseObj);
 };
 
 /**

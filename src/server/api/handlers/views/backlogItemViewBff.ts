@@ -1,13 +1,12 @@
 // externals
 import { Request, Response } from "express";
-import * as HttpStatus from "http-status-codes";
 
 // utils
 import { fetchBacklogItemsByDisplayId } from "../fetchers/backlogItemFetcher";
-import { buildResponseWithItems } from "../../utils/responseBuilder";
+import { isRestApiCollectionResult } from "../../utils/responseBuilder";
 import { getParamsFromRequest } from "../../utils/filterHelper";
 import { projectByDisplayIdFetcher } from "../fetchers/projectFetcher";
-import { respondWithError, respondWithNotFound } from "../../utils/responder";
+import { respondWithError, respondWithMessage, respondWithNotFound, respondWithObj } from "../../utils/responder";
 
 export const backlogItemViewBffGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -27,13 +26,15 @@ export const backlogItemViewBffGetHandler = async (req: Request, res: Response) 
 
     const backlogItemResult = await fetchBacklogItemsByDisplayId(selectedProjectId, backlogItemDisplayId);
 
-    if (backlogItemResult.status === HttpStatus.OK) {
-        res.json(buildResponseWithItems(backlogItemResult.data?.items));
-    } else {
-        res.status(backlogItemResult.status).json({
+    if (isRestApiCollectionResult(backlogItemResult)) {
+        respondWithObj(res, {
             status: backlogItemResult.status,
-            message: backlogItemResult.message
+            data: {
+                backlogItems: backlogItemResult.data?.items
+            }
         });
+    } else {
+        respondWithMessage(res, backlogItemResult);
         // TODO: Use logging utils
         console.log(`Unable to fetch backlog items: ${backlogItemResult.message}`);
     }
