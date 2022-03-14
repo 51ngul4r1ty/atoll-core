@@ -7,12 +7,14 @@ import { sequelize } from "../connection";
 // utils
 import restoreSequelizeAttributesOnClass from "../sequelizeModelHelpers";
 
+export const DB_INCLUDE_ALIAS_SPRINT = "sprint";
+
 export class SprintDataModel extends Model {
     id: string;
     projectId: string | null;
     name: string | null;
     startdate: string | null; // DATEONLY is returned as a string
-    finishdata: string | null; // DATEONLY is returned as a string
+    finishdate: string | null; // DATEONLY is returned as a string
     plannedPoints: number | null;
     acceptedPoints: number | null;
     velocityPoints: number | null;
