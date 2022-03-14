@@ -9,6 +9,8 @@ import { SprintDataModel } from "./SprintDataModel";
 // utils
 import restoreSequelizeAttributesOnClass from "../sequelizeModelHelpers";
 
+export const DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS = "sprintbacklogitems";
+
 export class SprintBacklogItemDataModel extends Model {
     id: string;
     sprintId: string;

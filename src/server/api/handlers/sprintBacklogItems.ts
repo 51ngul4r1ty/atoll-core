@@ -48,7 +48,7 @@ import {
     start
 } from "./utils/handlerContext";
 import {
-    buildFindOptionsIncludeForNested,
+    buildBacklogItemFindOptionsIncludeForNested,
     computeUnallocatedParts,
     computeUnallocatedPointsUsingDbObjs
 } from "./helpers/backlogItemHelper";
@@ -306,7 +306,7 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res: Response
 
                 const backlogItems = await BacklogItemDataModel.findAll({
                     where: { id: backlogitemId },
-                    include: buildFindOptionsIncludeForNested(),
+                    include: buildBacklogItemFindOptionsIncludeForNested(),
                     transaction: handlerContext.transactionContext.transaction
                 });
                 if (backlogItems.length !== 1) {

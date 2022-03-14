@@ -30,6 +30,7 @@
     "start-only": "npx --no-install cross-env NODE_ENV=development node scripts/start.js",
     "start:prod": "npx --no-install cross-env NODE_ENV=production node scripts/start.js",
     "sync-if-linked": "node scripts/sync-if-linked.js",
+    "sync-and-start": "npm run sync-quick && npm start",
     "test": "npm run test:ci",
     "test:watch": "node scripts/test.js --env=jsdom --coverage",
     "test:ci": "npm run test:tsc && npm run test:jest",
@@ -59,7 +60,7 @@
     "check:prereqs": "ts-node ./scripts/check-prereqs.ts"
   },
   "dependencies": {
-    "@atoll/shared": "0.41.1-alpha.4",
+    "@atoll/shared": "0.41.1-alpha.5",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.19.2",

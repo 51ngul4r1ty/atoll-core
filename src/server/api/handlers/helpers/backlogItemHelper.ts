@@ -3,10 +3,13 @@
  * Reason to change: Data model / logic changes related to the backlogitem API endpoints.
  */
 
-// interfaces/types
-import { BacklogItemDataModel } from "../../../dataaccess";
-import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
-import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
+// externals
+import type { Includeable, IncludeOptions } from "sequelize";
+
+// data access
+import { BacklogItemDataModel, SprintDataModel, DB_INCLUDE_ALIAS_SPRINT } from "../../../dataaccess";
+import { BacklogItemPartDataModel, DB_INCLUDE_ALIAS_BACKLOGITEMPARTS } from "../../../dataaccess/models/BacklogItemPartDataModel";
+import { SprintBacklogItemDataModel, DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS } from "../../../dataaccess/models/SprintBacklogItem";
 
 // utils
 import { convertDbFloatToNumber } from "../../../dataaccess/conversionUtils";
@@ -47,15 +50,24 @@ export const computeUnallocatedPointsUsingDbObjs = (
     return result;
 };
 
-export const buildFindOptionsIncludeForNested = () => [
-    {
+export const buildBacklogItemFindOptionsIncludeForNested = (includeSprint: boolean = false): Includeable[] => {
+    const sprintBacklogItemInclude: Includeable = {
+        model: SprintBacklogItemDataModel,
+        as: DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS
+    } as IncludeOptions;
+    const backlogItemPartsInclude: Includeable = {
         model: BacklogItemPartDataModel,
-        as: "backlogitemparts",
-        include: [
+        as: DB_INCLUDE_ALIAS_BACKLOGITEMPARTS,
+        include: [sprintBacklogItemInclude]
+    };
+    const result: Includeable[] = [backlogItemPartsInclude];
+    if (includeSprint) {
+        sprintBacklogItemInclude.include = [
             {
-                model: SprintBacklogItemDataModel,
-                as: "sprintbacklogitems"
+                model: SprintDataModel,
+                as: DB_INCLUDE_ALIAS_SPRINT
             }
-        ]
+        ];
     }
-];
+    return result;
+};

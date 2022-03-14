@@ -85,6 +85,11 @@ export const buildResponseWithItem = <T, U = undefined, V = undefined>(
     return result;
 };
 
+export const buildMessageResponse = (status: number, message: string): RestApiStatusAndMessageOnly => ({
+    status,
+    message
+});
+
 export const buildOkResponse = (message?: string): RestApiStatusAndMessageOnly => {
     const result: RestApiStatusAndMessageOnly = {
         status: HttpStatus.OK

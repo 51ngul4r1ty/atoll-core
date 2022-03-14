@@ -34,13 +34,7 @@ import {
     respondWithObj
 } from "../utils/responder";
 import { getParamsFromRequest } from "../utils/filterHelper";
-import {
-    fetchBacklogItemsByDisplayId,
-    fetchBacklogItems,
-    BacklogItemsResult,
-    fetchProductBacklogItemById,
-    fetchBacklogItem
-} from "./fetchers/backlogItemFetcher";
+import { fetchBacklogItemsByDisplayId, fetchBacklogItems, fetchBacklogItem } from "./fetchers/backlogItemFetcher";
 import { addIdToBody } from "../utils/uuidHelper";
 import { backlogItemRankFirstItemInserter, backlogItemRankSubsequentItemInserter } from "./inserters/backlogItemRankInserter";
 import {
@@ -49,20 +43,13 @@ import {
     mapDbToApiProjectSettings
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { getUpdatedBacklogItemWhenStatusChanges } from "../utils/statusChangeUtils";
-import {
-    buildInternalServerErrorResponse,
-    buildResponseFromCatchError,
-    buildResponseWithItem,
-    isRestApiCollectionResult,
-    isRestApiErrorResult,
-    isRestApiItemResult,
-    RestApiStatusAndMessageOnly
-} from "../utils/responseBuilder";
+import { isRestApiItemResult } from "../utils/responseBuilder";
 import { logError } from "./utils/serverLogger";
+import { fetchBacklogItemWithSprintAllocationInfo } from "./aggregators/backlogItemAggregator";
 
 // interfaces/types
-import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklogItem";
-import { fetchSprintsForBacklogItem } from "./fetchers/sprintFetcher";
+import type { BacklogItemsResult } from "./fetchers/backlogItemFetcher";
+import type { RestApiStatusAndMessageOnly } from "../utils/responseBuilder";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -91,63 +78,16 @@ export interface BacklogItemGetParams extends core.ParamsDictionary {
 
 export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, res: Response) => {
     try {
-        // TODO: Switch over to using a "fetch" util to get this data consistently across all endpoints.
-        // NOTE: I was in the middle of fixing this and it seems that it really should be standard data that's returned by a
-        //   fetcher that all callers can use... so it shouldn't be implemented right here like I was doing.  I will also need
-        //   to fix the other endpoints to use the same fetcher and resolve the single vs multiple item fetcher calls as well.
         const id = req.params.itemId;
-        const backlogItemFetchResult = await fetchBacklogItem(id);
-        // const backlogItem = await BacklogItemDataModel.findByPk(id, {
-        //     include: {
-        //         model: BacklogItemPartDataModel,
-        //         as: "backlogitemparts",
-        //         include: [
-        //             {
-        //                 model: SprintBacklogItemDataModel,
-        //                 as: "sprintbacklogitems"
-        //             }
-        //         ]
-        //     }
-        // });
-        if (backlogItemFetchResult.status === HttpStatus.NOT_FOUND) {
-            respondWithNotFound(res, backlogItemFetchResult.message);
-        } else if (isRestApiItemResult(backlogItemFetchResult)) {
-            const item = backlogItemFetchResult.data.item;
-            const productBacklogItem = await fetchProductBacklogItemById(id);
-            let inProductBacklog: boolean;
-            if (productBacklogItem.status === HttpStatus.OK) {
-                inProductBacklog = true;
-            } else if (productBacklogItem.status === HttpStatus.NOT_FOUND) {
-                inProductBacklog = false;
-            } else {
-                const error = `Unable to fetch product backlog item by ID ${id}: ${productBacklogItem.message}`;
-                const errorResponse = buildInternalServerErrorResponse(error);
-                res.status(errorResponse.status).json(errorResponse);
-                logError(error);
-                return;
-            }
-            const sprintsResult = await fetchSprintsForBacklogItem(id);
-            if (!isRestApiCollectionResult(sprintsResult)) {
-                const error = `Error retrieving sprints for backlog item ID ${id}: ${sprintsResult.message}`;
-                const errorResponse = buildInternalServerErrorResponse(error);
-                res.status(errorResponse.status).json(errorResponse);
-                logError(error);
-            } else {
-                const sprintIds = sprintsResult.data.items.map((item) => item.id);
-                const extra = {
-                    inProductBacklog,
-                    sprintIds
-                };
-                const responseObj = buildResponseWithItem(item, extra);
-                respondWithObj(res, responseObj);
-            }
+        const itemWithSprintInfoResult = await fetchBacklogItemWithSprintAllocationInfo(id);
+        if (isRestApiItemResult(itemWithSprintInfoResult)) {
+            respondWithObj(res, itemWithSprintInfoResult);
         } else {
-            res.status(backlogItemFetchResult.status).json(backlogItemFetchResult.message);
+            respondWithObj(res, itemWithSprintInfoResult);
+            logError(`backlogItemGetHandler: ${itemWithSprintInfoResult.message} (error)`);
         }
     } catch (error) {
-        const errorResponse = buildResponseFromCatchError(error);
-        res.status(errorResponse.status).json(errorResponse);
-        logError(`Unable to fetch backlog item: ${error}`);
+        respondWithError(res, error, "Unable to fetch backlog item");
     }
 };
 
@@ -308,6 +248,7 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         const newItem = updateBacklogItemPartResult.backlogItem;
         const addedBacklogItem = await BacklogItemDataModel.create(newItem, { transaction } as CreateOptions);
         if (!prevBacklogItemId) {
+            // TODO: Change name of this and investigate why Postman collection POST returns a "backlogitempart.version cannot be null error"
             await backlogItemRankFirstItemInserter(newItem, transaction);
         } else {
             const result = await backlogItemRankSubsequentItemInserter(newItem, transaction, prevBacklogItemId);

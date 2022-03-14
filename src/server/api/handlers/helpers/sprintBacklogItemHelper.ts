@@ -35,7 +35,7 @@ import {
 import { handleSprintStatUpdate } from "../updaters/sprintStatUpdater";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { addIdToBody } from "../../utils/uuidHelper";
-import { buildFindOptionsIncludeForNested, computeUnallocatedPointsUsingDbObjs } from "./backlogItemHelper";
+import { buildBacklogItemFindOptionsIncludeForNested, computeUnallocatedPointsUsingDbObjs } from "./backlogItemHelper";
 
 export const fetchSprintBacklogItemsForBacklogItemWithNested = async (
     handlerContext: HandlerContext,
@@ -148,7 +148,7 @@ export const fetchAssociatedBacklogItemWithParts = async (
     backlogItemId: string
 ): Promise<ApiBacklogItemWithParts> => {
     const dbBacklogItemWithParts = await BacklogItemDataModel.findByPk(backlogItemId, {
-        include: buildFindOptionsIncludeForNested(),
+        include: buildBacklogItemFindOptionsIncludeForNested(),
         transaction: handlerContext.transactionContext.transaction
     });
     const backlogItemParts = (dbBacklogItemWithParts as any).dataValues.backlogitemparts as any;

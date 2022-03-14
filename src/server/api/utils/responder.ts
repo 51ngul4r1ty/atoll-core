@@ -23,12 +23,14 @@ export const respondWithNotImplemented = (res: Response, message: string) => {
     respondWithObj(res, responseObj);
 };
 
-export const respondWithError = (res: Response, error: Error | string) => {
+export const respondWithError = (res: Response, error: Error | string, contextMessage: string = "ERROR") => {
     const responseObj = buildResponseFromCatchError(error);
     const stack = getStackFromError(error);
     if (stack) {
-        logError(`ERROR: ${responseObj.message}`);
+        logError(`${contextMessage}: ${responseObj.message}`);
         logDebug(`STACK: ${stack}`);
+    } else {
+        logError(`${contextMessage}: ${responseObj.message}`);
     }
     respondWithObj(res, responseObj);
 };

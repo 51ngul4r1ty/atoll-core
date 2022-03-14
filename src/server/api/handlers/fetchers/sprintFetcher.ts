@@ -3,15 +3,16 @@ import * as HttpStatus from "http-status-codes";
 import { FindOptions, Op, Transaction } from "sequelize";
 
 // libraries
-import { ApiSprint, ApiSprintBacklogItem, isoDateStringToDate, Link } from "@atoll/shared";
+import { ApiBacklogItemPart, ApiSprint, isoDateStringToDate, Link } from "@atoll/shared";
 
 // consts/enums
 import { SPRINT_RESOURCE_NAME } from "../../../resourceNames";
 
 // data access
-import { SprintDataModel } from "../../../dataaccess/models/SprintDataModel";
-import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
-import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
+import { DB_INCLUDE_ALIAS_SPRINT, SprintDataModel } from "../../../dataaccess/models/SprintDataModel";
+import { DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS, SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
+import { BacklogItemPartDataModel, DB_INCLUDE_ALIAS_BACKLOGITEMPARTS } from "../../../dataaccess/models/BacklogItemPartDataModel";
+import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
 
 // interfaces/types
 import type { HandlerContext } from "../utils/handlerContext";
@@ -26,7 +27,12 @@ import {
     RestApiCollectionResult,
     RestApiErrorResult
 } from "../../utils/responseBuilder";
-import { mapDbToApiSprint, mapDbToApiSprintBacklogItem } from "../../../dataaccess/mappers/dataAccessToApiMappers";
+import {
+    mapDbToApiBacklogItemPart,
+    mapDbToApiSprint,
+    mapDbToApiSprintBacklogItem
+} from "../../../dataaccess/mappers/dataAccessToApiMappers";
+import { buildBacklogItemFindOptionsIncludeForNested } from "../helpers/backlogItemHelper";
 
 export const fetchSprints = async (projectId: string | null, archived?: string | null) => {
     try {
@@ -156,6 +162,64 @@ export const fetchSprintsForBacklogItem = async (
                 links: [buildSelfLink(sprintWithoutLinks, sprintResourceBasePath)]
             };
             items.push(sprint);
+        });
+
+        return buildResponseWithItems(items);
+    } catch (error) {
+        return buildResponseFromCatchError(error);
+    }
+};
+
+export type PartAndSprintInfoForBacklogItem = {
+    sprint: ApiSprint;
+    backlogItemPart: ApiBacklogItemPart;
+};
+export type FetchPartAndSprintInfoForBacklogItemResult = RestApiCollectionResult<PartAndSprintInfoForBacklogItem>;
+
+export const fetchPartAndSprintInfoForBacklogItem = async (
+    backlogItemId: string | null
+): Promise<FetchPartAndSprintInfoForBacklogItemResult | RestApiErrorResult> => {
+    try {
+        const backlogItemPartAlias = "backlogitempart";
+        const sprintAlias = "sprint";
+        const includeSprint = true;
+        const options = {
+            include: buildBacklogItemFindOptionsIncludeForNested(includeSprint)
+        };
+        const dbBacklogItem: BacklogItemDataModel = await BacklogItemDataModel.findByPk(backlogItemId, options);
+        const items: PartAndSprintInfoForBacklogItem[] = [];
+        const sprintResourceBasePath = `/api/v1/${SPRINT_RESOURCE_NAME}/`;
+        const dbBacklogItemParts = dbBacklogItem[DB_INCLUDE_ALIAS_BACKLOGITEMPARTS];
+        dbBacklogItemParts.forEach((dbBacklogItemPart) => {
+            const backlogItemPart = mapDbToApiBacklogItemPart(dbBacklogItemPart);
+            const dbSprintBacklogItems = dbBacklogItemPart[DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS];
+            const backlogItemCount = dbSprintBacklogItems?.length || 0;
+            if (!backlogItemCount) {
+                items.push({
+                    sprint: null,
+                    backlogItemPart
+                });
+            } else {
+                dbSprintBacklogItems.forEach((dbSprintBacklogItem) => {
+                    const dbSprint = dbSprintBacklogItem[DB_INCLUDE_ALIAS_SPRINT];
+                    if (!dbSprint) {
+                        throw new Error(
+                            `Unexpected condition- a single sprint should be matched for Backlog Item ID` +
+                                ` ${dbSprintBacklogItem.backlogitemId}, but 0 were`
+                        );
+                    } else {
+                        const sprintWithoutLinks = mapDbToApiSprint(dbSprint);
+                        const sprint: ApiSprint = {
+                            ...sprintWithoutLinks,
+                            links: [buildSelfLink(sprintWithoutLinks, sprintResourceBasePath)]
+                        };
+                        items.push({
+                            sprint,
+                            backlogItemPart
+                        });
+                    }
+                });
+            }
         });
 
         return buildResponseWithItems(items);
