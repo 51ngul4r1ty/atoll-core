@@ -1,7 +1,7 @@
 Overview
 ========
 
-This document explains the API framework that's implemented in Atoll.
+This document explains the client-side API framework that's implemented in Atoll.
 
 Files
 -----

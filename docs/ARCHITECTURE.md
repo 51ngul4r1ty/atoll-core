@@ -3,12 +3,13 @@ Overview
 
 This document provides high level guidance on the application's architecture.
 
+There are 2 other documents that cover the code-level architecture that you may want to
+reference if you need more information on:
+1. Front-end API framework [ARCHITECTURE_FE_API.md](ARCHITECTURE_FE_API.md) document.
+2. Back-end API code patterns [ARCHITECTURE_BE_API.md](ARCHITECTURE_BE_API.md) document.
+
 Restful API
 ===========
-
-NOTE: If you're looking for information about using the API "framework"
-  (i.e. code level details) then take a look at the
-  [ARCHITECTURE_API.md](ARCHITECTURE_API.md) document.
 
 Atoll's API should follow a true RESTful API pattern, including the use of HATEOAS.
 
