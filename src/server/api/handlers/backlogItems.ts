@@ -34,7 +34,7 @@ import {
     respondWithObj
 } from "../utils/responder";
 import { getParamsFromRequest } from "../utils/filterHelper";
-import { fetchBacklogItemsByDisplayId, fetchBacklogItems, fetchBacklogItem } from "./fetchers/backlogItemFetcher";
+import { fetchBacklogItemsByDisplayId, fetchBacklogItems } from "./fetchers/backlogItemFetcher";
 import { addIdToBody } from "../utils/uuidHelper";
 import { backlogItemRankFirstItemInserter, backlogItemRankSubsequentItemInserter } from "./inserters/backlogItemRankInserter";
 import {
