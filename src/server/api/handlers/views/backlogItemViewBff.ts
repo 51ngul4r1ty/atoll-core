@@ -10,6 +10,9 @@ import { projectByDisplayIdFetcher } from "../fetchers/projectFetcher";
 import { respondWithError, respondWithMessage, respondWithNotFound, respondWithObj } from "../../utils/responder";
 import { fetchBacklogItemWithSprintAllocationInfo } from "../aggregators/backlogItemAggregator";
 import { logError } from "../utils/serverLogger";
+import { ApiBacklogItemPart, ApiSprint } from "@atoll/shared";
+
+export type BacklogItemPartAndSprint = { part: ApiBacklogItemPart; sprint: ApiSprint };
 
 export const backlogItemViewBffGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -45,16 +48,31 @@ export const backlogItemViewBffGetHandler = async (req: Request, res: Response) 
             const backlogItem = backlogItems[0];
             const itemWithSprintInfo = await fetchBacklogItemWithSprintAllocationInfo(backlogItem.id);
             if (isRestApiItemResult(itemWithSprintInfo)) {
-                const sprints = itemWithSprintInfo.data.extra?.sprints || [];
-                const backlogItemParts = itemWithSprintInfo.data.extra?.backlogItemParts || [];
-                respondWithObj(res, {
-                    status: itemWithSprintInfo.status,
-                    data: {
-                        backlogItems: [itemWithSprintInfo.data.item],
-                        sprints,
-                        backlogItemParts
-                    }
-                });
+                const inProductBacklog = itemWithSprintInfo.data.extra?.inProductBacklog || false;
+                const sprints: ApiSprint[] = itemWithSprintInfo.data.extra?.sprints || [];
+                const backlogItemParts: ApiBacklogItemPart[] = itemWithSprintInfo.data.extra?.backlogItemParts || [];
+                if (sprints.length !== backlogItemParts.length) {
+                    respondWithMessage(res, {
+                        status: HttpStatus.INTERNAL_SERVER_ERROR,
+                        message:
+                            "Unexpected result- mismatching number of items: " +
+                            `${backlogItemParts.length} backlog item parts vs ${sprints.length} sprints`
+                    });
+                } else {
+                    const backlogItemPartsAndSprints: BacklogItemPartAndSprint[] = [];
+                    sprints.forEach((sprint, index) => {
+                        backlogItemPartsAndSprints.push({ sprint, part: backlogItemParts[index] });
+                    });
+                    for (let i = 0; i < sprints.length; i++) {}
+                    respondWithObj(res, {
+                        status: itemWithSprintInfo.status,
+                        data: {
+                            backlogItem: itemWithSprintInfo.data.item,
+                            backlogItemPartsAndSprints,
+                            inProductBacklog
+                        }
+                    });
+                }
             } else {
                 respondWithObj(res, itemWithSprintInfo);
                 logError(`backlogItemViewBffGetHandler: ${backlogItemsResult.message} (error)`);
