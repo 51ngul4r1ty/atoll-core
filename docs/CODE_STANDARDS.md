@@ -116,7 +116,7 @@ should be chosen because it is the most specific path.
 Import Sections
 ---------------
 
-Import statments should be grouped into the following commented sections (try to stick to this order as well):
+Import statments should be grouped into the following commented sections (try to stick to this order as well- see notes on this below):
 
 | Section          |                                              |
 |------------------|----------------------------------------------|
@@ -132,6 +132,11 @@ Import statments should be grouped into the following commented sections (try to
 | consts/enums     | any project related constants and enums      |
 | interfaces/types | any project related interface or types       |
 | style            | any project related css module references    |
+
+Why the order matters- VS Code automatically adds imports to the first import statement it finds.
+For example, having "utils" before "interfaces/types" prevents VS Code from turning an
+"import type" statament into a plain "import" if it auto-imports a utility function.  There are
+other reasons  for doing this as well, including consistency when viewing one file after another.
 
 This helps to identify inconsistencies in naming because it becomes obvious when you group by category.  This also helps to make it
 obvious when a module could be going beyond its single responsibility (and thereby violating SOLID principles).
