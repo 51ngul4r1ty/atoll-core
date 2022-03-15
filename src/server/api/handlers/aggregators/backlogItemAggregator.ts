@@ -8,7 +8,7 @@
 import * as HttpStatus from "http-status-codes";
 
 // libraries
-import type { ApiBacklogItem } from "@atoll/shared";
+import type { ApiBacklogItem, ApiBacklogItemPart, ApiSprint } from "@atoll/shared";
 
 // utils
 import { fetchBacklogItem } from "../fetchers/backlogItemFetcher";
@@ -24,19 +24,21 @@ import { fetchProductBacklogItemById } from "../fetchers/productBacklogItemFetch
 import { fetchPartAndSprintInfoForBacklogItem } from "../fetchers/sprintFetcher";
 
 // interfaces/types
-import type { BacklogItemResult } from "../fetchers/backlogItemFetcher";
 import type { RestApiErrorResult, RestApiItemResult } from "../../utils/responseBuilder";
+
+export type BacklogItemPartAndSprint = { part: ApiBacklogItemPart; sprint: ApiSprint };
 
 export type BacklogItemWithSprintAllocationInfoExtra = {
     inProductBacklog: boolean;
     sprintIds: string[];
+    backlogItemPartsAndSprints: BacklogItemPartAndSprint[];
 };
 
 export type BacklogItemWithSprintAllocationInfoResult = RestApiItemResult<ApiBacklogItem, BacklogItemWithSprintAllocationInfoExtra>;
 
 export const fetchBacklogItemWithSprintAllocationInfo = async (
     backlogItemId: string
-): Promise<BacklogItemResult | RestApiErrorResult> => {
+): Promise<BacklogItemWithSprintAllocationInfoResult | RestApiErrorResult> => {
     const backlogItemFetchResult = await fetchBacklogItem(backlogItemId);
     if (backlogItemFetchResult.status === HttpStatus.NOT_FOUND) {
         return buildNotFoundResponse(backlogItemFetchResult.message);
@@ -59,19 +61,29 @@ export const fetchBacklogItemWithSprintAllocationInfo = async (
             const errorResponse = buildInternalServerErrorResponse(error);
             return errorResponse;
         } else {
-            const sprintIds = sprintsResult.data.items.reduce((result, item) => {
+            const backlogItemParts = sprintsResult.data.items.map((item) => item.backlogItemPart);
+            const sprints = sprintsResult.data.items.map((item) => item.sprint || null);
+            const backlogItemPartsAndSprints: BacklogItemPartAndSprint[] = [];
+            if (sprints.length !== backlogItemParts.length) {
+                return buildInternalServerErrorResponse(
+                    "Unexpected result- mismatching number of items: " +
+                        `${backlogItemParts.length} backlog item parts vs ${sprints.length} sprints`
+                );
+            }
+            sprints.forEach((sprint, index) => {
+                backlogItemPartsAndSprints.push({ sprint, part: backlogItemParts[index] });
+            });
+            backlogItemPartsAndSprints.sort((a, b) => a.part.partIndex - b.part.partIndex);
+            const sprintIds = backlogItemPartsAndSprints.reduce((result, item) => {
                 if (item.sprint) {
                     result.push(item.sprint.id);
                 }
                 return result;
             }, []);
-            const backlogItemParts = sprintsResult.data.items.map((item) => item.backlogItemPart);
-            const sprints = sprintsResult.data.items.map((item) => item.sprint || null);
             const extra = {
                 inProductBacklog,
                 sprintIds,
-                backlogItemParts,
-                sprints
+                backlogItemPartsAndSprints
             };
             const responseObj = buildResponseWithItem(item, extra);
             return responseObj;

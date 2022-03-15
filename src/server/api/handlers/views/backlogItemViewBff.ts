@@ -12,8 +12,6 @@ import { fetchBacklogItemWithSprintAllocationInfo } from "../aggregators/backlog
 import { logError } from "../utils/serverLogger";
 import { ApiBacklogItemPart, ApiSprint } from "@atoll/shared";
 
-export type BacklogItemPartAndSprint = { part: ApiBacklogItemPart; sprint: ApiSprint };
-
 export const backlogItemViewBffGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
     const backlogItemDisplayId = params.backlogItemDisplayId;
@@ -49,30 +47,15 @@ export const backlogItemViewBffGetHandler = async (req: Request, res: Response) 
             const itemWithSprintInfo = await fetchBacklogItemWithSprintAllocationInfo(backlogItem.id);
             if (isRestApiItemResult(itemWithSprintInfo)) {
                 const inProductBacklog = itemWithSprintInfo.data.extra?.inProductBacklog || false;
-                const sprints: ApiSprint[] = itemWithSprintInfo.data.extra?.sprints || [];
-                const backlogItemParts: ApiBacklogItemPart[] = itemWithSprintInfo.data.extra?.backlogItemParts || [];
-                if (sprints.length !== backlogItemParts.length) {
-                    respondWithMessage(res, {
-                        status: HttpStatus.INTERNAL_SERVER_ERROR,
-                        message:
-                            "Unexpected result- mismatching number of items: " +
-                            `${backlogItemParts.length} backlog item parts vs ${sprints.length} sprints`
-                    });
-                } else {
-                    const backlogItemPartsAndSprints: BacklogItemPartAndSprint[] = [];
-                    sprints.forEach((sprint, index) => {
-                        backlogItemPartsAndSprints.push({ sprint, part: backlogItemParts[index] });
-                    });
-                    for (let i = 0; i < sprints.length; i++) {}
-                    respondWithObj(res, {
-                        status: itemWithSprintInfo.status,
-                        data: {
-                            backlogItem: itemWithSprintInfo.data.item,
-                            backlogItemPartsAndSprints,
-                            inProductBacklog
-                        }
-                    });
-                }
+                const backlogItemPartsAndSprints = itemWithSprintInfo.data.extra?.backlogItemPartsAndSprints || [];
+                respondWithObj(res, {
+                    status: itemWithSprintInfo.status,
+                    data: {
+                        backlogItem: itemWithSprintInfo.data.item,
+                        backlogItemPartsAndSprints,
+                        inProductBacklog
+                    }
+                });
             } else {
                 respondWithObj(res, itemWithSprintInfo);
                 logError(`backlogItemViewBffGetHandler: ${backlogItemsResult.message} (error)`);
