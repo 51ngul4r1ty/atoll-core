@@ -180,8 +180,6 @@ export const fetchPartAndSprintInfoForBacklogItem = async (
     backlogItemId: string | null
 ): Promise<FetchPartAndSprintInfoForBacklogItemResult | RestApiErrorResult> => {
     try {
-        const backlogItemPartAlias = "backlogitempart";
-        const sprintAlias = "sprint";
         const includeSprint = true;
         const options = {
             include: buildBacklogItemFindOptionsIncludeForNested(includeSprint)
