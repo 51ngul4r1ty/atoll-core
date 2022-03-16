@@ -164,6 +164,11 @@ import { IntlProvider } from "@atoll/shared";
 import { layouts } from "@atoll/shared";
 ```
 
+Classes
+=======
+
+Avoid using classes as much as possible.  Classes should be restricted to specialized use only.
+
 Functions
 =========
 
@@ -191,15 +196,28 @@ Argument Types
 Interfaces/Types
 ================
 
+Preferred Style
+---------------
+
+Use `type` in most cases, `interface` should be reserved when applying to classes.  This standard was introduced
+later in the project so you may find a lot of interface use until a wide-scale refactor has been performed.
+
 Extending Interfaces
 --------------------
+
+As the "preferred style" section stated- `type` should be used most of the time, but when `interface` is used
+the following guidance should be applied (it is also possible to do the exact same thing with `type` as well).
 
 General guidance when extending interfaces:
 
 1. Keep hierarchy as shallow as possible- this may mean that you need to refactor at some point when
    the hierarchy has grown and there are unnecessary intermediary types that can be removed.
 
-2. When inheriting the type structure, duplicate it for readability:
+2. Try to avoid inheritance- instead you should aggregate interfaces, for example a `Saveable` interface
+   could have `hasBeenSaved` boolean property and `BacklogItem` could extend `Saveable` and so could
+   `Sprint` (that will make the `Saveable` interface reusable).
+
+3. When inheriting/aggregating the type structure, duplicate it for readability:
 
 For example:
 ```
