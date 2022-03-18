@@ -7,7 +7,7 @@ export * from "./models/CounterDataModel";
 export * from "./models/ProjectDataModel";
 export * from "./models/ProjectSettingsDataModel";
 export * from "./models/SprintDataModel";
-export * from "./models/SprintBacklogItem";
+export * from "./models/SprintBacklogItemModel";
 export * from "./models/UserSettingsDataModel";
 export * from "./mappers/apiToDataAccessMappers";
 

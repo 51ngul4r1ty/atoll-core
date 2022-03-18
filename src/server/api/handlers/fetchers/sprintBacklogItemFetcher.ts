@@ -8,7 +8,9 @@ import { ApiBacklogItemInSprint } from "@atoll/shared";
 import { SPRINT_BACKLOG_PARENT_RESOURCE_NAME, SPRINT_BACKLOG_CHILD_RESOURCE_NAME } from "../../../resourceNames";
 
 // data access
-import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
+import { SprintBacklogItemDataModel, DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS } from "../../../dataaccess/models/SprintBacklogItemModel";
+import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
+import { BacklogItemDataModel, DB_INCLUDE_BACKLOGITEM } from "../../../dataaccess/models/BacklogItemDataModel";
 
 // utils
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
@@ -25,9 +27,6 @@ import {
     mapDbBacklogPartsWithSprintItemsToApiBacklogItemInSprint,
     mapDbSprintBacklogWithNestedToApiBacklogItemInSprint
 } from "../../../dataaccess/mappers/dataAccessToApiMappers";
-import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
-import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
-import { SprintDataModel } from "dataaccess/models/SprintDataModel";
 
 export type FetchedSprintBacklogItems = RestApiCollectionResult<ApiBacklogItemInSprint>;
 export type FetchedSprintBacklogItem = RestApiItemResult<ApiBacklogItemInSprint>;
@@ -62,12 +61,12 @@ export const fetchSprintBacklogItemWithLinks = async (
             include: [
                 {
                     model: SprintBacklogItemDataModel,
-                    as: "sprintbacklogitems",
+                    as: DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS,
                     where: { sprintId }
                 },
                 {
                     model: BacklogItemDataModel,
-                    as: "backlogitem",
+                    as: DB_INCLUDE_BACKLOGITEM,
                     where: { id: backlogItemId }
                 }
             ]

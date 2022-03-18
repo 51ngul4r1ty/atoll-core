@@ -60,7 +60,7 @@ import {
     projectPostHandler,
     projectsGetHandler
 } from "./handlers/projects";
-import { backlogItemPartPatchHandler } from "./handlers/backlogItemParts";
+import { backlogItemPartGetHandler, backlogItemPartPatchHandler } from "./handlers/backlogItemParts";
 
 export const router = express.Router();
 
@@ -138,6 +138,7 @@ setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}/:itemId`, {
 });
 
 setupRoutes(router, `/${BACKLOG_ITEM_PART_RESOURCE_NAME}/:itemId`, {
+    get: backlogItemPartGetHandler,
     patch: backlogItemPartPatchHandler
 });
 

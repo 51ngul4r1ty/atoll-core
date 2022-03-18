@@ -9,7 +9,7 @@ import type { Includeable, IncludeOptions } from "sequelize";
 // data access
 import { BacklogItemDataModel, SprintDataModel, DB_INCLUDE_ALIAS_SPRINT } from "../../../dataaccess";
 import { BacklogItemPartDataModel, DB_INCLUDE_ALIAS_BACKLOGITEMPARTS } from "../../../dataaccess/models/BacklogItemPartDataModel";
-import { SprintBacklogItemDataModel, DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS } from "../../../dataaccess/models/SprintBacklogItem";
+import { SprintBacklogItemDataModel, DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS } from "../../../dataaccess/models/SprintBacklogItemModel";
 
 // utils
 import { convertDbFloatToNumber } from "../../../dataaccess/conversionUtils";
@@ -69,5 +69,21 @@ export const buildBacklogItemFindOptionsIncludeForNested = (includeSprint: boole
             }
         ];
     }
+    return result;
+};
+
+export const buildBacklogItemPartFindOptionsIncludeForNested = (): Includeable[] => {
+    const result: Includeable[] = [
+        {
+            model: SprintBacklogItemDataModel,
+            as: DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS,
+            include: [
+                {
+                    model: SprintDataModel,
+                    as: DB_INCLUDE_ALIAS_SPRINT
+                }
+            ]
+        } as IncludeOptions
+    ];
     return result;
 };

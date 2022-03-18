@@ -14,7 +14,7 @@ import {
 } from "@atoll/shared";
 
 // data access
-import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklogItem";
+import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklogItemModel";
 import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItemDataModel";
 
 // consts/enums
@@ -34,7 +34,7 @@ import {
 import { backlogItemRankFirstItemInserter, BacklogItemRankFirstItemInserterResult } from "./inserters/backlogItemRankInserter";
 import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
 import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
-import { backlogItemPartFetcher, BacklogItemPartsResult } from "./fetchers/backlogItemPartFetcher";
+import { fetchBacklogItemParts, BacklogItemPartsResult } from "./fetchers/backlogItemPartFetcher";
 import {
     abortWithNotFoundResponse,
     beginSerializableTransaction,
@@ -118,7 +118,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res: Response) 
 
         const displayIndex = determineNextSprintIndex(sprintBacklogs);
 
-        const backlogitempartsResult = await backlogItemPartFetcher(backlogitemId, handlerContext.transactionContext.transaction);
+        const backlogitempartsResult = await fetchBacklogItemParts(backlogitemId, handlerContext.transactionContext.transaction);
         let backlogItemPartAllocated: BacklogItemPart;
         let apiBacklogItemPartAllocated: ApiBacklogItemPart;
         let backlogItem: ApiBacklogItem;

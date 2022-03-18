@@ -1,6 +1,7 @@
 // externals
 import { Request, Response } from "express";
 import { Transaction } from "sequelize";
+import * as core from "express-serve-static-core";
 
 // libraries
 import { ApiBacklogItem, ApiBacklogItemPart, ApiSprintStats, mapApiItemToBacklogItemPart } from "@atoll/shared";
@@ -10,13 +11,13 @@ import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItemDataMod
 import { BacklogItemPartDataModel } from "../../dataaccess/models/BacklogItemPartDataModel";
 
 // utils
-import { buildResponseWithItem } from "../utils/responseBuilder";
+import { buildResponseWithItem, isRestApiItemResult } from "../utils/responseBuilder";
 import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
 import { getUpdatedBacklogItemPartWhenStatusChanges, getUpdatedBacklogItemWhenStatusChanges } from "../utils/statusChangeUtils";
 import { getIdForSprintContainingBacklogItemPart } from "./fetchers/sprintFetcher";
 import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
 import { mapDbToApiBacklogItem, mapDbToApiBacklogItemPart } from "../../dataaccess/mappers/dataAccessToApiMappers";
-import { respondWithFailedValidation, respondWithObj } from "../utils/responder";
+import { respondWithError, respondWithFailedValidation, respondWithObj } from "../utils/responder";
 import { respondedWithMismatchedItemIds } from "../utils/validationResponders";
 import {
     abortWithErrorResponse,
@@ -28,6 +29,27 @@ import {
     hasAborted,
     start
 } from "./utils/handlerContext";
+import { logError } from "./utils/serverLogger";
+import { fetchBacklogItemPart } from "./fetchers/backlogItemPartFetcher";
+
+export interface BacklogItemPartGetParams extends core.ParamsDictionary {
+    itemId: string;
+}
+
+export const backlogItemPartGetHandler = async (req: Request<BacklogItemPartGetParams>, res: Response) => {
+    try {
+        const id = req.params.itemId;
+        const itemOrErrorResult = await fetchBacklogItemPart(id);
+        if (isRestApiItemResult(itemOrErrorResult)) {
+            respondWithObj(res, itemOrErrorResult);
+        } else {
+            respondWithObj(res, itemOrErrorResult);
+            logError(`backlogItemGetHandler: ${itemOrErrorResult.message} (error)`);
+        }
+    } catch (error) {
+        respondWithError(res, error, "Unable to fetch backlog item part");
+    }
+};
 
 export const backlogItemPartPatchHandler = async (req: Request, res: Response) => {
     const handlerContext = start("backlogItemPartPatchHandler", res);

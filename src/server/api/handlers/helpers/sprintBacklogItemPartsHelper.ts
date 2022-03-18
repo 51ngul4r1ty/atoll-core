@@ -21,7 +21,7 @@ import {
 // data access
 import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
-import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
+import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItemModel";
 import { SprintDataModel } from "../../../dataaccess/models/SprintDataModel";
 
 // interfaces/types

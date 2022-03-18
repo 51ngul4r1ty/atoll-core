@@ -20,7 +20,7 @@ import {
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
 import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
 import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRankDataModel";
-import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItem";
+import { SprintBacklogItemDataModel, DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS } from "../../../dataaccess/models/SprintBacklogItemModel";
 
 // interfaces/types
 import { HandlerContext } from "../utils/handlerContext";
@@ -170,7 +170,7 @@ export const fetchSprintBacklogItemsPartByItemId = async (
         include: [
             {
                 model: SprintBacklogItemDataModel,
-                as: "sprintbacklogitems",
+                as: DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS,
                 where: { sprintId }
             }
         ],
