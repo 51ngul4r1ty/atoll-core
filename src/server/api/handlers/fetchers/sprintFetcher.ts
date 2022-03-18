@@ -6,7 +6,7 @@ import { FindOptions, Op, Transaction } from "sequelize";
 import { ApiBacklogItemPart, ApiSprint, isoDateStringToDate, Link } from "@atoll/shared";
 
 // consts/enums
-import { SPRINT_RESOURCE_NAME } from "../../../resourceNames";
+import { BACKLOG_ITEM_PART_RESOURCE_NAME, SPRINT_RESOURCE_NAME } from "../../../resourceNames";
 
 // data access
 import { SprintDataModel, DB_INCLUDE_ALIAS_SPRINT } from "../../../dataaccess/models/SprintDataModel";
@@ -187,9 +187,14 @@ export const fetchPartAndSprintInfoForBacklogItem = async (
         const dbBacklogItem: BacklogItemDataModel = await BacklogItemDataModel.findByPk(backlogItemId, options);
         const items: PartAndSprintInfoForBacklogItem[] = [];
         const sprintResourceBasePath = `/api/v1/${SPRINT_RESOURCE_NAME}/`;
+        const backlogItemPartResourceBasePath = `/api/v1/${BACKLOG_ITEM_PART_RESOURCE_NAME}/`;
         const dbBacklogItemParts = dbBacklogItem[DB_INCLUDE_ALIAS_BACKLOGITEMPARTS];
         dbBacklogItemParts.forEach((dbBacklogItemPart) => {
-            const backlogItemPart = mapDbToApiBacklogItemPart(dbBacklogItemPart);
+            const backlogItemPartWithoutLinks = mapDbToApiBacklogItemPart(dbBacklogItemPart);
+            const backlogItemPart: ApiBacklogItemPart = {
+                ...backlogItemPartWithoutLinks,
+                links: [buildSelfLink(backlogItemPartWithoutLinks, backlogItemPartResourceBasePath)]
+            };
             const dbSprintBacklogItems = dbBacklogItemPart[DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS];
             const backlogItemCount = dbSprintBacklogItems?.length || 0;
             if (!backlogItemCount) {
