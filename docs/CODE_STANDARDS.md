@@ -217,30 +217,6 @@ General guidance when extending interfaces:
    could have `hasBeenSaved` boolean property and `BacklogItem` could extend `Saveable` and so could
    `Sprint` (that will make the `Saveable` interface reusable).
 
-3. When inheriting/aggregating the type structure, duplicate it for readability:
-
-For example:
-```
-export interface SprintStats {
-    sprintStats: ApiSprintStats;
-}
-
-export interface SprintBacklogItemSuccessPayloadExtra extends SprintStats {
-    sprintStats: ApiSprintStats;
-    backlogItem: ApiBacklogItem;
-    backlogItemPart: ApiBacklogItemPart;
-}
-
-export interface MoveBacklogItemToBacklogSuccessPayloadExtra extends SprintStats {
-    sprintStats: ApiSprintStats;
-    backlogItem: ApiBacklogItem;
-}
-```
-
-See how each extended type includes everything from the ancestor?  This may seem redudant
-but it is for readability.  Other languages don't allow this, but TypeScript does.  If you
-don't do it this way it is harder to see, at a glance, what the full type structure is.
-
 Action Types
 ------------
 
