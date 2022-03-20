@@ -91,9 +91,4 @@ export const backlogItemRankSubsequentItemInserter = async (newItem, transaction
             rolledBack: false
         };
     }
-    // TODO: Write unit tests to try and mimick this and test that the logic handles it as well:
-    // 2. if there are multiple items in database then we'll have these entries:
-    // backlogitemId=null, nextbacklogitemId=item1
-    // backlogitemId=item1, nextbacklogitemId=item2
-    // backlogitemId=item2, nextbacklogitemId=null
 };
