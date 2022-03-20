@@ -2,12 +2,13 @@
 import * as HttpStatus from "http-status-codes";
 import { FindOptions, InstanceDestroyOptions, Transaction } from "sequelize";
 
+// data access
+import { SprintDataModel } from "../../../dataaccess/models/SprintDataModel";
+
 // utils
 import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
+import { buildResponseFromCatchError, buildResponseWithItem } from "../../utils/responseBuilder";
 import { mapDbToApiSprint } from "../../../dataaccess/mappers/dataAccessToApiMappers";
-
-// data access
-import { SprintDataModel } from "../../../dataaccess/models/Sprint";
 
 export const deleteSprint = async (sprintId: string | null, transaction?: Transaction) => {
     try {
@@ -22,16 +23,8 @@ export const deleteSprint = async (sprintId: string | null, transaction?: Transa
         const sprint = mapDbToApiSprint(item);
         const destroyOptions: InstanceDestroyOptions = buildOptionsWithTransaction(undefined, transaction);
         await item.destroy(destroyOptions);
-        return {
-            status: HttpStatus.OK,
-            data: {
-                item: sprint
-            }
-        };
+        return buildResponseWithItem(sprint);
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
-        };
+        return buildResponseFromCatchError(error);
     }
 };

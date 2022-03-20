@@ -2,12 +2,13 @@
 import * as HttpStatus from "http-status-codes";
 import { FindOptions, InstanceDestroyOptions, Transaction } from "sequelize";
 
+// data access
+import { ProjectDataModel } from "../../../dataaccess/models/ProjectDataModel";
+
 // utils
 import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
+import { buildResponseFromCatchError, buildResponseWithItem } from "../../utils/responseBuilder";
 import { mapDbToApiProject } from "../../../dataaccess/mappers/dataAccessToApiMappers";
-
-// data access
-import { ProjectDataModel } from "../../../dataaccess/models/Project";
 
 export const deleteProject = async (projectId: string | null, transaction?: Transaction) => {
     try {
@@ -22,16 +23,8 @@ export const deleteProject = async (projectId: string | null, transaction?: Tran
         const project = mapDbToApiProject(item);
         const destroyOptions: InstanceDestroyOptions = buildOptionsWithTransaction(undefined, transaction);
         await item.destroy(destroyOptions);
-        return {
-            status: HttpStatus.OK,
-            data: {
-                item: project
-            }
-        };
+        return buildResponseWithItem(project);
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
-        };
+        return buildResponseFromCatchError(error);
     }
 };

@@ -33,6 +33,11 @@ Reducers
 
 Types related to the data structure that the reducer stores in the state tree should be exported from the reducer itself.
 
+Middleware
+==========
+
+Middleware should have `next(action);` as the first line to ensure that state is updated frist.
+
 Components
 ==========
 
@@ -55,6 +60,11 @@ To combine the these two interfaces use:
 `ComponentNameStateProps` can be used for `mapStateToProps`
 `ComponentNameDispatchProps` can be used for `mapDispatchToProps`
 
+Button Components
+-----------------
+
+A base component called SimpleButton should be used when deriving specialized buttons.  There's a `cleanPassthroughProps` function
+that should be used for passing properties from the specialized button to the contained SimpleButton instance.
 
 Switch Statements
 =================
@@ -106,7 +116,7 @@ should be chosen because it is the most specific path.
 Import Sections
 ---------------
 
-Import statments should be grouped into the following commented sections (try to stick to this order as well):
+Import statments should be grouped into the following commented sections (try to stick to this order as well- see notes on this below):
 
 | Section          |                                              |
 |------------------|----------------------------------------------|
@@ -122,6 +132,11 @@ Import statments should be grouped into the following commented sections (try to
 | consts/enums     | any project related constants and enums      |
 | interfaces/types | any project related interface or types       |
 | style            | any project related css module references    |
+
+Why the order matters- VS Code automatically adds imports to the first import statement it finds.
+For example, having "utils" before "interfaces/types" prevents VS Code from turning an
+"import type" statament into a plain "import" if it auto-imports a utility function.  There are
+other reasons  for doing this as well, including consistency when viewing one file after another.
 
 This helps to identify inconsistencies in naming because it becomes obvious when you group by category.  This also helps to make it
 obvious when a module could be going beyond its single responsibility (and thereby violating SOLID principles).
@@ -148,6 +163,12 @@ import { IntlProvider } from "@atoll/shared";
 // layouts
 import { layouts } from "@atoll/shared";
 ```
+
+Classes
+=======
+
+Avoid using classes as much as possible.  Classes should be restricted to specialized use only.
+
 Functions
 =========
 
@@ -171,3 +192,47 @@ Argument Types
 3. Consider using an `options` argument (similar to the code style the "deno" project uses), when this applies, to contain all the
    various "configuration" type arguments if there are many.
 
+
+Interfaces/Types
+================
+
+Preferred Style
+---------------
+
+Use `type` in most cases, `interface` should be reserved when applying to classes.  This standard was introduced
+later in the project so you may find a lot of interface use until a wide-scale refactor has been performed.
+
+Extending Interfaces
+--------------------
+
+As the "preferred style" section stated- `type` should be used most of the time, but when `interface` is used
+the following guidance should be applied (it is also possible to do the exact same thing with `type` as well).
+
+General guidance when extending interfaces:
+
+1. Keep hierarchy as shallow as possible- this may mean that you need to refactor at some point when
+   the hierarchy has grown and there are unnecessary intermediary types that can be removed.
+
+2. Try to avoid inheritance- instead you should aggregate interfaces, for example a `Saveable` interface
+   could have `hasBeenSaved` boolean property and `BacklogItem` could extend `Saveable` and so could
+   `Sprint` (that will make the `Saveable` interface reusable).
+
+Action Types
+------------
+
+Make sure to extend the action type from redux's `Action` so that it can be used in a switch statement in the middleware.
+
+**Action Creator Code**
+
+```
+// externals
+import type { Action } from "redux";
+
+...
+
+export type ApiPostSprintBacklogItemSuccessAction = Action<typeof ActionTypes.API_POST_SPRINT_BACKLOG_ITEM_SUCCESS> & {
+    payload: ApiPostSprintBacklogItemSuccessActionPayload;
+    meta: ApiActionMetaDataRequestMeta<{}, MetaActionParams>;
+};
+
+```

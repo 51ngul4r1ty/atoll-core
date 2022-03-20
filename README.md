@@ -11,7 +11,12 @@ If you're interested in getting a detailed explanation of the various parts of t
 want to start with the "Other Docs" section below.  If not, and you just want to get going as quickly
 as possible then you're in the right section.
 
-Everyone contributing to this repo should read this document: [IMPORTANT.md](docs/IMPORTANT.md)
+Everyone contributing to this repo should read this document before doing anything: [IMPORTANT.md](docs/IMPORTANT.md)
+
+For specialized instructions (to save you time trying to do various things): [HOWTO.md](docs/HOWTO.md)
+
+Many code standards and conventions can be picked up from existing patterns in the code but it is advisable to use this resource as
+well: [CODE_STANDARDS.md](docs/CODE_STANDARDS.md)
 
 Tools Used
 ----------
@@ -35,25 +40,26 @@ Steps after Cloning Repo
 2. Clone `atoll-shared` repo and follow instructions in its README.md to get it building correctly.
 3. `npm run sync-quick` in `atoll-core` repo to get it to use the latest version of the shared repo code.
 4. `npm run build` (if this succeeds you have all dependencies correct)
-5. Use `setup.sql` to set up "atoll" database schema.
-6. Set environment variable `ATOLL_DATABASE_URL` to "postgres://atoll:l1m3atoll@localhost:5432/atoll"
+5. Do not use pgAdmin UI to create the database, just use the query tool to run the `setup.sql` statements in the next step.
+6. Use `setup.sql` to set up "atoll" database schema.
+7. Set environment variable `ATOLL_DATABASE_URL` to "postgres://atoll:l1m3atoll@localhost:5432/atoll"
    (use `~/.zprofile` file or equivalent).
-7. Set environment variable `ATOLL_DATABASE_USE_SSL` to "false"
+8. Set environment variable `ATOLL_DATABASE_USE_SSL` to "false"
    (use `~/.zprofile` file or equivalent).
-8. Set environment variable `ATOLL_AUTH_KEY` to "local-dev-test-key"
+9. Set environment variable `ATOLL_AUTH_KEY` to "local-dev-test-key"
    (use `~/.zprofile` file or equivalent).
-9. Restart your system to ensure that environment variables are set correctly.
-10. Use `npm run setup` to set to the test account (the `data.sql` script will not run correctly if this
+10. Restart your system to ensure that environment variables are set correctly.
+11. Use `npm run setup` to set to the test account (the `data.sql` script will not run correctly if this
    step is skipped).
-11. Use `data.sql` to set up some sample data.
-12. Use VS Code to open `atoll-core-main.code-workspace` - this will ensure that you see `atoll-core`
+12. Use `data.sql` to set up some sample data.
+13. Use VS Code to open `atoll-core-main.code-workspace` - this will ensure that you see `atoll-core`
    and `atoll-shared` folders in the editor.
-13. Install all recommended extensions in VS Code.
-14. Use VS Code's debugger to launch "App" and/or "Storybook"
+14. Install all recommended extensions in VS Code.
+15. Use VS Code's debugger to launch "App" and/or "Storybook"
    - If you prefer to use npm scripts you can use `npm start` and/or `npm run storybook`
      but you won't be able to set breakpoints in the app if you use `npm start` so we
      recommend the former approach.
-15. Use `npm test` while editing code to ensure that the tests keep passing while you
+16. Use `npm test` while editing code to ensure that the tests keep passing while you
    perform TDD coding iterations.  This will cause the tests to run every time code
    changes are saved and coverage gutters will be updated automatically (use "Watch"
    in the VS Code tray area).
@@ -87,4 +93,6 @@ README.md                                     - this document is intended as the
 [GLOSSARY.md](docs/GLOSSARY.md)               - glossary specific to this project.  
 [ISSUES_RESOLVED.md](docs/ISSUES_RESOLVED.md) - this may be useful if you're running into problems.  
 [DATA_MODEL.md](docs/dataModel/DATA_MODEL.md) - mapping the requirements to the data model.  
+[PROCESS.md](docs/PROCESS.md)                 - the index document for processes that should be followed.
 
+[Github Wiki](https://github.com/51ngul4r1ty/atoll-core/wiki)

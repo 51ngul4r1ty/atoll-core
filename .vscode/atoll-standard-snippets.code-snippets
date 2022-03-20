@@ -1,4 +1,10 @@
 {
+    "Test: Arrange, Act, Assert": {
+        "scope": "javascript,typescript,typescriptreact",
+        "prefix": "\\\\aaa",
+        "body": ["// arrange", "", "// act", "", "// assert", ""],
+        "description": "Add comments for each section in a test"
+    },
     "Import Section: Actions": {
         "scope": "javascript,typescript,typescriptreact",
         "prefix": "\\\\a",

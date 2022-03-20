@@ -1,48 +1,92 @@
 // externals
-import * as HttpStatus from "http-status-codes";
+import { FindOptions } from "sequelize";
 
 // libraries
 import { ApiBacklogItem, LinkedList } from "@atoll/shared";
+
+// data access
+import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
+import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRankDataModel";
+
+// consts/enums
+import { BACKLOG_ITEM_RESOURCE_NAME } from "../../../resourceNames";
 
 // utils
 import { mapDbToApiBacklogItem, mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
+import {
+    buildBacklogItemFindOptionsIncludeForNested,
+    computeUnallocatedParts,
+    computeUnallocatedPointsUsingDbObjs
+} from "../helpers/backlogItemHelper";
+import {
+    buildNotFoundResponse,
+    buildResponseFromCatchError,
+    buildResponseWithItem,
+    buildResponseWithItems
+} from "../../utils/responseBuilder";
 
-// data access
-import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItem";
-import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRank";
+// interfaces/types
+import { RestApiCollectionResult, RestApiErrorResult, RestApiItemResult } from "../../utils/responseBuilder";
 
-// consts/enums
-import { BACKLOG_ITEM_RESOURCE_NAME } from "../../../resourceNames";
+export type BacklogItemsResult = RestApiCollectionResult<ApiBacklogItem>;
 
-export interface BacklogItemsResult {
-    status: number;
-    data?: {
-        items: any[];
+export type BacklogItemResult = RestApiItemResult<ApiBacklogItem>;
+
+const buildApiItemFromDbItemWithParts = (dbItemWithParts: BacklogItemDataModel): ApiBacklogItem => {
+    const backlogItem = mapDbToApiBacklogItem(dbItemWithParts);
+    const dbBacklogItemParts = (dbItemWithParts as any).backlogitemparts;
+    backlogItem.unallocatedParts = computeUnallocatedParts(dbBacklogItemParts);
+    backlogItem.unallocatedPoints = computeUnallocatedPointsUsingDbObjs(dbItemWithParts, dbBacklogItemParts);
+    const result: ApiBacklogItem = {
+        ...backlogItem,
+        links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]
     };
-    message?: string;
-}
+    return result;
+};
 
-export const backlogItemFetcher = async (projectId: string, backlogItemDisplayId: string): Promise<BacklogItemsResult> => {
+export type BacklogItemParams = {
+    projectId?: string;
+    externalId?: string;
+};
+
+export const buildFindOptionsForBacklogItems = (params: BacklogItemParams): FindOptions => {
+    const options = buildOptionsFromParams(params);
+    const backlogItemsOptions: FindOptions = {
+        ...options,
+        include: buildBacklogItemFindOptionsIncludeForNested()
+    };
+    return backlogItemsOptions;
+};
+
+export const fetchBacklogItem = async (backlogItemId: string): Promise<BacklogItemResult | RestApiErrorResult> => {
     try {
-        const options = buildOptionsFromParams({ projectId, externalId: backlogItemDisplayId });
-        const backlogItems = await BacklogItemDataModel.findAll(options);
+        const backlogItemsOptions = buildFindOptionsForBacklogItems({});
+        const dbBacklogItem = await BacklogItemDataModel.findByPk(backlogItemId, backlogItemsOptions);
+        if (!dbBacklogItem) {
+            return buildNotFoundResponse(`Unable to find backlog item by ID ${backlogItemId}`);
+        }
+        const item = buildApiItemFromDbItemWithParts(dbBacklogItem);
+        return buildResponseWithItem(item);
+    } catch (error) {
+        return buildResponseFromCatchError(error);
+    }
+};
+
+export const fetchBacklogItemsByDisplayId = async (
+    projectId: string,
+    backlogItemDisplayId: string
+): Promise<BacklogItemsResult | RestApiErrorResult> => {
+    try {
+        const backlogItemsOptions = buildFindOptionsForBacklogItems({ projectId, externalId: backlogItemDisplayId });
+        const backlogItems = await BacklogItemDataModel.findAll(backlogItemsOptions);
         const getBacklogItemsResult = (backlogItems) => {
-            const items = backlogItems.map((item) => {
-                const backlogItem = mapDbToApiBacklogItem(item);
-                const result: ApiBacklogItem = {
-                    ...backlogItem,
-                    links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]
-                };
+            const items: ApiBacklogItem[] = backlogItems.map((item) => {
+                const result = buildApiItemFromDbItemWithParts(item);
                 return result;
             });
-            return {
-                status: HttpStatus.OK,
-                data: {
-                    items
-                }
-            };
+            return buildResponseWithItems(items);
         };
         if (backlogItems.length >= 1) {
             return getBacklogItemsResult(backlogItems);
@@ -52,16 +96,14 @@ export const backlogItemFetcher = async (projectId: string, backlogItemDisplayId
             return getBacklogItemsResult(backlogItems);
         }
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
-        };
+        return buildResponseFromCatchError(error);
     }
 };
 
-export const backlogItemsFetcher = async (projectId: string | null): Promise<BacklogItemsResult> => {
+export const fetchBacklogItems = async (projectId: string | null): Promise<BacklogItemsResult | RestApiErrorResult> => {
     try {
-        const options = buildOptionsFromParams({ projectId });
+        const params = { projectId };
+        const options = buildOptionsFromParams(params);
         const backlogItemRanks = await BacklogItemRankDataModel.findAll(options);
         const rankList = new LinkedList<ApiBacklogItem>();
         if (backlogItemRanks.length) {
@@ -70,25 +112,14 @@ export const backlogItemsFetcher = async (projectId: string | null): Promise<Bac
                 rankList.addInitialLink(item.backlogitemId, item.nextbacklogitemId);
             });
         }
-        const backlogItems = await BacklogItemDataModel.findAll(options);
+        const backlogItemsOptions = buildFindOptionsForBacklogItems(params);
+        const backlogItems = await BacklogItemDataModel.findAll(backlogItemsOptions);
         backlogItems.forEach((item) => {
-            const backlogItem = mapDbToApiBacklogItem(item);
-            const result: ApiBacklogItem = {
-                ...backlogItem,
-                links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]
-            };
+            const result = buildApiItemFromDbItemWithParts(item);
             rankList.addItemData(result.id, result);
         });
-        return {
-            status: HttpStatus.OK,
-            data: {
-                items: rankList.toArray()
-            }
-        };
+        return buildResponseWithItems(rankList.toArray());
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
-        };
+        return buildResponseFromCatchError(error);
     }
 };

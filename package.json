@@ -1,6 +1,6 @@
 {
   "name": "atoll",
-  "version": "0.40.9",
+  "version": "0.41.2",
   "author": {
     "name": "Kevin Berry",
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
@@ -30,6 +30,7 @@
     "start-only": "npx --no-install cross-env NODE_ENV=development node scripts/start.js",
     "start:prod": "npx --no-install cross-env NODE_ENV=production node scripts/start.js",
     "sync-if-linked": "node scripts/sync-if-linked.js",
+    "sync-and-start": "npm run sync-quick && npm start",
     "test": "npm run test:ci",
     "test:watch": "node scripts/test.js --env=jsdom --coverage",
     "test:ci": "npm run test:tsc && npm run test:jest",
@@ -59,7 +60,7 @@
     "check:prereqs": "ts-node ./scripts/check-prereqs.ts"
   },
   "dependencies": {
-    "@atoll/shared": "0.40.9",
+    "@atoll/shared": "0.41.2",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.19.2",
@@ -89,7 +90,7 @@
     "redux-devtools-extension": "2.13.8",
     "redux-thunk": "2.3.0",
     "reselect": "4.0.0",
-    "sequelize": "5.21.7",
+    "sequelize": "6.6.2",
     "text-encoding-polyfill": "0.6.7",
     "url-parse": "1.4.7",
     "uuid": "7.0.2",
@@ -117,7 +118,6 @@
     "@types/react-helmet": "5.0.15",
     "@types/react-redux": "7.1.7",
     "@types/react-router-dom": "5.1.5",
-    "@types/sequelize": "4.28.8",
     "@types/uuid": "7.0.0",
     "@types/webpack-env": "1.15.1",
     "@types/websocket": "1.0.0",
@@ -152,7 +152,7 @@
     "postcss-import": "12.0.1",
     "postcss-loader": "3.0.0",
     "postcss-nested": "4.2.1",
-    "prettier": "1.19.1",
+    "prettier": "2.5.1",
     "react-dev-utils": "10.2.0",
     "redux-mock-store": "1.5.4",
     "regenerator-runtime": "0.13.3",
@@ -164,7 +164,7 @@
     "stylelint-prettier": "1.1.2",
     "terser-webpack-plugin": "2.3.7",
     "ts-node": "9.1.1",
-    "typescript": "4.0.2",
+    "typescript": "4.2.4",
     "url-loader": "3.0.0",
     "webpack": "4.41.6",
     "webpack-bundle-analyzer": "3.6.0",
@@ -174,6 +174,6 @@
     "webpack-manifest-plugin": "2.2.0",
     "webpack-node-externals": "1.7.2",
     "write-file-webpack-plugin": "4.5.1",
-    "yalc": "1.0.0-pre.35"
+    "yalc": "1.0.0-pre.53"
   }
 }

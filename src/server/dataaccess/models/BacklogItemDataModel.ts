@@ -1,10 +1,39 @@
 // externals
 import { Model, DataTypes, Deferrable } from "sequelize";
 
+// utils
+import restoreSequelizeAttributesOnClass from "../sequelizeModelHelpers";
+
 // data access
 import { sequelize } from "../connection";
 
-export class BacklogItemDataModel extends Model {}
+export const DB_INCLUDE_BACKLOGITEM = "backlogitem";
+
+export class BacklogItemDataModel extends Model {
+    public id!: string;
+    public projectId!: string;
+    public friendlyId!: string | null;
+    public externalId!: string | null;
+    public rolePhrase!: string | null;
+    public storyPhrase!: string;
+    public reasonPhrase!: string | null;
+    public estimate!: number | null;
+    public type!: string;
+    public status!: string | null;
+    public acceptanceCriteria!: string | null;
+    public startedAt!: Date | null;
+    public finishedAt!: Date | null;
+    public acceptedAt!: Date | null;
+    public releasedAt!: Date | null;
+    public totalParts!: number | null;
+    readonly createdAt!: Date;
+    readonly updatedAt!: Date;
+    readonly version: number;
+    constructor(...args) {
+        super(...args);
+        restoreSequelizeAttributesOnClass(new.target, this);
+    }
+}
 
 BacklogItemDataModel.init(
     {
@@ -21,7 +50,7 @@ BacklogItemDataModel.init(
                 // TODO: Find out why it was defined this way:
                 deferrable: Deferrable.INITIALLY_DEFERRED as any
             },
-            get: function() {
+            get: function () {
                 return this.getDataValue("projectId");
             }
         },
@@ -53,6 +82,10 @@ BacklogItemDataModel.init(
         },
         acceptanceCriteria: {
             type: DataTypes.TEXT,
+            allowNull: true
+        },
+        totalParts: {
+            type: DataTypes.INTEGER,
             allowNull: true
         },
         startedAt: DataTypes.DATE,

@@ -1,20 +1,23 @@
 // externals
-import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
-import { mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import * as HttpStatus from "http-status-codes";
 import { FindOptions, InstanceDestroyOptions, InstanceUpdateOptions, Transaction } from "sequelize";
 
 // data access
-import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRank";
+import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRankDataModel";
 
-export const removeFromProductBacklog = async (backlogitemId: string | null, transaction?: Transaction) => {
+// utils
+import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
+import { buildResponseFromCatchError, buildResponseWithItem } from "../../utils/responseBuilder";
+import { mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
+
+export const removeFromProductBacklog = async (backlogitemId: string, transaction?: Transaction) => {
     try {
         const findItemOptions: FindOptions = buildOptionsWithTransaction({ where: { backlogitemId } }, transaction);
         const item = await BacklogItemRankDataModel.findOne(findItemOptions);
         if (!item) {
             return {
                 status: HttpStatus.NOT_FOUND,
-                message: `Backlog item ${backlogitemId} was not found`
+                message: `Backlog item "${backlogitemId}" was not found`
             };
         }
         const findItemBeforeOptions: FindOptions = buildOptionsWithTransaction(
@@ -47,16 +50,8 @@ export const removeFromProductBacklog = async (backlogitemId: string | null, tra
             await itemBefore.update({ nextbacklogitemId: nextBacklogItemId }, updateOptions);
         }
         await item.destroy(destroyOptions);
-        return {
-            status: HttpStatus.OK,
-            data: {
-                item: itemData
-            }
-        };
+        return buildResponseWithItem(itemData);
     } catch (error) {
-        return {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: error
-        };
+        return buildResponseFromCatchError(error);
     }
 };

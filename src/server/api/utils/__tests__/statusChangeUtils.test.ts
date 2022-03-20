@@ -5,7 +5,7 @@ import "jest";
 import { ApiBacklogItem } from "@atoll/shared";
 
 // code under test
-import { getUpdatedDataItemWhenStatusChanges } from "../statusChangeUtils";
+import { getUpdatedBacklogItemWhenStatusChanges } from "../statusChangeUtils";
 
 // mocks
 // import * as atollShared from "@atoll/shared";
@@ -30,7 +30,12 @@ const buildApiBacklogItem = (): ApiBacklogItem => {
         releasedAt: null,
         startedAt: null,
         status: "N", // not started
-        type: "story"
+        type: "story",
+        partIndex: 1,
+        storyEstimate: 5,
+        totalParts: 1,
+        unallocatedParts: 0,
+        unallocatedPoints: undefined
     };
     return result;
 };
@@ -54,57 +59,57 @@ describe("Status Change Utils", () => {
     });
     describe("getUpdatedDataItemWhenStatusChanges", () => {
         it("should handle null values correctly", () => {
-            const actual = getUpdatedDataItemWhenStatusChanges(null, {} as ApiBacklogItem);
-            expect(actual).toStrictEqual({});
+            const actual = getUpdatedBacklogItemWhenStatusChanges(null, {} as ApiBacklogItem);
+            expect(actual.backlogItem).toStrictEqual({});
         });
         it("should handle empty objects correctly", () => {
-            const actual = getUpdatedDataItemWhenStatusChanges({} as ApiBacklogItem, {} as ApiBacklogItem);
-            expect(actual).toStrictEqual({});
+            const actual = getUpdatedBacklogItemWhenStatusChanges({} as ApiBacklogItem, {} as ApiBacklogItem);
+            expect(actual.backlogItem).toStrictEqual({});
         });
         it("should handle same object correctly", () => {
             const item = buildApiBacklogItem();
-            const actual = getUpdatedDataItemWhenStatusChanges(item, item);
-            expect(actual).toStrictEqual(item);
+            const actual = getUpdatedBacklogItemWhenStatusChanges(item, item);
+            expect(actual.backlogItem).toStrictEqual(item);
         });
         it("should update all the time fields when setting status to released", () => {
             const oldItem = buildApiBacklogItem();
             const newItem = buildApiBacklogItem();
             newItem.status = "R";
-            const actual = getUpdatedDataItemWhenStatusChanges(oldItem, newItem);
-            expect(actual.startedAt).toEqualX({ name: "startedAt", value: MOCK_NOW.toISOString() });
-            expect(actual.finishedAt).toEqualX({ name: "finishedAt", value: MOCK_NOW.toISOString() });
-            expect(actual.acceptedAt).toEqualX({ name: "acceptedAt", value: MOCK_NOW.toISOString() });
-            expect(actual.releasedAt).toEqualX({ name: "releasedAt", value: MOCK_NOW.toISOString() });
+            const actual = getUpdatedBacklogItemWhenStatusChanges(oldItem, newItem);
+            expect(actual.backlogItem.startedAt).toEqualX({ name: "startedAt", value: MOCK_NOW.toISOString() });
+            expect(actual.backlogItem.finishedAt).toEqualX({ name: "finishedAt", value: MOCK_NOW.toISOString() });
+            expect(actual.backlogItem.acceptedAt).toEqualX({ name: "acceptedAt", value: MOCK_NOW.toISOString() });
+            expect(actual.backlogItem.releasedAt).toEqualX({ name: "releasedAt", value: MOCK_NOW.toISOString() });
         });
         it("should update startedAt, finishedAt, acceptedAt when setting status to accepted", () => {
             const oldItem = buildApiBacklogItem();
             const newItem = buildApiBacklogItem();
             newItem.status = "A";
-            const actual = getUpdatedDataItemWhenStatusChanges(oldItem, newItem);
-            expect(actual.startedAt).toEqualX({ name: "startedAt", value: MOCK_NOW.toISOString() });
-            expect(actual.finishedAt).toEqualX({ name: "finishedAt", value: MOCK_NOW.toISOString() });
-            expect(actual.acceptedAt).toEqualX({ name: "acceptedAt", value: MOCK_NOW.toISOString() });
-            expect(actual.releasedAt).toEqualX({ name: "releasedAt", value: null });
+            const actual = getUpdatedBacklogItemWhenStatusChanges(oldItem, newItem);
+            expect(actual.backlogItem.startedAt).toEqualX({ name: "startedAt", value: MOCK_NOW.toISOString() });
+            expect(actual.backlogItem.finishedAt).toEqualX({ name: "finishedAt", value: MOCK_NOW.toISOString() });
+            expect(actual.backlogItem.acceptedAt).toEqualX({ name: "acceptedAt", value: MOCK_NOW.toISOString() });
+            expect(actual.backlogItem.releasedAt).toEqualX({ name: "releasedAt", value: null });
         });
         it("should update startedAt, finishedAt, acceptedAt when setting status to accepted", () => {
             const oldItem = buildApiBacklogItem();
             const newItem = buildApiBacklogItem();
             newItem.status = "D";
-            const actual = getUpdatedDataItemWhenStatusChanges(oldItem, newItem);
-            expect(actual.startedAt).toEqualX({ name: "startedAt", value: MOCK_NOW.toISOString() });
-            expect(actual.finishedAt).toEqualX({ name: "finishedAt", value: MOCK_NOW.toISOString() });
-            expect(actual.acceptedAt).toEqualX({ name: "acceptedAt", value: null });
-            expect(actual.releasedAt).toEqualX({ name: "releasedAt", value: null });
+            const actual = getUpdatedBacklogItemWhenStatusChanges(oldItem, newItem);
+            expect(actual.backlogItem.startedAt).toEqualX({ name: "startedAt", value: MOCK_NOW.toISOString() });
+            expect(actual.backlogItem.finishedAt).toEqualX({ name: "finishedAt", value: MOCK_NOW.toISOString() });
+            expect(actual.backlogItem.acceptedAt).toEqualX({ name: "acceptedAt", value: null });
+            expect(actual.backlogItem.releasedAt).toEqualX({ name: "releasedAt", value: null });
         });
         it("should update startedAt, finishedAt, acceptedAt when setting status to accepted", () => {
             const oldItem = buildApiBacklogItem();
             const newItem = buildApiBacklogItem();
             newItem.status = "P";
-            const actual = getUpdatedDataItemWhenStatusChanges(oldItem, newItem);
-            expect(actual.startedAt).toEqualX({ name: "startedAt", value: MOCK_NOW.toISOString() });
-            expect(actual.finishedAt).toEqualX({ name: "finishedAt", value: null });
-            expect(actual.acceptedAt).toEqualX({ name: "acceptedAt", value: null });
-            expect(actual.releasedAt).toEqualX({ name: "releasedAt", value: null });
+            const actual = getUpdatedBacklogItemWhenStatusChanges(oldItem, newItem);
+            expect(actual.backlogItem.startedAt).toEqualX({ name: "startedAt", value: MOCK_NOW.toISOString() });
+            expect(actual.backlogItem.finishedAt).toEqualX({ name: "finishedAt", value: null });
+            expect(actual.backlogItem.acceptedAt).toEqualX({ name: "acceptedAt", value: null });
+            expect(actual.backlogItem.releasedAt).toEqualX({ name: "releasedAt", value: null });
         });
         it("should not update startedAt if it has already been set", () => {
             const oldItem = buildApiBacklogItem();
@@ -112,11 +117,11 @@ describe("Status Change Utils", () => {
             const newItem = buildApiBacklogItem();
             newItem.startedAt = oldItem.startedAt;
             newItem.status = "P";
-            const actual = getUpdatedDataItemWhenStatusChanges(oldItem, newItem);
-            expect(actual.startedAt).toEqualX({ name: "startedAt", value: PREV_SET_DATE.toISOString() });
-            expect(actual.finishedAt).toEqualX({ name: "finishedAt", value: null });
-            expect(actual.acceptedAt).toEqualX({ name: "acceptedAt", value: null });
-            expect(actual.releasedAt).toEqualX({ name: "releasedAt", value: null });
+            const actual = getUpdatedBacklogItemWhenStatusChanges(oldItem, newItem);
+            expect(actual.backlogItem.startedAt).toEqualX({ name: "startedAt", value: PREV_SET_DATE.toISOString() });
+            expect(actual.backlogItem.finishedAt).toEqualX({ name: "finishedAt", value: null });
+            expect(actual.backlogItem.acceptedAt).toEqualX({ name: "acceptedAt", value: null });
+            expect(actual.backlogItem.releasedAt).toEqualX({ name: "releasedAt", value: null });
         });
         it("should not update finishedAt if it has already been set", () => {
             const oldItem = buildApiBacklogItem();
@@ -124,11 +129,11 @@ describe("Status Change Utils", () => {
             const newItem = buildApiBacklogItem();
             newItem.finishedAt = oldItem.finishedAt;
             newItem.status = "D";
-            const actual = getUpdatedDataItemWhenStatusChanges(oldItem, newItem);
-            expect(actual.startedAt).toEqualX({ name: "startedAt", value: MOCK_NOW.toISOString() });
-            expect(actual.finishedAt).toEqualX({ name: "finishedAt", value: PREV_SET_DATE.toISOString() });
-            expect(actual.acceptedAt).toEqualX({ name: "acceptedAt", value: null });
-            expect(actual.releasedAt).toEqualX({ name: "releasedAt", value: null });
+            const actual = getUpdatedBacklogItemWhenStatusChanges(oldItem, newItem);
+            expect(actual.backlogItem.startedAt).toEqualX({ name: "startedAt", value: MOCK_NOW.toISOString() });
+            expect(actual.backlogItem.finishedAt).toEqualX({ name: "finishedAt", value: PREV_SET_DATE.toISOString() });
+            expect(actual.backlogItem.acceptedAt).toEqualX({ name: "acceptedAt", value: null });
+            expect(actual.backlogItem.releasedAt).toEqualX({ name: "releasedAt", value: null });
         });
         it("should not update acceptedAt if it has already been set", () => {
             const oldItem = buildApiBacklogItem();
@@ -136,11 +141,11 @@ describe("Status Change Utils", () => {
             const newItem = buildApiBacklogItem();
             newItem.acceptedAt = oldItem.acceptedAt;
             newItem.status = "A";
-            const actual = getUpdatedDataItemWhenStatusChanges(oldItem, newItem);
-            expect(actual.startedAt).toEqualX({ name: "startedAt", value: MOCK_NOW.toISOString() });
-            expect(actual.finishedAt).toEqualX({ name: "finishedAt", value: MOCK_NOW.toISOString() });
-            expect(actual.acceptedAt).toEqualX({ name: "acceptedAt", value: PREV_SET_DATE.toISOString() });
-            expect(actual.releasedAt).toEqualX({ name: "releasedAt", value: null });
+            const actual = getUpdatedBacklogItemWhenStatusChanges(oldItem, newItem);
+            expect(actual.backlogItem.startedAt).toEqualX({ name: "startedAt", value: MOCK_NOW.toISOString() });
+            expect(actual.backlogItem.finishedAt).toEqualX({ name: "finishedAt", value: MOCK_NOW.toISOString() });
+            expect(actual.backlogItem.acceptedAt).toEqualX({ name: "acceptedAt", value: PREV_SET_DATE.toISOString() });
+            expect(actual.backlogItem.releasedAt).toEqualX({ name: "releasedAt", value: null });
         });
         it("should not update releasedAt if it has already been set", () => {
             const oldItem = buildApiBacklogItem();
@@ -148,11 +153,11 @@ describe("Status Change Utils", () => {
             const newItem = buildApiBacklogItem();
             newItem.releasedAt = oldItem.releasedAt;
             newItem.status = "R";
-            const actual = getUpdatedDataItemWhenStatusChanges(oldItem, newItem);
-            expect(actual.startedAt).toEqualX({ name: "startedAt", value: MOCK_NOW.toISOString() });
-            expect(actual.finishedAt).toEqualX({ name: "finishedAt", value: MOCK_NOW.toISOString() });
-            expect(actual.acceptedAt).toEqualX({ name: "acceptedAt", value: MOCK_NOW.toISOString() });
-            expect(actual.releasedAt).toEqualX({ name: "releasedAt", value: PREV_SET_DATE.toISOString() });
+            const actual = getUpdatedBacklogItemWhenStatusChanges(oldItem, newItem);
+            expect(actual.backlogItem.startedAt).toEqualX({ name: "startedAt", value: MOCK_NOW.toISOString() });
+            expect(actual.backlogItem.finishedAt).toEqualX({ name: "finishedAt", value: MOCK_NOW.toISOString() });
+            expect(actual.backlogItem.acceptedAt).toEqualX({ name: "acceptedAt", value: MOCK_NOW.toISOString() });
+            expect(actual.backlogItem.releasedAt).toEqualX({ name: "releasedAt", value: PREV_SET_DATE.toISOString() });
         });
     });
 });

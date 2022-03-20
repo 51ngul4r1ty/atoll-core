@@ -45,8 +45,63 @@ alter table backlogitem add column "releasedAt" timestamp with time zone;
 
 alter table sprint add column "totalPoints" decimal(10, 2);
 
--- Atoll 0.v40.0
+-- Atoll v0.40.0
 alter table sprint alter column startdate type date;
 alter table sprint alter column finishdate type date;
 
 update sprint set finishdate = finishdate - interval '1' day where startdate + interval '14' day = finishdate;
+
+-- Atoll v0.41.0
+create table backlogitempart
+(
+    id character varying(32) not null,
+    "externalId" character varying(30),
+    "backlogitemId" character varying(32) not null,
+    "partIndex" integer,
+    percentage numeric(10,2),
+    points numeric(10,2),
+    "startedAt" timestamp with time zone,
+    "finishedAt" timestamp with time zone,
+    status character(1),
+    "createdAt" timestamp with time zone not null,
+    "updatedAt" timestamp with time zone not null,
+    version integer not null,
+    constraint backlogitempart_pkey primary key (id),
+    constraint "backlogitempart_backlogitemId_fkey" foreign key ("backlogitemId")
+        references backlogitem (id) match simple
+	    on update cascade
+	    on delete no action
+	    deferrable initially deferred
+)
+tablespace pg_default;
+
+alter table backlogitempart
+    owner to atoll;
+
+insert into backlogitempart
+select newuuid() as "id", substring("externalId" || '-1', 1, 30) as "externalId", id as "backlogitemId", 1 as "partIndex",
+	100.00 as "percentage", estimate as "points", "startedAt", "finishedAt", status, "createdAt", "updatedAt", "version"
+from backlogitem;
+
+alter table sprintbacklogitem add column "backlogitempartId" varchar(32);
+
+update sprintbacklogitem set "backlogitempartId" = bip.id
+	from backlogitempart bip join sprintbacklogitem sbi on bip."backlogitemId" = sbi."backlogitemId"
+	where sprintbacklogitem."backlogitemId" = bip."backlogitemId";
+
+alter table sprintbacklogitem
+    add constraint "sprintbacklogitem_backlogitempartId_fkey" foreign key ("backlogitempartId")
+    references backlogitempart (id) match simple
+    on update cascade
+	on delete cascade
+	deferrable initially deferred;
+
+alter table sprintbacklogitem alter column "backlogitempartId" set not null;
+
+alter table sprintbacklogitem drop constraint "sprintbacklogitem_backlogitemId_fkey";
+
+alter table sprintbacklogitem drop column "backlogitemId";
+
+alter table backlogitem add column "totalParts" integer;
+
+update backlogitem set "totalParts" = 1;

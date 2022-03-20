@@ -23,3 +23,6 @@ export const buildLink = (item: ItemWithId, basePath: string, rel: string): Link
 export const buildItemLink = (item: ItemWithId, basePath: string) => buildLink(item, basePath, "item");
 
 export const buildSelfLink = (item: ItemWithId, basePath: string) => buildLink(item, basePath, "self");
+
+export const buildChldSelfLink = (childItemId: string, parentBasePath: string) =>
+    buildLink({ id: childItemId }, parentBasePath, "self");

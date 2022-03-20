@@ -6,11 +6,14 @@ import auth from "../middleware/auth";
 
 // consts/enums
 import {
+    BACKLOG_ITEM_PART_RESOURCE_NAME,
     BACKLOG_ITEM_RANK_RESOURCE_NAME,
     BACKLOG_ITEM_RESOURCE_NAME,
     PROJECT_RESOURCE_NAME,
     SPRINT_BACKLOG_CHILD_RESOURCE_NAME,
+    SPRINT_BACKLOG_ITEM_PART_RESOURCE_NAME,
     SPRINT_BACKLOG_PARENT_RESOURCE_NAME,
+    SPRINT_BACKLOG_PART_CHILD_RESOURCE_NAME,
     SPRINT_RESOURCE_NAME
 } from "../resourceNames";
 
@@ -21,8 +24,7 @@ import {
     backlogItemsPostHandler,
     backlogItemsReorderPostHandler,
     backlogItemGetHandler,
-    backlogItemPutHandler,
-    backlogItemPatchHandler
+    backlogItemPutHandler
 } from "./handlers/backlogItems";
 import {
     sprintPostHandler,
@@ -37,6 +39,7 @@ import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
 import { userPreferencesHandler } from "./handlers/userPreferences";
 import { loginPostHandler, refreshTokenPostHandler } from "./handlers/auth";
+import { sprintBacklogItemPartsPostHandler } from "./handlers/sprintBacklogItemParts";
 
 // utils
 import { setupRoutes, setupNoAuthRoutes } from "./utils/routerHelper";
@@ -44,7 +47,9 @@ import { planViewBffGetHandler } from "./handlers/views/planViewBff";
 import {
     sprintBacklogItemDeleteHandler,
     sprintBacklogItemsGetHandler,
-    sprintBacklogItemPostHandler
+    sprintBacklogItemPostHandler,
+    sprintBacklogItemPartGetHandler,
+    sprintBacklogItemGetHandler
 } from "./handlers/sprintBacklogItems";
 import { sprintUpdateStatsPostHandler } from "./handlers/sprintUpdateStats";
 import { backlogItemViewBffGetHandler } from "./handlers/views/backlogItemViewBff";
@@ -55,6 +60,7 @@ import {
     projectPostHandler,
     projectsGetHandler
 } from "./handlers/projects";
+import { backlogItemPartGetHandler, backlogItemPartPatchHandler } from "./handlers/backlogItemParts";
 
 export const router = express.Router();
 
@@ -103,16 +109,37 @@ setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_
 });
 
 setupRoutes(router, `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}/:backlogItemId`, {
+    get: sprintBacklogItemGetHandler,
     delete: sprintBacklogItemDeleteHandler
 });
+
+setupRoutes(
+    router,
+    `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_PART_CHILD_RESOURCE_NAME}/:backlogItemPartId`,
+    {
+        get: sprintBacklogItemPartGetHandler
+    }
+);
+
+setupRoutes(
+    router,
+    `/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/:sprintId/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}/:backlogItemId/${SPRINT_BACKLOG_ITEM_PART_RESOURCE_NAME}`,
+    {
+        post: sprintBacklogItemPartsPostHandler
+    }
+);
 
 setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}`, { get: backlogItemsGetHandler, post: backlogItemsPostHandler });
 
 setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}/:itemId`, {
     get: backlogItemGetHandler,
     put: backlogItemPutHandler,
-    patch: backlogItemPatchHandler,
     delete: backlogItemsDeleteHandler
+});
+
+setupRoutes(router, `/${BACKLOG_ITEM_PART_RESOURCE_NAME}/:itemId`, {
+    get: backlogItemPartGetHandler,
+    patch: backlogItemPartPatchHandler
 });
 
 setupRoutes(router, `/${BACKLOG_ITEM_RANK_RESOURCE_NAME}`, { get: backlogItemRanksGetHandler });

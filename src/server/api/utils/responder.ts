@@ -1,61 +1,77 @@
-// externals
-import { Response } from "express";
-import * as HttpStatus from "http-status-codes";
+/**
+ * Purpose: Provide standard ways to generate REST API responses using the Response object.
+ */
 
-export const respondWithStatus = (res: Response, rawMessageOrError: any, status: number) => {
-    let message: string;
-    if (typeof rawMessageOrError === "string") {
-        message = rawMessageOrError;
-    } else if (rawMessageOrError.message) {
-        message = rawMessageOrError.message;
-        console.log(`ERROR: ${message}`);
-        console.log(`STACK: ${rawMessageOrError.stack}`);
-    } else {
-        message = `${rawMessageOrError}`;
-    }
-    res.status(status).send({
-        message,
-        status
-    });
-};
+// externals
+import { logDebug, logError } from "api/handlers/utils/serverLogger";
+import { Response } from "express";
+
+// utils
+import {
+    buildBadRequestResponse,
+    buildNotFoundResponse,
+    buildNotImplementedResponse,
+    buildOkResponse,
+    buildResponseFromCatchError,
+    buildResponseWithItem,
+    RestApiStatusAndMessageOnly
+} from "./responseBuilder";
+import { getStackFromError } from "./errorUtils";
 
 export const respondWithNotImplemented = (res: Response, message: string) => {
-    respondWithStatus(res, message, HttpStatus.NOT_IMPLEMENTED);
+    const responseObj = buildNotImplementedResponse(message);
+    respondWithObj(res, responseObj);
 };
 
-export const respondWithError = (res: Response, message: string) => {
-    respondWithStatus(res, message, HttpStatus.INTERNAL_SERVER_ERROR);
+export const respondWithError = (res: Response, error: Error | string, contextMessage: string = "ERROR") => {
+    const responseObj = buildResponseFromCatchError(error);
+    const stack = getStackFromError(error);
+    if (stack) {
+        logError(`${contextMessage}: ${responseObj.message}`);
+        logDebug(`STACK: ${stack}`);
+    } else {
+        logError(`${contextMessage}: ${responseObj.message}`);
+    }
+    respondWithObj(res, responseObj);
 };
 
 export const respondWithNotFound = (res: Response, message: string) => {
-    respondWithStatus(res, message, HttpStatus.NOT_FOUND);
+    const responseObj = buildNotFoundResponse(message);
+    respondWithObj(res, responseObj);
 };
 
 export const respondWithFailedValidation = (res: Response, message: string) => {
-    respondWithStatus(res, message, HttpStatus.BAD_REQUEST);
+    const responseObj = buildBadRequestResponse(message);
+    respondWithObj(res, responseObj);
 };
 
 export const respondWithOk = (res: Response) => {
-    const responseObj = { status: HttpStatus.OK };
-    res.send(responseObj);
+    const responseObj = buildOkResponse();
+    respondWithObj(res, responseObj);
 };
 
-export const respondWithBase = (res: Response, base: string, baseData: object, original?: object, extra?: object) => {
-    const responseObj: any = { data: { [base]: baseData }, status: HttpStatus.OK };
-    if (extra) {
-        responseObj.data.extra = extra;
-    }
-    if (original) {
-        res.send({ ...responseObj, meta: { original } });
+export type MetaWithOriginal<T> = {
+    original: T;
+};
+
+export const respondWithObj = (res: Response, responseObj: any) => {
+    if (responseObj.status) {
+        res.status(responseObj.status).send(responseObj);
     } else {
         res.send(responseObj);
     }
 };
 
-export const respondWithItem = (res: Response, data: object, original?: object, extra?: object) => {
-    respondWithBase(res, "item", data, original, extra);
+export const respondWithMessage = (res: Response, responseObj: RestApiStatusAndMessageOnly) => {
+    res.status(responseObj.status).send(responseObj);
 };
 
-export const respondWithItems = (res: Response, data: object, original?: object, extra?: object) => {
-    respondWithBase(res, "items", data, original, extra);
+/**
+ * @deprecated This should not be used- see newer patterns.
+ */
+export const respondWithItem = (res: Response, data: object, original?: object, extra?: object) => {
+    const message = undefined;
+    const meta = original ? { original } : undefined;
+    const response = buildResponseWithItem(data, extra, meta, message);
+    respondWithObj(res, response);
 };

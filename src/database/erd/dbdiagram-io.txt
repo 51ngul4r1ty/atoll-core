@@ -1,0 +1,40 @@
+Table backlogitem as BI {
+   id varchar(32) [pk]
+   externalId varchar(30)
+    "rolePhrase" varchar(80)
+    "storyPhrase" varchar(80)
+    "reasonPhrase" varchar(80)
+    estimate decimal(10,2)
+    type varchar(50)
+    "friendlyId" varchar(30)
+    "projectId" varchar(32)
+    status char(1)
+    "acceptanceCriteria" text
+    "startedAt" timestamp
+    "finishedAt" timestamp
+    "acceptedAt" timestamp
+    "releasedAt" timestamp
+}
+
+Table backlogitempart as BIP {
+    id varchar(32) [pk]
+    externalId varchar(30)
+    backlogitemId varchar(32)
+    partIndex int
+    percentage decimal(10,2)
+    points decimal(10,2)
+    startedAt timestamp
+    finishedAt timestamp
+    status char(1)
+}
+
+Ref: BIP.backlogitemId > BI.id  
+
+Table sprintbacklogitem as SBI {
+    id varchar(32) [pk]
+    backlogitempartId varchar(32)
+    "sprintId" varchar(32)
+    displayindex int
+}
+
+Ref: SBI.backlogitempartId > BIP.id  

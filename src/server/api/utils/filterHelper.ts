@@ -20,6 +20,7 @@ export interface ParamsFromRequest {
     projectId?: string;
     sprintId?: string;
     backlogItemId?: string;
+    backlogItemPartId?: string;
     backlogItemDisplayId?: string;
     projectDisplayId?: string;
 }
@@ -37,6 +38,10 @@ export const getParamsFromRequest = (req: Request): ParamsFromRequest => {
     const backlogItemId = getParamFromRequest(req, "backlogItemId");
     if (backlogItemId) {
         result.backlogItemId = backlogItemId;
+    }
+    const backlogItemPartId = getParamFromRequest(req, "backlogItemPartId");
+    if (backlogItemPartId) {
+        result.backlogItemPartId = backlogItemPartId;
     }
     const backlogItemDisplayId = getParamFromRequest(req, "backlogItemDisplayId");
     if (backlogItemDisplayId) {

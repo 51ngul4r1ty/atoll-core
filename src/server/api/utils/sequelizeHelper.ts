@@ -1,6 +1,6 @@
 // externals
 import { Request } from "express";
-import { Transaction } from "sequelize";
+import { FindOptions, Transaction } from "sequelize";
 
 // utils
 import { getParamsFromRequest } from "./filterHelper";
@@ -11,6 +11,8 @@ export interface OptionsParams {
     projectId?: string | null;
     sprintId?: string | null;
     archived?: string | null;
+    backlogitemId?: string | null;
+    backlogitempartId?: string | null;
 }
 
 export const addWhereClauseToOptions = (options: any, key: string, value: any) => {
@@ -23,14 +25,30 @@ export const addWhereClauseToOptions = (options: any, key: string, value: any) =
     options.where[key] = value;
 };
 
-export const buildOptionsFromParams = (params: OptionsParams) => {
+export const buildOptionsFromParams = (params: OptionsParams): FindOptions => {
     const options: any = {};
     addWhereClauseToOptions(options, "friendlyId", params.friendlyId);
     addWhereClauseToOptions(options, "externalId", params.externalId);
     addWhereClauseToOptions(options, "projectId", params.projectId);
     addWhereClauseToOptions(options, "sprintId", params.sprintId);
+    addWhereClauseToOptions(options, "backlogitemId", params.backlogitemId);
+    addWhereClauseToOptions(options, "backlogitempartId", params.backlogitempartId);
     addWhereClauseToOptions(options, "archived", params.archived);
     return options;
+};
+
+export const addIncludeAllNestedToOptions = (options: FindOptions): FindOptions => {
+    const result = { ...options };
+    if (options.include) {
+        throw new Error(
+            `Unexpected condition: options already had include "${options.include}" - unable to add include all,nested`
+        );
+    }
+    result.include = {
+        all: true,
+        nested: true
+    };
+    return result;
 };
 
 export const buildOptions = (req: Request) => {

@@ -8,7 +8,7 @@ import { ApiSprint, logger } from "@atoll/shared";
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
-import { SprintDataModel } from "../../dataaccess/models/Sprint";
+import { SprintDataModel } from "../../dataaccess/models/SprintDataModel";
 
 // consts/enums
 import { fetchSprint, fetchSprints } from "./fetchers/sprintFetcher";

@@ -1,20 +1,18 @@
 // externals
-import { respondWithError, respondWithNotFound } from "api/utils/responder";
-import { combineMessages, combineStatuses } from "api/utils/resultAggregator";
 import { Request, Response } from "express";
 import * as HttpStatus from "http-status-codes";
 
 // utils
-import { getLoggedInAppUserId } from "../../utils/authUtils";
+import { fetchBacklogItemsByDisplayId } from "../fetchers/backlogItemFetcher";
+import { isRestApiCollectionResult, isRestApiItemResult } from "../../utils/responseBuilder";
 import { getParamsFromRequest } from "../../utils/filterHelper";
-import { backlogItemFetcher } from "../fetchers/backlogItemFetcher";
 import { projectByDisplayIdFetcher } from "../fetchers/projectFetcher";
-import { FetcherErrorResponse } from "../fetchers/types";
-import { userPreferencesFetcher, UserPreferencesSuccessResponse } from "../fetchers/userPreferencesFetcher";
+import { respondWithError, respondWithMessage, respondWithNotFound, respondWithObj } from "../../utils/responder";
+import { fetchBacklogItemWithSprintAllocationInfo } from "../aggregators/backlogItemAggregator";
+import { logError } from "../utils/serverLogger";
+import { ApiBacklogItemPart, ApiSprint } from "@atoll/shared";
 
 export const backlogItemViewBffGetHandler = async (req: Request, res: Response) => {
-    // const userPreferencesResult = await userPreferencesFetcher("{self}", () => getLoggedInAppUserId(req));
-    // const selectedProjectId = (userPreferencesResult as UserPreferencesSuccessResponse).data.item.settings.selectedProject;
     const params = getParamsFromRequest(req);
     const backlogItemDisplayId = params.backlogItemDisplayId;
     const projectDisplayId = params.projectDisplayId;
@@ -30,23 +28,38 @@ export const backlogItemViewBffGetHandler = async (req: Request, res: Response) 
         selectedProjectId = project.data.items[0].id;
     }
 
-    const backlogItemResult = await backlogItemFetcher(selectedProjectId, backlogItemDisplayId);
-
-    // TODO: May need to retrieve sprints because the whole app may need this info... otherwise will have to
-    //       make the API call when navigating back to "Plan" view?
-    if (backlogItemResult.status === HttpStatus.OK) {
-        res.json({
-            status: HttpStatus.OK,
-            data: {
-                backlogItems: backlogItemResult.data?.items
-            }
-        });
+    const backlogItemsResult = await fetchBacklogItemsByDisplayId(selectedProjectId, backlogItemDisplayId);
+    if (!isRestApiCollectionResult(backlogItemsResult)) {
+        respondWithObj(res, backlogItemsResult);
+        logError(`backlogItemViewBffGetHandler: ${backlogItemsResult.message} (error)`);
     } else {
-        res.status(backlogItemResult.status).json({
-            status: backlogItemResult.status,
-            message: backlogItemResult.message
-        });
-        // TODO: Use logging utils
-        console.log(`Unable to fetch backlog items: ${backlogItemResult.message}`);
+        const backlogItems = backlogItemsResult.data.items;
+        const backlogItemCount = backlogItems.length;
+        if (backlogItemCount === 0) {
+            respondWithNotFound(res, `Unable to find a backlog item with Display ID ${backlogItemDisplayId}`);
+        } else if (backlogItemCount > 1) {
+            respondWithMessage(res, {
+                status: HttpStatus.BAD_REQUEST,
+                message: `Unexpected result- there should be only one backlog item that matches and ${backlogItemCount} were found!`
+            });
+        } else {
+            const backlogItem = backlogItems[0];
+            const itemWithSprintInfo = await fetchBacklogItemWithSprintAllocationInfo(backlogItem.id);
+            if (isRestApiItemResult(itemWithSprintInfo)) {
+                const inProductBacklog = itemWithSprintInfo.data.extra?.inProductBacklog || false;
+                const backlogItemPartsAndSprints = itemWithSprintInfo.data.extra?.backlogItemPartsAndSprints || [];
+                respondWithObj(res, {
+                    status: itemWithSprintInfo.status,
+                    data: {
+                        backlogItem: itemWithSprintInfo.data.item,
+                        backlogItemPartsAndSprints,
+                        inProductBacklog
+                    }
+                });
+            } else {
+                respondWithObj(res, itemWithSprintInfo);
+                logError(`backlogItemViewBffGetHandler: ${backlogItemsResult.message} (error)`);
+            }
+        }
     }
 };
