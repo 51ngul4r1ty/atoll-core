@@ -65,6 +65,13 @@ export const backlogItemPartPatchHandler = async (req: Request, res: Response) =
     if (respondedWithMismatchedItemIds(res, queryParamItemId, bodyItemId)) {
         return;
     }
+
+    if (req.body.points !== undefined && req.body.percentage === undefined) {
+        respondWithFailedValidation(res, 'If "points" field is provided, "percentage" must also be provided.');
+    } else if (req.body.points === undefined && req.body.percentage !== undefined) {
+        respondWithFailedValidation(res, 'If "percentage" field is provided, "points" must also be provided.');
+    }
+
     try {
         await beginSerializableTransaction(handlerContext);
         const dbBacklogItemPart = await BacklogItemPartDataModel.findOne({
@@ -141,7 +148,6 @@ const patchBacklogItem = async (
     dbBacklogItem: BacklogItemDataModel
 ) => {
     let newDataItem: ApiBacklogItem;
-    let result: ApiBacklogItem;
     if (reqBody.status) {
         newDataItem = getPatchedItem(originalApiBacklogItem, { status: reqBody.status });
         const updateBacklogItemResult = getUpdatedBacklogItemWhenStatusChanges(originalApiBacklogItem, newDataItem);
@@ -149,9 +155,9 @@ const patchBacklogItem = async (
         await dbBacklogItem.update(newDataItem, {
             transaction: handlerContext.transactionContext.transaction
         });
-        result = mapDbToApiBacklogItem(dbBacklogItem);
+        return mapDbToApiBacklogItem(dbBacklogItem);
     }
-    return result;
+    return originalApiBacklogItem;
 };
 
 const handleResponseWithUpdatedStatsAndCommit = async (

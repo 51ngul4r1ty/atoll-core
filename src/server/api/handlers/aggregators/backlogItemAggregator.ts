@@ -26,12 +26,12 @@ import { fetchPartAndSprintInfoForBacklogItem } from "../fetchers/sprintFetcher"
 // interfaces/types
 import type { RestApiErrorResult, RestApiItemResult } from "../../utils/responseBuilder";
 
-export type BacklogItemPartAndSprint = { part: ApiBacklogItemPart; sprint: ApiSprint };
+export type ApiBacklogItemPartAndSprint = { part: ApiBacklogItemPart; sprint: ApiSprint };
 
 export type BacklogItemWithSprintAllocationInfoExtra = {
     inProductBacklog: boolean;
     sprintIds: string[];
-    backlogItemPartsAndSprints: BacklogItemPartAndSprint[];
+    backlogItemPartsAndSprints: ApiBacklogItemPartAndSprint[];
 };
 
 export type BacklogItemWithSprintAllocationInfoResult = RestApiItemResult<ApiBacklogItem, BacklogItemWithSprintAllocationInfoExtra>;
@@ -63,7 +63,7 @@ export const fetchBacklogItemWithSprintAllocationInfo = async (
         } else {
             const backlogItemParts = sprintsResult.data.items.map((item) => item.backlogItemPart);
             const sprints = sprintsResult.data.items.map((item) => item.sprint || null);
-            const backlogItemPartsAndSprints: BacklogItemPartAndSprint[] = [];
+            const backlogItemPartsAndSprints: ApiBacklogItemPartAndSprint[] = [];
             if (sprints.length !== backlogItemParts.length) {
                 return buildInternalServerErrorResponse(
                     "Unexpected result- mismatching number of items: " +

@@ -85,6 +85,11 @@ export const getUpdatedBacklogItemPartWhenStatusChanges = (
 ): UpdatedBacklogItemPartResult => {
     let result = newItem;
     const originalItemToUse = !originalItem ? ({} as Partial<ApiBacklogItemPart>) : originalItem;
+    if (newItem.status === undefined) {
+        throw new Error(
+            "Unexpected condition - new item should provide status for getUpdatedBacklogItemPartWhenStatusChanges to work correctly"
+        );
+    }
     let changed = false;
     if (originalItemToUse.status !== result.status) {
         const statusTyped = mapApiStatusToBacklogItem(result.status);
