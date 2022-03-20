@@ -35,6 +35,10 @@ Heroku
     - Change directory to ATOLL_HEROKU_PATH
     - `npm i`
     - `npm start`
+    - Use browser to view app: `http://localhost:8500/app`
+    - NOTE: You may see "LOADING..." and the app doesn't load - if so, some changes may be needed
+      to get this working locally (perhaps the code has deviated too much since this was initially
+      implemented and it may only be possible to deploy to Heroku to see it functioning correctly)
 
 Deplyoment Notes
 ----------------
