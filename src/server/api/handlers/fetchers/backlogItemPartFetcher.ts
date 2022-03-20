@@ -47,8 +47,6 @@ export const fetchBacklogItemParts = async (
                 const result: ApiBacklogItemPart = {
                     ...backlogItemPart,
                     links: [
-                        // TODO: This link seems wrong... a part may not be allocated to a sprint, and this path will be invalid in that case
-                        //   see where this is used.
                         buildSelfLink(
                             backlogItemPart,
                             `/api/v1/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/${item.sprintId}/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`
