@@ -83,8 +83,6 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
                 const backlogItemPart = await addBacklogItemPart(handlerContext, dbBacklogItem);
 
                 addedBacklogItemPart = mapDbToApiBacklogItemPart(backlogItemPart);
-                // TODO: Add a check in this code to ensure that a backlogItemPart is not added to a sprint that already contains
-                // a part split from the same backlogItem.
                 const addToNextSprintResult = await addBacklogItemPartToNextSprint(
                     handlerContext,
                     addedBacklogItemPart.backlogitemId,
