@@ -22,12 +22,12 @@ import { combineMessages, combineStatuses } from "../../utils/resultAggregator";
 import { fetchSprints } from "../fetchers/sprintFetcher";
 import { fetchSprintBacklogItemsWithLinks, FetchedSprintBacklogItems } from "../fetchers/sprintBacklogItemFetcher";
 import { getLoggedInAppUserId } from "../../utils/authUtils";
-import { userPreferencesFetcher } from "../fetchers/userPreferencesFetcher";
+import { getUserPreferences } from "../fetchers/userPreferencesFetcher";
 import { logError } from "../utils/serverLogger";
 
 export const planViewBffGetHandler = async (req: Request, res: Response) => {
     try {
-        const userPreferencesResult = await userPreferencesFetcher("{self}", () => getLoggedInAppUserId(req));
+        const userPreferencesResult = await getUserPreferences("{self}", () => getLoggedInAppUserId(req));
         const selectedProjectId = (userPreferencesResult as UserPreferencesSuccessResponse).data.item.settings.selectedProject;
 
         const archived = "N";
