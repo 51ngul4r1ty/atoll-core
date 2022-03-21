@@ -76,7 +76,7 @@ create table backlogitempart
 tablespace pg_default;
 
 alter table backlogitempart
-    owner to atoll;
+    owner to atoll; -- change atoll to the heroku postgresql user account
 
 insert into backlogitempart
 select newuuid() as "id", substring("externalId" || '-1', 1, 30) as "externalId", id as "backlogitemId", 1 as "partIndex",
