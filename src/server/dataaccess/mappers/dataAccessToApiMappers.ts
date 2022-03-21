@@ -11,7 +11,8 @@ import {
     ApiSprint,
     ApiSprintBacklogItem,
     ApiUserSettings,
-    ApiBacklogItemWithParts
+    ApiBacklogItemWithParts,
+    cloneWithNested
 } from "@atoll/shared";
 
 // utils
@@ -213,7 +214,7 @@ export const mapDbToApiProjectSettings = (item: any): ApiProjectSettings => {
     if (!item) {
         return item;
     }
-    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
+    const dataValueFieldsOnly = cloneWithNested(item.dataValues);
     return {
         ...dataValueFieldsOnly
     };
