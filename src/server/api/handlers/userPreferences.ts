@@ -7,11 +7,11 @@ import type { RestApiErrorResult } from "../utils/responseBuilder";
 
 // utils
 import { getLoggedInAppUserId } from "../utils/authUtils";
-import { userPreferencesFetcher } from "./fetchers/userPreferencesFetcher";
+import { getUserPreferences } from "./fetchers/userPreferencesFetcher";
 
 export const userPreferencesHandler = async function (req: Request, res: Response) {
     const userId = req.params.userId || "";
-    const result = await userPreferencesFetcher(userId, () => getLoggedInAppUserId(req));
+    const result = await getUserPreferences(userId, () => getLoggedInAppUserId(req));
     if (result.status === HttpStatus.OK) {
         res.json(result);
     } else {

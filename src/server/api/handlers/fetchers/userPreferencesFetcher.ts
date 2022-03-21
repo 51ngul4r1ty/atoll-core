@@ -24,10 +24,7 @@ export type UserPreferencesResponse = RestApiErrorResult | UserPreferencesSucces
 
 export type UserPreferencesSuccessResponse = RestApiItemResult<ApiUserSettings, undefined, { original: ApiUserSettings }>;
 
-export const userPreferencesFetcher = async (
-    userId: string | null,
-    getLoggedInAppUserId: { () }
-): Promise<UserPreferencesResponse> => {
+export const getUserPreferences = async (userId: string | null, getLoggedInAppUserId: { () }): Promise<UserPreferencesResponse> => {
     try {
         if (userId !== "{self}") {
             return buildNotImplementedResponse(
