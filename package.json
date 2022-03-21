@@ -1,6 +1,6 @@
 {
   "name": "atoll",
-  "version": "0.41.3",
+  "version": "0.41.4",
   "author": {
     "name": "Kevin Berry",
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
@@ -90,7 +90,7 @@
     "redux-devtools-extension": "2.13.8",
     "redux-thunk": "2.3.0",
     "reselect": "4.0.0",
-    "sequelize": "6.6.2",
+    "sequelize": "6.6.5",
     "text-encoding-polyfill": "0.6.7",
     "url-parse": "1.4.7",
     "uuid": "7.0.2",

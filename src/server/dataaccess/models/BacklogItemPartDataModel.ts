@@ -20,9 +20,9 @@ export class BacklogItemPartDataModel extends Model {
     public startedAt!: Date | null;
     public finishedAt!: Date | null;
     public status: string | null;
-    public readonly createdAt!: Date;
-    public readonly updatedAt!: Date;
-    public readonly version: number;
+    readonly createdAt!: Date;
+    readonly updatedAt!: Date;
+    readonly version: number;
     constructor(...args) {
         super(...args);
         restoreSequelizeAttributesOnClass(new.target, this);
@@ -79,18 +79,6 @@ BacklogItemPartDataModel.init(
         status: {
             type: DataTypes.CHAR(1),
             allowNull: true
-        },
-        createdAt: {
-            type: DataTypes.DATE,
-            allowNull: false
-        },
-        updatedAt: {
-            type: DataTypes.DATE,
-            allowNull: false
-        },
-        version: {
-            type: DataTypes.INTEGER,
-            allowNull: false
         }
     },
     {
