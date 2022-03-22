@@ -13,7 +13,7 @@ Heroku
     two or more sequences of words that aren't in well known public documents - each individual
     phrase can come from public documents (for example, poems) but the combination should not
     appear pubicly.
-* Manual deploy steps (from local system) OR just use `npm run build-deploy`
+* Manual deploy steps (from local system) OR just use `npm run build` which will use `build-deploy`
   (from ATOLL_CORE_PATH folder):
   - Set up the heroku deploy folder (ATOLL_HEROKU_PATH) in a different location to the git repo
     folder (ATOLL_CORE_PATH) where you have "atoll-core" checked out to.
