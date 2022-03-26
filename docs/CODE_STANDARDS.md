@@ -4,6 +4,7 @@ Overview
 This document contains everything except:
 1) naming conventions, please refer to [CODE_STANDARDS_NAMING.md](CODE_STANDARDS_NAMING.md) for these details.
 2) test code standards, please refer to [CODE_STANDARDS_TESTS.md](CODE_STANDARDS_TESTS.md) for these details.
+3) specialized patterns, please refer to [CODE_STANDARDS_PATTERNS.md](CODE_STANDARDS_PATTERNS.md) for these details.
 
 File Purpose Comments
 =====================
