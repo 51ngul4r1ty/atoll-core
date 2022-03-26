@@ -1,6 +1,6 @@
 {
   "name": "atoll",
-  "version": "0.41.5",
+  "version": "0.41.6",
   "author": {
     "name": "Kevin Berry",
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
@@ -72,6 +72,7 @@
     "express": "4.17.1",
     "express-manifest-helpers": "0.6.0",
     "express-ws": "4.0.0",
+    "find-package-json": "1.2.0",
     "history": "4.10.1",
     "http-status-codes": "1.4.0",
     "i18next": "19.0.0",
