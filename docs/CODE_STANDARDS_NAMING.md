@@ -1,7 +1,7 @@
 Overview
 ========
 
-This document contains only naming conventions, pleas refer to
+This document contains only naming conventions, please refer to
 [CODE_STANDARDS.md](CODE_STANDARDS.md) for more code standards.
 
 General Naming
