@@ -185,3 +185,101 @@ Example: `API_GET_USER_PREFS_REQUEST: "app/api:get-user-prefs:request"`
   - `user-prefs` is the resource targeted
 * `request` is the stage, other values for stage are:
   `success` and `failure`
+
+Redux Selector Naming
+=====================
+
+Overview
+--------
+
+There are two types of selectors:
+1. Root state selectors
+2. State slice selectors
+
+Each of these selectors has slightly different rules because of how and where they are typically used.
+
+Naming
+------
+
+| Selector Type | Name Format  | Example                    |
+|---------------|--------------|----------------------------|
+| Root State    | select*      | selectBacklogItemById      |
+| State Slice   | sliceSelect* | sliceSelectBacklogItemById |
+
+Root State Selectors
+--------------------
+
+These selectors work with the root state object and can derive their results from multiple state slices that are produced
+by different reducers.  However, most typically they work with a single state slice.  These selectors are used wherever
+the root state is available (redux middleware, thunks, redux containers, etc.)
+
+file: ./selectors/backlogItemSelectors.ts
+```
+// selectors
+import * as backlogItemsSliceSelectors from "../reducers/backlogItems/backlogItemsSliceSelectors";
+
+...
+
+export const selectBacklogItemById = (state: StateTree, itemId: string): BacklogItem | null =>
+    backlogItemsSliceSelectors.sliceSelectBacklogItemById(state.backlogItems, itemId);
+
+```
+
+file: ./middleware/sprintBacklogItemMiddleware.ts
+```
+// selectors
+import * as backlogItemSelectors from "../selectors/backlogItemSelectors";
+
+...
+
+      const backlogItem = backlogItemSelectors.selectBacklogItemById(state, backlogItemId);
+      if (!backlogItem) {
+          throw new Error(`Unable to find backlog item with ID ${backlogItemId}`);
+      }
+
+```
+
+State Slice Selectors
+---------------------
+
+State slice selectors are used when only a subset of the data is available- one example is the reducer itself.  For the
+same reason we use root state selectors, it is valuable to use state slice selectors that encompass the same logic.
+Whenever a state slice selector is provided, the equivalent root state selector should use that same state slice selector
+so that refactoring them is coupled so the changes can be done to both simultaneously.
+
+file: ./reducers/backlogItems/backlogItemsSliceSelectors.ts
+```
+export const sliceSelectBacklogItemById = (backlogItems: BacklogItemsState, itemId: string): BacklogItemWithSource | null => {
+    const matchingItems = backlogItems.allItems.filter((item) => item.id === itemId);
+    if (matchingItems.length === 1) {
+        const matchingItem = matchingItems[0];
+        return matchingItem as BacklogItemWithSource;
+    } else {
+        return null;
+    }
+};
+```
+
+file: ./reducers/backlogItems/backlogItemsReducer.ts
+```
+// selectors
+import * as backlogItemsSliceSelectors from "./backlogItemsSliceSelectors";
+
+...
+
+    case ActionTypes.TOGGLE_BACKLOG_ITEM_DETAIL: {
+        const actionTyped = action as ToggleBacklogItemDetailAction;
+        draft.openedDetailMenuBacklogItemId = calcDropDownMenuState(
+            draft.openedDetailMenuBacklogItemId,
+            actionTyped.payload.itemId,
+            (itemId: string) => backlogItemsSliceSelectors.sliceSelectBacklogItemById(state, itemId),
+            (item) => item.pushState !== PushState.Removed
+        );
+        return;
+    }
+```
+
+References
+==========
+
+Some redux related code standards came from this page: https://redux.js.org/usage/deriving-data-selectors
