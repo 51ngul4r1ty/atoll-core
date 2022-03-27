@@ -1,6 +1,6 @@
 {
   "name": "atoll",
-  "version": "0.42.1",
+  "version": "0.41.8",
   "author": {
     "name": "Kevin Berry",
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
@@ -59,7 +59,7 @@
     "check:prereqs": "ts-node ./scripts/check-prereqs.ts"
   },
   "dependencies": {
-    "@atoll/shared": "0.41.7",
+    "@atoll/shared": "0.41.8",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.21.2",
