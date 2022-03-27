@@ -62,7 +62,7 @@
     "@atoll/shared": "file:.yalc/@atoll/shared",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
-    "axios": "0.19.2",
+    "axios": "0.21.2",
     "body-parser": "1.19.0",
     "chalk": "3.0.0",
     "connected-react-router": "6.8.0",
@@ -75,7 +75,7 @@
     "history": "4.10.1",
     "http-status-codes": "1.4.0",
     "i18next": "19.0.0",
-    "immer": "5.3.6",
+    "immer": "9.0.6",
     "jsonwebtoken": "8.5.1",
     "pg": "7.18.2",
     "pg-hstore": "2.3.3",
@@ -92,10 +92,10 @@
     "reselect": "4.0.0",
     "sequelize": "6.6.5",
     "text-encoding-polyfill": "0.6.7",
-    "url-parse": "1.4.7",
+    "url-parse": "1.5.9",
     "uuid": "7.0.2",
     "websocket": "1.0.31",
-    "ws": "7.2.3"
+    "ws": "7.4.6"
   },
   "devDependencies": {
     "@babel/cli": "7.10.1",
