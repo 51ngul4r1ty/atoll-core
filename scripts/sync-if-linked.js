@@ -9,13 +9,13 @@ const isWindows = () => {
 };
 
 const getNpmCmd = () => {
-    return isWindows ? "npm.cmd" : "npm";
+    return isWindows() ? "npm.cmd" : "npm";
 };
 
 if (fileContents.includes("file:.yalc/")) {
     console.log("package.json has a yalc file reference, sync'ing from @atoll/shared");
     const p = spawn(getNpmCmd(), ["run", "sync-quick"]);
-    p.on("exit", function(code) {
+    p.on("exit", function (code) {
         if (code !== 0) {
             console.error("`npm run sync-quick` failed with error code: " + code);
             process.exit(code);
