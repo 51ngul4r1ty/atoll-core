@@ -208,7 +208,6 @@ export const mapDbToApiCounter = (item: any): ApiCounter => {
     };
 };
 
-// TODO: Unit test this
 export const mapDbToApiProjectSettings = (item: any): ApiProjectSettings => {
     if (!item) {
         return item;
