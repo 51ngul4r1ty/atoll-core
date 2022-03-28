@@ -1,11 +1,26 @@
 // externals
 import { Model, DataTypes, Deferrable } from "sequelize";
 
+// utils
+import restoreSequelizeAttributesOnClass from "../sequelizeModelHelpers";
+
 // data access
 import { sequelize } from "../connection";
 import { BacklogItemDataModel } from "./BacklogItemDataModel";
 
-export class BacklogItemRankDataModel extends Model {}
+export class BacklogItemRankDataModel extends Model {
+    public id!: string;
+    public projectId!: string;
+    public backlogitemId!: string | null;
+    public nextbacklogitemId!: string | null;
+    readonly createdAt!: Date;
+    readonly updatedAt!: Date;
+    readonly version: number;
+    constructor(...args) {
+        super(...args);
+        restoreSequelizeAttributesOnClass(new.target, this);
+    }
+}
 
 BacklogItemRankDataModel.init(
     {

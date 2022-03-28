@@ -14,7 +14,7 @@ import {
 } from "@atoll/shared";
 
 // data access
-import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklogItemModel";
+import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklogItemDataModel";
 import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItemDataModel";
 
 // consts/enums

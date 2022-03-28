@@ -80,7 +80,7 @@ export const fetchBacklogItemsByDisplayId = async (
 ): Promise<BacklogItemsResult | RestApiErrorResult> => {
     try {
         const backlogItemsOptions = buildFindOptionsForBacklogItems({ projectId, externalId: backlogItemDisplayId });
-        const backlogItems = await BacklogItemDataModel.findAll(backlogItemsOptions);
+        const dbBacklogItemsByExternalId = await BacklogItemDataModel.findAll(backlogItemsOptions);
         const getBacklogItemsResult = (backlogItems) => {
             const items: ApiBacklogItem[] = backlogItems.map((item) => {
                 const result = buildApiItemFromDbItemWithParts(item);
@@ -88,12 +88,12 @@ export const fetchBacklogItemsByDisplayId = async (
             });
             return buildResponseWithItems(items);
         };
-        if (backlogItems.length >= 1) {
-            return getBacklogItemsResult(backlogItems);
+        if (dbBacklogItemsByExternalId.length >= 1) {
+            return getBacklogItemsResult(dbBacklogItemsByExternalId);
         } else {
             const options = buildOptionsFromParams({ projectId, friendlyId: backlogItemDisplayId });
-            const backlogItems = await BacklogItemDataModel.findAll(options);
-            return getBacklogItemsResult(backlogItems);
+            const dbBacklogItemsByFriendlyId = await BacklogItemDataModel.findAll(options);
+            return getBacklogItemsResult(dbBacklogItemsByFriendlyId);
         }
     } catch (error) {
         return buildResponseFromCatchError(error);
@@ -104,22 +104,22 @@ export const fetchBacklogItems = async (projectId: string | null): Promise<Backl
     try {
         const params = { projectId };
         const options = buildOptionsFromParams(params);
-        const backlogItemRanks = await BacklogItemRankDataModel.findAll(options);
+        const dbBacklogItemRanks = await BacklogItemRankDataModel.findAll(options);
         const rankList = new LinkedList<ApiBacklogItem>();
-        if (backlogItemRanks.length) {
-            const backlogItemRanksMapped = backlogItemRanks.map((item) => mapDbToApiBacklogItemRank(item));
+        if (dbBacklogItemRanks.length) {
+            const backlogItemRanksMapped = dbBacklogItemRanks.map((item) => mapDbToApiBacklogItemRank(item));
             backlogItemRanksMapped.forEach((item) => {
                 rankList.addInitialLink(item.backlogitemId, item.nextbacklogitemId);
             });
         }
         const backlogItemsOptions = buildFindOptionsForBacklogItems(params);
-        const backlogItems = await BacklogItemDataModel.findAll(backlogItemsOptions);
-        backlogItems.forEach((item) => {
-            const result = buildApiItemFromDbItemWithParts(item);
+        const dbBacklogItemsWithParts = await BacklogItemDataModel.findAll(backlogItemsOptions);
+        dbBacklogItemsWithParts.forEach((dbBacklogItemWithParts) => {
+            const result = buildApiItemFromDbItemWithParts(dbBacklogItemWithParts);
             rankList.addItemData(result.id, result);
         });
         return buildResponseWithItems(rankList.toArray());
     } catch (error) {
-        return buildResponseFromCatchError(error);
+        return buildResponseFromCatchError(error, { includeStack: true });
     }
 };

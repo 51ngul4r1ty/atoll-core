@@ -8,7 +8,10 @@ import { ApiBacklogItemInSprint } from "@atoll/shared";
 import { SPRINT_BACKLOG_PARENT_RESOURCE_NAME, SPRINT_BACKLOG_CHILD_RESOURCE_NAME } from "../../../resourceNames";
 
 // data access
-import { SprintBacklogItemDataModel, DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS } from "../../../dataaccess/models/SprintBacklogItemModel";
+import {
+    SprintBacklogItemDataModel,
+    DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS
+} from "../../../dataaccess/models/SprintBacklogItemDataModel";
 import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
 import { BacklogItemDataModel, DB_INCLUDE_BACKLOGITEM } from "../../../dataaccess/models/BacklogItemDataModel";
 

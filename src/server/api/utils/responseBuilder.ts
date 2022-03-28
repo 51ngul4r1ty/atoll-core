@@ -2,7 +2,7 @@
 import * as HttpStatus from "http-status-codes";
 
 // utils
-import { getMessageFromError } from "./errorUtils";
+import { getMessageFromError, getStackFromError } from "./errorUtils";
 import { isStatusError } from "./httpStatusHelper";
 
 export type RestApiStatusAndMessageOnly = {
@@ -10,7 +10,9 @@ export type RestApiStatusAndMessageOnly = {
     message?: string;
 };
 
-export type RestApiErrorResult = RestApiStatusAndMessageOnly;
+export type RestApiErrorResult = RestApiStatusAndMessageOnly & {
+    stack?: string;
+};
 
 export type RestApiBaseResult<T, U = undefined, V = undefined> = {
     status: number;
@@ -128,8 +130,18 @@ export const buildInternalServerErrorResponse = (message: string): RestApiErrorR
     };
 };
 
-export const buildResponseFromCatchError = (error: Error | string): RestApiErrorResult => {
-    return buildInternalServerErrorResponse(getMessageFromError(error));
+export type ErrorOptions = {
+    includeStack?: boolean;
+};
+
+export const buildResponseFromCatchError = (error: Error | string, errorOptions: ErrorOptions = {}): RestApiErrorResult => {
+    const message = getMessageFromError(error);
+    const result = buildInternalServerErrorResponse(message);
+    if (errorOptions.includeStack) {
+        const stack = getStackFromError(error);
+        result.stack = stack;
+    }
+    return result;
 };
 
 export const isRestApiErrorResult = (response: RestApiBaseResult<any> | RestApiErrorResult): response is RestApiErrorResult =>

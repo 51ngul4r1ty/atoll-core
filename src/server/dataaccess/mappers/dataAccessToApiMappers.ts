@@ -24,12 +24,10 @@ export const mapDbToApiBacklogItem = (item: any): ApiBacklogItem => {
     }
     const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
     const storyEstimate = convertDbFloatToNumber(item.dataValues.estimate);
-    const remainingPoints = convertDbFloatToNumber(item.dataValues.remainingPoints);
     const unallocatedPoints = convertDbFloatToNumber(item.dataValues.unallocatedPoints);
     return {
         ...dataValueFieldsOnly,
         estimate: storyEstimate,
-        remainingPoints,
         storyEstimate,
         unallocatedPoints,
         status: item.dataValues.status || "N"
@@ -210,6 +208,7 @@ export const mapDbToApiCounter = (item: any): ApiCounter => {
     };
 };
 
+// TODO: Unit test this
 export const mapDbToApiProjectSettings = (item: any): ApiProjectSettings => {
     if (!item) {
         return item;

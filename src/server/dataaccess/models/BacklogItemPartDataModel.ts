@@ -8,8 +8,6 @@ import restoreSequelizeAttributesOnClass from "../sequelizeModelHelpers";
 import { sequelize } from "../connection";
 import { BacklogItemDataModel } from "./BacklogItemDataModel";
 
-export const DB_INCLUDE_ALIAS_BACKLOGITEMPARTS = "backlogitemparts";
-
 export class BacklogItemPartDataModel extends Model {
     public id!: string;
     public externalId!: string | null;

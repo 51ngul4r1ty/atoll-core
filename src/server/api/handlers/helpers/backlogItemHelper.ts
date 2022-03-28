@@ -7,9 +7,13 @@
 import type { Includeable, IncludeOptions } from "sequelize";
 
 // data access
+import { DB_INCLUDE_ALIAS_BACKLOGITEMPARTS } from "../../../dataaccess/models/dataModelConsts";
 import { BacklogItemDataModel, SprintDataModel, DB_INCLUDE_ALIAS_SPRINT } from "../../../dataaccess";
-import { BacklogItemPartDataModel, DB_INCLUDE_ALIAS_BACKLOGITEMPARTS } from "../../../dataaccess/models/BacklogItemPartDataModel";
-import { SprintBacklogItemDataModel, DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS } from "../../../dataaccess/models/SprintBacklogItemModel";
+import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
+import {
+    SprintBacklogItemDataModel,
+    DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS
+} from "../../../dataaccess/models/SprintBacklogItemDataModel";
 
 // utils
 import { convertDbFloatToNumber } from "../../../dataaccess/conversionUtils";
