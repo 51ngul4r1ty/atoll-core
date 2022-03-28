@@ -4,6 +4,14 @@ module.exports = {
     verbose: true,
     collectCoverageFrom: ["src/**/*.{js,jsx,mjs,ts,tsx}"],
     coverageReporters: ["lcov", "text-summary"],
+    coverageThreshold: {
+        global: {
+            statements: 11.45,
+            branches: 7.12,
+            functions: 11.88,
+            lines: 11.45
+        }
+    },
     setupFiles: ["<rootDir>/node_modules/regenerator-runtime/runtime", "<rootDir>/config/polyfills.js"],
     setupFilesAfterEnv: ["<rootDir>config/jest/setup.js"],
     testMatch: ["<rootDir>/src/*.test.{js,jsx,mjs,ts,tsx}", "<rootDir>/src/**/*.test.{js,jsx,mjs,ts,tsx}"],
