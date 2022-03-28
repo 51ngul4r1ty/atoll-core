@@ -9,9 +9,13 @@ import { ApiBacklogItemPart, ApiSprint, isoDateStringToDate, Link } from "@atoll
 import { BACKLOG_ITEM_PART_RESOURCE_NAME, SPRINT_RESOURCE_NAME } from "../../../resourceNames";
 
 // data access
+import { DB_INCLUDE_ALIAS_BACKLOGITEMPARTS } from "../../../dataaccess/models/dataModelConsts";
 import { SprintDataModel, DB_INCLUDE_ALIAS_SPRINT } from "../../../dataaccess/models/SprintDataModel";
-import { SprintBacklogItemDataModel, DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS } from "../../../dataaccess/models/SprintBacklogItemModel";
-import { BacklogItemPartDataModel, DB_INCLUDE_ALIAS_BACKLOGITEMPARTS } from "../../../dataaccess/models/BacklogItemPartDataModel";
+import {
+    SprintBacklogItemDataModel,
+    DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS
+} from "../../../dataaccess/models/SprintBacklogItemDataModel";
+import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
 
 // interfaces/types

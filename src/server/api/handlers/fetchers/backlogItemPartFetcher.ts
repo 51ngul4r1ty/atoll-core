@@ -6,7 +6,7 @@ import { ApiBacklogItemPart } from "@atoll/shared";
 
 // data access
 import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
-import { DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS } from "../../../dataaccess/models/SprintBacklogItemModel";
+import { DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS } from "../../../dataaccess/models/SprintBacklogItemDataModel";
 
 // consts/enums
 import {

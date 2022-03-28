@@ -45,6 +45,7 @@ import {
 import { getUpdatedBacklogItemWhenStatusChanges } from "../utils/statusChangeUtils";
 import { isRestApiItemResult } from "../utils/responseBuilder";
 import { logError } from "./utils/serverLogger";
+import { logErrorInfoFromResponseObj } from "../utils/serverLogUtils";
 import { fetchBacklogItemWithSprintAllocationInfo } from "./aggregators/backlogItemAggregator";
 
 // interfaces/types
@@ -55,8 +56,6 @@ export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
     let result: BacklogItemsResult | RestApiStatusAndMessageOnly;
     if (params.projectId && params.backlogItemDisplayId) {
-        // TODO: It seems that this function doesn't return exactly the same data structure - it is missing unallocatedPoints
-        //   and unallocatedParts - I think?
         result = await fetchBacklogItemsByDisplayId(params.projectId, params.backlogItemDisplayId);
     } else {
         result = await fetchBacklogItems(params.projectId);
@@ -68,7 +67,7 @@ export const backlogItemsGetHandler = async (req: Request, res: Response) => {
             status: result.status,
             message: result.message
         });
-        console.log(`Unable to fetch backlog items: ${result.message}`);
+        logErrorInfoFromResponseObj(result, "backlog items", "Unable to fetch backlog items");
     }
 };
 

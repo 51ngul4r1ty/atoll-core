@@ -24,7 +24,6 @@ export class SprintBacklogItemDataModel extends Model {
     }
 }
 
-// TODO: Rename this SprintBacklogItemPartDataModel (because sprint used to contain backlog items, but now contains parts)
 SprintBacklogItemDataModel.init(
     {
         id: {

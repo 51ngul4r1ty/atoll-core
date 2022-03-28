@@ -29,7 +29,6 @@ const buildOptions = (): Options => {
             rejectUnauthorized: false
         };
     }
-    const ssl = !dbConfig.useSsl ? undefined : {};
     return options;
 };
 

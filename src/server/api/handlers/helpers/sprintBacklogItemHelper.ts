@@ -20,7 +20,10 @@ import {
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
 import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
 import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRankDataModel";
-import { SprintBacklogItemDataModel, DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS } from "../../../dataaccess/models/SprintBacklogItemModel";
+import {
+    SprintBacklogItemDataModel,
+    DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS
+} from "../../../dataaccess/models/SprintBacklogItemDataModel";
 
 // interfaces/types
 import { HandlerContext } from "../utils/handlerContext";
