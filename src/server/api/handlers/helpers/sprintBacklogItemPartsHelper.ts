@@ -21,7 +21,7 @@ import {
 // data access
 import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
-import { SprintBacklogItemDataModel } from "../../../dataaccess/models/SprintBacklogItemDataModel";
+import { SprintBacklogItemPartDataModel } from "../../../dataaccess/models/SprintBacklogItemPartDataModel";
 import { SprintDataModel } from "../../../dataaccess/models/SprintDataModel";
 
 // interfaces/types
@@ -37,7 +37,7 @@ import { fetchNextSprint } from "../fetchers/sprintFetcher";
 
 export const fetchSprintBacklogItemsWithNested = async (handlerContext: HandlerContext, sprintId: string) => {
     const options: FindOptions = { ...buildOptionsFromParams({ sprintId }), include: { all: true, nested: true } };
-    const sprintBacklogItems = await SprintBacklogItemDataModel.findAll({
+    const sprintBacklogItems = await SprintBacklogItemPartDataModel.findAll({
         ...options,
         order: [["displayindex", "ASC"]],
         transaction: handlerContext.transactionContext.transaction
@@ -112,7 +112,7 @@ export const addBacklogItemPart = async (
 };
 
 export interface AddBacklogItemPartToNextSprintResult {
-    sprintBacklogItem: SprintBacklogItemDataModel;
+    sprintBacklogItem: SprintBacklogItemPartDataModel;
     nextSprint: SprintDataModel;
 }
 
@@ -136,7 +136,7 @@ export const addBacklogItemPartToNextSprint = async (
         sprintId: nextSprintId,
         backlogitempartId: backlogitempartId
     };
-    const addedSprintBacklogItem = await SprintBacklogItemDataModel.create(newSprintBacklogItem, {
+    const addedSprintBacklogItem = await SprintBacklogItemPartDataModel.create(newSprintBacklogItem, {
         transaction: handlerContext.transactionContext.transaction
     });
     return {

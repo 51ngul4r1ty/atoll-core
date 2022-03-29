@@ -62,8 +62,8 @@ jest.mock("../../../../dataaccess/models/BacklogItemTagDataModel", () => ({
     }
 }));
 
-jest.mock("../../../../dataaccess/models/SprintBacklogItemDataModel", () => ({
-    SprintBacklogItemDataModel: {
+jest.mock("../../../../dataaccess/models/SprintBacklogItemPartDataModel", () => ({
+    SprintBacklogItemPartDataModel: {
         belongsTo: () => null
     }
 }));

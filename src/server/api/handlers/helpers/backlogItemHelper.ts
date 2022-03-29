@@ -7,13 +7,14 @@
 import type { Includeable, IncludeOptions } from "sequelize";
 
 // data access
-import { DB_INCLUDE_ALIAS_BACKLOGITEMPARTS } from "../../../dataaccess/models/dataModelConsts";
-import { BacklogItemDataModel, SprintDataModel, DB_INCLUDE_ALIAS_SPRINT } from "../../../dataaccess";
-import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
 import {
-    SprintBacklogItemDataModel,
+    DB_INCLUDE_ALIAS_BACKLOGITEMPARTS,
+    DB_INCLUDE_ALIAS_SPRINT,
     DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS
-} from "../../../dataaccess/models/SprintBacklogItemDataModel";
+} from "../../../dataaccess/models/dataModelConsts";
+import { BacklogItemDataModel, SprintDataModel } from "../../../dataaccess";
+import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
+import { SprintBacklogItemPartDataModel } from "../../../dataaccess/models/SprintBacklogItemPartDataModel";
 
 // utils
 import { convertDbFloatToNumber } from "../../../dataaccess/conversionUtils";
@@ -56,7 +57,7 @@ export const computeUnallocatedPointsUsingDbObjs = (
 
 export const buildBacklogItemFindOptionsIncludeForNested = (includeSprint: boolean = false): Includeable[] => {
     const sprintBacklogItemInclude: Includeable = {
-        model: SprintBacklogItemDataModel,
+        model: SprintBacklogItemPartDataModel,
         as: DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS
     } as IncludeOptions;
     const backlogItemPartsInclude: Includeable = {
@@ -79,7 +80,7 @@ export const buildBacklogItemFindOptionsIncludeForNested = (includeSprint: boole
 export const buildBacklogItemPartFindOptionsIncludeForNested = (): Includeable[] => {
     const result: Includeable[] = [
         {
-            model: SprintBacklogItemDataModel,
+            model: SprintBacklogItemPartDataModel,
             as: DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS,
             include: [
                 {

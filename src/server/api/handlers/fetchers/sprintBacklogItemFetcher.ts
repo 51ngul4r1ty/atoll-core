@@ -8,12 +8,10 @@ import { ApiBacklogItemInSprint } from "@atoll/shared";
 import { SPRINT_BACKLOG_PARENT_RESOURCE_NAME, SPRINT_BACKLOG_CHILD_RESOURCE_NAME } from "../../../resourceNames";
 
 // data access
-import {
-    SprintBacklogItemDataModel,
-    DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS
-} from "../../../dataaccess/models/SprintBacklogItemDataModel";
+import { DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS, DB_INCLUDE_ALIAS_BACKLOGITEM } from "../../../dataaccess/models/dataModelConsts";
+import { SprintBacklogItemPartDataModel } from "../../../dataaccess/models/SprintBacklogItemPartDataModel";
 import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
-import { BacklogItemDataModel, DB_INCLUDE_BACKLOGITEM } from "../../../dataaccess/models/BacklogItemDataModel";
+import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
 
 // utils
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
@@ -39,7 +37,7 @@ export const fetchSprintBacklogItemsWithLinks = async (
 ): Promise<FetchedSprintBacklogItems | RestApiErrorResult> => {
     try {
         const options = buildOptionsFromParams({ sprintId });
-        const sprintBacklogs = await SprintBacklogItemDataModel.findAll({
+        const sprintBacklogs = await SprintBacklogItemPartDataModel.findAll({
             ...options,
             include: { all: true, nested: true },
             order: [["displayindex", "ASC"]]
@@ -63,13 +61,13 @@ export const fetchSprintBacklogItemWithLinks = async (
             where: { backlogitemId: backlogItemId },
             include: [
                 {
-                    model: SprintBacklogItemDataModel,
+                    model: SprintBacklogItemPartDataModel,
                     as: DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS,
                     where: { sprintId }
                 },
                 {
                     model: BacklogItemDataModel,
-                    as: DB_INCLUDE_BACKLOGITEM,
+                    as: DB_INCLUDE_ALIAS_BACKLOGITEM,
                     where: { id: backlogItemId }
                 }
             ]
@@ -101,7 +99,7 @@ export const fetchSprintBacklogItemPartWithLinks = async (
 ): Promise<FetchedSprintBacklogItem | RestApiErrorResult> => {
     try {
         const options = buildOptionsFromParams({ sprintId, backlogitempartId: backlogItemPartId });
-        const sprintBacklogItems = await SprintBacklogItemDataModel.findAll({
+        const sprintBacklogItems = await SprintBacklogItemPartDataModel.findAll({
             ...options,
             include: { all: true, nested: true }
         });

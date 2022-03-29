@@ -9,12 +9,13 @@ import { ApiBacklogItemPart, ApiSprint, isoDateStringToDate, Link } from "@atoll
 import { BACKLOG_ITEM_PART_RESOURCE_NAME, SPRINT_RESOURCE_NAME } from "../../../resourceNames";
 
 // data access
-import { DB_INCLUDE_ALIAS_BACKLOGITEMPARTS } from "../../../dataaccess/models/dataModelConsts";
-import { SprintDataModel, DB_INCLUDE_ALIAS_SPRINT } from "../../../dataaccess/models/SprintDataModel";
 import {
-    SprintBacklogItemDataModel,
-    DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS
-} from "../../../dataaccess/models/SprintBacklogItemDataModel";
+    DB_INCLUDE_ALIAS_BACKLOGITEMPARTS,
+    DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS,
+    DB_INCLUDE_ALIAS_SPRINT
+} from "../../../dataaccess/models/dataModelConsts";
+import { SprintDataModel } from "../../../dataaccess/models/SprintDataModel";
+import { SprintBacklogItemPartDataModel } from "../../../dataaccess/models/SprintBacklogItemPartDataModel";
 import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
 
@@ -126,7 +127,7 @@ export const getIdForSprintContainingBacklogItemPart = async (
     backlogItemPartId: string,
     transaction?: Transaction
 ): Promise<string | null> => {
-    const dbSprintBacklogItem = await SprintBacklogItemDataModel.findOne({
+    const dbSprintBacklogItem = await SprintBacklogItemPartDataModel.findOne({
         where: { backlogitempartId: backlogItemPartId },
         transaction
     });
@@ -155,7 +156,7 @@ export const fetchSprintsForBacklogItem = async (
                 }
             ]
         };
-        const dbSbisWithSprintAndBacklogItem = await SprintBacklogItemDataModel.findAll(options);
+        const dbSbisWithSprintAndBacklogItem = await SprintBacklogItemPartDataModel.findAll(options);
         const items: ApiSprint[] = [];
         const sprintResourceBasePath = `/api/v1/${SPRINT_RESOURCE_NAME}/`;
         dbSbisWithSprintAndBacklogItem.forEach((dbSbiWithSprintAndBacklogItem) => {

@@ -9,9 +9,7 @@ import { SprintDataModel } from "./SprintDataModel";
 // utils
 import restoreSequelizeAttributesOnClass from "../sequelizeModelHelpers";
 
-export const DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS = "sprintbacklogitems";
-
-export class SprintBacklogItemDataModel extends Model {
+export class SprintBacklogItemPartDataModel extends Model {
     id: string;
     sprintId: string;
     backlogitempartId: string;
@@ -24,7 +22,7 @@ export class SprintBacklogItemDataModel extends Model {
     }
 }
 
-SprintBacklogItemDataModel.init(
+SprintBacklogItemPartDataModel.init(
     {
         id: {
             type: DataTypes.STRING(32),
@@ -70,8 +68,8 @@ SprintBacklogItemDataModel.init(
     }
 );
 
-BacklogItemPartDataModel.hasMany(SprintBacklogItemDataModel, { foreignKey: "backlogitempartId" });
-SprintBacklogItemDataModel.belongsTo(BacklogItemPartDataModel, { foreignKey: "backlogitempartId" });
+BacklogItemPartDataModel.hasMany(SprintBacklogItemPartDataModel, { foreignKey: "backlogitempartId" });
+SprintBacklogItemPartDataModel.belongsTo(BacklogItemPartDataModel, { foreignKey: "backlogitempartId" });
 
-SprintDataModel.hasMany(SprintBacklogItemDataModel, { foreignKey: "sprintId" });
-SprintBacklogItemDataModel.belongsTo(SprintDataModel, { foreignKey: "sprintId" });
+SprintDataModel.hasMany(SprintBacklogItemPartDataModel, { foreignKey: "sprintId" });
+SprintBacklogItemPartDataModel.belongsTo(SprintDataModel, { foreignKey: "sprintId" });
