@@ -5,8 +5,8 @@ import { FindOptions, Transaction } from "sequelize";
 import { ApiBacklogItemPart } from "@atoll/shared";
 
 // data access
+import { DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS } from "../../../dataaccess/models/dataModelConsts";
 import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
-import { DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS } from "../../../dataaccess/models/SprintBacklogItemDataModel";
 
 // consts/enums
 import {

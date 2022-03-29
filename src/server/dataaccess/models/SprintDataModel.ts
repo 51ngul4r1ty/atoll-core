@@ -7,8 +7,6 @@ import { sequelize } from "../connection";
 // utils
 import restoreSequelizeAttributesOnClass from "../sequelizeModelHelpers";
 
-export const DB_INCLUDE_ALIAS_SPRINT = "sprint";
-
 export class SprintDataModel extends Model {
     id: string;
     projectId: string | null;

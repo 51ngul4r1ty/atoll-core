@@ -8,7 +8,7 @@ import { hasBacklogItemAtLeastBeenAccepted, mapApiStatusToBacklogItem } from "@a
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
-import { BacklogItemDataModel, mapApiToDbSprint, SprintBacklogItemDataModel, SprintDataModel } from "../../dataaccess";
+import { BacklogItemDataModel, mapApiToDbSprint, SprintBacklogItemPartDataModel, SprintDataModel } from "../../dataaccess";
 
 // utils
 import { buildOptionsFromParams } from "../utils/sequelizeHelper";
@@ -27,7 +27,7 @@ export const sprintUpdateStatsPostHandler = async (req: Request, res: Response) 
     let transaction: Transaction;
     try {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        const sprintBacklogItems = await SprintBacklogItemDataModel.findAll({
+        const sprintBacklogItems = await SprintBacklogItemPartDataModel.findAll({
             ...options,
             include: [BacklogItemDataModel],
             order: [["displayindex", "ASC"]],

@@ -5,6 +5,7 @@ import { FindOptions } from "sequelize";
 import { ApiBacklogItem, LinkedList } from "@atoll/shared";
 
 // data access
+import { DB_INCLUDE_ALIAS_BACKLOGITEMPARTS } from "../../../dataaccess/models/dataModelConsts";
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
 import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRankDataModel";
 
@@ -36,7 +37,7 @@ export type BacklogItemResult = RestApiItemResult<ApiBacklogItem>;
 
 const buildApiItemFromDbItemWithParts = (dbItemWithParts: BacklogItemDataModel): ApiBacklogItem => {
     const backlogItem = mapDbToApiBacklogItem(dbItemWithParts);
-    const dbBacklogItemParts = (dbItemWithParts as any).backlogitemparts;
+    const dbBacklogItemParts = dbItemWithParts[DB_INCLUDE_ALIAS_BACKLOGITEMPARTS];
     backlogItem.unallocatedParts = computeUnallocatedParts(dbBacklogItemParts);
     backlogItem.unallocatedPoints = computeUnallocatedPointsUsingDbObjs(dbItemWithParts, dbBacklogItemParts);
     const result: ApiBacklogItem = {
@@ -74,6 +75,11 @@ export const fetchBacklogItem = async (backlogItemId: string): Promise<BacklogIt
     }
 };
 
+const buildBacklogItemsResult = (dbBacklogItems) => {
+    const items: ApiBacklogItem[] = dbBacklogItems.map((item) => buildApiItemFromDbItemWithParts(item));
+    return buildResponseWithItems(items);
+};
+
 export const fetchBacklogItemsByDisplayId = async (
     projectId: string,
     backlogItemDisplayId: string
@@ -81,20 +87,12 @@ export const fetchBacklogItemsByDisplayId = async (
     try {
         const backlogItemsOptions = buildFindOptionsForBacklogItems({ projectId, externalId: backlogItemDisplayId });
         const dbBacklogItemsByExternalId = await BacklogItemDataModel.findAll(backlogItemsOptions);
-        const getBacklogItemsResult = (backlogItems) => {
-            const items: ApiBacklogItem[] = backlogItems.map((item) => {
-                const result = buildApiItemFromDbItemWithParts(item);
-                return result;
-            });
-            return buildResponseWithItems(items);
-        };
         if (dbBacklogItemsByExternalId.length >= 1) {
-            return getBacklogItemsResult(dbBacklogItemsByExternalId);
-        } else {
-            const options = buildOptionsFromParams({ projectId, friendlyId: backlogItemDisplayId });
-            const dbBacklogItemsByFriendlyId = await BacklogItemDataModel.findAll(options);
-            return getBacklogItemsResult(dbBacklogItemsByFriendlyId);
+            return buildBacklogItemsResult(dbBacklogItemsByExternalId);
         }
+        const options = buildOptionsFromParams({ projectId, friendlyId: backlogItemDisplayId });
+        const dbBacklogItemsByFriendlyId = await BacklogItemDataModel.findAll(options);
+        return buildBacklogItemsResult(dbBacklogItemsByFriendlyId);
     } catch (error) {
         return buildResponseFromCatchError(error);
     }

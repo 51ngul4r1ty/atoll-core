@@ -14,7 +14,7 @@ import {
 } from "@atoll/shared";
 
 // data access
-import { SprintBacklogItemDataModel } from "../../dataaccess/models/SprintBacklogItemDataModel";
+import { SprintBacklogItemPartDataModel } from "../../dataaccess/models/SprintBacklogItemPartDataModel";
 import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItemDataModel";
 
 // consts/enums
@@ -156,7 +156,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res: Response) 
                 allocatedBacklogItemPartId = backlogItemPartAllocated.id;
             }
         }
-        let addedDbSprintBacklogItem: SprintBacklogItemDataModel;
+        let addedDbSprintBacklogItem: SprintBacklogItemPartDataModel;
         let sprintStats: ApiSprintStats;
         if (!hasRolledBack(handlerContext)) {
             if (joinSplitParts) {

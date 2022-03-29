@@ -2,7 +2,7 @@
 import { DB_INCLUDE_ALIAS_BACKLOGITEMPARTS } from "../../../../dataaccess/models/dataModelConsts";
 import type { BacklogItemPartDataModel } from "../../../../dataaccess/models/BacklogItemPartDataModel";
 import type { BacklogItemDataModel } from "../../../../dataaccess/models/BacklogItemDataModel";
-import type { SprintBacklogItemDataModel } from "../../../../dataaccess/models/SprintBacklogItemDataModel";
+import type { SprintBacklogItemPartDataModel } from "../../../../dataaccess/models/SprintBacklogItemPartDataModel";
 
 export type RelationData = {
     relation: string;
@@ -24,9 +24,9 @@ export const dataModelWithRelated = <T>(obj: T, relationData: RelationData): T =
     return result;
 };
 
-// #region SprintBacklogItemDataModel
-const mockDbSprintBacklogItem1 = mockBuildDataModelFromObj({} as SprintBacklogItemDataModel);
-const mockDbSprintBacklogItem2 = mockBuildDataModelFromObj({} as SprintBacklogItemDataModel);
+// #region SprintBacklogItemPartDataModel
+const mockDbSprintBacklogItem1 = mockBuildDataModelFromObj({} as SprintBacklogItemPartDataModel);
+const mockDbSprintBacklogItem2 = mockBuildDataModelFromObj({} as SprintBacklogItemPartDataModel);
 // #endregion
 
 export const MOCK_BACKLOG_ITEM_1_ID = "fake-backlog-item-id-1";
