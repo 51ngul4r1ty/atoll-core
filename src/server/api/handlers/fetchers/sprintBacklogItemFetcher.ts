@@ -32,9 +32,10 @@ import {
 export type FetchedSprintBacklogItems = RestApiCollectionResult<ApiBacklogItemInSprint>;
 export type FetchedSprintBacklogItem = RestApiItemResult<ApiBacklogItemInSprint>;
 
-export const fetchSprintBacklogItemsWithLinks = async (
-    sprintId: string | null
-): Promise<FetchedSprintBacklogItems | RestApiErrorResult> => {
+export type FetchedSprintBacklogs = FetchedSprintBacklogItems | RestApiErrorResult;
+export type FetchedSprintBacklog = FetchedSprintBacklogItem | RestApiErrorResult;
+
+export const fetchSprintBacklogItemsWithLinks = async (sprintId: string | null): Promise<FetchedSprintBacklogs> => {
     try {
         const options = buildOptionsFromParams({ sprintId });
         const sprintBacklogs = await SprintBacklogItemPartDataModel.findAll({
@@ -46,7 +47,8 @@ export const fetchSprintBacklogItemsWithLinks = async (
             const sprintBacklog = mapDbSprintBacklogWithNestedToApiBacklogItemInSprint(item);
             return buildBacklogItemPartForResponse(sprintId, sprintBacklog);
         });
-        return buildResponseWithItems(items);
+        const result: FetchedSprintBacklogItems = buildResponseWithItems(items);
+        return result;
     } catch (error) {
         return buildResponseFromCatchError(error);
     }
@@ -55,7 +57,7 @@ export const fetchSprintBacklogItemsWithLinks = async (
 export const fetchSprintBacklogItemWithLinks = async (
     sprintId: string | null,
     backlogItemId: string | null
-): Promise<FetchedSprintBacklogItem | RestApiErrorResult> => {
+): Promise<FetchedSprintBacklog> => {
     try {
         const options = {
             where: { backlogitemId: backlogItemId },
@@ -87,7 +89,8 @@ export const fetchSprintBacklogItemWithLinks = async (
         }
         const sprintBacklog = mapDbBacklogPartsWithSprintItemsToApiBacklogItemInSprint(dbBacklogItemPartsWithSprintItems[0]);
         const item = buildBacklogItemPartForResponse(sprintId, sprintBacklog);
-        return buildResponseWithItem(item);
+        const result: FetchedSprintBacklogItem = buildResponseWithItem(item);
+        return result;
     } catch (error) {
         return buildResponseFromCatchError(error);
     }
@@ -96,7 +99,7 @@ export const fetchSprintBacklogItemWithLinks = async (
 export const fetchSprintBacklogItemPartWithLinks = async (
     sprintId: string | null,
     backlogItemPartId: string | null
-): Promise<FetchedSprintBacklogItem | RestApiErrorResult> => {
+): Promise<FetchedSprintBacklog> => {
     try {
         const options = buildOptionsFromParams({ sprintId, backlogitempartId: backlogItemPartId });
         const sprintBacklogItems = await SprintBacklogItemPartDataModel.findAll({
@@ -116,7 +119,8 @@ export const fetchSprintBacklogItemPartWithLinks = async (
         }
         const sprintBacklog = mapDbSprintBacklogWithNestedToApiBacklogItemInSprint(sprintBacklogItems[0]);
         const item = buildBacklogItemPartForResponse(sprintId, sprintBacklog);
-        return buildResponseWithItem(item);
+        const result: FetchedSprintBacklogItem = buildResponseWithItem(item);
+        return result;
     } catch (error) {
         return buildResponseFromCatchError(error);
     }

@@ -6,7 +6,7 @@ import * as HttpStatus from "http-status-codes";
 import { mapApiItemsToSprints } from "@atoll/shared";
 
 // interfaces/types
-import type { UserPreferencesSuccessResponse } from "../fetchers/userPreferencesFetcher";
+import type { UserPreferencesItemResult } from "../fetchers/userPreferencesFetcher";
 
 // utils
 import { fetchBacklogItems } from "../fetchers/backlogItemFetcher";
@@ -28,7 +28,7 @@ import { logError } from "../utils/serverLogger";
 export const planViewBffGetHandler = async (req: Request, res: Response) => {
     try {
         const userPreferencesResult = await getUserPreferences("{self}", () => getLoggedInAppUserId(req));
-        const selectedProjectId = (userPreferencesResult as UserPreferencesSuccessResponse).data.item.settings.selectedProject;
+        const selectedProjectId = (userPreferencesResult as UserPreferencesItemResult).data.item.settings.selectedProject;
 
         const archived = "N";
         let [backlogItemsResult, sprintsResult] = await Promise.all([
@@ -61,7 +61,7 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
                     backlogItems: backlogItemsResult.data?.items,
                     sprints,
                     sprintBacklogItems: sprintBacklogItemsResult?.data?.items,
-                    userPreferences: (userPreferencesResult as UserPreferencesSuccessResponse).data?.item
+                    userPreferences: (userPreferencesResult as UserPreferencesItemResult).data?.item
                 })
             );
         } else {

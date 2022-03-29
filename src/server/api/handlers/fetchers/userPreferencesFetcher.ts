@@ -20,11 +20,11 @@ import {
     RestApiItemResult
 } from "../../utils/responseBuilder";
 
-export type UserPreferencesResponse = RestApiErrorResult | UserPreferencesSuccessResponse;
+export type UserPreferencesResult = RestApiErrorResult | UserPreferencesItemResult;
 
-export type UserPreferencesSuccessResponse = RestApiItemResult<ApiUserSettings, undefined, { original: ApiUserSettings }>;
+export type UserPreferencesItemResult = RestApiItemResult<ApiUserSettings, undefined, { original: ApiUserSettings }>;
 
-export const getUserPreferences = async (userId: string | null, getLoggedInAppUserId: { () }): Promise<UserPreferencesResponse> => {
+export const getUserPreferences = async (userId: string | null, getLoggedInAppUserId: { () }): Promise<UserPreferencesResult> => {
     try {
         if (userId !== "{self}") {
             return buildNotImplementedResponse(
@@ -37,7 +37,8 @@ export const getUserPreferences = async (userId: string | null, getLoggedInAppUs
             });
             if (userSettingsItem) {
                 const userSettingsItemTyped = mapDbToApiUserSettings(userSettingsItem);
-                return buildResponseWithItem(userSettingsItemTyped);
+                const result: UserPreferencesItemResult = buildResponseWithItem(userSettingsItemTyped);
+                return result;
             } else {
                 return buildNotFoundResponse("User settings object was not found for this user");
             }
