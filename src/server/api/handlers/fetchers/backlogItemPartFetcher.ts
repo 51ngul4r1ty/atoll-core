@@ -30,6 +30,23 @@ import { buildBacklogItemPartFindOptionsIncludeForNested } from "../helpers/back
 
 export type BacklogItemPartsResult = RestApiCollectionResult<ApiBacklogItemPart>;
 
+const buildBacklogItemPartsResult = (dbBacklogItemParts): BacklogItemPartsResult => {
+    const items = dbBacklogItemParts.map((item) => {
+        const backlogItemPart = mapDbToApiBacklogItemPart(item);
+        const result: ApiBacklogItemPart = {
+            ...backlogItemPart,
+            links: [
+                buildSelfLink(
+                    backlogItemPart,
+                    `/api/v1/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/${item.sprintId}/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`
+                )
+            ]
+        };
+        return result;
+    });
+    return buildResponseWithItems(items);
+};
+
 export const fetchBacklogItemParts = async (
     backlogItemId: string,
     transaction?: Transaction
@@ -41,23 +58,8 @@ export const fetchBacklogItemParts = async (
         }
         addWhereClauseToOptions(options, "backlogitemId", backlogItemId);
         const dbBacklogItemParts = await BacklogItemPartDataModel.findAll(options);
-        const getBacklogItemPartsResult = (dbBacklogItemParts) => {
-            const items = dbBacklogItemParts.map((item) => {
-                const backlogItemPart = mapDbToApiBacklogItemPart(item);
-                const result: ApiBacklogItemPart = {
-                    ...backlogItemPart,
-                    links: [
-                        buildSelfLink(
-                            backlogItemPart,
-                            `/api/v1/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/${item.sprintId}/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`
-                        )
-                    ]
-                };
-                return result;
-            });
-            return buildResponseWithItems(items);
-        };
-        return getBacklogItemPartsResult(dbBacklogItemParts);
+        const result: BacklogItemPartsResult = buildBacklogItemPartsResult(dbBacklogItemParts);
+        return result;
     } catch (error) {
         return buildResponseFromCatchError(error);
     }

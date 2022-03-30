@@ -11,18 +11,34 @@ import { ProjectDataModel } from "../../../dataaccess/models/ProjectDataModel";
 // consts/enums
 import { PROJECT_RESOURCE_NAME } from "../../../resourceNames";
 
+// interfaces/types
+import { RestApiCollectionResult, RestApiErrorResult } from "../../utils/responseBuilder";
+
 // utils
 import { buildResponseFromCatchError, buildResponseWithItem, buildResponseWithItems } from "../../utils/responseBuilder";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 import { mapDbToApiProject } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
-export interface ProjectsResult {
-    status: number;
-    data?: {
-        items: any[];
+export type ProjectItemsResult = RestApiCollectionResult<ApiProject>;
+
+export type ProjectsResult = ProjectItemsResult | RestApiErrorResult;
+
+const buildProjectsResult = (dbProjects): ProjectItemsResult => {
+    const items = dbProjects.map((item) => {
+        const project = mapDbToApiProject(item);
+        const result: ApiProject = {
+            ...project,
+            links: [buildSelfLink(project, `/api/v1/${PROJECT_RESOURCE_NAME}/`)]
+        };
+        return result;
+    });
+    return {
+        status: HttpStatus.OK,
+        data: {
+            items
+        }
     };
-    message?: string;
-}
+};
 
 export const projectByDisplayIdFetcher = async (projectDisplayId: string): Promise<ProjectsResult> => {
     try {
@@ -34,23 +50,8 @@ export const projectByDisplayIdFetcher = async (projectDisplayId: string): Promi
             }
         };
         const projects = await ProjectDataModel.findAll(options);
-        const getProjectsResult = (projects) => {
-            const items = projects.map((item) => {
-                const project = mapDbToApiProject(item);
-                const result: ApiProject = {
-                    ...project,
-                    links: [buildSelfLink(project, `/api/v1/${PROJECT_RESOURCE_NAME}/`)]
-                };
-                return result;
-            });
-            return {
-                status: HttpStatus.OK,
-                data: {
-                    items
-                }
-            };
-        };
-        return getProjectsResult(projects);
+        const result: ProjectItemsResult = buildProjectsResult(projects);
+        return result;
     } catch (error) {
         return buildResponseFromCatchError(error);
     }

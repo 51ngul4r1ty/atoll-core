@@ -30,7 +30,8 @@ import {
     buildResponseWithItem,
     buildResponseWithItems,
     RestApiCollectionResult,
-    RestApiErrorResult
+    RestApiErrorResult,
+    RestApiItemResult
 } from "../../utils/responseBuilder";
 import {
     mapDbToApiBacklogItemPart,
@@ -39,7 +40,20 @@ import {
 } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildBacklogItemFindOptionsIncludeForNested } from "../helpers/backlogItemHelper";
 
-export const fetchSprints = async (projectId: string | null, archived?: string | null) => {
+export type SprintItemsResult = RestApiCollectionResult<ApiSprint>;
+export type SprintsResult = SprintItemsResult | RestApiErrorResult;
+
+export type SprintItemResult = RestApiItemResult<ApiSprint>;
+export type SprintResult = SprintItemResult | RestApiErrorResult;
+
+export type PartAndSprintInfoForBacklogItem = {
+    sprint: ApiSprint;
+    backlogItemPart: ApiBacklogItemPart;
+};
+export type PartAndSprintInfoForBacklogItemItemResult = RestApiCollectionResult<PartAndSprintInfoForBacklogItem>;
+export type PartAndSprintInfoForBacklogItemsResult = PartAndSprintInfoForBacklogItemItemResult | RestApiErrorResult;
+
+export const fetchSprints = async (projectId: string | null, archived?: string | null): Promise<SprintsResult> => {
     try {
         const options = buildOptionsFromParams({ projectId, archived });
         options.order = [
@@ -62,13 +76,14 @@ export const fetchSprints = async (projectId: string | null, archived?: string |
             lastSprint = sprint;
             items.push(sprint);
         });
-        return buildResponseWithItems(items);
+        const result: SprintItemsResult = buildResponseWithItems(items);
+        return result;
     } catch (error) {
         return buildResponseFromCatchError(error);
     }
 };
 
-export const fetchSprint = async (sprintId: string) => {
+export const fetchSprint = async (sprintId: string): Promise<SprintResult> => {
     const handlerContext = null;
     try {
         const sprint = await SprintDataModel.findByPk(sprintId);
@@ -90,7 +105,8 @@ export const fetchSprint = async (sprintId: string) => {
             ...sprintItem,
             links
         };
-        return buildResponseWithItem(item);
+        const result: SprintItemResult = buildResponseWithItem(item);
+        return result;
     } catch (error) {
         return buildResponseFromCatchError(error);
     }
@@ -135,11 +151,7 @@ export const getIdForSprintContainingBacklogItemPart = async (
     return apiSprintBacklogItem ? apiSprintBacklogItem.sprintId : null;
 };
 
-export type FetchSprintsForBacklogItemResult = RestApiCollectionResult<ApiSprint>;
-
-export const fetchSprintsForBacklogItem = async (
-    backlogItemId: string | null
-): Promise<FetchSprintsForBacklogItemResult | RestApiErrorResult> => {
+export const fetchSprintsForBacklogItem = async (backlogItemId: string | null): Promise<SprintsResult> => {
     try {
         const backlogItemPartAlias = "backlogitempart";
         const sprintAlias = "sprint";
@@ -169,21 +181,16 @@ export const fetchSprintsForBacklogItem = async (
             items.push(sprint);
         });
 
-        return buildResponseWithItems(items);
+        const result: SprintItemsResult = buildResponseWithItems(items);
+        return result;
     } catch (error) {
         return buildResponseFromCatchError(error);
     }
 };
 
-export type PartAndSprintInfoForBacklogItem = {
-    sprint: ApiSprint;
-    backlogItemPart: ApiBacklogItemPart;
-};
-export type FetchPartAndSprintInfoForBacklogItemResult = RestApiCollectionResult<PartAndSprintInfoForBacklogItem>;
-
 export const fetchPartAndSprintInfoForBacklogItem = async (
     backlogItemId: string | null
-): Promise<FetchPartAndSprintInfoForBacklogItemResult | RestApiErrorResult> => {
+): Promise<PartAndSprintInfoForBacklogItemsResult> => {
     try {
         const includeSprint = true;
         const options = {
@@ -230,7 +237,8 @@ export const fetchPartAndSprintInfoForBacklogItem = async (
             }
         });
 
-        return buildResponseWithItems(items);
+        const result: PartAndSprintInfoForBacklogItemItemResult = buildResponseWithItems(items);
+        return result;
     } catch (error) {
         return buildResponseFromCatchError(error);
     }

@@ -18,31 +18,31 @@ import {
 // utils
 import { convertDbCharToBoolean, convertDbFloatToNumber } from "../conversionUtils";
 
-export const mapDbToApiBacklogItem = (item: any): ApiBacklogItem => {
-    if (!item) {
-        return item;
+export const mapDbToApiBacklogItem = (dbItem: any): ApiBacklogItem => {
+    if (!dbItem) {
+        return dbItem;
     }
-    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
-    const storyEstimate = convertDbFloatToNumber(item.dataValues.estimate);
-    const unallocatedPoints = convertDbFloatToNumber(item.dataValues.unallocatedPoints);
+    const dataValueFieldsOnly = cloneWithoutNested(dbItem.dataValues);
+    const storyEstimate = convertDbFloatToNumber(dbItem.dataValues.estimate);
+    const unallocatedPoints = convertDbFloatToNumber(dbItem.dataValues.unallocatedPoints);
     return {
         ...dataValueFieldsOnly,
         estimate: storyEstimate,
         storyEstimate,
         unallocatedPoints,
-        status: item.dataValues.status || "N"
+        status: dbItem.dataValues.status || "N"
     };
 };
 
-export const mapDbToApiBacklogItemWithParts = (item: any): ApiBacklogItemWithParts => {
-    if (!item) {
-        return item;
+export const mapDbToApiBacklogItemWithParts = (dbItem: any): ApiBacklogItemWithParts => {
+    if (!dbItem) {
+        return dbItem;
     }
-    let backlogItemParts: ApiBacklogItemPart[] = item.dataValues.backlogitemparts.map((itemDataValues) =>
+    let backlogItemParts: ApiBacklogItemPart[] = dbItem.dataValues.backlogitemparts.map((itemDataValues) =>
         mapDbDataValuesToApiBacklogItemPart(itemDataValues)
     );
     let result: ApiBacklogItemWithParts = {
-        ...mapDbToApiBacklogItem(item),
+        ...mapDbToApiBacklogItem(dbItem),
         backlogItemParts
     };
     return result;
@@ -59,46 +59,46 @@ export const mapDbDataValuesToApiBacklogItemPart = (itemDataValues: any): ApiBac
     };
 };
 
-export const mapDbToApiBacklogItemPart = (item: any): ApiBacklogItemPart => {
-    if (!item) {
-        return item;
+export const mapDbToApiBacklogItemPart = (dbItem: any): ApiBacklogItemPart => {
+    if (!dbItem) {
+        return dbItem;
     }
-    return mapDbDataValuesToApiBacklogItemPart(item.dataValues);
+    return mapDbDataValuesToApiBacklogItemPart(dbItem.dataValues);
 };
 
-export const mapDbToApiBacklogItemRank = (item: any): ApiBacklogItemRank => {
-    if (!item) {
-        return item;
+export const mapDbToApiBacklogItemRank = (dbItem: any): ApiBacklogItemRank => {
+    if (!dbItem) {
+        return dbItem;
     }
-    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
+    const dataValueFieldsOnly = cloneWithoutNested(dbItem.dataValues);
     return {
         ...dataValueFieldsOnly
     };
 };
 
-export const mapDbToApiSprint = (item: any): ApiSprint => {
-    if (!item) {
-        return item;
+export const mapDbToApiSprint = (dbItem: any): ApiSprint => {
+    if (!dbItem) {
+        return dbItem;
     }
-    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
+    const dataValueFieldsOnly = cloneWithoutNested(dbItem.dataValues);
     return {
         ...dataValueFieldsOnly,
-        acceptedPoints: convertDbFloatToNumber(item.dataValues.acceptedPoints),
-        archived: convertDbCharToBoolean(item.dataValues.archived),
-        plannedPoints: convertDbFloatToNumber(item.dataValues.plannedPoints),
-        remainingSplitPoints: convertDbFloatToNumber(item.dataValues.remainingSplitPoints),
-        totalPoints: convertDbFloatToNumber(item.dataValues.totalPoints),
-        usedSplitPoints: convertDbFloatToNumber(item.dataValues.usedSplitPoints),
-        velocityPoints: convertDbFloatToNumber(item.dataValues.velocityPoints)
+        acceptedPoints: convertDbFloatToNumber(dbItem.dataValues.acceptedPoints),
+        archived: convertDbCharToBoolean(dbItem.dataValues.archived),
+        plannedPoints: convertDbFloatToNumber(dbItem.dataValues.plannedPoints),
+        remainingSplitPoints: convertDbFloatToNumber(dbItem.dataValues.remainingSplitPoints),
+        totalPoints: convertDbFloatToNumber(dbItem.dataValues.totalPoints),
+        usedSplitPoints: convertDbFloatToNumber(dbItem.dataValues.usedSplitPoints),
+        velocityPoints: convertDbFloatToNumber(dbItem.dataValues.velocityPoints)
     };
 };
 
-export const mapDbSprintBacklogWithNestedToApiBacklogItemInSprint = (item: any): ApiBacklogItemInSprint => {
-    if (!item) {
-        return item;
+export const mapDbSprintBacklogWithNestedToApiBacklogItemInSprint = (dbItem: any): ApiBacklogItemInSprint => {
+    if (!dbItem) {
+        return dbItem;
     }
     const sprintBacklogWithItems = {
-        ...item.dataValues
+        ...dbItem.dataValues
     };
     const backlogitempart = sprintBacklogWithItems.backlogitempart?.dataValues;
     const backlogitem = backlogitempart?.backlogitem?.dataValues;
@@ -140,12 +140,12 @@ export const mapDbSprintBacklogWithNestedToApiBacklogItemInSprint = (item: any):
     return result;
 };
 
-export const mapDbBacklogPartsWithSprintItemsToApiBacklogItemInSprint = (item: any): ApiBacklogItemInSprint => {
-    if (!item) {
-        return item;
+export const mapDbBacklogPartsWithSprintItemsToApiBacklogItemInSprint = (dbItem: any): ApiBacklogItemInSprint => {
+    if (!dbItem) {
+        return dbItem;
     }
     const partsWithSprintItems = {
-        ...item.dataValues
+        ...dbItem.dataValues
     };
     const backlogitem = partsWithSprintItems?.backlogitem?.dataValues;
     const sprintbacklogitem = partsWithSprintItems?.sprintbacklogitems?.[0]?.dataValues;
@@ -187,53 +187,53 @@ export const mapDbBacklogPartsWithSprintItemsToApiBacklogItemInSprint = (item: a
     return result;
 };
 
-export const mapDbToApiSprintBacklogItem = (item: any): ApiSprintBacklogItem => {
-    if (!item) {
-        return item;
+export const mapDbToApiSprintBacklogItem = (dbItem: any): ApiSprintBacklogItem => {
+    if (!dbItem) {
+        return dbItem;
     }
 
-    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
+    const dataValueFieldsOnly = cloneWithoutNested(dbItem.dataValues);
     return {
         ...dataValueFieldsOnly
     };
 };
 
-export const mapDbToApiCounter = (item: any): ApiCounter => {
-    if (!item) {
-        return item;
+export const mapDbToApiCounter = (dbItem: any): ApiCounter => {
+    if (!dbItem) {
+        return dbItem;
     }
-    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
+    const dataValueFieldsOnly = cloneWithoutNested(dbItem.dataValues);
     return {
         ...dataValueFieldsOnly
     };
 };
 
-export const mapDbToApiProjectSettings = (item: any): ApiProjectSettings => {
-    if (!item) {
-        return item;
+export const mapDbToApiProjectSettings = (dbItem: any): ApiProjectSettings => {
+    if (!dbItem) {
+        return dbItem;
     }
-    const dataValueFieldsOnly = cloneWithNested(item.dataValues);
+    const dataValueFieldsOnly = cloneWithNested(dbItem.dataValues);
     return {
         ...dataValueFieldsOnly
     };
 };
 
-export const mapDbToApiUserSettings = (item: any): ApiUserSettings => {
-    if (!item) {
-        return item;
+export const mapDbToApiUserSettings = (dbItem: any): ApiUserSettings => {
+    if (!dbItem) {
+        return dbItem;
     }
-    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
+    const dataValueFieldsOnly = cloneWithoutNested(dbItem.dataValues);
     return {
         ...dataValueFieldsOnly,
-        settings: cloneWithoutNested(item.dataValues.settings)
+        settings: cloneWithoutNested(dbItem.dataValues.settings)
     };
 };
 
-export const mapDbToApiProject = (item: any): ApiProject => {
-    if (!item) {
-        return item;
+export const mapDbToApiProject = (dbItem: any): ApiProject => {
+    if (!dbItem) {
+        return dbItem;
     }
-    const dataValueFieldsOnly = cloneWithoutNested(item.dataValues);
+    const dataValueFieldsOnly = cloneWithoutNested(dbItem.dataValues);
     return {
         ...dataValueFieldsOnly
     };

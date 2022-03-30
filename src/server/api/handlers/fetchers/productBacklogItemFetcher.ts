@@ -12,7 +12,7 @@ import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItem
 import { BACKLOG_ITEM_RESOURCE_NAME } from "../../../resourceNames";
 
 // interfaces/types
-import type { RestApiCollectionResult, RestApiErrorResult } from "../../utils/responseBuilder";
+import type { RestApiErrorResult, RestApiItemResult } from "../../utils/responseBuilder";
 
 // utils
 import { mapDbToApiBacklogItem } from "../../../dataaccess/mappers/dataAccessToApiMappers";
@@ -30,15 +30,15 @@ import {
     buildResponseWithItem
 } from "../../utils/responseBuilder";
 
-export type ProductBacklogItemResult = RestApiCollectionResult<ApiBacklogItem>;
+export type ProductBacklogItemResult = RestApiItemResult<ApiBacklogItem>;
+
+export type ProductBacklogsResult = ProductBacklogItemResult | RestApiErrorResult;
 
 /**
  * Looks for the item in the product backlog - even if the work item itself exists it must be present in the product backlog
  * specifically for this function to return it.
  */
-export const fetchProductBacklogItemById = async (
-    backlogItemId: string
-): Promise<ProductBacklogItemResult | RestApiErrorResult> => {
+export const fetchProductBacklogItemById = async (backlogItemId: string): Promise<ProductBacklogsResult> => {
     try {
         const options = buildOptionsFromParams({ backlogitemId: backlogItemId });
         const backlogItemRanks = await BacklogItemRankDataModel.findAll(options);
@@ -61,7 +61,8 @@ export const fetchProductBacklogItemById = async (
             ...backlogItem,
             links: [buildSelfLink(backlogItem, `/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/`)]
         };
-        return buildResponseWithItem(item);
+        const result: ProductBacklogItemResult = buildResponseWithItem(item);
+        return result;
     } catch (error) {
         return buildResponseFromCatchError(error);
     }

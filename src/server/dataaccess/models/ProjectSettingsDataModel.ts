@@ -4,7 +4,11 @@ import { Model, DataTypes, Deferrable } from "sequelize";
 // data access
 import { sequelize } from "../connection";
 
-export class ProjectSettingsDataModel extends Model {}
+export class ProjectSettingsDataModel extends Model {
+    public id!: string;
+    public projectId!: string;
+    public settings!: any;
+}
 
 ProjectSettingsDataModel.init(
     {
@@ -20,14 +24,14 @@ ProjectSettingsDataModel.init(
                 key: "id",
                 deferrable: Deferrable.INITIALLY_DEFERRED as any
             },
-            get: function() {
+            get: function () {
                 return this.getDataValue("projectId");
             }
         },
         settings: {
             type: DataTypes.JSON,
             allowNull: false,
-            get: function() {
+            get: function () {
                 return this.getDataValue("settings");
             }
         }
