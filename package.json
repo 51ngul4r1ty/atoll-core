@@ -7,8 +7,8 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=10.15.3 <13.0.0",
-    "npm": ">=6.10.1"
+    "node": ">=16.14.0",
+    "npm": ">=8.3.1"
   },
   "scripts": {
     "analyze": "npm run build:with-stats && npm run start:analyzer",
@@ -59,7 +59,7 @@
     "check:prereqs": "ts-node ./scripts/check-prereqs.ts"
   },
   "dependencies": {
-    "@atoll/shared": "0.42.2",
+    "@atoll/shared": "0.42.4",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.21.2",
