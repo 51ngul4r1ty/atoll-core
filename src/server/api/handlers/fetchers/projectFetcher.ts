@@ -11,28 +11,20 @@ import { ProjectDataModel } from "../../../dataaccess/models/ProjectDataModel";
 // consts/enums
 import { PROJECT_RESOURCE_NAME } from "../../../resourceNames";
 
+// interfaces/types
+import { RestApiCollectionResult, RestApiErrorResult } from "../../utils/responseBuilder";
+
 // utils
-import {
-    buildResponseFromCatchError,
-    buildResponseWithItem,
-    buildResponseWithItems,
-    RestApiErrorResult
-} from "../../utils/responseBuilder";
+import { buildResponseFromCatchError, buildResponseWithItem, buildResponseWithItems } from "../../utils/responseBuilder";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 import { mapDbToApiProject } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
-export type ProjectItemsResult = {
-    status: number;
-    data?: {
-        items: any[];
-    };
-    message?: string;
-};
+export type ProjectItemsResult = RestApiCollectionResult<ApiProject>;
 
 export type ProjectsResult = ProjectItemsResult | RestApiErrorResult;
 
-const buildProjectsResult = (projects) => {
-    const items = projects.map((item) => {
+const buildProjectsResult = (dbProjects): ProjectItemsResult => {
+    const items = dbProjects.map((item) => {
         const project = mapDbToApiProject(item);
         const result: ApiProject = {
             ...project,

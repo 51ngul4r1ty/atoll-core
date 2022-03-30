@@ -7,6 +7,8 @@ import { mapApiItemsToSprints } from "@atoll/shared";
 
 // interfaces/types
 import type { UserPreferencesItemResult } from "../fetchers/userPreferencesFetcher";
+import type { SprintBacklogItemsResult } from "../fetchers/sprintBacklogItemFetcher";
+import type { RestApiCollectionResult, RestApiErrorResult } from "../../utils/responseBuilder";
 
 // utils
 import { fetchBacklogItems } from "../fetchers/backlogItemFetcher";
@@ -14,13 +16,11 @@ import {
     buildResponseFromCatchError,
     buildResponseWithData,
     isRestApiCollectionResult,
-    isRestApiItemResult,
-    RestApiCollectionResult,
-    RestApiErrorResult
+    isRestApiItemResult
 } from "../../utils/responseBuilder";
 import { combineMessages, combineStatuses } from "../../utils/resultAggregator";
 import { fetchSprints } from "../fetchers/sprintFetcher";
-import { fetchSprintBacklogItemsWithLinks, FetchedSprintBacklogItems } from "../fetchers/sprintBacklogItemFetcher";
+import { fetchSprintBacklogItemsWithLinks } from "../fetchers/sprintBacklogItemFetcher";
 import { getLoggedInAppUserId } from "../../utils/authUtils";
 import { getUserPreferences } from "../fetchers/userPreferencesFetcher";
 import { logError } from "../utils/serverLogger";
@@ -37,7 +37,7 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
         ]);
         const sprintsSuccessResult = sprintsResult as RestApiCollectionResult<any>;
         let sprints = sprintsSuccessResult.data ? sprintsSuccessResult.data?.items : [];
-        let sprintBacklogItemsResult: FetchedSprintBacklogItems | RestApiErrorResult;
+        let sprintBacklogItemsResult: SprintBacklogItemsResult | RestApiErrorResult;
         let sprintBacklogItemsStatus = HttpStatus.OK;
         let sprintBacklogItemsMessage = "";
         if (sprints.length) {
