@@ -22,7 +22,7 @@ export const backlogItemViewBffGetHandler = async (req: Request, res: Response) 
         logError(`backlogItemViewBffGetHandler: ${projectFetchResult.message} (error retrieving project)`);
         return;
     }
-    if (!projectFetchResult || projectFetchResult.data?.items?.length || 0 === 0) {
+    if (!projectFetchResult || (projectFetchResult.data?.items?.length || 0) === 0) {
         respondWithNotFound(res, `No matching project with display ID "${projectDisplayId}" found.`);
         return;
     } else if (projectFetchResult.data.items.length > 1) {
