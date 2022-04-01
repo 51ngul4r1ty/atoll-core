@@ -13,14 +13,14 @@ import * as backlogItemViewBff from "../backlogItemViewBff";
 
 // interfaces/types
 import type { ProjectItemsResult } from "../../fetchers/projectFetcher";
+import type { BacklogItemsResult } from "../../fetchers/backlogItemFetcher";
+import type { BacklogItemWithSprintAllocationInfoResult } from "../../aggregators/backlogItemAggregator";
 
 // mock related
 import * as filterHelper from "../../../utils/filterHelper";
 import * as projectFetcher from "../../fetchers/projectFetcher";
 import * as backlogItemFetcher from "../../fetchers/backlogItemFetcher";
 import * as backlogItemAggregator from "../../aggregators/backlogItemAggregator";
-import { BacklogItemsResult } from "../../fetchers/backlogItemFetcher";
-import { BacklogItemWithSprintAllocationInfoResult } from "../../aggregators/backlogItemAggregator";
 
 describe("Backlog Item View BFF Handler", () => {
     describe("backlogItemViewBffGetHandler", () => {
