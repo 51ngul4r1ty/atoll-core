@@ -99,8 +99,11 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
                     apiBacklogItemForAddedPart,
                     addedBacklogItemPart
                 );
-
-                await updateBacklogItemWithPartCount(handlerContext, backlogItemId, addedBacklogItemPart.partIndex);
+                const totalParts = addedBacklogItemPart.partIndex;
+                await updateBacklogItemWithPartCount(handlerContext, backlogItemId, totalParts);
+                // NOTE: We could make a database call to get the latest data, but it makes no sense here because we already have
+                //   the backlog item object- so just update the totalParts and return it because this is more efficient.
+                apiBacklogItemForAddedPart.totalParts = totalParts;
             }
         }
 
