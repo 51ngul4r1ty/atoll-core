@@ -91,17 +91,6 @@ export const sprintBacklogItemGetHandler = async (req: Request, res: Response) =
     }
 };
 
-export const sprintBacklogItemPartGetHandler = async (req: Request, res: Response) => {
-    const params = getParamsFromRequest(req);
-    const result = await fetchSprintBacklogItemPartWithLinks(params.sprintId, params.backlogItemPartId);
-    if (isRestApiItemResult(result)) {
-        res.json(result);
-    } else {
-        res.status(result.status).json(result);
-        console.log(`Unable to fetch sprintBacklogItemPart: ${result.message}`);
-    }
-};
-
 export const sprintBacklogItemPostHandler = async (req: Request, res: Response) => {
     const handlerContext = start("sprintBacklogItemPostHandler", res);
 

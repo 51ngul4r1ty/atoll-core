@@ -38,6 +38,19 @@ import {
     mapDbToApiSprint,
     mapDbToApiSprintBacklogItem
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
+import { fetchSprintBacklogItemPartWithLinks } from "./fetchers/sprintBacklogItemFetcher";
+import { isRestApiItemResult } from "../utils/responseBuilder";
+
+export const sprintBacklogItemPartGetHandler = async (req: Request, res: Response) => {
+    const params = getParamsFromRequest(req);
+    const result = await fetchSprintBacklogItemPartWithLinks(params.sprintId, params.backlogItemPartId);
+    if (isRestApiItemResult(result)) {
+        res.json(result);
+    } else {
+        res.status(result.status).json(result);
+        console.log(`Unable to fetch sprintBacklogItemPart: ${result.message}`);
+    }
+};
 
 /**
  * Split a backlog item from current sprint into next sprint (by adding an additional part to it).

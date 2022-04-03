@@ -17,6 +17,9 @@ import {
     SPRINT_RESOURCE_NAME
 } from "../resourceNames";
 
+// utils
+import { setupRoutes, setupNoAuthRoutes } from "./utils/routerHelper";
+
 // handlers
 import {
     backlogItemsDeleteHandler,
@@ -39,16 +42,12 @@ import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
 import { userPreferencesHandler } from "./handlers/userPreferences";
 import { loginPostHandler, refreshTokenPostHandler } from "./handlers/auth";
-import { sprintBacklogItemPartsPostHandler } from "./handlers/sprintBacklogItemParts";
-
-// utils
-import { setupRoutes, setupNoAuthRoutes } from "./utils/routerHelper";
+import { sprintBacklogItemPartGetHandler, sprintBacklogItemPartsPostHandler } from "./handlers/sprintBacklogItemParts";
 import { planViewBffGetHandler } from "./handlers/views/planViewBff";
 import {
     sprintBacklogItemDeleteHandler,
     sprintBacklogItemsGetHandler,
     sprintBacklogItemPostHandler,
-    sprintBacklogItemPartGetHandler,
     sprintBacklogItemGetHandler
 } from "./handlers/sprintBacklogItems";
 import { sprintUpdateStatsPostHandler } from "./handlers/sprintUpdateStats";
