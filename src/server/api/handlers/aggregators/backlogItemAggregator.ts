@@ -6,6 +6,7 @@
 
 // externals
 import * as HttpStatus from "http-status-codes";
+import { Transaction } from "sequelize";
 
 // libraries
 import type { ApiBacklogItem, ApiBacklogItemPart, ApiSprint } from "@atoll/shared";
@@ -37,14 +38,15 @@ export type BacklogItemWithSprintAllocationInfoExtra = {
 export type BacklogItemWithSprintAllocationInfoResult = RestApiItemResult<ApiBacklogItem, BacklogItemWithSprintAllocationInfoExtra>;
 
 export const fetchBacklogItemWithSprintAllocationInfo = async (
-    backlogItemId: string
+    backlogItemId: string,
+    transaction?: Transaction
 ): Promise<BacklogItemWithSprintAllocationInfoResult | RestApiErrorResult> => {
-    const backlogItemFetchResult = await fetchBacklogItem(backlogItemId);
+    const backlogItemFetchResult = await fetchBacklogItem(backlogItemId, transaction);
     if (backlogItemFetchResult.status === HttpStatus.NOT_FOUND) {
         return buildNotFoundResponse(backlogItemFetchResult.message);
     } else if (isRestApiItemResult(backlogItemFetchResult)) {
         const item = backlogItemFetchResult.data.item;
-        const productBacklogItem = await fetchProductBacklogItemById(backlogItemId);
+        const productBacklogItem = await fetchProductBacklogItemById(backlogItemId, transaction);
         let inProductBacklog: boolean;
         if (productBacklogItem.status === HttpStatus.OK) {
             inProductBacklog = true;
@@ -55,7 +57,7 @@ export const fetchBacklogItemWithSprintAllocationInfo = async (
             const errorResponse = buildInternalServerErrorResponse(error);
             return errorResponse;
         }
-        const sprintsResult = await fetchPartAndSprintInfoForBacklogItem(backlogItemId);
+        const sprintsResult = await fetchPartAndSprintInfoForBacklogItem(backlogItemId, transaction);
         if (!isRestApiCollectionResult(sprintsResult)) {
             const error = `Error retrieving sprints for backlog item ID ${backlogItemId}: ${sprintsResult.message}`;
             const errorResponse = buildInternalServerErrorResponse(error);

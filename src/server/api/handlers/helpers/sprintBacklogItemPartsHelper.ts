@@ -4,7 +4,7 @@
  */
 
 // externals
-import { FindOptions } from "sequelize";
+import { CreateOptions, FindOptions, Transaction } from "sequelize";
 
 // libraries
 import {
@@ -24,24 +24,24 @@ import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemData
 import { SprintBacklogItemPartDataModel } from "../../../dataaccess/models/SprintBacklogItemPartDataModel";
 import { SprintDataModel } from "../../../dataaccess/models/SprintDataModel";
 
-// interfaces/types
-import { HandlerContext } from "../utils/handlerContext";
-
 // utils
-import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
+import { buildOptionsFromParams, buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
 import { mapApiToDbBacklogItemPart } from "../../../dataaccess/mappers/apiToDataAccessMappers";
 import { addIdToBody, getSimpleUuid } from "../../utils/uuidHelper";
 import { buildNewSprintStats, buildSprintStatsFromApiSprint } from "./sprintStatsHelper";
 import { fetchSprintBacklogItemsPartByItemId } from "./sprintBacklogItemHelper";
 import { fetchNextSprint } from "../fetchers/sprintFetcher";
 
-export const fetchSprintBacklogItemsWithNested = async (handlerContext: HandlerContext, sprintId: string) => {
-    const options: FindOptions = { ...buildOptionsFromParams({ sprintId }), include: { all: true, nested: true } };
-    const sprintBacklogItems = await SprintBacklogItemPartDataModel.findAll({
-        ...options,
-        order: [["displayindex", "ASC"]],
-        transaction: handlerContext.transactionContext.transaction
-    });
+export const fetchSprintBacklogItemsWithNested = async (sprintId: string, transaction?: Transaction) => {
+    const baseOptions: FindOptions = { ...buildOptionsFromParams({ sprintId }), include: { all: true, nested: true } };
+    const options = buildOptionsWithTransaction(
+        {
+            ...baseOptions,
+            order: [["displayindex", "ASC"]]
+        },
+        transaction
+    );
+    const sprintBacklogItems = await SprintBacklogItemPartDataModel.findAll(options);
     return sprintBacklogItems;
 };
 
@@ -73,11 +73,14 @@ export const filterAndReturnDbBacklogItemAndSprint = (
     return { dbBacklogItem, dbSprint };
 };
 
-export const fetchBacklogItemPartsMaxPartIndex = async (backlogItemId: string, handlerContext: HandlerContext): Promise<number> => {
-    const allBacklogItemParts = await BacklogItemPartDataModel.findAll({
-        where: { backlogitemId: backlogItemId },
-        transaction: handlerContext.transactionContext.transaction
-    });
+export const fetchBacklogItemPartsMaxPartIndex = async (backlogItemId: string, transaction?: Transaction): Promise<number> => {
+    const options = buildOptionsWithTransaction(
+        {
+            where: { backlogitemId: backlogItemId }
+        },
+        transaction
+    );
+    const allBacklogItemParts = await BacklogItemPartDataModel.findAll(options);
     let maxPartIndex: number = 0;
     allBacklogItemParts.forEach((item) => {
         if (item.partIndex > maxPartIndex) {
@@ -88,10 +91,10 @@ export const fetchBacklogItemPartsMaxPartIndex = async (backlogItemId: string, h
 };
 
 export const addBacklogItemPart = async (
-    handlerContext: HandlerContext,
-    backlogItem: BacklogItemDataModel
+    backlogItem: BacklogItemDataModel,
+    transaction?: Transaction
 ): Promise<BacklogItemPartDataModel> => {
-    const maxPartIndex = await fetchBacklogItemPartsMaxPartIndex(backlogItem.id, handlerContext);
+    const maxPartIndex = await fetchBacklogItemPartsMaxPartIndex(backlogItem.id, transaction);
     const percentage = 20; // Apply the default rule that there's often 20% of the work remaining (unless estimate was off)
     const newApiBacklogItemPart: ApiBacklogItemPart = {
         id: null,
@@ -105,9 +108,11 @@ export const addBacklogItemPart = async (
         status: "N" /* this part has not been started yet */
     };
     const newBacklogItemPart = mapApiToDbBacklogItemPart({ ...addIdToBody(newApiBacklogItemPart), version: 0 });
-    const addedBacklogItemPart = await BacklogItemPartDataModel.create(newBacklogItemPart, {
-        transaction: handlerContext.transactionContext.transaction
-    });
+    const options: CreateOptions = {};
+    if (transaction) {
+        options.transaction = transaction;
+    }
+    const addedBacklogItemPart = await BacklogItemPartDataModel.create(newBacklogItemPart, options);
     return addedBacklogItemPart;
 };
 
@@ -117,14 +122,14 @@ export interface AddBacklogItemPartToNextSprintResult {
 }
 
 export const addBacklogItemPartToNextSprint = async (
-    handlerContext: HandlerContext,
     backlogitemId: string,
     backlogitempartId: string,
-    currentSprintStartDate: Date
+    currentSprintStartDate: Date,
+    transaction?: Transaction
 ): Promise<AddBacklogItemPartToNextSprintResult> => {
-    const nextSprint = await fetchNextSprint(handlerContext, currentSprintStartDate);
+    const nextSprint = await fetchNextSprint(currentSprintStartDate, transaction);
     const nextSprintId = nextSprint.id;
-    const backlogItemParts = await fetchSprintBacklogItemsPartByItemId(handlerContext, nextSprintId, backlogitemId);
+    const backlogItemParts = await fetchSprintBacklogItemsPartByItemId(nextSprintId, backlogitemId, transaction);
     if (backlogItemParts.length > 0) {
         throw new Error(
             `Unable to add backlog item part to next sprint because parts already exist ` +
@@ -136,9 +141,11 @@ export const addBacklogItemPartToNextSprint = async (
         sprintId: nextSprintId,
         backlogitempartId: backlogitempartId
     };
-    const addedSprintBacklogItem = await SprintBacklogItemPartDataModel.create(newSprintBacklogItem, {
-        transaction: handlerContext.transactionContext.transaction
-    });
+    const createOptions: CreateOptions = {};
+    if (transaction) {
+        createOptions.transaction = transaction;
+    }
+    const addedSprintBacklogItem = await SprintBacklogItemPartDataModel.create(newSprintBacklogItem, createOptions);
     return {
         sprintBacklogItem: addedSprintBacklogItem,
         nextSprint
@@ -146,10 +153,10 @@ export const addBacklogItemPartToNextSprint = async (
 };
 
 export const updateNextSprintStats = async (
-    handlerContext: HandlerContext,
     apiNextSprint: ApiSprint,
     backlogItem: ApiBacklogItem,
-    backlogItemPart: ApiBacklogItemPart
+    backlogItemPart: ApiBacklogItemPart,
+    transaction?: Transaction
 ): Promise<ApiSprintStats> => {
     const nextSprint = mapApiItemToSprint(apiNextSprint);
 
@@ -171,34 +178,40 @@ export const updateNextSprintStats = async (
         backlogItemStatus
     );
     const sprintStats = newSprintStatsResult.sprintStats;
+    const options = buildOptionsWithTransaction(
+        {
+            where: {
+                id: nextSprint.id
+            }
+        },
+        transaction
+    );
     await SprintDataModel.update(
         {
             ...sprintStats
         },
-        {
-            where: {
-                id: nextSprint.id
-            },
-            transaction: handlerContext.transactionContext.transaction
-        }
+        options
     );
     return sprintStats;
 };
 
 export const updateBacklogItemWithPartCount = async (
-    handlerContext: HandlerContext,
     backlogItemId: string,
-    newTotalPartCount: number
+    newTotalPartCount: number,
+    transaction?: Transaction
 ) => {
+    const options = buildOptionsWithTransaction(
+        {
+            where: {
+                id: backlogItemId
+            }
+        },
+        transaction
+    );
     await BacklogItemDataModel.update(
         {
             totalParts: newTotalPartCount
         },
-        {
-            where: {
-                id: backlogItemId
-            },
-            transaction: handlerContext.transactionContext.transaction
-        }
+        options
     );
 };

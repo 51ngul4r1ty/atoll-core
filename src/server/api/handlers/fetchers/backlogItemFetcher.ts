@@ -1,5 +1,5 @@
 // externals
-import { FindOptions } from "sequelize";
+import { FindOptions, Transaction } from "sequelize";
 
 // libraries
 import { ApiBacklogItem, LinkedList } from "@atoll/shared";
@@ -52,7 +52,7 @@ export type BacklogItemParams = {
     externalId?: string;
 };
 
-export const buildFindOptionsForBacklogItems = (params: BacklogItemParams): FindOptions => {
+export const buildFindOptionsForBacklogItems = (params: BacklogItemParams, transaction?: Transaction): FindOptions => {
     const options = buildOptionsFromParams(params);
     const backlogItemsOptions: FindOptions = {
         ...options,
@@ -61,9 +61,12 @@ export const buildFindOptionsForBacklogItems = (params: BacklogItemParams): Find
     return backlogItemsOptions;
 };
 
-export const fetchBacklogItem = async (backlogItemId: string): Promise<BacklogItemResult | RestApiErrorResult> => {
+export const fetchBacklogItem = async (
+    backlogItemId: string,
+    transaction?: Transaction
+): Promise<BacklogItemResult | RestApiErrorResult> => {
     try {
-        const backlogItemsOptions = buildFindOptionsForBacklogItems({});
+        const backlogItemsOptions = buildFindOptionsForBacklogItems({}, transaction);
         const dbBacklogItem = await BacklogItemDataModel.findByPk(backlogItemId, backlogItemsOptions);
         if (!dbBacklogItem) {
             return buildNotFoundResponse(`Unable to find backlog item by ID ${backlogItemId}`);

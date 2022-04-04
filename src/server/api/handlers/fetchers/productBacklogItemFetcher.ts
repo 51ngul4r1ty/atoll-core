@@ -1,5 +1,5 @@
 // externals
-import { FindOptions } from "sequelize";
+import { FindOptions, Transaction } from "sequelize";
 
 // libraries
 import { ApiBacklogItem } from "@atoll/shared";
@@ -38,9 +38,12 @@ export type ProductBacklogsResult = ProductBacklogItemResult | RestApiErrorResul
  * Looks for the item in the product backlog - even if the work item itself exists it must be present in the product backlog
  * specifically for this function to return it.
  */
-export const fetchProductBacklogItemById = async (backlogItemId: string): Promise<ProductBacklogsResult> => {
+export const fetchProductBacklogItemById = async (
+    backlogItemId: string,
+    transaction?: Transaction
+): Promise<ProductBacklogsResult> => {
     try {
-        const options = buildOptionsFromParams({ backlogitemId: backlogItemId });
+        const options = buildOptionsFromParams({ backlogitemId: backlogItemId }, transaction);
         const backlogItemRanks = await BacklogItemRankDataModel.findAll(options);
         if (backlogItemRanks.length === 0) {
             return buildNotFoundResponse(`Unable to find backlog item by ID ${backlogItemId}`);

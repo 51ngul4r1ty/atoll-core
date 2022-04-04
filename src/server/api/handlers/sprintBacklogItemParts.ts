@@ -67,7 +67,10 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
     try {
         await beginSerializableTransaction(handlerContext);
 
-        const sprintBacklogItemsWithNested = await fetchSprintBacklogItemsWithNested(handlerContext, sourceSprintId);
+        const sprintBacklogItemsWithNested = await fetchSprintBacklogItemsWithNested(
+            sourceSprintId,
+            handlerContext.transactionContext.transaction
+        );
         if (!sprintBacklogItemsWithNested.length) {
             abortWithNotFoundResponse(
                 handlerContext,
@@ -93,27 +96,27 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
                         `a "${apiBacklogItemForAddedPart.status}" status`
                 );
             } else {
-                const backlogItemPart = await addBacklogItemPart(handlerContext, dbBacklogItem);
+                const backlogItemPart = await addBacklogItemPart(dbBacklogItem, handlerContext.transactionContext.transaction);
 
                 addedBacklogItemPart = mapDbToApiBacklogItemPart(backlogItemPart);
                 const addToNextSprintResult = await addBacklogItemPartToNextSprint(
-                    handlerContext,
                     addedBacklogItemPart.backlogitemId,
                     addedBacklogItemPart.id,
-                    isoDateStringToDate(dbSprint.startdate)
+                    isoDateStringToDate(dbSprint.startdate),
+                    handlerContext.transactionContext.transaction
                 );
                 const { sprintBacklogItem: dbSprintBacklogItem, nextSprint: dbNextSprint } = addToNextSprintResult;
                 addedSprintBacklogItem = mapDbToApiSprintBacklogItem(dbSprintBacklogItem);
 
                 const apiNextSprint = mapDbToApiSprint(dbNextSprint);
                 sprintStats = await updateNextSprintStats(
-                    handlerContext,
                     apiNextSprint,
                     apiBacklogItemForAddedPart,
-                    addedBacklogItemPart
+                    addedBacklogItemPart,
+                    handlerContext.transactionContext.transaction
                 );
                 const totalParts = addedBacklogItemPart.partIndex;
-                await updateBacklogItemWithPartCount(handlerContext, backlogItemId, totalParts);
+                await updateBacklogItemWithPartCount(backlogItemId, totalParts, handlerContext.transactionContext.transaction);
                 // NOTE: We could make a database call to get the latest data, but it makes no sense here because we already have
                 //   the backlog item object- so just update the totalParts and return it because this is more efficient.
                 apiBacklogItemForAddedPart.totalParts = totalParts;

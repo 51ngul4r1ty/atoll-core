@@ -25,7 +25,7 @@ export const addWhereClauseToOptions = (options: any, key: string, value: any) =
     options.where[key] = value;
 };
 
-export const buildOptionsFromParams = (params: OptionsParams): FindOptions => {
+export const buildOptionsFromParams = (params: OptionsParams, transaction?: Transaction): FindOptions => {
     const options: any = {};
     addWhereClauseToOptions(options, "friendlyId", params.friendlyId);
     addWhereClauseToOptions(options, "externalId", params.externalId);
@@ -34,7 +34,7 @@ export const buildOptionsFromParams = (params: OptionsParams): FindOptions => {
     addWhereClauseToOptions(options, "backlogitemId", params.backlogitemId);
     addWhereClauseToOptions(options, "backlogitempartId", params.backlogitempartId);
     addWhereClauseToOptions(options, "archived", params.archived);
-    return options;
+    return buildOptionsWithTransaction(options, transaction);
 };
 
 export const addIncludeAllNestedToOptions = (options: FindOptions): FindOptions => {
@@ -51,21 +51,20 @@ export const addIncludeAllNestedToOptions = (options: FindOptions): FindOptions 
     return result;
 };
 
-export const buildOptions = (req: Request) => {
+export const buildOptions = (req: Request, transaction: Transaction) => {
     const params = getParamsFromRequest(req);
-    return buildOptionsFromParams({ projectId: params.projectId });
+    return buildOptionsFromParams({ projectId: params.projectId }, transaction);
 };
 
 export const buildOptionsWithTransaction = (options: any, transaction: Transaction) => {
+    if (!transaction) {
+        return options;
+    }
     if (options === undefined) {
         if (!transaction) {
             return undefined;
         }
         return { transaction };
     }
-    const result = { ...options };
-    if (transaction) {
-        result.transaction = transaction;
-    }
-    return result;
+    return { ...options, transaction };
 };
