@@ -154,14 +154,11 @@ export const sprintBacklogItemPostHandler = async (req: Request, res: Response) 
             if (joinSplitParts) {
                 const removePartResult = await removeUnallocatedBacklogItemPart(
                     allocatedBacklogItemPartId,
-                    {
-                        suppressTransactions: true,
-                        lastPartRemovalOptions: LastPartRemovalOptions.Allow
-                    },
+                    LastPartRemovalOptions.Allow,
                     handlerContext.transactionContext.transaction
                 );
-                if (isRestApiErrorResult(removePartResult.response)) {
-                    rollbackWithErrorResponse(handlerContext, removePartResult.response.message);
+                if (isRestApiErrorResult(removePartResult)) {
+                    rollbackWithErrorResponse(handlerContext, removePartResult.message);
                 }
             } else {
                 addedDbSprintBacklogItem = await allocateBacklogItemToSprint(
