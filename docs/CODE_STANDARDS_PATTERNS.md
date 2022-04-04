@@ -54,7 +54,51 @@ Answer: It is always better to abstract the state structure from the consuming c
 Server-side Code Patterns
 =========================
 
-(todo)
+Express API Handler Related
+---------------------------
+
+**Building Responses**
+
+| Response Utility Function | Scenario Where Applicable                                                              |
+|---------------------------|----------------------------------------------------------------------------------------|
+| respondWithObj            | Already have a correctly structured obj preferred produced by responseBuilder util fns |
+| respondWithObj            | Already have a correctly structured obj that's a pretty unique custom structure        |
+| respondWithMessage        | For !isRestApiItemResult or !isRestApiCollectionResult scenarios                       |
+
+**Handler Helper Options**
+
+If it is necessary to control transactions in the caller and suppress them in the "helper" function then use
+HandlerHelperOptions (see how removeUnallocatedBacklogItemPart implements this).
+
+**Transactions**
+
+Code below has examples for a handler called "backlogItemPartPatchHandler".
+
+Handlers must start with:
+
+```
+    const handlerContext = start("backlogItemPartPatchHandler", res);
+```
+
+and end with:
+
+```
+    finish(handlerContext);
+```
+
+For transaction handling it will have this:
+
+```
+    try {
+        await beginSerializableTransaction(handlerContext);
+
+...
+
+    } catch (err) {
+        await handleUnexpectedErrorResponse(handlerContext, err);
+    }
+```
+
 
 General Code Patterns
 =====================
