@@ -187,7 +187,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res: Response) 
                     handlerContext.transactionContext.transaction
                 );
                 if (joinSplitParts) {
-                    const fetchSprintResult = await fetchSprint(sprintId);
+                    const fetchSprintResult = await fetchSprint(sprintId, handlerContext.transactionContext.transaction);
                     if (!isRestApiItemResult<ApiSprint>(fetchSprintResult)) {
                         rollbackWithErrorResponse(
                             handlerContext,
@@ -330,5 +330,7 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res: Response
         }
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);
+    } finally {
+        finish(handlerContext);
     }
 };

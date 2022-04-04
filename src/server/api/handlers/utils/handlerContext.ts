@@ -10,7 +10,12 @@ import { logger, LoggingContext } from "@atoll/shared";
 import { sequelize } from "../../../dataaccess/connection";
 
 // utils
-import { respondWithError, respondWithFailedValidation, respondWithNotFound } from "../../../api/utils/responder";
+import {
+    respondWithError,
+    respondWithFailedValidation,
+    respondWithMessageAndStatus,
+    respondWithNotFound
+} from "../../../api/utils/responder";
 
 export interface HandlerTransactionContext {
     transaction: Transaction;
@@ -99,6 +104,13 @@ export const abortWithErrorResponse = (handlerContext: HandlerContext, message: 
 
 export const rollbackWithErrorResponse = async (handlerContext: HandlerContext, message: string) => {
     respondWithError(handlerContext.expressContext.res, message);
+    await handlerContext.transactionContext.transaction.rollback();
+    handlerContext.transactionContext.aborted = true;
+    handlerContext.transactionContext.rolledBack = true;
+};
+
+export const rollbackWithMessageAndStatus = async (handlerContext: HandlerContext, message: string, status: number) => {
+    respondWithMessageAndStatus(handlerContext.expressContext.res, message, status);
     await handlerContext.transactionContext.transaction.rollback();
     handlerContext.transactionContext.aborted = true;
     handlerContext.transactionContext.rolledBack = true;

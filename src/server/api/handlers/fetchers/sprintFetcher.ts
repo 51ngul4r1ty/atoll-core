@@ -80,9 +80,10 @@ export const fetchSprints = async (projectId: string | null, archived?: string |
     }
 };
 
-export const fetchSprint = async (sprintId: string): Promise<SprintResult> => {
+export const fetchSprint = async (sprintId: string, transaction?: Transaction): Promise<SprintResult> => {
     try {
-        const sprint = await SprintDataModel.findByPk(sprintId);
+        const options = buildOptionsWithTransaction({}, transaction);
+        const sprint = await SprintDataModel.findByPk(sprintId, options);
         if (!sprint) {
             return {
                 status: HttpStatus.NOT_FOUND,
@@ -90,7 +91,7 @@ export const fetchSprint = async (sprintId: string): Promise<SprintResult> => {
             };
         }
         const sprintItem = mapDbToApiSprint(sprint);
-        const nextSprint = await fetchNextSprint(isoDateStringToDate(sprintItem.startdate));
+        const nextSprint = await fetchNextSprint(isoDateStringToDate(sprintItem.startdate), transaction);
         const resourceBasePath = `/api/v1/${SPRINT_RESOURCE_NAME}/`;
         const links: Link[] = [buildSelfLink(sprintItem, resourceBasePath)];
         if (nextSprint) {

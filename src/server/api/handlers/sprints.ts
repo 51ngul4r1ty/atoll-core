@@ -23,6 +23,14 @@ import { mapDbToApiSprint } from "../../dataaccess/mappers/dataAccessToApiMapper
 import { respondedWithMismatchedItemIds } from "../utils/validationResponders";
 import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
 import { Transaction } from "sequelize";
+import {
+    beginSerializableTransaction,
+    commitWithOkResponseIfNotAborted,
+    finish,
+    handleUnexpectedErrorResponse,
+    rollbackWithMessageAndStatus,
+    start
+} from "./utils/handlerContext";
 
 export const sprintsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
@@ -224,15 +232,22 @@ export const sprintDeleteHandler = async (req: Request, res) => {
 };
 
 export const sprintGetHandler = async (req: Request, res: Response) => {
-    const params = getParamsFromRequest(req);
-    const result = await fetchSprint(params.sprintId);
-    if (result.status === HttpStatus.OK) {
-        res.json(result);
-    } else {
-        res.status(result.status).json({
-            status: result.status,
-            message: result.message
-        });
-        console.log(`Unable to fetch sprint: ${result.message}`);
+    const handlerContext = start("sprintGetHandler", res);
+
+    try {
+        await beginSerializableTransaction(handlerContext);
+
+        const params = getParamsFromRequest(req);
+        const result = await fetchSprint(params.sprintId, handlerContext.transactionContext.transaction);
+        if (result.status === HttpStatus.OK) {
+            await commitWithOkResponseIfNotAborted(handlerContext, result);
+        } else {
+            await rollbackWithMessageAndStatus(handlerContext, result.message, result.status);
+            console.log(`Unable to fetch sprint: ${result.message}`);
+        }
+    } catch (err) {
+        await handleUnexpectedErrorResponse(handlerContext, err);
+    } finally {
+        finish(handlerContext);
     }
 };
