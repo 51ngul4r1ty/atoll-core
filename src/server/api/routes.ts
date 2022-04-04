@@ -18,7 +18,7 @@ import {
 } from "../resourceNames";
 
 // utils
-import { setupRoutes, setupNoAuthRoutes } from "./utils/routerHelper";
+import { setupRoutes, setupNoAuthRoutes, setupNotFoundRoutes } from "./utils/routerHelper";
 
 // handlers
 import {
@@ -158,3 +158,5 @@ router.post("/actions/reorder-backlog-items", auth, backlogItemsReorderPostHandl
 
 router.post("/actions/login", loginPostHandler);
 router.post("/actions/refresh-token", refreshTokenPostHandler);
+
+setupNotFoundRoutes(router);
