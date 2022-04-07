@@ -27,7 +27,7 @@ export type RestApiDataResult<T, U = undefined> = RestApiBaseResult<T, U>;
  * NOTE: extra embedded in the "data" node is a legacy construct and will be removed in future.
  */
 export type RestApiItemResult<T, U = undefined, V = undefined> = RestApiBaseResult<{ item: T; extra?: any }, U, V>;
-export type RestApiCollectionResult<T, U = undefined> = RestApiBaseResult<{ items: T[] }, U>;
+export type RestApiCollectionResult<T, U = undefined, V = undefined> = RestApiBaseResult<{ items: T[] }, U, V>;
 
 export const buildResponseWithData = <T, U = undefined>(data: T, extra?: U, message?: string): RestApiDataResult<T, U> => {
     const result: RestApiDataResult<T, U> = {
