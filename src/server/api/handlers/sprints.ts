@@ -27,6 +27,7 @@ import {
     beginSerializableTransaction,
     commitWithOkResponseIfNotAborted,
     finish,
+    handleSuccessResponse,
     handleUnexpectedErrorResponse,
     rollbackWithMessageAndStatus,
     start
@@ -240,7 +241,7 @@ export const sprintGetHandler = async (req: Request, res: Response) => {
         const params = getParamsFromRequest(req);
         const result = await fetchSprint(params.sprintId, handlerContext.transactionContext.transaction);
         if (result.status === HttpStatus.OK) {
-            await commitWithOkResponseIfNotAborted(handlerContext, result);
+            await handleSuccessResponse(handlerContext, result);
         } else {
             await rollbackWithMessageAndStatus(handlerContext, result.message, result.status);
             console.log(`Unable to fetch sprint: ${result.message}`);
