@@ -91,7 +91,7 @@ export const sprintPatchHandler = async (req: Request, res: Response) => {
                 respondWithFailedValidation(res, `Unable to patch: ${invalidPatchMessage}`);
             } else {
                 const newItem = getPatchedItem(originalSprint, body);
-                await sprint.update(newItem);
+                await sprint.update(mapApiToDbSprint(newItem));
                 respondWithItem(res, sprint, originalSprint);
             }
         }
@@ -245,9 +245,8 @@ export const sprintGetHandler = async (req: Request, res: Response) => {
             await rollbackWithMessageAndStatus(handlerContext, result.message, result.status);
             console.log(`Unable to fetch sprint: ${result.message}`);
         }
+        finish(handlerContext);
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);
-    } finally {
-        finish(handlerContext);
     }
 };

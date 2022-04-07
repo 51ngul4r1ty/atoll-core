@@ -16,7 +16,7 @@ import {
 } from "@atoll/shared";
 
 // utils
-import { convertDbCharToBoolean, convertDbFloatToNumber } from "../conversionUtils";
+import { convertDateToApiDate, convertDbCharToBoolean, convertDbFloatToNumber } from "../conversionUtils";
 
 export const mapDbToApiBacklogItem = (dbItem: any): ApiBacklogItem => {
     if (!dbItem) {
@@ -25,12 +25,20 @@ export const mapDbToApiBacklogItem = (dbItem: any): ApiBacklogItem => {
     const dataValueFieldsOnly = cloneWithoutNested(dbItem.dataValues);
     const storyEstimate = convertDbFloatToNumber(dbItem.dataValues.estimate);
     const unallocatedPoints = convertDbFloatToNumber(dbItem.dataValues.unallocatedPoints);
+    const unallocatedParts = convertDbFloatToNumber(dbItem.dataValues.unallocatedParts);
     return {
         ...dataValueFieldsOnly,
         estimate: storyEstimate,
         storyEstimate,
         unallocatedPoints,
-        status: dbItem.dataValues.status || "N"
+        unallocatedParts,
+        status: dbItem.dataValues.status || "N",
+        acceptedAt: convertDateToApiDate(dbItem.dataValues.acceptedAt),
+        createdAt: convertDateToApiDate(dbItem.dataValues.createdAt),
+        finishedAt: convertDateToApiDate(dbItem.dataValues.finishedAt),
+        releasedAt: convertDateToApiDate(dbItem.dataValues.releasedAt),
+        startedAt: convertDateToApiDate(dbItem.dataValues.startedAt),
+        updatedAt: convertDateToApiDate(dbItem.dataValues.updatedAt)
     };
 };
 
@@ -55,7 +63,11 @@ export const mapDbDataValuesToApiBacklogItemPart = (itemDataValues: any): ApiBac
         ...dataValueFieldsOnly,
         percentage: convertDbFloatToNumber(itemDataValues.percentage),
         points: convertDbFloatToNumber(itemDataValues.points),
-        status: itemDataValues.status || "N"
+        status: itemDataValues.status || "N",
+        createdAt: convertDateToApiDate(itemDataValues.createdAt),
+        finishedAt: convertDateToApiDate(itemDataValues.finishedAt),
+        startedAt: convertDateToApiDate(itemDataValues.startedAt),
+        updatedAt: convertDateToApiDate(itemDataValues.updatedAt)
     };
 };
 

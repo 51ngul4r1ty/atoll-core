@@ -234,10 +234,10 @@ export const sprintBacklogItemPostHandler = async (req: Request, res: Response) 
                 await commitWithCreatedResponseIfNotAborted(handlerContext, addedSprintBacklogItem, extra);
             }
         }
+        finish(handlerContext);
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);
     }
-    finish(handlerContext);
 };
 
 /**
@@ -328,9 +328,9 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res: Response
             };
             await commitWithOkResponseIfNotAborted(handlerContext, apiBacklogItemTyped, extra);
         }
+        // TODO: eliminate direct calls to finish - all responses should call finish
+        finish(handlerContext);
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);
-    } finally {
-        finish(handlerContext);
     }
 };

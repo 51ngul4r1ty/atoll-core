@@ -26,6 +26,7 @@ import {
     backlogItemsGetHandler,
     backlogItemsPostHandler,
     backlogItemsReorderPostHandler,
+    backlogItemJoinUnallocatedPartsPostHandler,
     backlogItemGetHandler,
     backlogItemPutHandler
 } from "./handlers/backlogItems";
@@ -134,6 +135,10 @@ setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}/:itemId`, {
     get: backlogItemGetHandler,
     put: backlogItemPutHandler,
     delete: backlogItemsDeleteHandler
+});
+
+setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}/:itemId/join-unallocated-parts`, {
+    post: backlogItemJoinUnallocatedPartsPostHandler
 });
 
 setupRoutes(router, `/${BACKLOG_ITEM_PART_RESOURCE_NAME}/:itemId`, {

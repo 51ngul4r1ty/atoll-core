@@ -2,7 +2,7 @@
 import { Request, Response } from "express";
 import * as core from "express-serve-static-core";
 import * as HttpStatus from "http-status-codes";
-import { CreateOptions, Transaction } from "sequelize";
+import { CreateOptions, FindOptions, Transaction } from "sequelize";
 
 // libraries
 import {
@@ -39,18 +39,33 @@ import { addIdToBody } from "../utils/uuidHelper";
 import { backlogItemRankFirstItemInserter, backlogItemRankSubsequentItemInserter } from "./inserters/backlogItemRankInserter";
 import {
     mapDbToApiBacklogItem,
+    mapDbToApiBacklogItemPart,
     mapDbToApiCounter,
     mapDbToApiProjectSettings
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
 import { getUpdatedBacklogItemWhenStatusChanges } from "../utils/statusChangeUtils";
-import { isRestApiItemResult } from "../utils/responseBuilder";
+import { buildResponseWithItem, isRestApiCollectionResult, isRestApiItemResult, RestApiItemResult } from "../utils/responseBuilder";
 import { logError } from "./utils/serverLogger";
 import { logErrorInfoFromResponseObj } from "../utils/serverLogUtils";
 import { fetchBacklogItemWithSprintAllocationInfo } from "./aggregators/backlogItemAggregator";
+import { buildOptionsWithTransaction } from "../utils/sequelizeHelper";
+import { calcNewPartIndex } from "../utils/partIndexUtils";
+import { mapApiToDbBacklogItem, mapApiToDbBacklogItemPart } from "../../dataaccess/mappers/apiToDataAccessMappers";
 
 // interfaces/types
 import type { BacklogItemsResult } from "./fetchers/backlogItemFetcher";
 import type { RestApiStatusAndMessageOnly } from "../utils/responseBuilder";
+import {
+    beginSerializableTransaction,
+    finish,
+    handleFailedValidationResponse,
+    handlePersistenceErrorResponse,
+    handleSuccessResponse,
+    handleUnexpectedErrorResponse,
+    start
+} from "./utils/handlerContext";
+import { BacklogItemPartsResult, fetchBacklogItemParts } from "./fetchers/backlogItemPartFetcher";
+import { fetchAllocatedAndUnallocatedBacklogItemParts } from "./helpers/sprintBacklogItemHelper";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -247,7 +262,6 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         const newItem = updateBacklogItemPartResult.backlogItem;
         const addedBacklogItem = await BacklogItemDataModel.create(newItem, { transaction } as CreateOptions);
         if (!prevBacklogItemId) {
-            // TODO: Change name of this and investigate why Postman collection POST returns a "backlogitempart.version cannot be null error"
             await backlogItemRankFirstItemInserter(newItem, transaction);
         } else {
             const result = await backlogItemRankSubsequentItemInserter(newItem, transaction, prevBacklogItemId);
@@ -403,6 +417,92 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
             await transaction.rollback();
         }
         respondWithError(res, err);
+    }
+};
+
+export const backlogItemJoinUnallocatedPartsPostHandler = async (req: Request, res: Response) => {
+    const handlerContext = start("backlogItemJoinUnallocatedPartsPostHandler", res);
+
+    const queryParamBacklogItemId = req.params.itemId;
+
+    if (!queryParamBacklogItemId) {
+        return await handleFailedValidationResponse(handlerContext, "Item ID is required in URI path for this operation");
+    }
+    try {
+        await beginSerializableTransaction(handlerContext);
+
+        const transaction = handlerContext.transactionContext.transaction;
+
+        const backlogitempartsResult = await fetchBacklogItemParts(queryParamBacklogItemId, transaction);
+        if (!isRestApiCollectionResult(backlogitempartsResult)) {
+            return await handlePersistenceErrorResponse(
+                handlerContext,
+                `unable to retrieve backlog item parts for backlog item ID "${queryParamBacklogItemId}"`,
+                backlogitempartsResult
+            );
+        }
+        const allBacklogItemParts = backlogitempartsResult.data.items;
+
+        const partsWithAllocationInfo = await fetchAllocatedAndUnallocatedBacklogItemParts(allBacklogItemParts, transaction);
+        const unallocatedBacklogItemParts = partsWithAllocationInfo.filter((item) => !item.sprintId);
+        const unallocatedBacklogItemPartsSorted = unallocatedBacklogItemParts.sort((a, b) => a.partIndex - b.partIndex);
+
+        // Keep part with lowest partIndex value and remove all the other unallocated parts
+        // (for example, unallocated parts could be: 1, 5, 6 and 2, 3, 4 could be allocated to sprints)
+        const partIndexesRemoved: number[] = [];
+        const itemsToRemove = unallocatedBacklogItemPartsSorted.slice(1);
+        let errorMessage = "";
+        for (const item of itemsToRemove) {
+            if (!errorMessage) {
+                const backlogItemPartId = item.id;
+                const findItemOptions: FindOptions = buildOptionsWithTransaction({ where: { id: backlogItemPartId } }, transaction);
+                const dbBacklogItemPart = await BacklogItemPartDataModel.findOne(findItemOptions);
+                if (!dbBacklogItemPart) {
+                    errorMessage = `Backlog item part to remove ("${backlogItemPartId}") was not found`;
+                }
+                await dbBacklogItemPart.destroy({ transaction });
+                partIndexesRemoved.push(dbBacklogItemPart.partIndex);
+            }
+        }
+        if (errorMessage) {
+            return await handlePersistenceErrorResponse(handlerContext, errorMessage);
+        }
+
+        // Re-assign partIndex values
+        const firstItem = unallocatedBacklogItemPartsSorted[0];
+        const itemsToKeep = [firstItem];
+        const allocatedBacklogItemParts = partsWithAllocationInfo.filter((item) => item.sprintId);
+        allocatedBacklogItemParts.forEach((item) => {
+            itemsToKeep.push(item);
+        });
+        for (const item of itemsToKeep) {
+            if (!errorMessage) {
+                const newPartIndex = calcNewPartIndex(item.partIndex, partIndexesRemoved);
+                if (newPartIndex !== item.partIndex) {
+                    const backlogItemPartId = item.id;
+                    const findItemOptions: FindOptions = buildOptionsWithTransaction(
+                        { where: { id: backlogItemPartId } },
+                        transaction
+                    );
+                    const dbBacklogItemPart = await BacklogItemPartDataModel.findOne(findItemOptions);
+                    if (!dbBacklogItemPart) {
+                        errorMessage = `Backlog item part to keep ("${backlogItemPartId}") was not found`;
+                    }
+                    const newBacklogItemPart = { ...mapDbToApiBacklogItemPart(dbBacklogItemPart), partIndex: newPartIndex };
+                    await dbBacklogItemPart.update(mapApiToDbBacklogItemPart(newBacklogItemPart), { transaction });
+                }
+            }
+        }
+
+        // Update totalParts in backlog item
+        const findItemOptions: FindOptions = buildOptionsWithTransaction({ where: { id: queryParamBacklogItemId } }, transaction);
+        const dbBacklogItem = await BacklogItemDataModel.findOne(findItemOptions);
+        const newApiBacklogItem = { ...mapDbToApiBacklogItem(dbBacklogItem), totalParts: itemsToKeep.length };
+        await dbBacklogItem.update(mapApiToDbBacklogItem(newApiBacklogItem), { transaction });
+        const result = buildResponseWithItem(newApiBacklogItem, undefined);
+        await handleSuccessResponse(handlerContext, result);
+    } catch (err) {
+        await handleUnexpectedErrorResponse(handlerContext, err);
     }
 };
 
