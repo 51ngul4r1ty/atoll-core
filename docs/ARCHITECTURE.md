@@ -1,12 +1,9 @@
 Overview
 ========
 
-This document provides high level guidance on the application's architecture.
-
-There are 2 other documents that cover the code-level architecture that you may want to
-reference if you need more information on:
-1. Front-end API framework [ARCHITECTURE_FE_API.md](ARCHITECTURE_FE_API.md) document.
-2. Back-end API code patterns [ARCHITECTURE_BE_API.md](ARCHITECTURE_BE_API.md) document.
+This document provides high level guidance on the application's architecture.  This is the more
+typical high-level architecture information and doesn't go into the code level details that implement
+the described architecture.  For code-level guidance see [CODE_ARCHITECTURE.md](CODE_ARCHITECTURE.md)
 
 Restful API
 ===========
@@ -53,6 +50,8 @@ Rel Values
 2. `item`: this link will return an individual item
 3. `self`: the link to this resource, usually used within a collection when the
    item is simply providing a link to itself (collections return the full items)
+4. `action:*` can be used to link to POST actions associated with this resource,
+   for example, `action:join-unallocated-parts`
 
 Note: "self" should not be used when the current request URI to return this item
   returns that exact same URI.  It is only intended for the collection --> item
