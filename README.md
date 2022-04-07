@@ -80,19 +80,20 @@ Debugging Server
 Other Docs
 ==========
 
-README.md                                     - this document is intended as the index document to find
-                                                out where to go next.  
-[CODE_STANDARDS.md](docs/CODE_STANDARDS.md)   - read this!  
-[CONVENTIONS.md](docs/CONVENTIONS.md)         - important naming conventions information.  
-[ARCHITECTURE.md](docs/ARCHITECTURE.md)       - architecture related info  
-[HOWTO.md](docs/HOWTO.md)                     - contains details for how to implement things.  
-[DEPENDENCIES.md](docs/DEPENDENCIES.md)       - detailed information about the npm packages used.  
-[SCRIPTS.md](docs/SCRIPTS.md)                 - detailed information about the build & npm scripts.  
-[HISTORY.md](docs/HISTORY.md)                 - the past history of this project.  
-[POLICIES.md](docs/POLICIES.md)               - github branch policies etc.  
-[GLOSSARY.md](docs/GLOSSARY.md)               - glossary specific to this project.  
-[ISSUES_RESOLVED.md](docs/ISSUES_RESOLVED.md) - this may be useful if you're running into problems.  
-[DATA_MODEL.md](docs/dataModel/DATA_MODEL.md) - mapping the requirements to the data model.  
-[PROCESS.md](docs/PROCESS.md)                 - the index document for processes that should be followed.
+README.md                                         - this document is intended as the index document to find
+                                                    out where to go next.  
+[CODE_STANDARDS.md](docs/CODE_STANDARDS.md)       - read this!  
+[CONVENTIONS.md](docs/CONVENTIONS.md)             - important naming conventions information.  
+[ARCHITECTURE.md](docs/ARCHITECTURE.md)           - architecture related info  
+[CODE_ARCHITECTURE.md](docs/CODE_ARCHITECTURE.md) - code-level architecture related info  
+[HOWTO.md](docs/HOWTO.md)                         - contains details for how to implement things.  
+[DEPENDENCIES.md](docs/DEPENDENCIES.md)           - detailed information about the npm packages used.  
+[SCRIPTS.md](docs/SCRIPTS.md)                     - detailed information about the build & npm scripts.  
+[HISTORY.md](docs/HISTORY.md)                     - the past history of this project.  
+[POLICIES.md](docs/POLICIES.md)                   - github branch policies etc.  
+[GLOSSARY.md](docs/GLOSSARY.md)                   - glossary specific to this project.  
+[ISSUES_RESOLVED.md](docs/ISSUES_RESOLVED.md)     - this may be useful if you're running into problems.  
+[DATA_MODEL.md](docs/dataModel/DATA_MODEL.md)     - mapping the requirements to the data model.  
+[PROCESS.md](docs/PROCESS.md)                     - the index document for processes that should be followed.
 
 [Github Wiki](https://github.com/51ngul4r1ty/atoll-core/wiki)
