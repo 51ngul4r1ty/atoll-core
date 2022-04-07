@@ -56,6 +56,9 @@ export const beginSerializableTransaction = async (handlerContext: HandlerContex
     };
 };
 
+/**
+ * @deprecated this doesn't work well with the "fetcher" pattern so it shouldn't be used.
+ */
 export const commitWithResponseAndStatusIfNotAborted = async (
     handlerContext: HandlerContext,
     status: number,
@@ -79,10 +82,16 @@ export const commitWithResponseAndStatusIfNotAborted = async (
     }
 };
 
+/**
+ * @deprecated this doesn't work well with the "fetcher" pattern so it shouldn't be used.
+ */
 export const commitWithOkResponseIfNotAborted = async (handlerContext: HandlerContext, addedItem, extra?) => {
     await commitWithResponseAndStatusIfNotAborted(handlerContext, HttpStatus.OK, addedItem, extra);
 };
 
+/**
+ * @deprecated this doesn't work well with the "fetcher" pattern so it shouldn't be used.
+ */
 export const commitWithCreatedResponseIfNotAborted = async (handlerContext: HandlerContext, addedItem, extra?) => {
     await commitWithResponseAndStatusIfNotAborted(handlerContext, HttpStatus.CREATED, addedItem, extra);
 };
@@ -179,9 +188,9 @@ export const handleTransactionCommit = async (handlerContext: HandlerContext, lo
     }
 };
 
-export const handleSuccessResponse = async <T>(
+export const handleSuccessResponse = async <T = any, U = any, V = any>(
     handlerContext: HandlerContext,
-    result: RestApiCollectionResult<T> | RestApiItemResult<T>
+    result: RestApiCollectionResult<T, U, V> | RestApiItemResult<T, U, V>
 ) => {
     const logContext = logger.info("success", [handlerContext.functionTag], handlerContext.logContext);
     await handleTransactionCommit(handlerContext, logContext);
@@ -189,6 +198,22 @@ export const handleSuccessResponse = async <T>(
     logger.info("processed success response", [handlerContext.functionTag], handlerContext.logContext);
     finish(handlerContext);
 };
+
+// export const respondAndCommit = async <T, U, V>(
+//     handlerContext: HandlerContext,
+//     data: RestApiCollectionResult<T, U, V> | RestApiItemResult<T, U, V>
+// ) => {
+//     if (!hasRolledBack(handlerContext)) {
+//         await handlerContext.transactionContext.transaction.commit();
+//         const status = data.status;
+//         if (!hasAborted(handlerContext)) {
+//             handlerContext.expressContext.res.status(status).json({
+//                 status,
+//                 data
+//             });
+//         }
+//     }
+// };
 
 export const hasAborted = (handlerContext: HandlerContext): boolean => handlerContext.transactionContext.aborted || false;
 
