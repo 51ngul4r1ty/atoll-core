@@ -245,6 +245,7 @@ export const sprintGetHandler = async (req: Request, res: Response) => {
             await rollbackWithMessageAndStatus(handlerContext, result.message, result.status);
             console.log(`Unable to fetch sprint: ${result.message}`);
         }
+        // TODO: eliminate direct calls to finish - all responses should call finish
         finish(handlerContext);
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);

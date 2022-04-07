@@ -29,7 +29,7 @@ export const mapDbToApiBacklogItem = (dbItem: any): ApiBacklogItem => {
     return {
         ...dataValueFieldsOnly,
         estimate: storyEstimate,
-        storyEstimate,
+        storyEstimate, // TODO: Why do we have both and they map to the same thing??
         unallocatedPoints,
         unallocatedParts,
         status: dbItem.dataValues.status || "N",

@@ -57,6 +57,8 @@ export const backlogItemPartPatchHandler = async (req: Request, res: Response) =
     const queryParamItemId = req.params.itemId;
 
     if (!queryParamItemId) {
+        // TODO: Introduce a new pattern where the handlerContext handles all responses like this
+        //   then it can also handle 1) closing open transactions, 2) calling `finish`
         respondWithFailedValidation(res, "Item ID is required in URI path for this operation");
         return;
     }
@@ -122,6 +124,7 @@ export const backlogItemPartPatchHandler = async (req: Request, res: Response) =
                 }
             }
         }
+        // TODO: eliminate direct calls to finish - all responses should call finish
         finish(handlerContext);
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);
