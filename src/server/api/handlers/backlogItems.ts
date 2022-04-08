@@ -512,16 +512,8 @@ export const backlogItemJoinUnallocatedPartsPostHandler = async (req: Request, r
         const newApiBacklogItem = { ...mapDbToApiBacklogItem(dbBacklogItem), totalParts: itemsToKeep.length };
         await dbBacklogItem.update(mapApiToDbBacklogItem(newApiBacklogItem), { transaction });
 
-        // Retrieve updated product backlog item data and respond with it
-        const productBacklogItem = await fetchBacklogItem(queryParamBacklogItemId, transaction);
-        if (!isRestApiItemResult(productBacklogItem)) {
-            return await handlePersistenceErrorResponse(
-                handlerContext,
-                `unable to retrieve updated backlog item for backlog item ID "${queryParamBacklogItemId}"`,
-                backlogitempartsResult
-            );
-        }
-        await handleSuccessResponse(handlerContext, productBacklogItem);
+        const result = buildResponseWithItem({ ...newApiBacklogItem, unallocatedParts: 1 });
+        await handleSuccessResponse(handlerContext, result);
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);
     }
