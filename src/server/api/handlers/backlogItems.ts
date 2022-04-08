@@ -34,7 +34,7 @@ import {
     respondWithObj
 } from "../utils/responder";
 import { getParamsFromRequest } from "../utils/filterHelper";
-import { fetchBacklogItemsByDisplayId, fetchBacklogItems } from "./fetchers/backlogItemFetcher";
+import { fetchBacklogItemsByDisplayId, fetchBacklogItems, fetchBacklogItem } from "./fetchers/backlogItemFetcher";
 import { addIdToBody } from "../utils/uuidHelper";
 import { backlogItemRankFirstItemInserter, backlogItemRankSubsequentItemInserter } from "./inserters/backlogItemRankInserter";
 import {
@@ -511,8 +511,17 @@ export const backlogItemJoinUnallocatedPartsPostHandler = async (req: Request, r
         const dbBacklogItem = await BacklogItemDataModel.findOne(findItemOptions);
         const newApiBacklogItem = { ...mapDbToApiBacklogItem(dbBacklogItem), totalParts: itemsToKeep.length };
         await dbBacklogItem.update(mapApiToDbBacklogItem(newApiBacklogItem), { transaction });
-        const result = buildResponseWithItem(newApiBacklogItem, undefined);
-        await handleSuccessResponse(handlerContext, result);
+
+        // Retrieve updated product backlog item data and respond with it
+        const productBacklogItem = await fetchBacklogItem(queryParamBacklogItemId, transaction);
+        if (!isRestApiItemResult(productBacklogItem)) {
+            return await handlePersistenceErrorResponse(
+                handlerContext,
+                `unable to retrieve updated backlog item for backlog item ID "${queryParamBacklogItemId}"`,
+                backlogitempartsResult
+            );
+        }
+        await handleSuccessResponse(handlerContext, productBacklogItem);
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);
     }

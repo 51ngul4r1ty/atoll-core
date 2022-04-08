@@ -76,7 +76,7 @@ describe("Data Object To API Mappers", () => {
             const actual = dataAccessToApiMappers.mapDbToApiBacklogItem(dbItem);
 
             // assert
-            const expected: ApiBacklogItem = {
+            const expected: Partial<ApiBacklogItem> = {
                 id: "fake-id",
                 projectId: "fake-project-id",
                 friendlyId: "fake-friendly-id",

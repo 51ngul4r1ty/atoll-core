@@ -84,6 +84,7 @@ export const mapApiToDbBacklogItem = (
         delete dataValues.storyEstimate;
         delete dataValues.unallocatedParts;
         delete dataValues.unallocatedPoints;
+        delete dataValues.partIndex;
     }
     return {
         ...dataValues,
