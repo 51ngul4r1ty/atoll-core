@@ -10,7 +10,14 @@ import { logger, LoggingContext } from "@atoll/shared";
 import { sequelize } from "../../../dataaccess/connection";
 
 // utils
-import { respondWithError, respondWithFailedValidation, respondWithNotFound } from "../../../api/utils/responder";
+import {
+    respondWithError,
+    respondWithFailedValidation,
+    respondWithMessageAndStatus,
+    respondWithNotFound,
+    respondWithObj
+} from "../../utils/responder";
+import { RestApiCollectionResult, RestApiErrorResult, RestApiItemResult } from "../../utils/responseBuilder";
 
 export interface HandlerTransactionContext {
     transaction: Transaction;
@@ -47,6 +54,9 @@ export const beginSerializableTransaction = async (handlerContext: HandlerContex
     };
 };
 
+/**
+ * @deprecated this doesn't work well with the "fetcher" pattern so it shouldn't be used.
+ */
 export const commitWithResponseAndStatusIfNotAborted = async (
     handlerContext: HandlerContext,
     status: number,
@@ -70,10 +80,16 @@ export const commitWithResponseAndStatusIfNotAborted = async (
     }
 };
 
+/**
+ * @deprecated this doesn't work well with the "fetcher" pattern so it shouldn't be used.
+ */
 export const commitWithOkResponseIfNotAborted = async (handlerContext: HandlerContext, addedItem, extra?) => {
     await commitWithResponseAndStatusIfNotAborted(handlerContext, HttpStatus.OK, addedItem, extra);
 };
 
+/**
+ * @deprecated this doesn't work well with the "fetcher" pattern so it shouldn't be used.
+ */
 export const commitWithCreatedResponseIfNotAborted = async (handlerContext: HandlerContext, addedItem, extra?) => {
     await commitWithResponseAndStatusIfNotAborted(handlerContext, HttpStatus.CREATED, addedItem, extra);
 };
@@ -104,19 +120,81 @@ export const rollbackWithErrorResponse = async (handlerContext: HandlerContext, 
     handlerContext.transactionContext.rolledBack = true;
 };
 
-export const handleUnexpectedErrorResponse = async (handlerContext: HandlerContext, err) => {
-    const errLogContext = logger.warn(`handling error "${err}"`, [handlerContext.functionTag], handlerContext.logContext);
+export const rollbackWithMessageAndStatus = async (handlerContext: HandlerContext, message: string, status: number) => {
+    respondWithMessageAndStatus(handlerContext.expressContext.res, message, status);
+    await handlerContext.transactionContext.transaction.rollback();
+    handlerContext.transactionContext.aborted = true;
+    handlerContext.transactionContext.rolledBack = true;
+};
+
+const handleTransactionRollback = async (handlerContext: HandlerContext, logContext: LoggingContext) => {
     const context = handlerContext.transactionContext;
     if (context.transaction && !context.rolledBack) {
-        logger.info("rolling back transaction", [handlerContext.functionTag], errLogContext);
+        logger.info("rolling back transaction", [handlerContext.functionTag], logContext);
         try {
             await context.transaction.rollback();
         } catch (err) {
-            logger.warn(`roll back failed with error "${err}"`, [handlerContext.functionTag], errLogContext);
+            logger.warn(`roll back failed with error "${err}"`, [handlerContext.functionTag], logContext);
         }
     }
+};
+
+export const handleUnexpectedErrorResponse = async (handlerContext: HandlerContext, err) => {
+    const errLogContext = logger.warn(`handling error "${err}"`, [handlerContext.functionTag], handlerContext.logContext);
+    await handleTransactionRollback(handlerContext, errLogContext);
     respondWithError(handlerContext.expressContext.res, err);
-    logger.info(`handling error ${err}`, [handlerContext.functionTag], handlerContext.logContext);
+    logger.info(`handled error ${err}`, [handlerContext.functionTag], handlerContext.logContext);
+    finish(handlerContext);
+};
+
+export const handleFailedValidationResponse = async (handlerContext: HandlerContext, message: string) => {
+    const logContext = logger.info(`validation error: "${message}"`, [handlerContext.functionTag], handlerContext.logContext);
+    await handleTransactionRollback(handlerContext, logContext);
+    respondWithFailedValidation(handlerContext.expressContext.res, message);
+    logger.info(`processed validation: "${message}"`, [handlerContext.functionTag], handlerContext.logContext);
+    finish(handlerContext);
+};
+
+export const handlePersistenceErrorResponse = async (
+    handlerContext: HandlerContext,
+    message: string,
+    fetcherResult?: RestApiErrorResult
+) => {
+    const logContext = logger.info(`persistence error: "${message}"`, [handlerContext.functionTag], handlerContext.logContext);
+    await handleTransactionRollback(handlerContext, logContext);
+    respondWithError(handlerContext.expressContext.res, message);
+    if (fetcherResult?.message) {
+        logger.info(
+            `fetcher result: "${fetcherResult.message}" (status ${fetcherResult?.status})`,
+            [handlerContext.functionTag],
+            handlerContext.logContext
+        );
+    }
+    logger.info(`processed persistence error: "${message}"`, [handlerContext.functionTag], handlerContext.logContext);
+    finish(handlerContext);
+};
+
+export const handleTransactionCommit = async (handlerContext: HandlerContext, logContext: LoggingContext) => {
+    const context = handlerContext.transactionContext;
+    if (context.transaction && !context.rolledBack) {
+        logger.info("committing transaction", [handlerContext.functionTag], logContext);
+        try {
+            await handlerContext.transactionContext.transaction.commit();
+        } catch (err) {
+            logger.warn(`commit failed with error "${err}"`, [handlerContext.functionTag], logContext);
+        }
+    }
+};
+
+export const handleSuccessResponse = async <T = any, U = any, V = any>(
+    handlerContext: HandlerContext,
+    result: RestApiCollectionResult<T, U, V> | RestApiItemResult<T, U, V>
+) => {
+    const logContext = logger.info("success", [handlerContext.functionTag], handlerContext.logContext);
+    await handleTransactionCommit(handlerContext, logContext);
+    respondWithObj(handlerContext.expressContext.res, result);
+    logger.info("processed success response", [handlerContext.functionTag], handlerContext.logContext);
+    finish(handlerContext);
 };
 
 export const hasAborted = (handlerContext: HandlerContext): boolean => handlerContext.transactionContext.aborted || false;

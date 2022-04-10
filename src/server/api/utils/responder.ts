@@ -62,6 +62,13 @@ export const respondWithObj = (res: Response, responseObj: any) => {
     }
 };
 
+export const respondWithMessageAndStatus = (res: Response, message: string, status: number) => {
+    res.status(status).send({
+        message,
+        status
+    });
+};
+
 export const respondWithMessage = (res: Response, responseObj: RestApiStatusAndMessageOnly) => {
     res.status(responseObj.status).send(responseObj);
 };

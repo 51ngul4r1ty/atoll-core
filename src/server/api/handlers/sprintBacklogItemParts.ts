@@ -38,6 +38,19 @@ import {
     mapDbToApiSprint,
     mapDbToApiSprintBacklogItem
 } from "../../dataaccess/mappers/dataAccessToApiMappers";
+import { fetchSprintBacklogItemPartWithLinks } from "./fetchers/sprintBacklogItemFetcher";
+import { isRestApiItemResult } from "../utils/responseBuilder";
+
+export const sprintBacklogItemPartGetHandler = async (req: Request, res: Response) => {
+    const params = getParamsFromRequest(req);
+    const result = await fetchSprintBacklogItemPartWithLinks(params.sprintId, params.backlogItemPartId);
+    if (isRestApiItemResult(result)) {
+        res.json(result);
+    } else {
+        res.status(result.status).json(result);
+        console.log(`Unable to fetch sprintBacklogItemPart: ${result.message}`);
+    }
+};
 
 /**
  * Split a backlog item from current sprint into next sprint (by adding an additional part to it).
@@ -54,7 +67,10 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
     try {
         await beginSerializableTransaction(handlerContext);
 
-        const sprintBacklogItemsWithNested = await fetchSprintBacklogItemsWithNested(handlerContext, sourceSprintId);
+        const sprintBacklogItemsWithNested = await fetchSprintBacklogItemsWithNested(
+            sourceSprintId,
+            handlerContext.transactionContext.transaction
+        );
         if (!sprintBacklogItemsWithNested.length) {
             abortWithNotFoundResponse(
                 handlerContext,
@@ -80,27 +96,27 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
                         `a "${apiBacklogItemForAddedPart.status}" status`
                 );
             } else {
-                const backlogItemPart = await addBacklogItemPart(handlerContext, dbBacklogItem);
+                const backlogItemPart = await addBacklogItemPart(dbBacklogItem, handlerContext.transactionContext.transaction);
 
                 addedBacklogItemPart = mapDbToApiBacklogItemPart(backlogItemPart);
                 const addToNextSprintResult = await addBacklogItemPartToNextSprint(
-                    handlerContext,
                     addedBacklogItemPart.backlogitemId,
                     addedBacklogItemPart.id,
-                    isoDateStringToDate(dbSprint.startdate)
+                    isoDateStringToDate(dbSprint.startdate),
+                    handlerContext.transactionContext.transaction
                 );
                 const { sprintBacklogItem: dbSprintBacklogItem, nextSprint: dbNextSprint } = addToNextSprintResult;
                 addedSprintBacklogItem = mapDbToApiSprintBacklogItem(dbSprintBacklogItem);
 
                 const apiNextSprint = mapDbToApiSprint(dbNextSprint);
                 sprintStats = await updateNextSprintStats(
-                    handlerContext,
                     apiNextSprint,
                     apiBacklogItemForAddedPart,
-                    addedBacklogItemPart
+                    addedBacklogItemPart,
+                    handlerContext.transactionContext.transaction
                 );
                 const totalParts = addedBacklogItemPart.partIndex;
-                await updateBacklogItemWithPartCount(handlerContext, backlogItemId, totalParts);
+                await updateBacklogItemWithPartCount(backlogItemId, totalParts, handlerContext.transactionContext.transaction);
                 // NOTE: We could make a database call to get the latest data, but it makes no sense here because we already have
                 //   the backlog item object- so just update the totalParts and return it because this is more efficient.
                 apiBacklogItemForAddedPart.totalParts = totalParts;
@@ -112,8 +128,8 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
             sprintBacklogItem: addedSprintBacklogItem,
             sprintStats
         });
+        finish(handlerContext);
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);
     }
-    finish(handlerContext);
 };

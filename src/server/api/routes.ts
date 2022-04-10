@@ -17,12 +17,16 @@ import {
     SPRINT_RESOURCE_NAME
 } from "../resourceNames";
 
+// utils
+import { setupRoutes, setupNoAuthRoutes, setupNotFoundRoutes } from "./utils/routerHelper";
+
 // handlers
 import {
     backlogItemsDeleteHandler,
     backlogItemsGetHandler,
     backlogItemsPostHandler,
     backlogItemsReorderPostHandler,
+    backlogItemJoinUnallocatedPartsPostHandler,
     backlogItemGetHandler,
     backlogItemPutHandler
 } from "./handlers/backlogItems";
@@ -39,16 +43,12 @@ import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
 import { userPreferencesHandler } from "./handlers/userPreferences";
 import { loginPostHandler, refreshTokenPostHandler } from "./handlers/auth";
-import { sprintBacklogItemPartsPostHandler } from "./handlers/sprintBacklogItemParts";
-
-// utils
-import { setupRoutes, setupNoAuthRoutes } from "./utils/routerHelper";
+import { sprintBacklogItemPartGetHandler, sprintBacklogItemPartsPostHandler } from "./handlers/sprintBacklogItemParts";
 import { planViewBffGetHandler } from "./handlers/views/planViewBff";
 import {
     sprintBacklogItemDeleteHandler,
     sprintBacklogItemsGetHandler,
     sprintBacklogItemPostHandler,
-    sprintBacklogItemPartGetHandler,
     sprintBacklogItemGetHandler
 } from "./handlers/sprintBacklogItems";
 import { sprintUpdateStatsPostHandler } from "./handlers/sprintUpdateStats";
@@ -137,6 +137,10 @@ setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}/:itemId`, {
     delete: backlogItemsDeleteHandler
 });
 
+setupRoutes(router, `/${BACKLOG_ITEM_RESOURCE_NAME}/:itemId/join-unallocated-parts`, {
+    post: backlogItemJoinUnallocatedPartsPostHandler
+});
+
 setupRoutes(router, `/${BACKLOG_ITEM_PART_RESOURCE_NAME}/:itemId`, {
     get: backlogItemPartGetHandler,
     patch: backlogItemPartPatchHandler
@@ -159,3 +163,5 @@ router.post("/actions/reorder-backlog-items", auth, backlogItemsReorderPostHandl
 
 router.post("/actions/login", loginPostHandler);
 router.post("/actions/refresh-token", refreshTokenPostHandler);
+
+setupNotFoundRoutes(router);

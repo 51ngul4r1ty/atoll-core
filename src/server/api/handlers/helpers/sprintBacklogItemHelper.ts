@@ -4,7 +4,7 @@
  */
 
 // externals
-import { CreateOptions, FindOptions } from "sequelize";
+import { CreateOptions, Transaction } from "sequelize";
 
 // libraries
 import {
@@ -23,9 +23,6 @@ import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItem
 import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRankDataModel";
 import { SprintBacklogItemPartDataModel } from "../../../dataaccess/models/SprintBacklogItemPartDataModel";
 
-// interfaces/types
-import { HandlerContext } from "../utils/handlerContext";
-
 // utils
 import {
     mapDbSprintBacklogWithNestedToApiBacklogItemInSprint,
@@ -34,49 +31,58 @@ import {
     mapDbToApiSprintBacklogItem
 } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { handleSprintStatUpdate } from "../updaters/sprintStatUpdater";
-import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
+import { buildOptionsFromParams, buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
 import { addIdToBody } from "../../utils/uuidHelper";
 import { buildBacklogItemFindOptionsIncludeForNested, computeUnallocatedPointsUsingDbObjs } from "./backlogItemHelper";
 
 export const fetchSprintBacklogItemsForBacklogItemWithNested = async (
-    handlerContext: HandlerContext,
     sprintId: string,
-    backlogItemId: string
+    backlogItemId: string,
+    transaction?: Transaction
 ) => {
-    const sprintBacklogItems = await SprintBacklogItemPartDataModel.findAll({
-        where: { sprintId },
-        include: { all: true, nested: true },
-        transaction: handlerContext.transactionContext.transaction
-    });
+    const options = buildOptionsWithTransaction(
+        {
+            where: { sprintId },
+            include: { all: true, nested: true }
+        },
+        transaction
+    );
+    const sprintBacklogItems = await SprintBacklogItemPartDataModel.findAll(options);
     const matchingItems = sprintBacklogItems.filter((item) => {
         return (item as any).backlogitempart?.backlogitemId === backlogItemId;
     });
     return matchingItems;
 };
 
-export const isItemInProductBacklog = async (handlerContext: HandlerContext, backlogItemId: string) => {
-    const productBacklogItems = await BacklogItemRankDataModel.findAll({
-        where: { backlogitemId: backlogItemId },
-        include: [],
-        transaction: handlerContext.transactionContext.transaction
-    });
+export const isItemInProductBacklog = async (backlogItemId: string, transaction?: Transaction) => {
+    const options = buildOptionsWithTransaction(
+        {
+            where: { backlogitemId: backlogItemId },
+            include: []
+        },
+        transaction
+    );
+    const productBacklogItems = await BacklogItemRankDataModel.findAll(options);
     const itemInProductBacklog = productBacklogItems.length > 0;
     return itemInProductBacklog;
 };
 
 export const removeSprintBacklogItemAndUpdateStats = async (
-    handlerContext: HandlerContext,
     sprintId: string,
     sprintBacklogItemWithNested: SprintBacklogItemPartDataModel,
-    sprintStats: ApiSprintStats
+    sprintStats: ApiSprintStats,
+    transaction?: Transaction
 ): Promise<ApiSprintStats> => {
     const backlogitempartId = (sprintBacklogItemWithNested as any).backlogitempartId;
     const apiBacklogItemInSprint = mapDbSprintBacklogWithNestedToApiBacklogItemInSprint(sprintBacklogItemWithNested);
     const backlogItemTyped = mapApiItemToBacklogItem(apiBacklogItemInSprint);
-    await SprintBacklogItemPartDataModel.destroy({
-        where: { sprintId, backlogitempartId },
-        transaction: handlerContext.transactionContext.transaction
-    });
+    const options = buildOptionsWithTransaction(
+        {
+            where: { sprintId, backlogitempartId }
+        },
+        transaction
+    );
+    await SprintBacklogItemPartDataModel.destroy(options);
     sprintStats = await handleSprintStatUpdate(
         sprintId,
         backlogItemTyped.status,
@@ -85,21 +91,24 @@ export const removeSprintBacklogItemAndUpdateStats = async (
         apiBacklogItemInSprint.storyEstimate,
         null,
         null,
-        handlerContext.transactionContext.transaction
+        transaction
     );
     return sprintStats;
 };
 
 export const fetchSprintBacklogItems = async (
-    handlerContext: HandlerContext,
-    sprintId: string
+    sprintId: string,
+    transaction?: Transaction
 ): Promise<SprintBacklogItemPartDataModel[]> => {
-    const options = buildOptionsFromParams({ sprintId });
-    const sprintBacklogs = await SprintBacklogItemPartDataModel.findAll({
-        ...options,
-        order: [["displayindex", "ASC"]],
-        transaction: handlerContext.transactionContext.transaction
-    });
+    const baseOptions = buildOptionsFromParams({ sprintId });
+    const options = buildOptionsWithTransaction(
+        {
+            ...baseOptions,
+            order: [["displayindex", "ASC"]]
+        },
+        transaction
+    );
+    const sprintBacklogs = await SprintBacklogItemPartDataModel.findAll(options);
     return sprintBacklogs;
 };
 
@@ -119,15 +128,17 @@ export interface ApiBacklogItemPartWithSprintId extends ApiBacklogItemPart {
 }
 
 export const fetchAllocatedAndUnallocatedBacklogItemParts = async (
-    handlerContext: HandlerContext,
-    allBacklogItemParts: ApiBacklogItemPart[]
+    allBacklogItemParts: ApiBacklogItemPart[],
+    transaction?: Transaction
 ): Promise<ApiBacklogItemPartWithSprintId[]> => {
     const allBacklogItemPartIds = allBacklogItemParts.map((item) => item.id);
-    const options: FindOptions = {
-        where: { backlogitempartId: allBacklogItemPartIds },
-        order: [["displayindex", "ASC"]],
-        transaction: handlerContext.transactionContext.transaction
-    };
+    const options = buildOptionsWithTransaction(
+        {
+            where: { backlogitempartId: allBacklogItemPartIds },
+            order: [["displayindex", "ASC"]]
+        },
+        transaction
+    );
     const sprintBacklogItems = await SprintBacklogItemPartDataModel.findAll(options);
     const backlogItemPartsInSprints = sprintBacklogItems.map((item) => mapDbToApiSprintBacklogItem(item));
     let backlogItemPartIdsInSprints: { [backlogItemPartId: string]: ApiSprintBacklogItem } = {};
@@ -145,13 +156,16 @@ export const fetchAllocatedAndUnallocatedBacklogItemParts = async (
 };
 
 export const fetchAssociatedBacklogItemWithParts = async (
-    handlerContext: HandlerContext,
-    backlogItemId: string
+    backlogItemId: string,
+    transaction?: Transaction
 ): Promise<ApiBacklogItemWithParts> => {
-    const dbBacklogItemWithParts = await BacklogItemDataModel.findByPk(backlogItemId, {
-        include: buildBacklogItemFindOptionsIncludeForNested(),
-        transaction: handlerContext.transactionContext.transaction
-    });
+    const options = buildOptionsWithTransaction(
+        {
+            include: buildBacklogItemFindOptionsIncludeForNested()
+        },
+        transaction
+    );
+    const dbBacklogItemWithParts = await BacklogItemDataModel.findByPk(backlogItemId, options);
     const backlogItemParts = (dbBacklogItemWithParts as any).dataValues.backlogitemparts as any;
     const backlogItem = mapDbToApiBacklogItemWithParts(dbBacklogItemWithParts);
     backlogItem.unallocatedPoints = computeUnallocatedPointsUsingDbObjs(dbBacklogItemWithParts, backlogItemParts);
@@ -162,21 +176,24 @@ export const fetchAssociatedBacklogItemWithParts = async (
  * Uses backlogItemId to find a matching backlogItemParts in the specified sprint.
  */
 export const fetchSprintBacklogItemsPartByItemId = async (
-    handlerContext: HandlerContext,
     sprintId: string,
-    backlogItemId: string
+    backlogItemId: string,
+    transaction?: Transaction
 ): Promise<ApiBacklogItemPart[]> => {
-    const dbBacklogItemPartsWithSprintItems = await BacklogItemPartDataModel.findAll({
-        where: { backlogitemId: backlogItemId },
-        include: [
-            {
-                model: SprintBacklogItemPartDataModel,
-                as: DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS,
-                where: { sprintId }
-            }
-        ],
-        transaction: handlerContext.transactionContext.transaction
-    });
+    const options = buildOptionsWithTransaction(
+        {
+            where: { backlogitemId: backlogItemId },
+            include: [
+                {
+                    model: SprintBacklogItemPartDataModel,
+                    as: DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS,
+                    where: { sprintId }
+                }
+            ]
+        },
+        transaction
+    );
+    const dbBacklogItemPartsWithSprintItems = await BacklogItemPartDataModel.findAll(options);
     if (dbBacklogItemPartsWithSprintItems.length === 0) {
         return [];
     } else {
@@ -190,18 +207,20 @@ export const fetchSprintBacklogItemsPartByItemId = async (
  * @returns Database model sprint backlog object.
  */
 export const allocateBacklogItemToSprint = async (
-    handlerContext: HandlerContext,
     sprintId: string,
     backlogItemPartId: string,
-    displayIndex: number
+    displayIndex: number,
+    transaction?: Transaction
 ): Promise<SprintBacklogItemPartDataModel> => {
     const bodyWithId = addIdToBody({
         sprintId,
         backlogitempartId: backlogItemPartId,
         displayindex: displayIndex
     });
-    const addedSprintBacklog = await SprintBacklogItemPartDataModel.create(bodyWithId, {
-        transaction: handlerContext.transactionContext.transaction
-    } as CreateOptions);
+    const options: CreateOptions = {};
+    if (transaction) {
+        options.transaction = transaction;
+    }
+    const addedSprintBacklog = await SprintBacklogItemPartDataModel.create(bodyWithId, options);
     return addedSprintBacklog;
 };

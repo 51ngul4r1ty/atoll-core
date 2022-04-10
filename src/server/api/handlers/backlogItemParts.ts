@@ -122,10 +122,10 @@ export const backlogItemPartPatchHandler = async (req: Request, res: Response) =
                 }
             }
         }
+        finish(handlerContext);
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);
     }
-    finish(handlerContext);
 };
 
 const patchBacklogItemPart = async (

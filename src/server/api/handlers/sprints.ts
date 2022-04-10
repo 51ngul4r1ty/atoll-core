@@ -23,6 +23,16 @@ import { mapDbToApiSprint } from "../../dataaccess/mappers/dataAccessToApiMapper
 import { respondedWithMismatchedItemIds } from "../utils/validationResponders";
 import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
 import { Transaction } from "sequelize";
+import {
+    beginSerializableTransaction,
+    commitWithOkResponseIfNotAborted,
+    finish,
+    handleSuccessResponse,
+    handleUnexpectedErrorResponse,
+    rollbackWithMessageAndStatus,
+    start
+} from "./utils/handlerContext";
+import { isRestApiItemResult } from "api/utils/responseBuilder";
 
 export const sprintsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
@@ -83,7 +93,7 @@ export const sprintPatchHandler = async (req: Request, res: Response) => {
                 respondWithFailedValidation(res, `Unable to patch: ${invalidPatchMessage}`);
             } else {
                 const newItem = getPatchedItem(originalSprint, body);
-                await sprint.update(newItem);
+                await sprint.update(mapApiToDbSprint(newItem));
                 respondWithItem(res, sprint, originalSprint);
             }
         }
@@ -224,15 +234,21 @@ export const sprintDeleteHandler = async (req: Request, res) => {
 };
 
 export const sprintGetHandler = async (req: Request, res: Response) => {
-    const params = getParamsFromRequest(req);
-    const result = await fetchSprint(params.sprintId);
-    if (result.status === HttpStatus.OK) {
-        res.json(result);
-    } else {
-        res.status(result.status).json({
-            status: result.status,
-            message: result.message
-        });
-        console.log(`Unable to fetch sprint: ${result.message}`);
+    const handlerContext = start("sprintGetHandler", res);
+
+    try {
+        await beginSerializableTransaction(handlerContext);
+
+        const params = getParamsFromRequest(req);
+        const result = await fetchSprint(params.sprintId, handlerContext.transactionContext.transaction);
+        if (isRestApiItemResult(result)) {
+            await handleSuccessResponse(handlerContext, result);
+        } else {
+            await rollbackWithMessageAndStatus(handlerContext, result.message, result.status);
+            console.log(`Unable to fetch sprint: ${result.message}`);
+        }
+        finish(handlerContext);
+    } catch (err) {
+        await handleUnexpectedErrorResponse(handlerContext, err);
     }
 };

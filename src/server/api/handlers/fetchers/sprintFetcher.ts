@@ -19,12 +19,9 @@ import { SprintBacklogItemPartDataModel } from "../../../dataaccess/models/Sprin
 import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
 
-// interfaces/types
-import type { HandlerContext } from "../utils/handlerContext";
-
 // utils
 import { buildLink, buildSelfLink } from "../../../utils/linkBuilder";
-import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
+import { buildOptionsFromParams, buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
 import {
     buildResponseFromCatchError,
     buildResponseWithItem,
@@ -83,10 +80,10 @@ export const fetchSprints = async (projectId: string | null, archived?: string |
     }
 };
 
-export const fetchSprint = async (sprintId: string): Promise<SprintResult> => {
-    const handlerContext = null;
+export const fetchSprint = async (sprintId: string, transaction?: Transaction): Promise<SprintResult> => {
     try {
-        const sprint = await SprintDataModel.findByPk(sprintId);
+        const options = buildOptionsWithTransaction({}, transaction);
+        const sprint = await SprintDataModel.findByPk(sprintId, options);
         if (!sprint) {
             return {
                 status: HttpStatus.NOT_FOUND,
@@ -94,7 +91,7 @@ export const fetchSprint = async (sprintId: string): Promise<SprintResult> => {
             };
         }
         const sprintItem = mapDbToApiSprint(sprint);
-        const nextSprint = await fetchNextSprint(handlerContext, isoDateStringToDate(sprintItem.startdate));
+        const nextSprint = await fetchNextSprint(isoDateStringToDate(sprintItem.startdate), transaction);
         const resourceBasePath = `/api/v1/${SPRINT_RESOURCE_NAME}/`;
         const links: Link[] = [buildSelfLink(sprintItem, resourceBasePath)];
         if (nextSprint) {
@@ -112,10 +109,7 @@ export const fetchSprint = async (sprintId: string): Promise<SprintResult> => {
     }
 };
 
-export const fetchNextSprint = async (
-    handlerContext: HandlerContext | null,
-    currentSprintStartDate: Date
-): Promise<SprintDataModel | null> => {
+export const fetchNextSprint = async (currentSprintStartDate: Date, transaction?: Transaction): Promise<SprintDataModel | null> => {
     if (!currentSprintStartDate) {
         throw new Error("fetchNextSprint called without providing currentSprintStartDate!");
     }
@@ -129,8 +123,8 @@ export const fetchNextSprint = async (
         order: [["startdate", "ASC"]],
         limit: 2
     };
-    if (handlerContext) {
-        options.transaction = handlerContext.transactionContext.transaction;
+    if (transaction) {
+        options.transaction = transaction;
     }
     const sprintItems = await SprintDataModel.findAll(options);
     if (sprintItems.length === 0) {
@@ -189,13 +183,17 @@ export const fetchSprintsForBacklogItem = async (backlogItemId: string | null): 
 };
 
 export const fetchPartAndSprintInfoForBacklogItem = async (
-    backlogItemId: string | null
+    backlogItemId: string | null,
+    transaction?: Transaction
 ): Promise<PartAndSprintInfoForBacklogItemsResult> => {
     try {
         const includeSprint = true;
-        const options = {
-            include: buildBacklogItemFindOptionsIncludeForNested(includeSprint)
-        };
+        const options = buildOptionsWithTransaction(
+            {
+                include: buildBacklogItemFindOptionsIncludeForNested(includeSprint)
+            },
+            transaction
+        );
         const dbBacklogItem: BacklogItemDataModel = await BacklogItemDataModel.findByPk(backlogItemId, options);
         const items: PartAndSprintInfoForBacklogItem[] = [];
         const sprintResourceBasePath = `/api/v1/${SPRINT_RESOURCE_NAME}/`;

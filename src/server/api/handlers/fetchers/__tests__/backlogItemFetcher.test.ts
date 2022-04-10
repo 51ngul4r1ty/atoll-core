@@ -71,8 +71,11 @@ jest.mock("../../../../dataaccess/models/SprintBacklogItemPartDataModel", () => 
 describe("Backlog Item Fetcher", () => {
     const buildExpectedItems = () => [
         {
+            acceptedAt: undefined,
+            createdAt: undefined,
             estimate: 13,
             externalId: "fake-backlogitem-external-id-1",
+            finishedAt: undefined,
             friendlyId: "fake-backlogitem-friendly-id-1",
             id: "fake-backlog-item-id-1",
             links: [
@@ -82,14 +85,20 @@ describe("Backlog Item Fetcher", () => {
                     uri: "/api/v1/backlog-items/fake-backlog-item-id-1"
                 }
             ],
+            releasedAt: undefined,
+            startedAt: undefined,
             status: "P",
             storyEstimate: 13,
             unallocatedParts: 2,
-            unallocatedPoints: 5
+            unallocatedPoints: 5,
+            updatedAt: undefined
         },
         {
+            acceptedAt: undefined,
+            createdAt: undefined,
             estimate: 0.5,
             externalId: "fake-backlogitem-external-id-2",
+            finishedAt: undefined,
             friendlyId: "fake-backlogitem-friendly-id-2",
             id: "fake-backlog-item-id-2",
             links: [
@@ -99,10 +108,13 @@ describe("Backlog Item Fetcher", () => {
                     uri: "/api/v1/backlog-items/fake-backlog-item-id-2"
                 }
             ],
+            releasedAt: undefined,
+            startedAt: undefined,
             status: "N",
             storyEstimate: 0.5,
             unallocatedParts: 2,
-            unallocatedPoints: 5
+            unallocatedPoints: 5,
+            updatedAt: undefined
         }
     ];
     describe("fetchBacklogItems", () => {

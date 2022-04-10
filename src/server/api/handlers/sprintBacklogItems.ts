@@ -91,17 +91,6 @@ export const sprintBacklogItemGetHandler = async (req: Request, res: Response) =
     }
 };
 
-export const sprintBacklogItemPartGetHandler = async (req: Request, res: Response) => {
-    const params = getParamsFromRequest(req);
-    const result = await fetchSprintBacklogItemPartWithLinks(params.sprintId, params.backlogItemPartId);
-    if (isRestApiItemResult(result)) {
-        res.json(result);
-    } else {
-        res.status(result.status).json(result);
-        console.log(`Unable to fetch sprintBacklogItemPart: ${result.message}`);
-    }
-};
-
 export const sprintBacklogItemPostHandler = async (req: Request, res: Response) => {
     const handlerContext = start("sprintBacklogItemPostHandler", res);
 
@@ -114,7 +103,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res: Response) 
     try {
         await beginSerializableTransaction(handlerContext);
 
-        const sprintBacklogs = await fetchSprintBacklogItems(handlerContext, sprintId);
+        const sprintBacklogs = await fetchSprintBacklogItems(sprintId, handlerContext.transactionContext.transaction);
 
         const displayIndex = determineNextSprintIndex(sprintBacklogs);
 
@@ -134,7 +123,10 @@ export const sprintBacklogItemPostHandler = async (req: Request, res: Response) 
         if (!hasRolledBack(handlerContext)) {
             const allBacklogItemParts = backlogitempartsSuccessResult.data.items;
 
-            partsWithAllocationInfo = await fetchAllocatedAndUnallocatedBacklogItemParts(handlerContext, allBacklogItemParts);
+            partsWithAllocationInfo = await fetchAllocatedAndUnallocatedBacklogItemParts(
+                allBacklogItemParts,
+                handlerContext.transactionContext.transaction
+            );
             const unallocatedBacklogItemParts = partsWithAllocationInfo.filter((item) => !item.sprintId);
             if (!unallocatedBacklogItemParts.length) {
                 rollbackWithErrorResponse(
@@ -162,7 +154,7 @@ export const sprintBacklogItemPostHandler = async (req: Request, res: Response) 
             if (joinSplitParts) {
                 const removePartResult = await removeUnallocatedBacklogItemPart(
                     allocatedBacklogItemPartId,
-                    LastPartRemovalOptions.Disallow,
+                    LastPartRemovalOptions.Allow,
                     handlerContext.transactionContext.transaction
                 );
                 if (isRestApiErrorResult(removePartResult)) {
@@ -170,10 +162,10 @@ export const sprintBacklogItemPostHandler = async (req: Request, res: Response) 
                 }
             } else {
                 addedDbSprintBacklogItem = await allocateBacklogItemToSprint(
-                    handlerContext,
                     sprintId,
                     allocatedBacklogItemPartId,
-                    displayIndex
+                    displayIndex,
+                    handlerContext.transactionContext.transaction
                 );
             }
             if (!hasRolledBack(handlerContext) && allStoryPartsAllocated) {
@@ -190,9 +182,12 @@ export const sprintBacklogItemPostHandler = async (req: Request, res: Response) 
                 }
             }
             if (!hasRolledBack(handlerContext)) {
-                backlogItem = await fetchAssociatedBacklogItemWithParts(handlerContext, backlogitemId);
+                backlogItem = await fetchAssociatedBacklogItemWithParts(
+                    backlogitemId,
+                    handlerContext.transactionContext.transaction
+                );
                 if (joinSplitParts) {
-                    const fetchSprintResult = await fetchSprint(sprintId);
+                    const fetchSprintResult = await fetchSprint(sprintId, handlerContext.transactionContext.transaction);
                     if (!isRestApiItemResult<ApiSprint>(fetchSprintResult)) {
                         rollbackWithErrorResponse(
                             handlerContext,
@@ -239,10 +234,10 @@ export const sprintBacklogItemPostHandler = async (req: Request, res: Response) 
                 await commitWithCreatedResponseIfNotAborted(handlerContext, addedSprintBacklogItem, extra);
             }
         }
+        finish(handlerContext);
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);
     }
-    finish(handlerContext);
 };
 
 /**
@@ -260,7 +255,11 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res: Response
     try {
         await beginSerializableTransaction(handlerContext);
 
-        const matchingItems = await fetchSprintBacklogItemsForBacklogItemWithNested(handlerContext, sprintId, backlogitemId);
+        const matchingItems = await fetchSprintBacklogItemsForBacklogItemWithNested(
+            sprintId,
+            backlogitemId,
+            handlerContext.transactionContext.transaction
+        );
         if (!matchingItems.length) {
             abortWithNotFoundResponse(
                 handlerContext,
@@ -275,7 +274,7 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res: Response
             let result: BacklogItemRankFirstItemInserterResult;
             let sprintStats: ApiSprintStats;
             let apiBacklogItemTyped: ApiBacklogItemInSprint;
-            const itemInProductBacklog = await isItemInProductBacklog(handlerContext, backlogitemId);
+            const itemInProductBacklog = await isItemInProductBacklog(backlogitemId, handlerContext.transactionContext.transaction);
             if (!itemInProductBacklog) {
                 result = await backlogItemRankFirstItemInserter(
                     firstApiBacklogItemTyped,
@@ -295,10 +294,10 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res: Response
                 for (const sprintBacklogItem of matchingItems) {
                     if (!handlerContext.transactionContext.rolledBack) {
                         sprintStats = await removeSprintBacklogItemAndUpdateStats(
-                            handlerContext,
                             sprintId,
                             sprintBacklogItem,
-                            sprintStats
+                            sprintStats,
+                            handlerContext.transactionContext.transaction
                         );
                     }
                 }
@@ -329,6 +328,7 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res: Response
             };
             await commitWithOkResponseIfNotAborted(handlerContext, apiBacklogItemTyped, extra);
         }
+        finish(handlerContext);
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);
     }
