@@ -36,13 +36,11 @@ export interface HandlerContext {
     transactionContext?: HandlerTransactionContext;
 }
 
-// TODO: Rename this from start so that it doesn't seem like you have to call `finish`
 export const start = (functionTag: string, res: Response): HandlerContext => {
     const logContext = logger.info("starting call", [functionTag]);
     return { logContext, functionTag, expressContext: { res } };
 };
 
-// TODO: Stop exporting finish - it should not be called directly
 export const finish = (handlerContext: HandlerContext) => {
     logger.info("finishing call", [handlerContext.functionTag]);
 };
