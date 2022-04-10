@@ -128,6 +128,7 @@ export const sprintBacklogItemPartsPostHandler = async (req: Request, res: Respo
             sprintBacklogItem: addedSprintBacklogItem,
             sprintStats
         });
+        // TODO: eliminate direct calls to finish - all responses should call finish
         finish(handlerContext);
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);
