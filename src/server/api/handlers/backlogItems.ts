@@ -261,7 +261,6 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         const newItem = updateBacklogItemPartResult.backlogItem;
         const addedBacklogItem = await BacklogItemDataModel.create(newItem, { transaction } as CreateOptions);
         if (!prevBacklogItemId) {
-            // TODO: Change name of this and investigate why Postman collection POST returns a "backlogitempart.version cannot be null error"
             await backlogItemRankFirstItemInserter(newItem, transaction);
         } else {
             const result = await backlogItemRankSubsequentItemInserter(newItem, transaction, prevBacklogItemId);
@@ -428,7 +427,6 @@ export const backlogItemJoinUnallocatedPartsPostHandler = async (req: Request, r
     if (!queryParamBacklogItemId) {
         return await handleFailedValidationResponse(handlerContext, "Item ID is required in URI path for this operation");
     }
-    // TODO: validate that ID is a properly formatted ID
 
     try {
         await beginSerializableTransaction(handlerContext);
@@ -448,8 +446,6 @@ export const backlogItemJoinUnallocatedPartsPostHandler = async (req: Request, r
         const partsWithAllocationInfo = await fetchAllocatedAndUnallocatedBacklogItemParts(allBacklogItemParts, transaction);
         const unallocatedBacklogItemParts = partsWithAllocationInfo.filter((item) => !item.sprintId);
         const unallocatedBacklogItemPartsSorted = unallocatedBacklogItemParts.sort((a, b) => a.partIndex - b.partIndex);
-
-        // TODO: Refactor out each of these blocks that have comments into their own functions
 
         // Keep part with lowest partIndex value and remove all the other unallocated parts
         // (for example, unallocated parts could be: 1, 5, 6 and 2, 3, 4 could be allocated to sprints)
