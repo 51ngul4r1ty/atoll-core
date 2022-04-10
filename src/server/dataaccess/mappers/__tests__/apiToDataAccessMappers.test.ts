@@ -33,6 +33,7 @@ describe("API To Data Object Mappers", () => {
                 finishedAt: "2022-04-06T12:39:23.223Z",
                 acceptedAt: "2022-04-06T14:45:15.767Z",
                 releasedAt: "2022-04-06T15:05:33.334Z",
+                partIndex: 1,
                 totalParts: 2,
                 createdAt: "2022-04-02T09:59:01.000Z",
                 updatedAt: "2022-04-06T15:07:10.667Z",

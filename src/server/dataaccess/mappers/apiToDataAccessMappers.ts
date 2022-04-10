@@ -68,9 +68,11 @@ export const mapApiToDbBacklogItem = (
     mapOptions: ApiToDataAccessMapOptions = ApiToDataAccessMapOptions.RemoveExtraApiFields
 ) => {
     const storyEstimate = convertFloatToDbNumber(backlogItem.storyEstimate);
+    // const unallocatedPoints = convertFloatToDbNumber(backlogItem.unallocatedPoints);
     const dataValues = {
         ...backlogItem,
         storyEstimate,
+        // unallocatedPoints,
         acceptedAt: convertApiDateToDate(backlogItem.acceptedAt),
         createdAt: convertApiDateToDate(backlogItem.createdAt),
         finishedAt: convertApiDateToDate(backlogItem.finishedAt),
@@ -82,6 +84,7 @@ export const mapApiToDbBacklogItem = (
         delete dataValues.storyEstimate;
         delete dataValues.unallocatedParts;
         delete dataValues.unallocatedPoints;
+        delete dataValues.partIndex;
     }
     return {
         ...dataValues,

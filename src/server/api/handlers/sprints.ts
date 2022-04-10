@@ -27,10 +27,12 @@ import {
     beginSerializableTransaction,
     commitWithOkResponseIfNotAborted,
     finish,
+    handleSuccessResponse,
     handleUnexpectedErrorResponse,
     rollbackWithMessageAndStatus,
     start
 } from "./utils/handlerContext";
+import { isRestApiItemResult } from "api/utils/responseBuilder";
 
 export const sprintsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
@@ -239,8 +241,8 @@ export const sprintGetHandler = async (req: Request, res: Response) => {
 
         const params = getParamsFromRequest(req);
         const result = await fetchSprint(params.sprintId, handlerContext.transactionContext.transaction);
-        if (result.status === HttpStatus.OK) {
-            await commitWithOkResponseIfNotAborted(handlerContext, result);
+        if (isRestApiItemResult(result)) {
+            await handleSuccessResponse(handlerContext, result);
         } else {
             await rollbackWithMessageAndStatus(handlerContext, result.message, result.status);
             console.log(`Unable to fetch sprint: ${result.message}`);

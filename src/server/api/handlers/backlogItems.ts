@@ -34,7 +34,7 @@ import {
     respondWithObj
 } from "../utils/responder";
 import { getParamsFromRequest } from "../utils/filterHelper";
-import { fetchBacklogItemsByDisplayId, fetchBacklogItems } from "./fetchers/backlogItemFetcher";
+import { fetchBacklogItemsByDisplayId, fetchBacklogItems, fetchBacklogItem } from "./fetchers/backlogItemFetcher";
 import { addIdToBody } from "../utils/uuidHelper";
 import { backlogItemRankFirstItemInserter, backlogItemRankSubsequentItemInserter } from "./inserters/backlogItemRankInserter";
 import {
@@ -57,15 +57,14 @@ import type { BacklogItemsResult } from "./fetchers/backlogItemFetcher";
 import type { RestApiStatusAndMessageOnly } from "../utils/responseBuilder";
 import {
     beginSerializableTransaction,
-    finish,
     handleFailedValidationResponse,
     handlePersistenceErrorResponse,
     handleSuccessResponse,
     handleUnexpectedErrorResponse,
     start
 } from "./utils/handlerContext";
-import { BacklogItemPartsResult, fetchBacklogItemParts } from "./fetchers/backlogItemPartFetcher";
-import { fetchAllocatedAndUnallocatedBacklogItemParts } from "./helpers/sprintBacklogItemHelper";
+import { fetchBacklogItemParts } from "./fetchers/backlogItemPartFetcher";
+import { ApiBacklogItemPartWithSprintId, fetchAllocatedAndUnallocatedBacklogItemParts } from "./helpers/sprintBacklogItemHelper";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
@@ -428,6 +427,7 @@ export const backlogItemJoinUnallocatedPartsPostHandler = async (req: Request, r
     if (!queryParamBacklogItemId) {
         return await handleFailedValidationResponse(handlerContext, "Item ID is required in URI path for this operation");
     }
+
     try {
         await beginSerializableTransaction(handlerContext);
 
@@ -475,9 +475,14 @@ export const backlogItemJoinUnallocatedPartsPostHandler = async (req: Request, r
         allocatedBacklogItemParts.forEach((item) => {
             itemsToKeep.push(item);
         });
+        const unsortedBacklogItemPartsWithSprintId: ApiBacklogItemPartWithSprintId[] = [];
         for (const item of itemsToKeep) {
             if (!errorMessage) {
                 const newPartIndex = calcNewPartIndex(item.partIndex, partIndexesRemoved);
+                unsortedBacklogItemPartsWithSprintId.push({
+                    ...item,
+                    partIndex: newPartIndex
+                });
                 if (newPartIndex !== item.partIndex) {
                     const backlogItemPartId = item.id;
                     const findItemOptions: FindOptions = buildOptionsWithTransaction(
@@ -499,7 +504,15 @@ export const backlogItemJoinUnallocatedPartsPostHandler = async (req: Request, r
         const dbBacklogItem = await BacklogItemDataModel.findOne(findItemOptions);
         const newApiBacklogItem = { ...mapDbToApiBacklogItem(dbBacklogItem), totalParts: itemsToKeep.length };
         await dbBacklogItem.update(mapApiToDbBacklogItem(newApiBacklogItem), { transaction });
-        const result = buildResponseWithItem(newApiBacklogItem, undefined);
+
+        const backlogItemPartsWithSprintId = unsortedBacklogItemPartsWithSprintId.sort((a, b) => a.partIndex - b.partIndex);
+        const extra = {
+            backlogItemPartsWithSprintId
+        };
+        const result = buildResponseWithItem(
+            { ...newApiBacklogItem, unallocatedParts: 1, unallocatedPoints: firstItem.points },
+            extra
+        );
         await handleSuccessResponse(handlerContext, result);
     } catch (err) {
         await handleUnexpectedErrorResponse(handlerContext, err);

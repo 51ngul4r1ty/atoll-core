@@ -52,7 +52,7 @@ export type BacklogItemParams = {
     externalId?: string;
 };
 
-export const buildFindOptionsForBacklogItems = (params: BacklogItemParams, transaction?: Transaction): FindOptions => {
+export const buildBacklogItemFindOptionsForNested = (params: BacklogItemParams, transaction?: Transaction): FindOptions => {
     const options = buildOptionsFromParams(params);
     const backlogItemsOptions: FindOptions = {
         ...options,
@@ -61,12 +61,15 @@ export const buildFindOptionsForBacklogItems = (params: BacklogItemParams, trans
     return backlogItemsOptions;
 };
 
+/**
+ * @returns backlog item with
+ */
 export const fetchBacklogItem = async (
     backlogItemId: string,
     transaction?: Transaction
 ): Promise<BacklogItemResult | RestApiErrorResult> => {
     try {
-        const backlogItemsOptions = buildFindOptionsForBacklogItems({}, transaction);
+        const backlogItemsOptions = buildBacklogItemFindOptionsForNested({}, transaction);
         const dbBacklogItem = await BacklogItemDataModel.findByPk(backlogItemId, backlogItemsOptions);
         if (!dbBacklogItem) {
             return buildNotFoundResponse(`Unable to find backlog item by ID ${backlogItemId}`);
@@ -88,7 +91,7 @@ export const fetchBacklogItemsByDisplayId = async (
     backlogItemDisplayId: string
 ): Promise<BacklogItemsResult | RestApiErrorResult> => {
     try {
-        const backlogItemsOptions = buildFindOptionsForBacklogItems({ projectId, externalId: backlogItemDisplayId });
+        const backlogItemsOptions = buildBacklogItemFindOptionsForNested({ projectId, externalId: backlogItemDisplayId });
         const dbBacklogItemsByExternalId = await BacklogItemDataModel.findAll(backlogItemsOptions);
         if (dbBacklogItemsByExternalId.length >= 1) {
             return buildBacklogItemsResult(dbBacklogItemsByExternalId);
@@ -113,7 +116,7 @@ export const fetchBacklogItems = async (projectId: string | null): Promise<Backl
                 rankList.addInitialLink(item.backlogitemId, item.nextbacklogitemId);
             });
         }
-        const backlogItemsOptions = buildFindOptionsForBacklogItems(params);
+        const backlogItemsOptions = buildBacklogItemFindOptionsForNested(params);
         const dbBacklogItemsWithParts = await BacklogItemDataModel.findAll(backlogItemsOptions);
         dbBacklogItemsWithParts.forEach((dbBacklogItemWithParts) => {
             const result = buildApiItemFromDbItemWithParts(dbBacklogItemWithParts);

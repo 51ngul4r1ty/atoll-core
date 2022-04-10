@@ -54,6 +54,9 @@ export const beginSerializableTransaction = async (handlerContext: HandlerContex
     };
 };
 
+/**
+ * @deprecated this doesn't work well with the "fetcher" pattern so it shouldn't be used.
+ */
 export const commitWithResponseAndStatusIfNotAborted = async (
     handlerContext: HandlerContext,
     status: number,
@@ -77,10 +80,16 @@ export const commitWithResponseAndStatusIfNotAborted = async (
     }
 };
 
+/**
+ * @deprecated this doesn't work well with the "fetcher" pattern so it shouldn't be used.
+ */
 export const commitWithOkResponseIfNotAborted = async (handlerContext: HandlerContext, addedItem, extra?) => {
     await commitWithResponseAndStatusIfNotAborted(handlerContext, HttpStatus.OK, addedItem, extra);
 };
 
+/**
+ * @deprecated this doesn't work well with the "fetcher" pattern so it shouldn't be used.
+ */
 export const commitWithCreatedResponseIfNotAborted = async (handlerContext: HandlerContext, addedItem, extra?) => {
     await commitWithResponseAndStatusIfNotAborted(handlerContext, HttpStatus.CREATED, addedItem, extra);
 };
@@ -177,9 +186,9 @@ export const handleTransactionCommit = async (handlerContext: HandlerContext, lo
     }
 };
 
-export const handleSuccessResponse = async <T>(
+export const handleSuccessResponse = async <T = any, U = any, V = any>(
     handlerContext: HandlerContext,
-    result: RestApiCollectionResult<T> | RestApiItemResult<T>
+    result: RestApiCollectionResult<T, U, V> | RestApiItemResult<T, U, V>
 ) => {
     const logContext = logger.info("success", [handlerContext.functionTag], handlerContext.logContext);
     await handleTransactionCommit(handlerContext, logContext);

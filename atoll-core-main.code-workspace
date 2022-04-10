@@ -11,6 +11,7 @@
         }
     ],
     "settings": {
+        "editor.rulers": [132],
         "bookmarks.navigateThroughAllFiles": true,
         "bookmarks.backgroundLineColor": "#102030",
         "coverage-gutters.showGutterCoverage": true,
