@@ -197,22 +197,6 @@ export const handleSuccessResponse = async <T = any, U = any, V = any>(
     finish(handlerContext);
 };
 
-// export const respondAndCommit = async <T, U, V>(
-//     handlerContext: HandlerContext,
-//     data: RestApiCollectionResult<T, U, V> | RestApiItemResult<T, U, V>
-// ) => {
-//     if (!hasRolledBack(handlerContext)) {
-//         await handlerContext.transactionContext.transaction.commit();
-//         const status = data.status;
-//         if (!hasAborted(handlerContext)) {
-//             handlerContext.expressContext.res.status(status).json({
-//                 status,
-//                 data
-//             });
-//         }
-//     }
-// };
-
 export const hasAborted = (handlerContext: HandlerContext): boolean => handlerContext.transactionContext.aborted || false;
 
 export const hasRolledBack = (handlerContext: HandlerContext): boolean => handlerContext.transactionContext.rolledBack || false;
