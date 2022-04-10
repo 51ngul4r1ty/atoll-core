@@ -67,7 +67,6 @@ import { fetchBacklogItemParts } from "./fetchers/backlogItemPartFetcher";
 import { ApiBacklogItemPartWithSprintId, fetchAllocatedAndUnallocatedBacklogItemParts } from "./helpers/sprintBacklogItemHelper";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
-    // TODO: Convert this to use the standard patterns with transaction (if there isn't just a single query)
     const params = getParamsFromRequest(req);
     let result: BacklogItemsResult | RestApiStatusAndMessageOnly;
     if (params.projectId && params.backlogItemDisplayId) {
@@ -93,7 +92,6 @@ export interface BacklogItemGetParams extends core.ParamsDictionary {
 export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, res: Response) => {
     try {
         const id = req.params.itemId;
-        // TODO: Convert this to use the standard patterns (using a transaction)
         const itemWithSprintInfoResult = await fetchBacklogItemWithSprintAllocationInfo(id);
         if (isRestApiItemResult(itemWithSprintInfoResult)) {
             respondWithObj(res, itemWithSprintInfoResult);
@@ -110,7 +108,6 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
     let committing = false;
     let transaction: Transaction;
     try {
-        // TODO: Convert this to use the standard patterns
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_backlogitemId_fkey" DEFERRED;', { transaction });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
@@ -200,7 +197,6 @@ const getNewCounterValue = async (projectId: string, backlogItemType: string) =>
     let transaction: Transaction;
     try {
         let rolledBack = false;
-        // TODO: Convert this to use the standard patterns
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         let projectSettingsItem: any = await ProjectSettingsDataModel.findOne({
             where: { projectId: projectId },
@@ -258,7 +254,6 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
     let transaction: Transaction;
     try {
         let rolledBack = false;
-        // TODO: Convert this to use the standard patterns
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_backlogitemId_fkey" DEFERRED;', { transaction });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
@@ -336,7 +331,6 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
     }
     let transaction: Transaction;
     try {
-        // TODO: Convert this to use the standard patterns
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         const backlogItem = await BacklogItemDataModel.findOne({
             where: { id: bodyItemId },
@@ -383,7 +377,6 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
     let transaction: Transaction;
     try {
         let rolledBack = false;
-        // TODO: Convert this to use the standard patterns
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
 
         // 1. Unlink source item from old location
