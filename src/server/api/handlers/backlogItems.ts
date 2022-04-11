@@ -67,6 +67,7 @@ import { fetchBacklogItemParts } from "./fetchers/backlogItemPartFetcher";
 import { ApiBacklogItemPartWithSprintId, fetchAllocatedAndUnallocatedBacklogItemParts } from "./helpers/sprintBacklogItemHelper";
 
 export const backlogItemsGetHandler = async (req: Request, res: Response) => {
+    // TODO: Convert this to use the standard patterns with transaction (if there isn't just a single query)
     const params = getParamsFromRequest(req);
     let result: BacklogItemsResult | RestApiStatusAndMessageOnly;
     if (params.projectId && params.backlogItemDisplayId) {
@@ -92,6 +93,7 @@ export interface BacklogItemGetParams extends core.ParamsDictionary {
 export const backlogItemGetHandler = async (req: Request<BacklogItemGetParams>, res: Response) => {
     try {
         const id = req.params.itemId;
+        // TODO: Convert this to use the standard patterns (using a transaction)
         const itemWithSprintInfoResult = await fetchBacklogItemWithSprintAllocationInfo(id);
         if (isRestApiItemResult(itemWithSprintInfoResult)) {
             respondWithObj(res, itemWithSprintInfoResult);
@@ -108,6 +110,7 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
     let committing = false;
     let transaction: Transaction;
     try {
+        // TODO: Convert this to use the standard patterns
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_backlogitemId_fkey" DEFERRED;', { transaction });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
@@ -197,6 +200,7 @@ const getNewCounterValue = async (projectId: string, backlogItemType: string) =>
     let transaction: Transaction;
     try {
         let rolledBack = false;
+        // TODO: Convert this to use the standard patterns
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         let projectSettingsItem: any = await ProjectSettingsDataModel.findOne({
             where: { projectId: projectId },
@@ -254,6 +258,7 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
     let transaction: Transaction;
     try {
         let rolledBack = false;
+        // TODO: Convert this to use the standard patterns
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_backlogitemId_fkey" DEFERRED;', { transaction });
         await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
@@ -261,6 +266,7 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         const newItem = updateBacklogItemPartResult.backlogItem;
         const addedBacklogItem = await BacklogItemDataModel.create(newItem, { transaction } as CreateOptions);
         if (!prevBacklogItemId) {
+            // TODO: Change name of this and investigate why Postman collection POST returns a "backlogitempart.version cannot be null error"
             await backlogItemRankFirstItemInserter(newItem, transaction);
         } else {
             const result = await backlogItemRankSubsequentItemInserter(newItem, transaction, prevBacklogItemId);
@@ -330,6 +336,7 @@ export const backlogItemPutHandler = async (req: Request, res: Response) => {
     }
     let transaction: Transaction;
     try {
+        // TODO: Convert this to use the standard patterns
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
         const backlogItem = await BacklogItemDataModel.findOne({
             where: { id: bodyItemId },
@@ -376,6 +383,7 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
     let transaction: Transaction;
     try {
         let rolledBack = false;
+        // TODO: Convert this to use the standard patterns
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
 
         // 1. Unlink source item from old location
@@ -427,6 +435,7 @@ export const backlogItemJoinUnallocatedPartsPostHandler = async (req: Request, r
     if (!queryParamBacklogItemId) {
         return await handleFailedValidationResponse(handlerContext, "Item ID is required in URI path for this operation");
     }
+    // TODO: validate that ID is a properly formatted ID
 
     try {
         await beginSerializableTransaction(handlerContext);
@@ -446,6 +455,8 @@ export const backlogItemJoinUnallocatedPartsPostHandler = async (req: Request, r
         const partsWithAllocationInfo = await fetchAllocatedAndUnallocatedBacklogItemParts(allBacklogItemParts, transaction);
         const unallocatedBacklogItemParts = partsWithAllocationInfo.filter((item) => !item.sprintId);
         const unallocatedBacklogItemPartsSorted = unallocatedBacklogItemParts.sort((a, b) => a.partIndex - b.partIndex);
+
+        // TODO: Refactor out each of these blocks that have comments into their own functions
 
         // Keep part with lowest partIndex value and remove all the other unallocated parts
         // (for example, unallocated parts could be: 1, 5, 6 and 2, 3, 4 could be allocated to sprints)
