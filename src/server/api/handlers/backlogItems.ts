@@ -7,7 +7,7 @@ import { CreateOptions, FindOptions, Transaction } from "sequelize";
 // libraries
 import {
     ApiBacklogItem,
-    ApiBacklogItemRank,
+    ApiProductBacklogItem,
     ApiSprintStats,
     formatNumber,
     getValidStatuses,
@@ -20,7 +20,7 @@ import {
 import { sequelize } from "../../dataaccess/connection";
 import { BacklogItemDataModel } from "../../dataaccess/models/BacklogItemDataModel";
 import { BacklogItemPartDataModel } from "../../dataaccess/models/BacklogItemPartDataModel";
-import { BacklogItemRankDataModel } from "../../dataaccess/models/BacklogItemRankDataModel";
+import { ProductBacklogItemDataModel } from "../../dataaccess/models/ProductBacklogItemDataModel";
 import { CounterDataModel } from "../../dataaccess/models/CounterDataModel";
 import { ProjectSettingsDataModel } from "../../dataaccess/models/ProjectSettingsDataModel";
 
@@ -36,7 +36,10 @@ import {
 import { getParamsFromRequest } from "../utils/filterHelper";
 import { fetchBacklogItemsByDisplayId, fetchBacklogItems, fetchBacklogItem } from "./fetchers/backlogItemFetcher";
 import { addIdToBody } from "../utils/uuidHelper";
-import { backlogItemRankFirstItemInserter, backlogItemRankSubsequentItemInserter } from "./inserters/backlogItemRankInserter";
+import {
+    productBacklogItemFirstItemInserter,
+    productBacklogItemSubsequentItemInserter
+} from "./inserters/productBacklogItemInserter";
 import {
     mapDbToApiBacklogItem,
     mapDbToApiBacklogItemPart,
@@ -109,8 +112,8 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
     let transaction: Transaction;
     try {
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        await sequelize.query('SET CONSTRAINTS "backlogitemrank_backlogitemId_fkey" DEFERRED;', { transaction });
-        await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
+        await sequelize.query('SET CONSTRAINTS "productbacklogitem_backlogitemId_fkey" DEFERRED;', { transaction });
+        await sequelize.query('SET CONSTRAINTS "productbacklogitem_nextbacklogitemId_fkey" DEFERRED;', { transaction });
         const id = req.params.itemId;
         let abort = true;
         if (!id) {
@@ -125,31 +128,31 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
             abort = false;
         }
         if (!abort) {
-            const firstLink = await BacklogItemRankDataModel.findOne({
+            const firstLink = await ProductBacklogItemDataModel.findOne({
                 where: { nextbacklogitemId: id },
                 transaction
             });
-            let firstLinkTyped: ApiBacklogItemRank = null;
+            let firstLinkTyped: ApiProductBacklogItem = null;
             if (!firstLink) {
-                respondWithNotFound(res, `Unable to find backlogitemrank entry with next = ${id}`);
+                respondWithNotFound(res, `Unable to find productbacklogitem entry with next = ${id}`);
                 abort = true;
             } else {
-                firstLinkTyped = firstLink as unknown as ApiBacklogItemRank;
+                firstLinkTyped = firstLink as unknown as ApiProductBacklogItem;
             }
 
-            let secondLink: BacklogItemRankDataModel = null;
-            let secondLinkTyped: ApiBacklogItemRank = null;
+            let secondLink: ProductBacklogItemDataModel = null;
+            let secondLinkTyped: ApiProductBacklogItem = null;
 
             if (!abort) {
-                secondLink = await BacklogItemRankDataModel.findOne({
+                secondLink = await ProductBacklogItemDataModel.findOne({
                     where: { backlogitemId: id },
                     transaction
                 });
                 if (!secondLink) {
-                    respondWithNotFound(res, `Unable to find backlogitemrank entry with id = ${id}`);
+                    respondWithNotFound(res, `Unable to find productbacklogitem entry with id = ${id}`);
                     abort = true;
                 } else {
-                    secondLinkTyped = secondLink as unknown as ApiBacklogItemRank;
+                    secondLinkTyped = secondLink as unknown as ApiProductBacklogItem;
                 }
             }
 
@@ -170,11 +173,11 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
             if (!abort) {
                 if (!firstLinkTyped.backlogitemId && !secondLinkTyped.nextbacklogitemId) {
                     // we'll end up with one null-null row, just remove it instead
-                    await BacklogItemRankDataModel.destroy({ where: { id: firstLinkTyped.id }, transaction });
+                    await ProductBacklogItemDataModel.destroy({ where: { id: firstLinkTyped.id }, transaction });
                 } else {
                     await firstLink.update({ nextbacklogitemId: secondLinkTyped.nextbacklogitemId }, { transaction });
                 }
-                await BacklogItemRankDataModel.destroy({ where: { id: secondLinkTyped.id }, transaction });
+                await ProductBacklogItemDataModel.destroy({ where: { id: secondLinkTyped.id }, transaction });
                 await BacklogItemDataModel.destroy({ where: { id: backlogItemTyped.id }, transaction });
                 committing = true;
                 await transaction.commit();
@@ -255,15 +258,15 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
     try {
         let rolledBack = false;
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        await sequelize.query('SET CONSTRAINTS "backlogitemrank_backlogitemId_fkey" DEFERRED;', { transaction });
-        await sequelize.query('SET CONSTRAINTS "backlogitemrank_nextbacklogitemId_fkey" DEFERRED;', { transaction });
+        await sequelize.query('SET CONSTRAINTS "productbacklogitem_backlogitemId_fkey" DEFERRED;', { transaction });
+        await sequelize.query('SET CONSTRAINTS "productbacklogitem_nextbacklogitemId_fkey" DEFERRED;', { transaction });
         const updateBacklogItemPartResult = getUpdatedBacklogItemWhenStatusChanges(null, bodyWithId);
         const newItem = updateBacklogItemPartResult.backlogItem;
         const addedBacklogItem = await BacklogItemDataModel.create(newItem, { transaction } as CreateOptions);
         if (!prevBacklogItemId) {
-            await backlogItemRankFirstItemInserter(newItem, transaction);
+            await productBacklogItemFirstItemInserter(newItem, transaction);
         } else {
-            const result = await backlogItemRankSubsequentItemInserter(newItem, transaction, prevBacklogItemId);
+            const result = await productBacklogItemSubsequentItemInserter(newItem, transaction, prevBacklogItemId);
             if (result.status !== HttpStatus.OK) {
                 respondWithFailedValidation(res, result.message);
             }
@@ -379,10 +382,10 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
 
         // 1. Unlink source item from old location
-        const sourceItemPrevLink = await BacklogItemRankDataModel.findOne({
+        const sourceItemPrevLink = await ProductBacklogItemDataModel.findOne({
             where: { nextbacklogitemId: sourceItemId }
         });
-        const sourceItemNextLink = await BacklogItemRankDataModel.findOne({
+        const sourceItemNextLink = await ProductBacklogItemDataModel.findOne({
             where: { backlogitemId: sourceItemId }
         });
         const oldNextItemId = (sourceItemNextLink as any).dataValues.nextbacklogitemId;
@@ -393,7 +396,7 @@ export const backlogItemsReorderPostHandler = async (req: Request, res: Response
         await sourceItemPrevLink.update({ nextbacklogitemId: oldNextItemId }, { transaction });
 
         // 2. Re-link source item in new location
-        const targetItemPrevLink = await BacklogItemRankDataModel.findOne({
+        const targetItemPrevLink = await ProductBacklogItemDataModel.findOne({
             where: { nextbacklogitemId: targetItemId }
         });
         const targetItemPrevLinkId = (targetItemPrevLink as any).dataValues.backlogitemId;

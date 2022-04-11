@@ -105,3 +105,16 @@ alter table sprintbacklogitem drop column "backlogitemId";
 alter table backlogitem add column "totalParts" integer;
 
 update backlogitem set "totalParts" = 1;
+
+-- v0.47.0
+alter table if exists backlogitemrank
+rename to productbacklogitem;
+
+alter table productbacklogitem
+rename constraint "backlogitemrank_backlogitemId_fkey" TO "productbacklogitem_backlogitemId_fkey";
+
+alter table productbacklogitem
+rename constraint "productbacklogitem_nextbacklogitemId_fkey" TO "productbacklogitem_nextbacklogitemId_fkey";
+
+alter table productbacklogitem
+rename constraint "backlogitemrank_pkey" TO "productbacklogitem_pkey";

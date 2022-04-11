@@ -4,7 +4,7 @@ import {
     ApiBacklogItem,
     ApiBacklogItemInSprint,
     ApiBacklogItemPart,
-    ApiBacklogItemRank,
+    ApiProductBacklogItem,
     ApiCounter,
     ApiProject,
     ApiProjectSettings,
@@ -78,7 +78,7 @@ export const mapDbToApiBacklogItemPart = (dbItem: any): ApiBacklogItemPart => {
     return mapDbDataValuesToApiBacklogItemPart(dbItem.dataValues);
 };
 
-export const mapDbToApiBacklogItemRank = (dbItem: any): ApiBacklogItemRank => {
+export const mapDbToApiProductBacklogItem = (dbItem: any): ApiProductBacklogItem => {
     if (!dbItem) {
         return dbItem;
     }

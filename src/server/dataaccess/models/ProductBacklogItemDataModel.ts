@@ -8,7 +8,7 @@ import restoreSequelizeAttributesOnClass from "../sequelizeModelHelpers";
 import { sequelize } from "../connection";
 import { BacklogItemDataModel } from "./BacklogItemDataModel";
 
-export class BacklogItemRankDataModel extends Model {
+export class ProductBacklogItemDataModel extends Model {
     public id!: string;
     public projectId!: string;
     public backlogitemId!: string | null;
@@ -22,7 +22,7 @@ export class BacklogItemRankDataModel extends Model {
     }
 }
 
-BacklogItemRankDataModel.init(
+ProductBacklogItemDataModel.init(
     {
         id: {
             type: DataTypes.STRING(32),
@@ -69,7 +69,7 @@ BacklogItemRankDataModel.init(
         }
     },
     {
-        modelName: "backlogitemrank",
+        modelName: "productbacklogitem",
         freezeTableName: true,
         paranoid: false,
         timestamps: true,
@@ -78,7 +78,7 @@ BacklogItemRankDataModel.init(
     }
 );
 
-BacklogItemRankDataModel.belongsTo(BacklogItemDataModel);
-BacklogItemRankDataModel.belongsTo(BacklogItemDataModel, {
+ProductBacklogItemDataModel.belongsTo(BacklogItemDataModel);
+ProductBacklogItemDataModel.belongsTo(BacklogItemDataModel, {
     as: "nextbacklogitem"
 });

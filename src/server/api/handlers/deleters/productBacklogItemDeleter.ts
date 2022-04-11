@@ -3,17 +3,17 @@ import * as HttpStatus from "http-status-codes";
 import { FindOptions, InstanceDestroyOptions, InstanceUpdateOptions, Transaction } from "sequelize";
 
 // data access
-import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRankDataModel";
+import { ProductBacklogItemDataModel } from "../../../dataaccess/models/ProductBacklogItemDataModel";
 
 // utils
 import { buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
 import { buildResponseFromCatchError, buildResponseWithItem } from "../../utils/responseBuilder";
-import { mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
+import { mapDbToApiProductBacklogItem } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 export const removeFromProductBacklog = async (backlogitemId: string, transaction?: Transaction) => {
     try {
         const findItemOptions: FindOptions = buildOptionsWithTransaction({ where: { backlogitemId } }, transaction);
-        const item = await BacklogItemRankDataModel.findOne(findItemOptions);
+        const item = await ProductBacklogItemDataModel.findOne(findItemOptions);
         if (!item) {
             return {
                 status: HttpStatus.NOT_FOUND,
@@ -24,21 +24,21 @@ export const removeFromProductBacklog = async (backlogitemId: string, transactio
             { where: { nextbacklogitemId: backlogitemId } },
             transaction
         );
-        const itemBefore = await BacklogItemRankDataModel.findOne(findItemBeforeOptions);
+        const itemBefore = await ProductBacklogItemDataModel.findOne(findItemBeforeOptions);
         const nextBacklogItemId = (item as any)?.nextbacklogitemId;
         const findItemAfterOptions: FindOptions = buildOptionsWithTransaction(
             { where: { backlogitemId: nextBacklogItemId } },
             transaction
         );
-        const itemAfter = nextBacklogItemId ? await BacklogItemRankDataModel.findOne(findItemAfterOptions) : null;
+        const itemAfter = nextBacklogItemId ? await ProductBacklogItemDataModel.findOne(findItemAfterOptions) : null;
         if (nextBacklogItemId && !itemAfter) {
             return {
                 status: HttpStatus.INTERNAL_SERVER_ERROR,
                 message: `Backlog item ${backlogitemId} was found, but next item wasn't found!`
             };
         }
-        let itemData = mapDbToApiBacklogItemRank(item);
-        let itemBeforeData = mapDbToApiBacklogItemRank(itemBefore);
+        let itemData = mapDbToApiProductBacklogItem(item);
+        let itemBeforeData = mapDbToApiProductBacklogItem(itemBefore);
         const destroyOptions: InstanceDestroyOptions = buildOptionsWithTransaction(undefined, transaction);
         if (itemBeforeData.backlogitemId === null && !nextBacklogItemId) {
             // This is the first item in the list and we're telling it that nothing is after it... so we really should just remove

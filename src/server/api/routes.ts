@@ -7,7 +7,7 @@ import auth from "../middleware/auth";
 // consts/enums
 import {
     BACKLOG_ITEM_PART_RESOURCE_NAME,
-    BACKLOG_ITEM_RANK_RESOURCE_NAME,
+    PRODUCT_BACKLOG_ITEM_RESOURCE_NAME,
     BACKLOG_ITEM_RESOURCE_NAME,
     PROJECT_RESOURCE_NAME,
     SPRINT_BACKLOG_CHILD_RESOURCE_NAME,
@@ -38,7 +38,7 @@ import {
     sprintGetHandler,
     sprintPutHandler
 } from "./handlers/sprints";
-import { backlogItemRanksGetHandler, backlogItemRankGetHandler } from "./handlers/backlogItemRanks";
+import { productBacklogItemsGetHandler, productBacklogItemGetHandler } from "./handlers/productBacklogItems";
 import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
 import { userPreferencesHandler } from "./handlers/userPreferences";
@@ -146,10 +146,10 @@ setupRoutes(router, `/${BACKLOG_ITEM_PART_RESOURCE_NAME}/:itemId`, {
     patch: backlogItemPartPatchHandler
 });
 
-setupRoutes(router, `/${BACKLOG_ITEM_RANK_RESOURCE_NAME}`, { get: backlogItemRanksGetHandler });
+setupRoutes(router, `/${PRODUCT_BACKLOG_ITEM_RESOURCE_NAME}`, { get: productBacklogItemsGetHandler });
 
-setupRoutes(router, `/${BACKLOG_ITEM_RANK_RESOURCE_NAME}/:itemId`, {
-    get: backlogItemRankGetHandler
+setupRoutes(router, `/${PRODUCT_BACKLOG_ITEM_RESOURCE_NAME}/:itemId`, {
+    get: productBacklogItemGetHandler
 });
 
 // bff views

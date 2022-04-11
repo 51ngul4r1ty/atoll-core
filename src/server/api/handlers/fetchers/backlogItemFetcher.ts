@@ -7,13 +7,13 @@ import { ApiBacklogItem, LinkedList } from "@atoll/shared";
 // data access
 import { DB_INCLUDE_ALIAS_BACKLOGITEMPARTS } from "../../../dataaccess/models/dataModelConsts";
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
-import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRankDataModel";
+import { ProductBacklogItemDataModel } from "../../../dataaccess/models/ProductBacklogItemDataModel";
 
 // consts/enums
 import { BACKLOG_ITEM_RESOURCE_NAME } from "../../../resourceNames";
 
 // utils
-import { mapDbToApiBacklogItem, mapDbToApiBacklogItemRank } from "../../../dataaccess/mappers/dataAccessToApiMappers";
+import { mapDbToApiBacklogItem, mapDbToApiProductBacklogItem } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 import { buildOptionsFromParams } from "../../utils/sequelizeHelper";
 import { buildSelfLink } from "../../../utils/linkBuilder";
 import {
@@ -108,11 +108,11 @@ export const fetchBacklogItems = async (projectId: string | null): Promise<Backl
     try {
         const params = { projectId };
         const options = buildOptionsFromParams(params);
-        const dbBacklogItemRanks = await BacklogItemRankDataModel.findAll(options);
+        const dbProductBacklogItems = await ProductBacklogItemDataModel.findAll(options);
         const rankList = new LinkedList<ApiBacklogItem>();
-        if (dbBacklogItemRanks.length) {
-            const backlogItemRanksMapped = dbBacklogItemRanks.map((item) => mapDbToApiBacklogItemRank(item));
-            backlogItemRanksMapped.forEach((item) => {
+        if (dbProductBacklogItems.length) {
+            const productBacklogItemsMapped = dbProductBacklogItems.map((item) => mapDbToApiProductBacklogItem(item));
+            productBacklogItemsMapped.forEach((item) => {
                 rankList.addInitialLink(item.backlogitemId, item.nextbacklogitemId);
             });
         }
