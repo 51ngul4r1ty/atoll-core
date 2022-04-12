@@ -54,8 +54,10 @@ Middleware
 
 Middleware should have `next(action);` as the first line to ensure that state is updated first.
 
-TODO:
+Ensure that you're using the correct types like this:
+```
 export const apiOrchestrationMiddleware = (store: MiddlewareAPI<Dispatch, StateTree>) => (next) => (action: Action) => {
+```
 
 State retrieval is very common in middleware so it should be done at the start of the middleware like below.
 It should not be done in each `case` block.
