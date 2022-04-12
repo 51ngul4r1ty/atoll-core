@@ -31,9 +31,12 @@ import {
     fetchSprintBacklogItemPartWithLinks,
     fetchSprintBacklogItemWithLinks
 } from "./fetchers/sprintBacklogItemFetcher";
-import { backlogItemRankFirstItemInserter, BacklogItemRankFirstItemInserterResult } from "./inserters/backlogItemRankInserter";
+import {
+    productBacklogItemFirstItemInserter,
+    ProductBacklogItemFirstItemInserterResult
+} from "./inserters/productBacklogItemInserter";
 import { handleSprintStatUpdate } from "./updaters/sprintStatUpdater";
-import { removeFromProductBacklog } from "./deleters/backlogItemRankDeleter";
+import { removeFromProductBacklog } from "./deleters/productBacklogItemDeleter";
 import { fetchBacklogItemParts, BacklogItemPartsResult } from "./fetchers/backlogItemPartFetcher";
 import {
     abortWithNotFoundResponse,
@@ -271,21 +274,21 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res: Response
             //   there).
             const firstSprintBacklogItem = matchingItems[0];
             const firstApiBacklogItemTyped = mapDbSprintBacklogWithNestedToApiBacklogItemInSprint(firstSprintBacklogItem);
-            let result: BacklogItemRankFirstItemInserterResult;
+            let result: ProductBacklogItemFirstItemInserterResult;
             let sprintStats: ApiSprintStats;
             let apiBacklogItemTyped: ApiBacklogItemInSprint;
             const itemInProductBacklog = await isItemInProductBacklog(backlogitemId, handlerContext.transactionContext.transaction);
             if (!itemInProductBacklog) {
-                result = await backlogItemRankFirstItemInserter(
+                result = await productBacklogItemFirstItemInserter(
                     firstApiBacklogItemTyped,
                     handlerContext.transactionContext.transaction
                 );
                 if (isRestApiErrorResult(result)) {
                     await rollbackWithErrorResponse(
                         handlerContext,
-                        "Unable to insert new backlogitemrank entries, aborting move to product backlog for item part ID " +
+                        "Unable to insert new productbacklogitem entries, aborting move to product backlog for item part ID " +
                             `${backlogitemId}` +
-                            ` (reason: backlogItemRankFirstItemInserter returned status ${result.status})`
+                            ` (reason: productBacklogItemFirstItemInserter returned status ${result.status})`
                     );
                 }
             }
@@ -311,7 +314,7 @@ export const sprintBacklogItemDeleteHandler = async (req: Request, res: Response
                 if (backlogItems.length !== 1) {
                     await rollbackWithErrorResponse(
                         handlerContext,
-                        "Unable to insert new backlogitemrank entries, aborting move to product backlog for item part ID " +
+                        "Unable to insert new productbacklogitem entries, aborting move to product backlog for item part ID " +
                             `${backlogitemId}` +
                             ` (reason: expected 1 matching backlog item to match ID above, but ${backlogItems.length} matched)`
                     );

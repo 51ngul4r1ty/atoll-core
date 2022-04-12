@@ -6,7 +6,7 @@ import { ApiBacklogItem } from "@atoll/shared";
 
 // data access
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
-import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRankDataModel";
+import { ProductBacklogItemDataModel } from "../../../dataaccess/models/ProductBacklogItemDataModel";
 
 // consts/enums
 import { BACKLOG_ITEM_RESOURCE_NAME } from "../../../resourceNames";
@@ -44,10 +44,10 @@ export const fetchProductBacklogItemById = async (
 ): Promise<ProductBacklogsResult> => {
     try {
         const options = buildOptionsFromParams({ backlogitemId: backlogItemId }, transaction);
-        const backlogItemRanks = await BacklogItemRankDataModel.findAll(options);
-        if (backlogItemRanks.length === 0) {
+        const productBacklogItems = await ProductBacklogItemDataModel.findAll(options);
+        if (productBacklogItems.length === 0) {
             return buildNotFoundResponse(`Unable to find backlog item by ID ${backlogItemId}`);
-        } else if (backlogItemRanks.length > 1) {
+        } else if (productBacklogItems.length > 1) {
             return buildInternalServerErrorResponse(`Found backlog item by ID ${backlogItemId} multiple times in product backlog`);
         }
         const backlogItemsOptions: FindOptions = {

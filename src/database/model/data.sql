@@ -90,38 +90,38 @@ insert into backlogitempart
 values
 	('7028cdd7c389489fa2d7dfa7e75c66cb', '920581ae222e4fa2ab24117664cda3fb', 'B1000032', null, now(), now(), 1, 1, 100.0, '2020-10-25 12:05:00-04', '2020-10-28 16:31:00-04', 'R');
 
-/* 5. backlog item rank */
-insert into backlogitemrank
+/* 5. product backlog item */
+insert into productbacklogitem
 	(id, "projectId", "backlogitemId", "nextbacklogitemId", "createdAt", "updatedAt")
 values
 	('9dd4a166ae2849caadc5d84a6d1e8e57', '69a9288264964568beb5dd243dc29008', null, '30397fe2bd6747b8a0c3a56105b68843',
 		'2020-03-15 18:17:00-05', '2020-03-15 18:17:00-05');
-insert into backlogitemrank
+insert into productbacklogitem
 	(id, "projectId", "backlogitemId", "nextbacklogitemId", "createdAt", "updatedAt")
 values
 	('7df01b51fdf94b209bbcaacc7d8e24fa', '69a9288264964568beb5dd243dc29008', '30397fe2bd6747b8a0c3a56105b68843', '6d2f1bf323f74c0193e84f6a2168e417',
 		'2020-03-15 18:17:00-05', '2020-03-15 18:17:00-05');
-insert into backlogitemrank
+insert into productbacklogitem
 	(id, "projectId", "backlogitemId", "nextbacklogitemId", "createdAt", "updatedAt")
 values
 	('1d2b5d9214274250a47a9790b13de17c', '69a9288264964568beb5dd243dc29008', '6d2f1bf323f74c0193e84f6a2168e417', '81208c00e34d45209bbf27d6ac63b37a',
 		'2020-03-15 18:17:00-05', '2020-03-15 18:17:00-05');
-insert into backlogitemrank
+insert into productbacklogitem
 	(id, "projectId", "backlogitemId", "nextbacklogitemId", "createdAt", "updatedAt")
 values
 	('516641d2c00c44d4b595dd2ea5f727ad', '69a9288264964568beb5dd243dc29008', '81208c00e34d45209bbf27d6ac63b37a', '7a7b9fe004034a4a9532464a10e5a0ad',
 		'2020-03-15 18:17:00-05', '2020-03-15 18:17:00-05');
-insert into backlogitemrank
+insert into productbacklogitem
 	(id, "projectId", "backlogitemId", "nextbacklogitemId", "createdAt", "updatedAt")
 values
 	('c3865beee7f34513b625d1e27edb9a4b', '69a9288264964568beb5dd243dc29008', '7a7b9fe004034a4a9532464a10e5a0ad', 'd434aab2e71e4c8bbd24dae22941d06f',
 		'2020-03-15 18:17:00-05', '2020-03-15 18:17:00-05');
-insert into backlogitemrank
+insert into productbacklogitem
 	(id, "projectId", "backlogitemId", "nextbacklogitemId", "createdAt", "updatedAt")
 values
 	('fe364a6ac76b4ba387d5d976c153bb23', '69a9288264964568beb5dd243dc29008', 'd434aab2e71e4c8bbd24dae22941d06f', '920581ae222e4fa2ab24117664cda3fb',
 		'2020-03-15 18:17:00-05', '2020-03-15 18:17:00-05');
-insert into backlogitemrank
+insert into productbacklogitem
 	(id, "projectId", "backlogitemId", "nextbacklogitemId", "createdAt", "updatedAt")
 values
 	('2d96969bb2754832820bd68a90286c59', '69a9288264964568beb5dd243dc29008', '920581ae222e4fa2ab24117664cda3fb', null,

@@ -20,7 +20,7 @@ import {
 import { DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS } from "../../../dataaccess/models/dataModelConsts";
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
 import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItemPartDataModel";
-import { BacklogItemRankDataModel } from "../../../dataaccess/models/BacklogItemRankDataModel";
+import { ProductBacklogItemDataModel } from "../../../dataaccess/models/ProductBacklogItemDataModel";
 import { SprintBacklogItemPartDataModel } from "../../../dataaccess/models/SprintBacklogItemPartDataModel";
 
 // utils
@@ -62,7 +62,7 @@ export const isItemInProductBacklog = async (backlogItemId: string, transaction?
         },
         transaction
     );
-    const productBacklogItems = await BacklogItemRankDataModel.findAll(options);
+    const productBacklogItems = await ProductBacklogItemDataModel.findAll(options);
     const itemInProductBacklog = productBacklogItems.length > 0;
     return itemInProductBacklog;
 };

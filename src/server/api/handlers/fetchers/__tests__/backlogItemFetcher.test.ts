@@ -9,7 +9,7 @@ import * as backlogItemFetcher from "../backlogItemFetcher";
 
 // interfaces/types
 import type { BacklogItemsResult } from "../backlogItemFetcher";
-import type { BacklogItemRankDataModel } from "../../../../dataaccess/models/BacklogItemRankDataModel";
+import type { ProductBacklogItemDataModel } from "../../../../dataaccess/models/ProductBacklogItemDataModel";
 
 // test utils
 import {
@@ -19,21 +19,21 @@ import {
     mockDbBacklogItem2WithPartsWithSBIs
 } from "./setupMockDbData";
 
-const mockDbBacklogItemRank1 = mockBuildDataModelFromObj({
+const mockDbProductBacklogItem1 = mockBuildDataModelFromObj({
     id: "fake-id-0",
     backlogitemId: null,
     nextbacklogitemId: "fake-backlog-item-id-1"
-} as BacklogItemRankDataModel);
-const mockDbBacklogItemRank2 = mockBuildDataModelFromObj({
+} as ProductBacklogItemDataModel);
+const mockDbProductBacklogItem2 = mockBuildDataModelFromObj({
     id: "fake-id-1",
     backlogitemId: "fake-backlog-item-id-1",
     nextbacklogitemId: "fake-backlog-item-id-2"
-} as BacklogItemRankDataModel);
-const mockDbBacklogItemRank3 = mockBuildDataModelFromObj({
+} as ProductBacklogItemDataModel);
+const mockDbProductBacklogItem3 = mockBuildDataModelFromObj({
     id: "fake-id-2",
     backlogitemId: "fake-backlog-item-id-2",
     nextbacklogitemId: null
-} as BacklogItemRankDataModel);
+} as ProductBacklogItemDataModel);
 
 jest.mock("../../../../dataaccess/models/BacklogItemDataModel", () => ({
     BacklogItemDataModel: {
@@ -42,10 +42,14 @@ jest.mock("../../../../dataaccess/models/BacklogItemDataModel", () => ({
     }
 }));
 
-jest.mock("../../../../dataaccess/models/BacklogItemRankDataModel", () => ({
-    BacklogItemRankDataModel: {
+jest.mock("../../../../dataaccess/models/ProductBacklogItemDataModel", () => ({
+    ProductBacklogItemDataModel: {
         belongsTo: () => null,
-        findAll: (backlogItemOptions: FindOptions) => [mockDbBacklogItemRank1, mockDbBacklogItemRank2, mockDbBacklogItemRank3]
+        findAll: (backlogItemOptions: FindOptions) => [
+            mockDbProductBacklogItem1,
+            mockDbProductBacklogItem2,
+            mockDbProductBacklogItem3
+        ]
     }
 }));
 

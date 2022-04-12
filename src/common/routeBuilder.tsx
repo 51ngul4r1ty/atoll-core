@@ -7,7 +7,7 @@ import adapter from "@flopflip/memory-adapter";
 // components
 import {
     AppContainer,
-    BacklogItemRankViewContainer,
+    ProductBacklogItemViewContainer,
     BacklogItemViewContainer,
     IntlProvider,
     LoginViewContainer,
@@ -25,7 +25,7 @@ const appRoutes = (
                 <Route path="/plan" exact component={PlanViewContainer} />
                 <Route path="/sprint" exact component={SprintViewContainer} />
                 <Route path="/review" exact component={ReviewViewContainer} />
-                <Route path="/debug/backlog-item-rank" exact component={BacklogItemRankViewContainer} />
+                <Route path="/debug/product-backlog-items" exact component={ProductBacklogItemViewContainer} />
                 <Route
                     path="/project/:projectDisplayId/backlog-item/:backlogItemDisplayId"
                     exact

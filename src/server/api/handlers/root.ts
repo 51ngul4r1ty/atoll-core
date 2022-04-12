@@ -128,14 +128,14 @@ export const rootHandler = function (req, res) {
             ]
         },
         {
-            name: "Backlog Item Ranks",
+            name: "Product Backlog Items",
             description: "Linked lists used to display backlog items in prioritized order",
             displayIndex: 4,
             links: [
                 {
                     type: APPLICATION_JSON,
                     rel: ROOT_REL_COLLECTION,
-                    uri: "/api/v1/backlog-item-ranks"
+                    uri: "/api/v1/product-backlog-items"
                 }
             ]
         }
