@@ -34,10 +34,34 @@ Reducers
 
 Types related to the data structure that the reducer stores in the state tree should be exported from the reducer itself.
 
+Selectors
+=========
+
+Make sure to import selectors this way:
+
+```
+// selectors
+import * as apiSelectors from "../selectors/apiSelectors";
+import * as backlogItemSelectors from "../selectors/backlogItemSelectors";
+```
+
+Why it is done this way: it makes you think about where you're getting the data from.  Most of the
+time this will make sense, but sometimes it will make you question where the data lives.  It ensures
+that your application's state is logically structured.
+
 Middleware
 ==========
 
-Middleware should have `next(action);` as the first line to ensure that state is updated frist.
+Middleware should have `next(action);` as the first line to ensure that state is updated first.
+
+TODO:
+export const apiOrchestrationMiddleware = (store: MiddlewareAPI<Dispatch, StateTree>) => (next) => (action: Action) => {
+
+State retrieval is very common in middleware so it should be done at the start of the middleware like below.
+It should not be done in each `case` block.
+```
+const state = store.getState();
+```
 
 Components
 ==========
@@ -70,10 +94,10 @@ that should be used for passing properties from the specialized button to the co
 Switch Statements
 =================
 
-Case statements should always be enclosed in curly braces so that block scope is applied and variables within these blocks are
-scoped to the block.  This has a couple of benefits: firstly, it allows a variable name to be reused without errors being reported;
-secondly, it improves alignment of case statements - try copying and pasting a case section below along case section without curly
-braces and see what it does with indentation!
+Case statements should always be enclosed in curly braces so that block scope is applied and variables within
+these blocks are scoped to the block.  This has a couple of benefits: firstly, it allows a variable name to be
+reused without errors being reported; secondly, it improves alignment of case statements - try copying and
+pasting a case section below along case section without curly braces and see what it does with indentation!
 
 For example:
 ```
