@@ -114,7 +114,7 @@ alter table productbacklogitem
 rename constraint "backlogitemrank_backlogitemId_fkey" TO "productbacklogitem_backlogitemId_fkey";
 
 alter table productbacklogitem
-rename constraint "productbacklogitem_nextbacklogitemId_fkey" TO "productbacklogitem_nextbacklogitemId_fkey";
+rename constraint "backlogitemrank_nextbacklogitemId_fkey" TO "productbacklogitem_nextbacklogitemId_fkey";
 
 alter table productbacklogitem
 rename constraint "backlogitemrank_pkey" TO "productbacklogitem_pkey";
