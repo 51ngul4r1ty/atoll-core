@@ -2,14 +2,14 @@
 import * as jwt from "jsonwebtoken";
 
 // config
-import { getAuthKey, addMinutes, getAuthTokenExpirationMinutes } from "@atoll/shared";
+import { getAuthKey, addMinutes, getAuthTokenExpirationMinutes, timeNow } from "@atoll/shared";
 
 // interfaces/types
 import { AuthTokenContents, Role, RefreshTokenContents } from "../../types";
 
 export const buildAuthToken = (userId: string, username: string, role: Role) => {
     const authKey = getAuthKey();
-    const expirationDate = addMinutes(new Date(), getAuthTokenExpirationMinutes());
+    const expirationDate = addMinutes(timeNow(), getAuthTokenExpirationMinutes());
     const authTokenContents: AuthTokenContents = {
         userId,
         username,

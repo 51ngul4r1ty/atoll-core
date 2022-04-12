@@ -9,7 +9,8 @@ import {
     hasBacklogItemAtLeastBeenFinished,
     hasBacklogItemAtLeastBeenReleased,
     hasBacklogItemAtLeastBeenStarted,
-    mapApiStatusToBacklogItem
+    mapApiStatusToBacklogItem,
+    timeNow
 } from "@atoll/shared";
 
 const cloneApiBacklogItemIfChanged = (changed: boolean, currentResult: ApiBacklogItem): ApiBacklogItem => {
@@ -36,7 +37,7 @@ export const getUpdatedBacklogItemWhenStatusChanges = (
     let changed = false;
     if (originalItemToUse.status !== result.status) {
         const statusTyped = mapApiStatusToBacklogItem(result.status);
-        const nowIsoDateString = dateToIsoDateString(new Date());
+        const nowIsoDateString = dateToIsoDateString(timeNow());
         if (hasBacklogItemAtLeastBeenReleased(statusTyped) && !result.releasedAt) {
             result = cloneApiBacklogItemIfChanged(changed, result);
             result.releasedAt = nowIsoDateString;
@@ -93,7 +94,7 @@ export const getUpdatedBacklogItemPartWhenStatusChanges = (
     let changed = false;
     if (originalItemToUse.status !== result.status) {
         const statusTyped = mapApiStatusToBacklogItem(result.status);
-        const nowIsoDateString = dateToIsoDateString(new Date());
+        const nowIsoDateString = dateToIsoDateString(timeNow());
         if (hasBacklogItemAtLeastBeenFinished(statusTyped) && !result.finishedAt) {
             result = cloneApiBacklogItemPartIfChanged(changed, result);
             result.finishedAt = nowIsoDateString;
