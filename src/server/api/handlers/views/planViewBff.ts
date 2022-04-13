@@ -60,7 +60,7 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
                 buildResponseWithData({
                     backlogItems: backlogItemsResult.data?.items,
                     sprints,
-                    sprintBacklogItems: sprintBacklogItemsResult?.data?.items,
+                    sprintBacklogItems: sprintBacklogItemsResult?.data?.items || [],
                     userPreferences: (userPreferencesResult as UserPreferencesItemResult).data?.item
                 })
             );
