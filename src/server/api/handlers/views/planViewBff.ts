@@ -3,12 +3,12 @@ import type { Request, Response } from "express";
 import * as HttpStatus from "http-status-codes";
 
 // libraries
-import { mapApiItemsToSprints } from "@atoll/shared";
+import { ApiSprint, DateOnly, determineSprintStatus, mapApiItemsToSprints, SprintStatus } from "@atoll/shared";
 
 // interfaces/types
 import type { UserPreferencesItemResult } from "../fetchers/userPreferencesFetcher";
 import type { SprintBacklogItemsResult } from "../fetchers/sprintBacklogItemFetcher";
-import type { RestApiCollectionResult, RestApiErrorResult } from "../../utils/responseBuilder";
+import { isRestApiErrorResult, RestApiCollectionResult, RestApiErrorResult } from "../../utils/responseBuilder";
 
 // utils
 import { fetchBacklogItems } from "../fetchers/backlogItemFetcher";
@@ -40,12 +40,29 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
         let sprintBacklogItemsResult: SprintBacklogItemsResult | RestApiErrorResult;
         let sprintBacklogItemsStatus = HttpStatus.OK;
         let sprintBacklogItemsMessage = "";
+        let expandedSprintId: string;
         if (sprints.length) {
-            const mappedSprints = mapApiItemsToSprints(sprints);
-            const expandedSprints = mappedSprints.filter((item) => item.expanded);
-            if (expandedSprints.length) {
-                const firstExpandedSprint = expandedSprints[0];
-                sprintBacklogItemsResult = await fetchSprintBacklogItemsWithLinks(firstExpandedSprint.id);
+            const notStartedSprints = sprints.filter((sprint: ApiSprint) => {
+                const status = determineSprintStatus(
+                    DateOnly.fromISODate(sprint.startdate),
+                    DateOnly.fromISODate(sprint.finishdate)
+                );
+                return status === SprintStatus.NotStarted;
+            });
+            if (notStartedSprints.length) {
+                const firstNotStartedSprint = notStartedSprints[0];
+                sprintBacklogItemsResult = await fetchSprintBacklogItemsWithLinks(firstNotStartedSprint.id);
+                if (!isRestApiErrorResult(sprintBacklogItemsResult)) {
+                    expandedSprintId = firstNotStartedSprint.id;
+                }
+            } else if (sprints.length > 0) {
+                const lastSprint = sprints[sprints.length - 1];
+                sprintBacklogItemsResult = await fetchSprintBacklogItemsWithLinks(lastSprint.id);
+                if (!isRestApiErrorResult(sprintBacklogItemsResult)) {
+                    expandedSprintId = lastSprint.id;
+                }
+            }
+            if (sprintBacklogItemsResult) {
                 sprintBacklogItemsStatus = sprintBacklogItemsResult.status;
                 sprintBacklogItemsMessage = sprintBacklogItemsResult.message;
             }
@@ -61,7 +78,8 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
                     backlogItems: backlogItemsResult.data?.items,
                     sprints,
                     sprintBacklogItems: sprintBacklogItemsResult?.data?.items || [],
-                    userPreferences: (userPreferencesResult as UserPreferencesItemResult).data?.item
+                    userPreferences: (userPreferencesResult as UserPreferencesItemResult).data?.item,
+                    expandedSprintId: expandedSprintId || null
                 })
             );
         } else {
