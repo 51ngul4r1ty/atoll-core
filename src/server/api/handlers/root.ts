@@ -54,6 +54,7 @@ export const rootHandler = function (req, res) {
         const packageJsonPath = getPackageJsonPath();
         const data = fs.readFileSync(packageJsonPath, { encoding: "utf8", flag: "r" });
         const packageJson = JSON.parse(data);
+        // NOTE: X-App-Version is reported at api/v1/users/{self}/preferences endpoint.
         res.set(
             "X-Atoll-Info",
             JSON.stringify({
