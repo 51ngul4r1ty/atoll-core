@@ -71,7 +71,7 @@ export const rootHandler = function (req, res) {
         {
             name: "Current User's Preferences",
             description: "Collection of current user's preferences",
-            displayIndex: 0,
+            displayIndex: 1,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -83,7 +83,7 @@ export const rootHandler = function (req, res) {
         {
             name: "Current User's Feature Toggles",
             description: "Feature toggle state specific to the current user",
-            displayIndex: 1,
+            displayIndex: 2,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -95,7 +95,7 @@ export const rootHandler = function (req, res) {
         {
             name: "Sprints",
             description: "Collection of sprints",
-            displayIndex: 2,
+            displayIndex: 3,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -107,7 +107,7 @@ export const rootHandler = function (req, res) {
         {
             name: "Backlog Items",
             description: "Collection of backlog items",
-            displayIndex: 3,
+            displayIndex: 4,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -119,7 +119,7 @@ export const rootHandler = function (req, res) {
         {
             name: "Sprint Backlog Item Parts",
             description: "Collection of parts under a backlog item contained in a specific sprint",
-            displayIndex: 3,
+            displayIndex: 5,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -131,7 +131,7 @@ export const rootHandler = function (req, res) {
         {
             name: "Product Backlog Items",
             description: "Linked lists used to display backlog items in prioritized order",
-            displayIndex: 4,
+            displayIndex: 6,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -142,5 +142,56 @@ export const rootHandler = function (req, res) {
         }
     ];
 
-    res.json(buildResponseWithItems(items));
+    res.format({
+        json: () => {
+            res.send(buildResponseWithItems(items));
+        },
+        html: () => {
+            const pageOpeningTags =
+                `<html>` +
+                `<head>` +
+                `<link rel="preconnect" href="https://fonts.googleapis.com">` +
+                `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>` +
+                `<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300,700&display=swap" rel="stylesheet">` +
+                `</head>` +
+                `<body>` +
+                `<style>` +
+                `* { font-family: 'Open Sans', sans-serif; } ` +
+                `table { background-color: #e0e0e0; padding: 0.5rem; }` +
+                `td { padding-left: 0.25rem; padding-right: 0.25rem; padding-top: 0.125rem; padding-bottom: 0.125rem; }` +
+                `</style>` +
+                `<h1>API Endpoints</h1>` +
+                `<table>` +
+                `<tr>` +
+                ["Name", "Description", "Links"].map((item) => `<th>${item}</th>`).join("") +
+                `</tr>`;
+            const pageContent = items
+                .sort((a, b) => a.displayIndex - b.displayIndex)
+                .map((item) => {
+                    const itemLinksHtml = item.links
+                        .map((itemLink) => {
+                            return `${itemLink.rel}: ${itemLink.uri}`;
+                        })
+                        .join("<br/>");
+                    const fieldValues = [item.name, item.description, itemLinksHtml];
+                    const rowCells = fieldValues
+                        .map((fieldValue) => {
+                            return `<td>${fieldValue}</td>`;
+                        })
+                        .join("");
+                    return `<tr>${rowCells}</tr>`;
+                })
+                .join("");
+            const pageClosingTags =
+                `</table>` +
+                `<br/>` +
+                `<b>` +
+                `NOTE: This content is available in JSON format too- just use the same endpoint with the` +
+                ` "Accept" header with "application/json" value.  A browser automatically requests HTML` +
+                ` so that is why you're seeing it rendered this way!` +
+                `</b>` +
+                `</body></html>`;
+            res.send(pageOpeningTags + pageContent + pageClosingTags);
+        }
+    });
 };
