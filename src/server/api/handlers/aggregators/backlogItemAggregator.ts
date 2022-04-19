@@ -64,7 +64,7 @@ export const fetchBacklogItemWithSprintAllocationInfo = async (
             return errorResponse;
         } else {
             const backlogItemParts = sprintsResult.data.items.map((item) => item.backlogItemPart);
-            const sprints = sprintsResult.data.items.map((item) => item.sprint || null);
+            const sprints = sprintsResult.data.items.map((item) => item.sprint ?? null);
             const backlogItemPartsAndSprints: ApiBacklogItemPartAndSprint[] = [];
             if (sprints.length !== backlogItemParts.length) {
                 return buildInternalServerErrorResponse(
