@@ -149,7 +149,7 @@ export const fetchAllocatedAndUnallocatedBacklogItemParts = async (
         const sprintInfo = backlogItemPartIdsInSprints[backlogItemPart.id];
         return {
             ...backlogItemPart,
-            sprintId: sprintInfo?.sprintId || null
+            sprintId: sprintInfo?.sprintId ?? null
         };
     });
     return result;

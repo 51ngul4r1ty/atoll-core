@@ -2,11 +2,11 @@ module.exports = {
     compact: true,
     presets: [
         [
-            '@babel/env',
+            "@babel/env",
             {
                 modules: false,
                 targets: {
-                    node: 'current',
+                    node: "current"
                 }
             }
         ],
@@ -17,16 +17,13 @@ module.exports = {
         "@babel/proposal-object-rest-spread",
         "@babel/proposal-class-properties",
         "@babel/proposal-optional-chaining",
+        "@babel/proposal-nullish-coalescing-operator",
         "@babel/syntax-dynamic-import",
         "macros"
     ],
     env: {
         test: {
-            plugins: [
-                "@babel/transform-modules-commonjs",
-                "@babel/syntax-dynamic-import",
-                "@babel/plugin-transform-runtime"
-            ]
+            plugins: ["@babel/transform-modules-commonjs", "@babel/syntax-dynamic-import", "@babel/plugin-transform-runtime"]
         }
     }
 };

@@ -79,7 +79,7 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
                     sprints,
                     sprintBacklogItems: sprintBacklogItemsResult?.data?.items || [],
                     userPreferences: (userPreferencesResult as UserPreferencesItemResult).data?.item,
-                    expandedSprintId: expandedSprintId || null
+                    expandedSprintId: expandedSprintId ?? null
                 })
             );
         } else {

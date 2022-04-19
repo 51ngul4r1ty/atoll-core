@@ -6,10 +6,10 @@ module.exports = {
     coverageReporters: ["lcov", "text-summary"],
     coverageThreshold: {
         global: {
-            statements: 15.35,
-            branches: 10.42,
-            functions: 17.9,
-            lines: 15.2
+            statements: 15.21,
+            branches: 10.28,
+            functions: 17.52,
+            lines: 15.06
         }
     },
     setupFiles: ["<rootDir>/node_modules/regenerator-runtime/runtime", "<rootDir>/config/polyfills.js"],
