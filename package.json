@@ -13,7 +13,7 @@
   "scripts": {
     "analyze": "npm run build:with-stats && npm run start:analyzer",
     "build": "npm run build-only && npm run build-deploy",
-    "build-only": "npx --no-install cross-env NODE_ENV=production node scripts/build.js",
+    "build-only": "echo Node Version && node --version && npx --no-install cross-env NODE_ENV=production node scripts/build.js",
     "build-deploy": "node ./scripts/build-deploy.js",
     "build:dev": "npm run build-only:dev && npm run build-deploy",
     "build-only:dev": "npx --no-install cross-env NODE_ENV=development node scripts/build.js",
