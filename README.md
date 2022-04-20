@@ -21,7 +21,7 @@ well: [CODE_STANDARDS.md](docs/CODE_STANDARDS.md)
 Tools Used
 ----------
 
-1. At time of writing, Node v12.8.1 was used with NPM v6.10.2.  
+1. At time of writing, Node v16.4.2 was used with NPM v8.5.0.  
    NOTE: you may experience silent script failures (no errors) when using `npm run setup` if you are
      using Node v14+.  Also, `npm start` may not create the database structure (see "Unsupported Version of Node" in the wiki
      pages if you'd like to see what the typical output is).
