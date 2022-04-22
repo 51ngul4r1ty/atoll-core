@@ -77,6 +77,18 @@ Debugging Server
 1. `start:client-only` (which runs `npm run build:dev` and then `npm run start:clent`)
 2. Use VS Code's debugger to launch "Server"
 
+Strict Mode
+-----------
+
+Adding the query param `strict-mode=true` to the URL will turn on strict mode.  Strict mode will
+cause the app to throw errors for inconsistencies as they occur.  Most of the time these errors
+don't appear to cause problems but they are unexpected so a developer should be aware of them.
+A user, on the other hand, would prefer that the app is as stable as possible... so a random
+error thrown every now and then may not go down well for "production" use.  Developers can also
+add more "strict mode" errors by using the `isStrictMode` selector.  In future this will probably
+be turned on when running using a localhost URL, but for now it has been turned off unless
+specifically requested in this way.
+
 Other Docs
 ==========
 
