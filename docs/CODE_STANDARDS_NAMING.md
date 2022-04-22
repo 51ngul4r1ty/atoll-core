@@ -269,9 +269,10 @@ import * as backlogItemsSliceSelectors from "./backlogItemsSliceSelectors";
 
     case ActionTypes.TOGGLE_BACKLOG_ITEM_DETAIL: {
         const actionTyped = action as ToggleBacklogItemDetailAction;
-        draft.openedDetailMenuBacklogItemId = calcDropDownMenuState(
+        draft.openedDetailMenuBacklogItemId = calcToggledOpenMenuItemId(
             draft.openedDetailMenuBacklogItemId,
             actionTyped.payload.itemId,
+            strictMode,
             (itemId: string) => backlogItemsSliceSelectors.sliceSelectBacklogItemById(state, itemId),
             (item) => item.pushState !== PushState.Removed
         );
