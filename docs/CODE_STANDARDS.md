@@ -244,6 +244,32 @@ General guidance when extending interfaces:
    could have `hasBeenSaved` boolean property and `BacklogItem` could extend `Saveable` and so could
    `Sprint` (that will make the `Saveable` interface reusable).
 
+Function Definitions
+--------------------
+
+Use arrow function style for function types.
+
+For example,
+
+```
+export type BacklogItemFullDetailFormDispatchProps = {
+    ...
+    onDetailClick: (partId: string, strictMode: boolean) => void;
+};
+```
+
+In the past it would've been done this way:
+```
+export type BacklogItemFullDetailFormDispatchProps = {
+    ...
+    onDetailClick: { (partId: string, strictMode: boolean): void };
+};
+```
+
+Reason: It is easy to see the `: void` as just another argument and you may append arguments after
+  this which TypeScript will allow... but that will make it a structured type and not a function call
+  definition.  Since the two can easily be confused this new style is preferred.
+
 Action Types
 ------------
 
