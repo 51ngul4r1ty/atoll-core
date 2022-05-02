@@ -5,7 +5,7 @@
  */
 
 // externals
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import { Transaction } from "sequelize";
 
 // libraries
@@ -42,15 +42,15 @@ export const fetchBacklogItemWithSprintAllocationInfo = async (
     transaction?: Transaction
 ): Promise<BacklogItemWithSprintAllocationInfoResult | RestApiErrorResult> => {
     const backlogItemFetchResult = await fetchBacklogItem(backlogItemId, transaction);
-    if (backlogItemFetchResult.status === HttpStatus.NOT_FOUND) {
+    if (backlogItemFetchResult.status === StatusCodes.NOT_FOUND) {
         return buildNotFoundResponse(backlogItemFetchResult.message);
     } else if (isRestApiItemResult(backlogItemFetchResult)) {
         const item = backlogItemFetchResult.data.item;
         const productBacklogItem = await fetchProductBacklogItemById(backlogItemId, transaction);
         let inProductBacklog: boolean;
-        if (productBacklogItem.status === HttpStatus.OK) {
+        if (productBacklogItem.status === StatusCodes.OK) {
             inProductBacklog = true;
-        } else if (productBacklogItem.status === HttpStatus.NOT_FOUND) {
+        } else if (productBacklogItem.status === StatusCodes.NOT_FOUND) {
             inProductBacklog = false;
         } else {
             const error = `Unable to fetch product backlog item by ID ${backlogItemId}: ${productBacklogItem.message}`;

@@ -1,5 +1,5 @@
 // externals
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import { FindOptions, InstanceDestroyOptions, InstanceUpdateOptions, Transaction } from "sequelize";
 
 // data access
@@ -16,7 +16,7 @@ export const removeFromProductBacklog = async (backlogitemId: string, transactio
         const item = await ProductBacklogItemDataModel.findOne(findItemOptions);
         if (!item) {
             return {
-                status: HttpStatus.NOT_FOUND,
+                status: StatusCodes.NOT_FOUND,
                 message: `Backlog item "${backlogitemId}" was not found`
             };
         }
@@ -33,7 +33,7 @@ export const removeFromProductBacklog = async (backlogitemId: string, transactio
         const itemAfter = nextBacklogItemId ? await ProductBacklogItemDataModel.findOne(findItemAfterOptions) : null;
         if (nextBacklogItemId && !itemAfter) {
             return {
-                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                status: StatusCodes.INTERNAL_SERVER_ERROR,
                 message: `Backlog item ${backlogitemId} was found, but next item wasn't found!`
             };
         }

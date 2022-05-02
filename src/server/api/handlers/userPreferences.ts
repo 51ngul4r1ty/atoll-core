@@ -1,6 +1,6 @@
 // externals
 import { Request, Response } from "express";
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import * as findPackageJson from "find-package-json";
 
 // libraries
@@ -19,7 +19,7 @@ export const userPreferencesHandler = async function (req: Request, res: Respons
     const version = packageJsonContents.version;
     const userId = req.params.userId || "";
     const result = await getUserPreferences(userId, () => getLoggedInAppUserId(req));
-    if (result.status === HttpStatus.OK) {
+    if (result.status === StatusCodes.OK) {
         // NOTE: X-Atoll-Info also reports version info (app & library versions) at api/vi endpoint.
         res.header("x-app-version", version).header("x-server-time", timeNow().toISOString()).json(result);
     } else {

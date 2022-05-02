@@ -1,6 +1,6 @@
 // externals
 import { Request, Response } from "express";
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 
 // data access
 import { ProjectDataModel } from "../../dataaccess/models/ProjectDataModel";
@@ -20,7 +20,7 @@ import { getInvalidPatchMessage, getPatchedItem } from "../utils/patcher";
 
 export const projectsGetHandler = async (req: Request, res) => {
     const result = await fetchProjects();
-    if (result.status === HttpStatus.OK) {
+    if (result.status === StatusCodes.OK) {
         res.json(result);
     } else {
         res.status(result.status).json({
@@ -76,8 +76,8 @@ export const projectPostHandler = async (req: Request, res) => {
     const projectDataObject = mapApiToDbProject({ ...addIdToBody(req.body) });
     try {
         const addedProject = await ProjectDataModel.create(projectDataObject);
-        res.status(HttpStatus.CREATED).json({
-            status: HttpStatus.CREATED,
+        res.status(StatusCodes.CREATED).json({
+            status: StatusCodes.CREATED,
             data: {
                 item: addedProject
             }
@@ -90,7 +90,7 @@ export const projectPostHandler = async (req: Request, res) => {
 export const projectDeleteHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
     const result = await deleteProject(params.projectId);
-    if (result.status === HttpStatus.OK) {
+    if (result.status === StatusCodes.OK) {
         res.json(result);
     } else {
         res.status(result.status).json({
@@ -104,7 +104,7 @@ export const projectDeleteHandler = async (req: Request, res) => {
 export const projectGetHandler = async (req: Request, res: Response) => {
     const params = getParamsFromRequest(req);
     const result = await fetchProject(params.projectId);
-    if (result.status === HttpStatus.OK) {
+    if (result.status === StatusCodes.OK) {
         res.json(result);
     } else {
         res.status(result.status).json({

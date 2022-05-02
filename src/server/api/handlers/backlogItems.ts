@@ -1,7 +1,7 @@
 // externals
 import { Request, Response } from "express";
 import * as core from "express-serve-static-core";
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import { CreateOptions, FindOptions, Transaction } from "sequelize";
 
 // libraries
@@ -77,7 +77,7 @@ export const backlogItemsGetHandler = async (req: Request, res: Response) => {
     } else {
         result = await fetchBacklogItems(params.projectId);
     }
-    if (result.status === HttpStatus.OK) {
+    if (result.status === StatusCodes.OK) {
         res.json(result);
     } else {
         res.status(result.status).json({
@@ -267,7 +267,7 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
             await productBacklogItemFirstItemInserter(newItem, transaction);
         } else {
             const result = await productBacklogItemSubsequentItemInserter(newItem, transaction, prevBacklogItemId);
-            if (result.status !== HttpStatus.OK) {
+            if (result.status !== StatusCodes.OK) {
                 respondWithFailedValidation(res, result.message);
             }
             rolledBack = result.rolledBack;
@@ -293,8 +293,8 @@ export const backlogItemsPostHandler = async (req: Request, res: Response) => {
         }
         if (!rolledBack) {
             await transaction.commit();
-            res.status(HttpStatus.CREATED).json({
-                status: HttpStatus.CREATED,
+            res.status(StatusCodes.CREATED).json({
+                status: StatusCodes.CREATED,
                 data: {
                     item: addedBacklogItem
                 }

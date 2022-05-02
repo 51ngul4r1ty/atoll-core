@@ -1,6 +1,6 @@
 // externals
 import type { Request, Response } from "express";
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 
 // libraries
 import { ApiSprint, DateOnly, determineSprintStatus, mapApiItemsToSprints, SprintStatus } from "@atoll/shared";
@@ -38,7 +38,7 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
         const sprintsSuccessResult = sprintsResult as RestApiCollectionResult<any>;
         let sprints = sprintsSuccessResult.data ? sprintsSuccessResult.data?.items : [];
         let sprintBacklogItemsResult: SprintBacklogItemsResult | RestApiErrorResult;
-        let sprintBacklogItemsStatus = HttpStatus.OK;
+        let sprintBacklogItemsStatus = StatusCodes.OK;
         let sprintBacklogItemsMessage = "";
         let expandedSprintId: string;
         if (sprints.length) {

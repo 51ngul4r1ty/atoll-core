@@ -1,5 +1,5 @@
 // externals
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 
 // libraries
 import { ApiBacklogItemInSprint } from "@atoll/shared";
@@ -78,12 +78,12 @@ export const fetchSprintBacklogItemWithLinks = async (
 
         if (!dbBacklogItemPartsWithSprintItems.length) {
             return {
-                status: HttpStatus.NOT_FOUND
+                status: StatusCodes.NOT_FOUND
             };
         }
         if (dbBacklogItemPartsWithSprintItems.length > 1) {
             return {
-                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                status: StatusCodes.INTERNAL_SERVER_ERROR,
                 message: `Multiple matches for Backog Item ID ${backlogItemId}`
             };
         }
@@ -108,12 +108,12 @@ export const fetchSprintBacklogItemPartWithLinks = async (
         });
         if (!sprintBacklogItems.length) {
             return {
-                status: HttpStatus.NOT_FOUND
+                status: StatusCodes.NOT_FOUND
             };
         }
         if (sprintBacklogItems.length > 1) {
             return {
-                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                status: StatusCodes.INTERNAL_SERVER_ERROR,
                 message: `Multiple matches for Backog Item Part ID ${backlogItemPartId}`
             };
         }

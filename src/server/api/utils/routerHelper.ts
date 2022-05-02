@@ -1,6 +1,6 @@
 // externals
 import { Router, RequestHandler } from "express";
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 
 // middleware
 import auth from "../../middleware/auth";
@@ -49,7 +49,7 @@ export const setupNotFoundRoutes = (router: Router) => {
         res.json({
             status: 404,
             message: `Cannot ${req.method} ${req.originalUrl}`
-        }).status(HttpStatus.NOT_FOUND);
+        }).status(StatusCodes.NOT_FOUND);
     });
 };
 

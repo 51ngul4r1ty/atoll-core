@@ -1,5 +1,5 @@
 // externals
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import { Op } from "sequelize";
 
 // libraries
@@ -33,7 +33,7 @@ const buildProjectsResult = (dbProjects): ProjectItemsResult => {
         return result;
     });
     return {
-        status: HttpStatus.OK,
+        status: StatusCodes.OK,
         data: {
             items
         }
