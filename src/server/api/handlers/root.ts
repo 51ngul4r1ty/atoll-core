@@ -8,6 +8,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 export type RootResourceItem = {
+    id: string;
     name: string;
     description: string;
     displayIndex: number;
@@ -46,6 +47,7 @@ export const getPackageJsonPath = (): string | null => {
     return foundPath;
 };
 
+export const ROOT_REL_ACTION = "action";
 export const ROOT_REL_ITEM = "item";
 export const ROOT_REL_COLLECTION = "collection";
 
@@ -69,9 +71,23 @@ export const rootHandler = function (req, res) {
     }
     const items: RootResourceItem[] = [
         {
+            id: "user-auth",
+            name: "User Authentication",
+            description: "Authenticate with user account and password",
+            displayIndex: 1,
+            links: [
+                {
+                    type: APPLICATION_JSON,
+                    rel: ROOT_REL_ACTION,
+                    uri: "/api/v1/actions/login"
+                }
+            ]
+        },
+        {
+            id: "user-prefs",
             name: "Current User's Preferences",
             description: "Collection of current user's preferences",
-            displayIndex: 1,
+            displayIndex: 2,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -81,9 +97,10 @@ export const rootHandler = function (req, res) {
             ]
         },
         {
+            id: "user-toggles",
             name: "Current User's Feature Toggles",
             description: "Feature toggle state specific to the current user",
-            displayIndex: 2,
+            displayIndex: 3,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -93,9 +110,10 @@ export const rootHandler = function (req, res) {
             ]
         },
         {
+            id: "sprints",
             name: "Sprints",
             description: "Collection of sprints",
-            displayIndex: 3,
+            displayIndex: 4,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -105,9 +123,10 @@ export const rootHandler = function (req, res) {
             ]
         },
         {
+            id: "backlog-items",
             name: "Backlog Items",
             description: "Collection of backlog items",
-            displayIndex: 4,
+            displayIndex: 5,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -117,9 +136,10 @@ export const rootHandler = function (req, res) {
             ]
         },
         {
+            id: "sprint-backlog-items-parts",
             name: "Sprint Backlog Item Parts",
             description: "Collection of parts under a backlog item contained in a specific sprint",
-            displayIndex: 5,
+            displayIndex: 6,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -129,9 +149,10 @@ export const rootHandler = function (req, res) {
             ]
         },
         {
+            id: "product-backlog-items",
             name: "Product Backlog Items",
             description: "Linked lists used to display backlog items in prioritized order",
-            displayIndex: 6,
+            displayIndex: 7,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -163,7 +184,7 @@ export const rootHandler = function (req, res) {
                 `<h1>API Endpoints</h1>` +
                 `<table>` +
                 `<tr>` +
-                ["Name", "Description", "Links"].map((item) => `<th>${item}</th>`).join("") +
+                ["ID", "Name", "Description", "Links"].map((item) => `<th>${item}</th>`).join("") +
                 `</tr>`;
             const pageContent = items
                 .sort((a, b) => a.displayIndex - b.displayIndex)
@@ -173,7 +194,7 @@ export const rootHandler = function (req, res) {
                             return `${itemLink.rel}: ${itemLink.uri}`;
                         })
                         .join("<br/>");
-                    const fieldValues = [item.name, item.description, itemLinksHtml];
+                    const fieldValues = [item.id, item.name, item.description, itemLinksHtml];
                     const rowCells = fieldValues
                         .map((fieldValue) => {
                             return `<td>${fieldValue}</td>`;

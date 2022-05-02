@@ -102,33 +102,17 @@ export const buildOkResponse = (message?: string): RestApiStatusAndMessageOnly =
     return result;
 };
 
-export const buildNotImplementedResponse = (message?: string): RestApiErrorResult => {
-    return {
-        status: HttpStatus.NOT_IMPLEMENTED,
-        message
-    };
-};
+export const buildNotImplementedResponse = (message?: string): RestApiErrorResult =>
+    buildMessageResponse(HttpStatus.NOT_IMPLEMENTED, message) as RestApiErrorResult;
 
-export const buildBadRequestResponse = (message?: string): RestApiErrorResult => {
-    return {
-        status: HttpStatus.BAD_REQUEST,
-        message
-    };
-};
+export const buildBadRequestResponse = (message?: string): RestApiErrorResult =>
+    buildMessageResponse(HttpStatus.BAD_REQUEST, message) as RestApiErrorResult;
 
-export const buildNotFoundResponse = (message?: string): RestApiErrorResult => {
-    return {
-        status: HttpStatus.NOT_FOUND,
-        message
-    };
-};
+export const buildNotFoundResponse = (message?: string): RestApiErrorResult =>
+    buildMessageResponse(HttpStatus.NOT_FOUND, message) as RestApiErrorResult;
 
-export const buildInternalServerErrorResponse = (message: string): RestApiErrorResult => {
-    return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message
-    };
-};
+export const buildInternalServerErrorResponse = (message: string): RestApiErrorResult =>
+    buildMessageResponse(HttpStatus.INTERNAL_SERVER_ERROR, message) as RestApiErrorResult;
 
 export type ErrorOptions = {
     includeStack?: boolean;
