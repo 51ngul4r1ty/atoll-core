@@ -1,7 +1,7 @@
 // externals
 import { Request, Response } from "express";
 import * as core from "express-serve-static-core";
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 
 // libraries
 import { ApiProductBacklogItem } from "@atoll/shared";
@@ -51,7 +51,7 @@ export const productBacklogItemGetHandler = async (req: Request<BacklogItemGetPa
             respondWithNotFound(res, `Unable to find productbacklogitem by primary key ${id}`);
         } else {
             res.json({
-                status: HttpStatus.OK,
+                status: StatusCodes.OK,
                 data: {
                     item: mapDbToApiProductBacklogItem(productBacklogItem)
                 }

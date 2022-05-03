@@ -1,5 +1,5 @@
 // externals
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import { FindOptions, Op, Transaction } from "sequelize";
 
 // libraries
@@ -86,7 +86,7 @@ export const fetchSprint = async (sprintId: string, transaction?: Transaction): 
         const sprint = await SprintDataModel.findByPk(sprintId, options);
         if (!sprint) {
             return {
-                status: HttpStatus.NOT_FOUND,
+                status: StatusCodes.NOT_FOUND,
                 message: `Unable to find sprint with ID ${sprintId}.`
             };
         }

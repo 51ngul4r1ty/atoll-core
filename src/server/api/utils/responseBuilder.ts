@@ -1,5 +1,5 @@
 // externals
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 
 // utils
 import { getMessageFromError, getStackFromError } from "./errorUtils";
@@ -31,7 +31,7 @@ export type RestApiCollectionResult<T, U = undefined, V = undefined> = RestApiBa
 
 export const buildResponseWithData = <T, U = undefined>(data: T, extra?: U, message?: string): RestApiDataResult<T, U> => {
     const result: RestApiDataResult<T, U> = {
-        status: HttpStatus.OK,
+        status: StatusCodes.OK,
         data
     };
     if (extra) {
@@ -49,7 +49,7 @@ export const buildResponseWithItems = <T, U = undefined>(
     message?: string
 ): RestApiCollectionResult<T, U> => {
     const result: RestApiCollectionResult<T, U> = {
-        status: HttpStatus.OK,
+        status: StatusCodes.OK,
         data: {
             items: items || []
         }
@@ -70,7 +70,7 @@ export const buildResponseWithItem = <T, U = undefined, V = undefined>(
     message?: string
 ): RestApiItemResult<T, U, V> => {
     const result: RestApiItemResult<T, U, V> = {
-        status: HttpStatus.OK,
+        status: StatusCodes.OK,
         data: {
             item
         }
@@ -94,7 +94,7 @@ export const buildMessageResponse = (status: number, message: string): RestApiSt
 
 export const buildOkResponse = (message?: string): RestApiStatusAndMessageOnly => {
     const result: RestApiStatusAndMessageOnly = {
-        status: HttpStatus.OK
+        status: StatusCodes.OK
     };
     if (message) {
         result.message = message;
@@ -102,33 +102,17 @@ export const buildOkResponse = (message?: string): RestApiStatusAndMessageOnly =
     return result;
 };
 
-export const buildNotImplementedResponse = (message?: string): RestApiErrorResult => {
-    return {
-        status: HttpStatus.NOT_IMPLEMENTED,
-        message
-    };
-};
+export const buildNotImplementedResponse = (message?: string): RestApiErrorResult =>
+    buildMessageResponse(StatusCodes.NOT_IMPLEMENTED, message) as RestApiErrorResult;
 
-export const buildBadRequestResponse = (message?: string): RestApiErrorResult => {
-    return {
-        status: HttpStatus.BAD_REQUEST,
-        message
-    };
-};
+export const buildBadRequestResponse = (message?: string): RestApiErrorResult =>
+    buildMessageResponse(StatusCodes.BAD_REQUEST, message) as RestApiErrorResult;
 
-export const buildNotFoundResponse = (message?: string): RestApiErrorResult => {
-    return {
-        status: HttpStatus.NOT_FOUND,
-        message
-    };
-};
+export const buildNotFoundResponse = (message?: string): RestApiErrorResult =>
+    buildMessageResponse(StatusCodes.NOT_FOUND, message) as RestApiErrorResult;
 
-export const buildInternalServerErrorResponse = (message: string): RestApiErrorResult => {
-    return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message
-    };
-};
+export const buildInternalServerErrorResponse = (message: string): RestApiErrorResult =>
+    buildMessageResponse(StatusCodes.INTERNAL_SERVER_ERROR, message) as RestApiErrorResult;
 
 export type ErrorOptions = {
     includeStack?: boolean;

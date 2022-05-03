@@ -8,6 +8,9 @@
         },
         {
             "path": "../atoll-scripts"
+        },
+        {
+            "path": "../atoll-api-types"
         }
     ],
     "settings": {

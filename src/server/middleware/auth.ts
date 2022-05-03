@@ -1,6 +1,6 @@
 // externals
 import * as jwt from "jsonwebtoken";
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 
 // libraries
 import { getAuthKey, timeNow } from "@atoll/shared";
@@ -8,10 +8,10 @@ import { getAuthKey, timeNow } from "@atoll/shared";
 // interfaces/types
 import { AuthTokenContents } from "../types";
 
-export default function(req, res, next) {
+export default function (req, res, next) {
     const authHeader: string = req.headers["x-auth-token"] || req.headers["authorization"];
     if (!authHeader) {
-        return res.status(HttpStatus.UNAUTHORIZED).send("Access denied. No token provided.");
+        return res.status(StatusCodes.UNAUTHORIZED).send("Access denied. No token provided.");
     }
     const authHeaderPrefix = "Bearer  ";
     let token: string;
@@ -23,7 +23,7 @@ export default function(req, res, next) {
 
     const authKey = getAuthKey();
     if (!authKey) {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send("Invalid configuration - auth key has not been set up");
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Invalid configuration - auth key has not been set up");
         return;
     }
 
@@ -31,18 +31,18 @@ export default function(req, res, next) {
     try {
         decoded = jwt.verify(token, authKey) as AuthTokenContents;
     } catch (ex) {
-        return res.status(HttpStatus.FORBIDDEN).send("Invalid token.");
+        return res.status(StatusCodes.FORBIDDEN).send("Invalid token.");
     }
     let expirationDate: Date;
     try {
         expirationDate = new Date(decoded.expirationDate);
     } catch (ex) {
-        return res.status(HttpStatus.FORBIDDEN).send("Invalid expirated date in token.");
+        return res.status(StatusCodes.FORBIDDEN).send("Invalid expirated date in token.");
     }
     const nowDate = timeNow();
     const stillValid = expirationDate.getTime() >= nowDate.getTime();
     if (!stillValid) {
-        return res.status(HttpStatus.FORBIDDEN).send("Token has expired.");
+        return res.status(StatusCodes.FORBIDDEN).send("Token has expired.");
     }
     req.user = decoded;
     next();

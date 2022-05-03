@@ -1,6 +1,6 @@
 // externals
 import { Request, Response } from "express";
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import * as jwt from "jsonwebtoken";
 
 // config
@@ -12,26 +12,31 @@ import { ROLE_USER, RefreshTokenContents } from "../../types";
 // utils
 import { buildAuthToken, buildRefreshToken } from "../utils/tokenHelper";
 import { getSimpleUuid } from "../utils/uuidHelper";
-import { buildResponseWithItem } from "../utils/responseBuilder";
+import { buildMessageResponse, buildResponseWithItem } from "../utils/responseBuilder";
 
 export const loginPostHandler = async (req: Request, res: Response) => {
     const username = req.body?.username;
     const password = req.body?.password;
     if (!username || !password) {
-        res.status(HttpStatus.BAD_REQUEST).send("username and password is required");
+        const messageResponse = buildMessageResponse(StatusCodes.BAD_REQUEST, "username and password is required");
+        res.status(messageResponse.status).send(messageResponse);
         return;
     }
     const authKey = getAuthKey();
     if (!authKey) {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send("Invalid configuration - auth key has not been set up");
+        const messageResponse = buildMessageResponse(
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "Invalid configuration - auth key has not been set up"
+        );
+        res.status(messageResponse.status).send(messageResponse);
         return;
     }
     // TODO: Query the database to get list of users
     if (username === "test" && password === "atoll") {
         try {
             const refreshTokenId = getSimpleUuid();
-            res.status(HttpStatus.OK).send({
-                status: HttpStatus.OK,
+            res.status(StatusCodes.OK).send({
+                status: StatusCodes.OK,
                 data: {
                     item: {
                         authToken: buildAuthToken("217796f6e1ab455a980263171099533f", username, ROLE_USER),
@@ -41,11 +46,16 @@ export const loginPostHandler = async (req: Request, res: Response) => {
             });
             return;
         } catch (err) {
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).send("An unknown error occurred while generating an auth token");
+            const messageResponse = buildMessageResponse(
+                StatusCodes.INTERNAL_SERVER_ERROR,
+                "An unknown error occurred while generating an auth token"
+            );
+            res.status(messageResponse.status).send(messageResponse);
             return;
         }
     } else {
-        res.status(HttpStatus.UNAUTHORIZED).send("Either username or password is incorrect");
+        const messageResponse = buildMessageResponse(StatusCodes.UNAUTHORIZED, "Either username or password is incorrect");
+        res.status(messageResponse.status).send(messageResponse);
         return;
     }
 };
@@ -53,12 +63,17 @@ export const loginPostHandler = async (req: Request, res: Response) => {
 export const refreshTokenPostHandler = async (req: Request, res: Response) => {
     const refreshToken = req.body?.refreshToken;
     if (!refreshToken) {
-        res.status(HttpStatus.BAD_REQUEST).send("refreshToken is required");
+        const messageResponse = buildMessageResponse(StatusCodes.BAD_REQUEST, "refreshToken is required");
+        res.status(messageResponse.status).send(messageResponse);
         return;
     }
     const authKey = getAuthKey();
     if (!authKey) {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send("Invalid configuration - auth key has not been set up");
+        const messageResponse = buildMessageResponse(
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "Invalid configuration - auth key has not been set up"
+        );
+        res.status(messageResponse.status).send(messageResponse);
         return;
     }
     try {
@@ -66,7 +81,7 @@ export const refreshTokenPostHandler = async (req: Request, res: Response) => {
         try {
             decoded = jwt.verify(refreshToken, authKey) as RefreshTokenContents;
         } catch (ex) {
-            return res.status(HttpStatus.FORBIDDEN).send("Invalid refresh token.");
+            return res.status(StatusCodes.FORBIDDEN).send("Invalid refresh token.");
         }
 
         const responseWithItem = buildResponseWithItem({
@@ -77,7 +92,11 @@ export const refreshTokenPostHandler = async (req: Request, res: Response) => {
 
         return;
     } catch (err) {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send("An unknown error occurred while generating an auth token");
+        const messageResponse = buildMessageResponse(
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            "An unknown error occurred while generating an auth token"
+        );
+        res.status(messageResponse.status).send(messageResponse);
         return;
     }
 };

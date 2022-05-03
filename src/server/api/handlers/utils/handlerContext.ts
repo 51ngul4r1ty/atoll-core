@@ -1,5 +1,5 @@
 // externals
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import { Transaction } from "sequelize";
 import { Response } from "express";
 
@@ -84,14 +84,14 @@ export const commitWithResponseAndStatusIfNotAborted = async (
  * @deprecated this doesn't work well with the "fetcher" pattern so it shouldn't be used.
  */
 export const commitWithOkResponseIfNotAborted = async (handlerContext: HandlerContext, addedItem, extra?) => {
-    await commitWithResponseAndStatusIfNotAborted(handlerContext, HttpStatus.OK, addedItem, extra);
+    await commitWithResponseAndStatusIfNotAborted(handlerContext, StatusCodes.OK, addedItem, extra);
 };
 
 /**
  * @deprecated this doesn't work well with the "fetcher" pattern so it shouldn't be used.
  */
 export const commitWithCreatedResponseIfNotAborted = async (handlerContext: HandlerContext, addedItem, extra?) => {
-    await commitWithResponseAndStatusIfNotAborted(handlerContext, HttpStatus.CREATED, addedItem, extra);
+    await commitWithResponseAndStatusIfNotAborted(handlerContext, StatusCodes.CREATED, addedItem, extra);
 };
 
 export const abortSilently = (handlerContext: HandlerContext) => {

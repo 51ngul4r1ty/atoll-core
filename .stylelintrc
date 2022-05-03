@@ -1,11 +1,8 @@
 {
-  "plugins": [
-  	"stylelint-order",
-    "stylelint-prettier"
-  ],
+  "plugins": ["stylelint-order", "stylelint-prettier"],
   "extends": ["stylelint-prettier/recommended"],
   "rules": {
-    "declaration-block-no-shorthand-property-overrides": [true, { "severity": "warning" } ],
+    "declaration-block-no-shorthand-property-overrides": [true, { "severity": "warning" }],
     "order/properties-alphabetical-order": true,
     "color-no-invalid-hex": true,
     "font-family-no-duplicate-names": true,

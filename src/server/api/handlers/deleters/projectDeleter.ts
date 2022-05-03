@@ -1,5 +1,5 @@
 // externals
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import { FindOptions, InstanceDestroyOptions, Transaction } from "sequelize";
 
 // data access
@@ -16,7 +16,7 @@ export const deleteProject = async (projectId: string | null, transaction?: Tran
         const item = await ProjectDataModel.findOne(findItemOptions);
         if (!item) {
             return {
-                status: HttpStatus.NOT_FOUND,
+                status: StatusCodes.NOT_FOUND,
                 message: `Project ${projectId} was not found`
             };
         }

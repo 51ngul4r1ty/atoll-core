@@ -1,6 +1,6 @@
 // externals
 import { CreateOptions, Transaction } from "sequelize";
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 
 // utils
 import { addIdToBody } from "../../utils/uuidHelper";
@@ -41,7 +41,7 @@ export const productBacklogItemFirstItemInserter = async (
         } as CreateOptions
     );
     return {
-        status: HttpStatus.OK
+        status: StatusCodes.OK
     };
 };
 
@@ -62,7 +62,7 @@ export const productBacklogItemSubsequentItemInserter = async (newItem, transact
     if (!prevBacklogItems.length) {
         await transaction.rollback();
         return {
-            status: HttpStatus.BAD_REQUEST,
+            status: StatusCodes.BAD_REQUEST,
             message: `Invalid previous backlog item - can't find entries with ID ${prevBacklogItemId} in database`,
             rolledBack: true
         };
@@ -86,7 +86,7 @@ export const productBacklogItemSubsequentItemInserter = async (newItem, transact
             } as CreateOptions
         );
         return {
-            status: HttpStatus.OK,
+            status: StatusCodes.OK,
             message: null,
             rolledBack: false
         };

@@ -6,7 +6,7 @@ import { ApiBacklogItem, ApiProject } from "@atoll/shared";
 
 // externals
 import { Request, Response } from "express";
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 
 // code under test
 import * as backlogItemViewBff from "../backlogItemViewBff";
@@ -37,7 +37,7 @@ describe("Backlog Item View BFF Handler", () => {
                 projectDisplayId: "fake-project-display-id"
             });
             const projectsResult: ProjectItemsResult = {
-                status: HttpStatus.OK,
+                status: StatusCodes.OK,
                 data: {
                     items: []
                 }
@@ -66,7 +66,7 @@ describe("Backlog Item View BFF Handler", () => {
                 projectDisplayId: "fake-project-display-id"
             });
             const projectsResult: ProjectItemsResult = {
-                status: HttpStatus.OK,
+                status: StatusCodes.OK,
                 data: {
                     items: [
                         {
@@ -77,7 +77,7 @@ describe("Backlog Item View BFF Handler", () => {
             };
             jest.spyOn(projectFetcher, "projectByDisplayIdFetcher").mockResolvedValueOnce(projectsResult);
             const backlogItemsResult: BacklogItemsResult = {
-                status: HttpStatus.OK,
+                status: StatusCodes.OK,
                 data: {
                     items: [
                         {
@@ -93,7 +93,7 @@ describe("Backlog Item View BFF Handler", () => {
                 "fetchBacklogItemWithSprintAllocationInfo"
             );
             const backlogItemWithSprintAllocInfoResult: BacklogItemWithSprintAllocationInfoResult = {
-                status: HttpStatus.OK,
+                status: StatusCodes.OK,
                 data: {
                     item: {
                         id: "fake-backlog-item-id"

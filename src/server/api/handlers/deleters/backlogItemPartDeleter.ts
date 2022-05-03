@@ -1,5 +1,5 @@
 // externals
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import { FindOptions, Transaction } from "sequelize";
 
 // data access
@@ -37,7 +37,7 @@ export const removeUnallocatedBacklogItemPart = async (
         const item = await BacklogItemPartDataModel.findOne(findItemOptions);
         if (!item) {
             return {
-                status: HttpStatus.NOT_FOUND,
+                status: StatusCodes.NOT_FOUND,
                 message: `Backlog item part "${backlogItemPartId}" was not found`
             };
         }
@@ -59,13 +59,13 @@ export const removeUnallocatedBacklogItemPart = async (
         if (!peerItems.length) {
             if (lastPartRemovalOptions === LastPartRemovalOptions.Disallow) {
                 return {
-                    status: HttpStatus.BAD_REQUEST,
+                    status: StatusCodes.BAD_REQUEST,
                     message: `Backlog Item Part removal resulted in last part with ID "${backlogItemPartId}" being removed`
                 };
             }
             if (!backlogItem) {
                 return {
-                    status: HttpStatus.INTERNAL_SERVER_ERROR,
+                    status: StatusCodes.INTERNAL_SERVER_ERROR,
                     message:
                         `After removing last backlog item part with ID "${backlogItemPartId}"` +
                         ` unable to find backlog item with ID "${item.backlogitemId}"`
@@ -74,7 +74,7 @@ export const removeUnallocatedBacklogItemPart = async (
             let backlogItemData = mapDbToApiBacklogItem(item);
             await dbBacklogItem.destroy({ transaction });
             return {
-                status: HttpStatus.OK,
+                status: StatusCodes.OK,
                 data: {
                     item: itemData
                 },

@@ -1,6 +1,6 @@
 // externals
 import { Request, Response } from "express";
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 
 // utils
 import { fetchBacklogItemsByDisplayId } from "../fetchers/backlogItemFetcher";
@@ -45,7 +45,7 @@ export const backlogItemViewBffGetHandler = async (req: Request, res: Response) 
         return;
     } else if (backlogItemCount > 1) {
         respondWithMessage(res, {
-            status: HttpStatus.BAD_REQUEST,
+            status: StatusCodes.BAD_REQUEST,
             message: `Unexpected result- there should be only one backlog item that matches and ${backlogItemCount} were found!`
         });
         return;

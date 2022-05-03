@@ -1,6 +1,6 @@
 // externals
 import { Request, Response } from "express";
-import * as HttpStatus from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import { Op } from "sequelize";
 
 // libraries
@@ -50,7 +50,7 @@ export const sprintsGetHandler = async (req: Request, res) => {
             break;
     }
     const result = await fetchSprints(params.projectId, archivedValue);
-    if (result.status === HttpStatus.OK) {
+    if (result.status === StatusCodes.OK) {
         res.json(result);
     } else {
         res.status(result.status).json({
@@ -106,8 +106,8 @@ export const sprintPostHandler = async (req: Request, res) => {
     const sprintDataObject = mapApiToDbSprint({ ...addIdToBody(req.body) });
     try {
         const addedSprint = await SprintDataModel.create(sprintDataObject);
-        res.status(HttpStatus.CREATED).json({
-            status: HttpStatus.CREATED,
+        res.status(StatusCodes.CREATED).json({
+            status: StatusCodes.CREATED,
             data: {
                 item: addedSprint
             }
@@ -222,7 +222,7 @@ export const sprintPutHandler = async (req: Request, res) => {
 export const sprintDeleteHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
     const result = await deleteSprint(params.sprintId);
-    if (result.status === HttpStatus.OK) {
+    if (result.status === StatusCodes.OK) {
         res.json(result);
     } else {
         res.status(result.status).json({
