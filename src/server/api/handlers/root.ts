@@ -110,10 +110,23 @@ export const rootHandler = function (req, res) {
             ]
         },
         {
+            id: "projects",
+            name: "Projects",
+            description: "Collection of projects",
+            displayIndex: 5,
+            links: [
+                {
+                    type: APPLICATION_JSON,
+                    rel: ROOT_REL_COLLECTION,
+                    uri: "/api/v1/projects"
+                }
+            ]
+        },
+        {
             id: "sprints",
             name: "Sprints",
             description: "Collection of sprints",
-            displayIndex: 4,
+            displayIndex: 6,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -126,7 +139,7 @@ export const rootHandler = function (req, res) {
             id: "backlog-items",
             name: "Backlog Items",
             description: "Collection of backlog items",
-            displayIndex: 5,
+            displayIndex: 7,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -139,7 +152,7 @@ export const rootHandler = function (req, res) {
             id: "sprint-backlog-items-parts",
             name: "Sprint Backlog Item Parts",
             description: "Collection of parts under a backlog item contained in a specific sprint",
-            displayIndex: 6,
+            displayIndex: 8,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -152,7 +165,7 @@ export const rootHandler = function (req, res) {
             id: "product-backlog-items",
             name: "Product Backlog Items",
             description: "Linked lists used to display backlog items in prioritized order",
-            displayIndex: 7,
+            displayIndex: 9,
             links: [
                 {
                     type: APPLICATION_JSON,
