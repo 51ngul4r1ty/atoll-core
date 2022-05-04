@@ -10,7 +10,7 @@ import { buildResponseWithItem } from "api/utils/responseBuilder";
 
 export const featureTogglesHandler = function (req: Request, res: Response) {
     const userId = req.params.userId || "";
-    if (userId !== "{self}") {
+    if (userId !== "--self--") {
         respondWithNotImplemented(
             res,
             "This endpoint is intended as an admin endpoint, so a typical user would not be able to use it."

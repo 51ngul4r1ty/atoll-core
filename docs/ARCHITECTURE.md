@@ -28,38 +28,26 @@ Endpoints
    _These endpoints differ from the collection endpoints by returning more detail than the
    collection resource itself- logic that may be too expensive to perform when retrieving
    the full list of items._
+5. Sometimes IDs have "magic values" instead of a specific unique identifier.  These magic
+   values are differentiated by the used of `--` as prefix and suffix.  
+   For example, `/api/v1/projects/{id}/sprints/--curr--`
+   and `/api/v1/projects/{id}/sprints/--next--`
+
+Endpoint ID Magic Values
+------------------------
+
+As mentioned in the "Endpoints" section above, the full list will be maintained here:
+1. Current item is referenced by `--curr--`
+2. Next item is referenced by `--next--`
+3. Previous item is referenced by `--prev--`
 
 Use of HATEOAS
 --------------
 
-1. There's an index resource at the API root `/api/v1/` that provides links to all
-   of the resources.
-2. Each resource also responds to an OPTIONS request by providing the HTTP verbs
-   that can be used for that resource using `Access-Control-Allow-Methods`
-   (for example, "GET, OPTIONS" is returned for the index resource).
-3. Items that have links to other resources return a `links` object that includes
-   the following properties:
-   - `type`: the resource format, for example, "application/json"
-   - `rel`: the relationship, for example, "collection", "item", or "self"
-   - `uri`: the URI to the resource itself
+The API reponses include links and there's an index resource (`/api/v1/`) that provides named
+links so that a consuming app (or developer) can discover resource links dynamically.
 
-Rel Values
-----------
-
-1. `collection`: this link will return a collection of items
-2. `item`: this link will return an individual item
-3. `self`: the link to this resource, usually used within a collection when the
-   item is simply providing a link to itself (collections return the full items)
-4. `action:*` can be used to link to POST actions associated with this resource,
-   for example, `action:join-unallocated-parts`
-
-Note: "self" should not be used when the current request URI to return this item
-  returns that exact same URI.  It is only intended for the collection --> item
-  navigation scenario where you request a collection and need to get the URI for
-  an item within that collection.  It signifies that no further data will be
-  returned by navigating using that link.  It is useful because an "OPTIONS" call
-  to that URI may return other HTTP verbs that can be used on that resource,
-  for example, "PUT", "DELETE" or "PATCH".
+For more information see [ARCHITECTURE_HATEOAS.md](ARCHITECTURE_HATEOAS.md).
 
 CSS
 ===

@@ -27,7 +27,7 @@ import { logError } from "../utils/serverLogger";
 
 export const planViewBffGetHandler = async (req: Request, res: Response) => {
     try {
-        const userPreferencesResult = await getUserPreferences("{self}", () => getLoggedInAppUserId(req));
+        const userPreferencesResult = await getUserPreferences("--self--", () => getLoggedInAppUserId(req));
         const selectedProjectId = (userPreferencesResult as UserPreferencesItemResult).data.item.settings.selectedProject;
 
         const archived = "N";

@@ -26,7 +26,7 @@ export type UserPreferencesItemResult = RestApiItemResult<ApiUserSettings, undef
 
 export const getUserPreferences = async (userId: string | null, getLoggedInAppUserId: { () }): Promise<UserPreferencesResult> => {
     try {
-        if (userId !== "{self}") {
+        if (userId !== "--self--") {
             return buildNotImplementedResponse(
                 "This endpoint is intended as an admin endpoint, so a typical user would not be able to use it."
             );

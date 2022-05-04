@@ -36,7 +36,8 @@ import {
     sprintDeleteHandler,
     sprintPatchHandler,
     sprintGetHandler,
-    sprintPutHandler
+    sprintPutHandler,
+    projectSprintGetHandler
 } from "./handlers/sprints";
 import { productBacklogItemsGetHandler, productBacklogItemGetHandler } from "./handlers/productBacklogItems";
 import { featureTogglesHandler } from "./handlers/featureToggles";
@@ -85,6 +86,10 @@ setupRoutes(router, `/${PROJECT_RESOURCE_NAME}/:projectId`, {
     get: projectGetHandler,
     patch: projectPatchHandler,
     delete: projectDeleteHandler
+});
+
+setupRoutes(router, `/${PROJECT_RESOURCE_NAME}/:projectId/sprints/:sprintId`, {
+    get: projectSprintGetHandler
 });
 
 setupRoutes(router, `/${SPRINT_RESOURCE_NAME}`, {

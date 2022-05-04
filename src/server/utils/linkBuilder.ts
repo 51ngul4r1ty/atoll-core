@@ -12,6 +12,14 @@ export const combinePaths = (baseUrl: string, relativeUrl: string): string => {
     }
 };
 
+export const buildSimpleLink = (relativeUri: string, rel: string): Link => {
+    return {
+        type: APPLICATION_JSON,
+        rel,
+        uri: relativeUri
+    };
+};
+
 export const buildLink = (item: ItemWithId, basePath: string, rel: string): Link => {
     return {
         type: APPLICATION_JSON,

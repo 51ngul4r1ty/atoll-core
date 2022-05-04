@@ -56,7 +56,7 @@ export const rootHandler = function (req, res) {
         const packageJsonPath = getPackageJsonPath();
         const data = fs.readFileSync(packageJsonPath, { encoding: "utf8", flag: "r" });
         const packageJson = JSON.parse(data);
-        // NOTE: X-App-Version is reported at api/v1/users/{self}/preferences endpoint.
+        // NOTE: X-App-Version is reported at api/v1/users/--self--/preferences endpoint.
         res.set(
             "X-Atoll-Info",
             JSON.stringify({
@@ -92,7 +92,7 @@ export const rootHandler = function (req, res) {
                 {
                     type: APPLICATION_JSON,
                     rel: ROOT_REL_COLLECTION,
-                    uri: "/api/v1/users/{self}/preferences"
+                    uri: "/api/v1/users/--self--/preferences"
                 }
             ]
         },
@@ -105,7 +105,7 @@ export const rootHandler = function (req, res) {
                 {
                     type: APPLICATION_JSON,
                     rel: ROOT_REL_COLLECTION,
-                    uri: "/api/v1/users/{self}/feature-toggles"
+                    uri: "/api/v1/users/--self--/feature-toggles"
                 }
             ]
         },

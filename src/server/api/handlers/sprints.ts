@@ -4,7 +4,15 @@ import { StatusCodes } from "http-status-codes";
 import { Op } from "sequelize";
 
 // libraries
-import { ApiSprint, logger } from "@atoll/shared";
+import {
+    ApiSprint,
+    ApiSprintBacklogItem,
+    DateOnly,
+    determineSprintStatus,
+    isoDateStringToDate,
+    logger,
+    SprintStatus
+} from "@atoll/shared";
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
@@ -32,7 +40,7 @@ import {
     rollbackWithMessageAndStatus,
     start
 } from "./utils/handlerContext";
-import { isRestApiItemResult } from "api/utils/responseBuilder";
+import { buildResponseWithItem, isRestApiCollectionResult, isRestApiItemResult } from "api/utils/responseBuilder";
 
 export const sprintsGetHandler = async (req: Request, res) => {
     const params = getParamsFromRequest(req);
@@ -246,6 +254,84 @@ export const sprintGetHandler = async (req: Request, res: Response) => {
         } else {
             await rollbackWithMessageAndStatus(handlerContext, result.message, result.status);
             console.log(`Unable to fetch sprint: ${result.message}`);
+        }
+        finish(handlerContext);
+    } catch (err) {
+        await handleUnexpectedErrorResponse(handlerContext, err);
+    }
+};
+
+export const projectSprintGetHandler = async (req: Request, res: Response) => {
+    const handlerContext = start("projectSprintGetHandler", res);
+
+    try {
+        await beginSerializableTransaction(handlerContext);
+
+        const params = getParamsFromRequest(req);
+        let descrip: string;
+        switch (params.sprintId) {
+            case "--curr--": {
+                descrip = '"current" sprint';
+                break;
+            }
+            case "--next--": {
+                descrip = '"next" sprint';
+                break;
+            }
+            default: {
+                descrip = `sprint with ID ${params.sprintId}`;
+                break;
+            }
+        }
+        const result = await fetchSprints(params.projectId);
+        if (isRestApiCollectionResult(result)) {
+            const sprints = result.data.items;
+            let matchingSprints: ApiSprint[];
+            switch (params.sprintId) {
+                case "--curr--": {
+                    matchingSprints = sprints.filter((sprint: ApiSprint) => {
+                        const status = determineSprintStatus(
+                            DateOnly.fromISODate(sprint.startdate),
+                            DateOnly.fromISODate(sprint.finishdate)
+                        );
+                        return status === SprintStatus.InProgress;
+                    });
+                    break;
+                }
+                case "--next--": {
+                    let firstMatch = true;
+                    matchingSprints = sprints.filter((sprint: ApiSprint) => {
+                        const status = determineSprintStatus(
+                            DateOnly.fromISODate(sprint.startdate),
+                            DateOnly.fromISODate(sprint.finishdate)
+                        );
+                        const match = status === SprintStatus.NotStarted;
+                        const result = match && firstMatch;
+                        if (match) {
+                            firstMatch = false;
+                        }
+                        return result;
+                    });
+                    break;
+                }
+                default: {
+                    matchingSprints = sprints.filter((sprint: ApiSprint) => {
+                        return sprint.id === params.sprintId;
+                    });
+                    break;
+                }
+            }
+            const sprintCount = matchingSprints.length;
+            if (sprintCount > 1) {
+                throw new Error(`Unexpected condition- more than one (${sprintCount}) ${descrip}`);
+            } else if (sprintCount === 0) {
+                await rollbackWithMessageAndStatus(handlerContext, `Unable to find a ${descrip}!`, StatusCodes.NOT_FOUND);
+            } else {
+                await handleSuccessResponse(handlerContext, buildResponseWithItem(matchingSprints[0]));
+            }
+        } else {
+            await rollbackWithMessageAndStatus(handlerContext, result.message, result.status);
+            console.log(`Unable to fetch ${descrip}: ${result.message}`);
         }
         finish(handlerContext);
     } catch (err) {
