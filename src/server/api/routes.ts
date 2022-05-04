@@ -88,7 +88,7 @@ setupRoutes(router, `/${PROJECT_RESOURCE_NAME}/:projectId`, {
     delete: projectDeleteHandler
 });
 
-setupRoutes(router, `/${PROJECT_RESOURCE_NAME}/:projectId/sprints/:sprintId`, {
+setupRoutes(router, `/${PROJECT_RESOURCE_NAME}/:projectId/${SPRINT_RESOURCE_NAME}/:sprintId`, {
     get: projectSprintGetHandler
 });
 
