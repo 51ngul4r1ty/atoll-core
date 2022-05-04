@@ -5,7 +5,11 @@ import { StatusCodes } from "http-status-codes";
 import { ApiBacklogItemInSprint } from "@atoll/shared";
 
 // consts/enums
-import { SPRINT_BACKLOG_PARENT_RESOURCE_NAME, SPRINT_BACKLOG_CHILD_RESOURCE_NAME } from "../../../resourceNames";
+import {
+    SPRINT_BACKLOG_PARENT_RESOURCE_NAME,
+    SPRINT_BACKLOG_CHILD_RESOURCE_NAME,
+    BACKLOG_ITEM_RESOURCE_NAME
+} from "../../../resourceNames";
 
 // data access
 import { DB_INCLUDE_ALIAS_SPRINTBACKLOGITEMS, DB_INCLUDE_ALIAS_BACKLOGITEM } from "../../../dataaccess/models/dataModelConsts";
@@ -23,7 +27,7 @@ import {
     RestApiErrorResult,
     RestApiItemResult
 } from "../../utils/responseBuilder";
-import { buildSelfLink } from "../../../utils/linkBuilder";
+import { buildSelfLink, buildSimpleLink } from "../../../utils/linkBuilder";
 import {
     mapDbBacklogPartsWithSprintItemsToApiBacklogItemInSprint,
     mapDbSprintBacklogWithNestedToApiBacklogItemInSprint
@@ -136,7 +140,8 @@ export const buildBacklogItemPartForResponse = (
             buildSelfLink(
                 sprintBacklog,
                 `/api/v1/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/${sprintId}/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`
-            )
+            ),
+            buildSimpleLink(`/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/${sprintBacklog.id}`, "related:backlog-item")
         ]
     };
 };
