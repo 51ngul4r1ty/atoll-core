@@ -6,7 +6,12 @@ import { FindOptions, Op, Transaction } from "sequelize";
 import { ApiBacklogItemPart, ApiSprint, isoDateStringToDate, Link } from "@atoll/shared";
 
 // consts/enums
-import { BACKLOG_ITEM_PART_RESOURCE_NAME, SPRINT_RESOURCE_NAME } from "../../../resourceNames";
+import {
+    BACKLOG_ITEM_PART_RESOURCE_NAME,
+    BACKLOG_ITEM_RESOURCE_NAME,
+    SPRINT_BACKLOG_CHILD_RESOURCE_NAME,
+    SPRINT_RESOURCE_NAME
+} from "../../../resourceNames";
 
 // data access
 import {
@@ -20,7 +25,7 @@ import { BacklogItemPartDataModel } from "../../../dataaccess/models/BacklogItem
 import { BacklogItemDataModel } from "../../../dataaccess/models/BacklogItemDataModel";
 
 // utils
-import { buildLink, buildSelfLink } from "../../../utils/linkBuilder";
+import { buildLink, buildSelfLink, buildSimpleLink } from "../../../utils/linkBuilder";
 import { buildOptionsFromParams, buildOptionsWithTransaction } from "../../utils/sequelizeHelper";
 import {
     buildResponseFromCatchError,
@@ -50,6 +55,22 @@ export type PartAndSprintInfoForBacklogItem = {
 export type PartAndSprintInfoForBacklogItemItemResult = RestApiCollectionResult<PartAndSprintInfoForBacklogItem>;
 export type PartAndSprintInfoForBacklogItemsResult = PartAndSprintInfoForBacklogItemItemResult | RestApiErrorResult;
 
+const RESOURCE_BASE_PATH = `/api/v1/${SPRINT_RESOURCE_NAME}/`;
+
+export const buildSprintLinks = (sprint: ApiSprint) => {
+    const links = [
+        buildSelfLink(sprint, RESOURCE_BASE_PATH),
+        buildSimpleLink(`${RESOURCE_BASE_PATH}${sprint.id}/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`, "related:sprint-backlog-items")
+    ];
+    return links;
+};
+
+export const addLinkToLastSprint = (lastSprint: ApiSprint, sprint: ApiSprint) => {
+    if (lastSprint) {
+        lastSprint.links!.push(buildLink(sprint, RESOURCE_BASE_PATH, "next-item"));
+    }
+};
+
 export const fetchSprints = async (projectId: string | null, archived?: string | null): Promise<SprintsResult> => {
     try {
         const options = buildOptionsFromParams({ projectId, archived });
@@ -60,16 +81,13 @@ export const fetchSprints = async (projectId: string | null, archived?: string |
         const dbSprints = await SprintDataModel.findAll(options);
         const items: ApiSprint[] = [];
         let lastSprint: ApiSprint;
-        const resourceBasePath = `/api/v1/${SPRINT_RESOURCE_NAME}/`;
         dbSprints.forEach((dbSprint) => {
             const sprintWithoutLinks = mapDbToApiSprint(dbSprint);
             const sprint: ApiSprint = {
                 ...sprintWithoutLinks,
-                links: [buildSelfLink(sprintWithoutLinks, resourceBasePath)]
+                links: buildSprintLinks(sprintWithoutLinks)
             };
-            if (lastSprint) {
-                lastSprint.links!.push(buildLink(sprint, resourceBasePath, "next"));
-            }
+            addLinkToLastSprint(lastSprint, sprint);
             lastSprint = sprint;
             items.push(sprint);
         });
@@ -92,11 +110,10 @@ export const fetchSprint = async (sprintId: string, transaction?: Transaction): 
         }
         const sprintItem = mapDbToApiSprint(sprint);
         const nextSprint = await fetchNextSprint(isoDateStringToDate(sprintItem.startdate), transaction);
-        const resourceBasePath = `/api/v1/${SPRINT_RESOURCE_NAME}/`;
-        const links: Link[] = [buildSelfLink(sprintItem, resourceBasePath)];
+        const links: Link[] = buildSprintLinks(sprintItem);
         if (nextSprint) {
             const nextSprintItem = mapDbToApiSprint(nextSprint);
-            links.push(buildLink(nextSprintItem, resourceBasePath, "next"));
+            links.push(buildLink(nextSprintItem, RESOURCE_BASE_PATH, "next-item"));
         }
         const item: ApiSprint = {
             ...sprintItem,

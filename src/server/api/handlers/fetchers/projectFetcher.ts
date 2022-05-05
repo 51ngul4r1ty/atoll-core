@@ -9,14 +9,14 @@ import { ApiProject } from "@atoll/shared";
 import { ProjectDataModel } from "../../../dataaccess/models/ProjectDataModel";
 
 // consts/enums
-import { PROJECT_RESOURCE_NAME } from "../../../resourceNames";
+import { PROJECT_RESOURCE_NAME, SPRINT_RESOURCE_NAME } from "../../../resourceNames";
 
 // interfaces/types
 import { RestApiCollectionResult, RestApiErrorResult } from "../../utils/responseBuilder";
 
 // utils
 import { buildResponseFromCatchError, buildResponseWithItem, buildResponseWithItems } from "../../utils/responseBuilder";
-import { buildSelfLink } from "../../../utils/linkBuilder";
+import { buildLink, buildSelfLink, buildSimpleLink } from "../../../utils/linkBuilder";
 import { mapDbToApiProject } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 export type ProjectItemsResult = RestApiCollectionResult<ApiProject>;
@@ -57,14 +57,20 @@ export const projectByDisplayIdFetcher = async (projectDisplayId: string): Promi
     }
 };
 
+export const buildProjectLinks = (project: ApiProject) => [
+    buildSelfLink(project, `/api/v1/${PROJECT_RESOURCE_NAME}/`),
+    buildSimpleLink(`/api/v1/${PROJECT_RESOURCE_NAME}/${project.id}/${SPRINT_RESOURCE_NAME}/--curr--`, "related:sprint/current"),
+    buildSimpleLink(`/api/v1/${PROJECT_RESOURCE_NAME}/${project.id}/${SPRINT_RESOURCE_NAME}/--next--`, "related:sprint/next")
+];
+
 export const fetchProjects = async () => {
     try {
-        const projects = await ProjectDataModel.findAll();
-        const items = projects.map((item) => {
+        const dbProjects = await ProjectDataModel.findAll();
+        const items = dbProjects.map((item) => {
             const project = mapDbToApiProject(item);
             const result: ApiProject = {
                 ...project,
-                links: [buildSelfLink(project, `/api/v1/${PROJECT_RESOURCE_NAME}/`)]
+                links: buildProjectLinks(project)
             };
             return result;
         });
@@ -76,9 +82,12 @@ export const fetchProjects = async () => {
 
 export const fetchProject = async (projectId: string) => {
     try {
-        const project = await ProjectDataModel.findByPk(projectId);
-        const projectItem = mapDbToApiProject(project);
-        const item = { ...projectItem, links: [buildSelfLink(projectItem, `/api/v1/${PROJECT_RESOURCE_NAME}/`)] };
+        const dbProject = await ProjectDataModel.findByPk(projectId);
+        const project = mapDbToApiProject(dbProject);
+        const item = {
+            ...project,
+            links: buildProjectLinks(project)
+        };
         return buildResponseWithItem(item);
     } catch (error) {
         return buildResponseFromCatchError(error);

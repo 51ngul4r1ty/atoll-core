@@ -17,12 +17,18 @@ and interface names) we allow successive capitalized letters, for
 example, "HTML" instead of "Html".  An example of this is:
 `HTMLInputElement` (from the browser "Web API").
 
+File/Folder Naming
+==================
+
 Folder Naming
 -------------
 
 1. Folder names should use lowercase letters.
 2. Folder names should use dashes to separate words.
 3. Folder names should not use underscores to separate words.
+
+Variable, Interface, Type and Class Naming
+==========================================
 
 Interface Type Naming
 ---------------------
@@ -39,6 +45,11 @@ Interface Type Naming
      evolve separately._
 6. Preserve acronym case in interface names (to follow Web API standards, for example, HTMLInputElement).
 
+Variable Naming
+---------------
+
+1. Database related objects should be prefixed by `db`,
+  for example `const dbProject = await ProjectDataModel.findByPk(projectId);`
 
 Component Naming
 ================
