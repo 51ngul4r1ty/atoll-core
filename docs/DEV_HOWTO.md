@@ -1,3 +1,9 @@
+Overview
+========
+
+This document explains how to do certain coding activities when contributing to the main project.  However, if you're instead
+trying to use Atoll's REST API you should use this document for guidance: [DEV_USING_REST_API.md](DEV_USING_REST_API.md)
+
 Extending Data Model
 ====================
 

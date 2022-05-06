@@ -84,10 +84,23 @@ export const rootHandler = function (req, res) {
             ]
         },
         {
+            id: "refresh-token",
+            name: "Refresh Authentication Token",
+            description: "Request a new auth token without requiring user account and password",
+            displayIndex: 2,
+            links: [
+                {
+                    type: APPLICATION_JSON,
+                    rel: ROOT_REL_ACTION,
+                    uri: "/api/v1/actions/refresh-token"
+                }
+            ]
+        },
+        {
             id: "user-prefs",
             name: "Current User's Preferences",
             description: "Collection of current user's preferences",
-            displayIndex: 2,
+            displayIndex: 3,
             links: [
                 {
                     type: APPLICATION_JSON,
@@ -100,7 +113,7 @@ export const rootHandler = function (req, res) {
             id: "user-toggles",
             name: "Current User's Feature Toggles",
             description: "Feature toggle state specific to the current user",
-            displayIndex: 3,
+            displayIndex: 4,
             links: [
                 {
                     type: APPLICATION_JSON,
