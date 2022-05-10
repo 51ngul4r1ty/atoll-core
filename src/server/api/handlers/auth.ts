@@ -81,7 +81,7 @@ export const refreshTokenPostHandler = async (req: Request, res: Response) => {
         try {
             decoded = jwt.verify(refreshToken, authKey) as RefreshTokenContents;
         } catch (ex) {
-            return res.status(StatusCodes.FORBIDDEN).send("Invalid refresh token.");
+            return res.status(StatusCodes.UNAUTHORIZED).send("Invalid refresh token.");
         }
 
         const responseWithItem = buildResponseWithItem({
