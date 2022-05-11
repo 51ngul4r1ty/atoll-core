@@ -1,15 +1,15 @@
 Overview
 ========
 
-The goal of this project is to create a good agile project management tool that adheres as
-closely to scrum best practices as possible.
+The goal of this project is to create a good agile project management tool that adheres as closely to scrum best practices as
+possible.
 
 Getting Started
 ===============
 
-If you're interested in getting a detailed explanation of the various parts of this project you may
-want to start with the "Other Docs" section below.  If not, and you just want to get going as quickly
-as possible then you're in the right section.
+If you're interested in getting a detailed explanation of the various parts of this project you may want to also take a look at the
+"Document Index" section below.  If not, and you just want to get going as quickly as possible then you may only need to read this
+section.
 
 Everyone contributing to this repo should read this document before doing anything: [IMPORTANT.md](docs/IMPORTANT.md)
 
@@ -89,23 +89,35 @@ add more "strict mode" errors by using the `isStrictMode` selector.  In future t
 be turned on when running using a localhost URL, but for now it has been turned off unless
 specifically requested in this way.
 
-Other Docs
-==========
+Document Index
+==============
 
-README.md                                         - this document is intended as the index document to find
+General Use
+-----------
+
+README.md                                         - This document is intended as the index document to find
                                                     out where to go next.  
-[CODE_STANDARDS.md](docs/CODE_STANDARDS.md)       - read this!  
-[CONVENTIONS.md](docs/CONVENTIONS.md)             - important naming conventions information.  
-[ARCHITECTURE.md](docs/ARCHITECTURE.md)           - architecture related info  
-[CODE_ARCHITECTURE.md](docs/CODE_ARCHITECTURE.md) - code-level architecture related info  
-[DEV_HOWTO.md](docs/DEV_HOWTO.md)                 - contains details for how to implement things.  
-[DEPENDENCIES.md](docs/DEPENDENCIES.md)           - detailed information about the npm packages used.  
-[SCRIPTS.md](docs/SCRIPTS.md)                     - detailed information about the build & npm scripts.  
-[HISTORY.md](docs/HISTORY.md)                     - the past history of this project.  
-[POLICIES.md](docs/POLICIES.md)                   - github branch policies etc.  
-[GLOSSARY.md](docs/GLOSSARY.md)                   - glossary specific to this project.  
-[ISSUES_RESOLVED.md](docs/ISSUES_RESOLVED.md)     - this may be useful if you're running into problems.  
-[DATA_MODEL.md](docs/dataModel/DATA_MODEL.md)     - mapping the requirements to the data model.  
-[PROCESS.md](docs/PROCESS.md)                     - the index document for processes that should be followed.
+
+End Users
+---------
+
+[USER_GUIDE.md](docs/USER_GUIDE.md)               - An entrypoint for end users of Atoll.
+
+Contributor Related
+-------------------
+
+[CODE_STANDARDS.md](docs/CODE_STANDARDS.md)       - Read this!  
+[CONVENTIONS.md](docs/CONVENTIONS.md)             - Important naming conventions information.  
+[ARCHITECTURE.md](docs/ARCHITECTURE.md)           - Architecture related info  
+[CODE_ARCHITECTURE.md](docs/CODE_ARCHITECTURE.md) - Code-level architecture related info  
+[DEV_HOWTO.md](docs/DEV_HOWTO.md)                 - Contains details for how to implement things.  
+[DEPENDENCIES.md](docs/DEPENDENCIES.md)           - Detailed information about the npm packages used.  
+[SCRIPTS.md](docs/SCRIPTS.md)                     - Detailed information about the build & npm scripts.  
+[HISTORY.md](docs/HISTORY.md)                     - The past history of this project.  
+[POLICIES.md](docs/POLICIES.md)                   - Github branch policies etc.  
+[GLOSSARY.md](docs/GLOSSARY.md)                   - Glossary specific to this project.  
+[ISSUES_RESOLVED.md](docs/ISSUES_RESOLVED.md)     - This may be useful if you're running into problems.  
+[DATA_MODEL.md](docs/dataModel/DATA_MODEL.md)     - Mapping the requirements to the data model.  
+[PROCESS.md](docs/PROCESS.md)                     - The index document for processes that should be followed.
 
 [Github Wiki](https://github.com/51ngul4r1ty/atoll-core/wiki)
