@@ -98,7 +98,7 @@ README.md                                         - this document is intended as
 [CONVENTIONS.md](docs/CONVENTIONS.md)             - important naming conventions information.  
 [ARCHITECTURE.md](docs/ARCHITECTURE.md)           - architecture related info  
 [CODE_ARCHITECTURE.md](docs/CODE_ARCHITECTURE.md) - code-level architecture related info  
-[HOWTO.md](docs/HOWTO.md)                         - contains details for how to implement things.  
+[DEV_HOWTO.md](docs/DEV_HOWTO.md)                 - contains details for how to implement things.  
 [DEPENDENCIES.md](docs/DEPENDENCIES.md)           - detailed information about the npm packages used.  
 [SCRIPTS.md](docs/SCRIPTS.md)                     - detailed information about the build & npm scripts.  
 [HISTORY.md](docs/HISTORY.md)                     - the past history of this project.  

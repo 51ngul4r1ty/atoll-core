@@ -1,6 +1,6 @@
 {
   "name": "atoll",
-  "version": "0.57.0",
+  "version": "0.59.1",
   "author": {
     "name": "Kevin Berry",
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
@@ -30,9 +30,9 @@
     "start-only": "npx --no-install cross-env NODE_ENV=development node scripts/start.js",
     "start:prod": "npx --no-install cross-env NODE_ENV=production node scripts/start.js",
     "sync-if-linked": "node scripts/sync-if-linked.js",
-    "test": "npm run test:ci",
+    "test": "npm run test:unit",
     "test:watch": "node scripts/test.js --env=jsdom --coverage",
-    "test:ci": "npm run test:tsc && npm run test:jest",
+    "test:unit": "npm run test:tsc && npm run test:jest",
     "test:tsc": "tsc --noEmit --project tsconfig.json",
     "test:jest": "npx --no-install cross-env CI=true node scripts/test.js --env=jsdom --coverage",
     "test:update": "npx --no-install cross-env CI=true npm test --updateSnapshot",
@@ -59,7 +59,7 @@
     "check:prereqs": "ts-node ./scripts/check-prereqs.ts"
   },
   "dependencies": {
-    "@atoll/shared": "0.57.0",
+    "@atoll/shared": "0.57.1",
     "@flopflip/memory-adapter": "1.6.0",
     "@flopflip/react-broadcast": "10.1.11",
     "axios": "0.26.1",
