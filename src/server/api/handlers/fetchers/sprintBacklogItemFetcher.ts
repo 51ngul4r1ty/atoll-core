@@ -8,7 +8,8 @@ import { ApiBacklogItemInSprint } from "@atoll/shared";
 import {
     SPRINT_BACKLOG_PARENT_RESOURCE_NAME,
     SPRINT_BACKLOG_CHILD_RESOURCE_NAME,
-    BACKLOG_ITEM_RESOURCE_NAME
+    BACKLOG_ITEM_RESOURCE_NAME,
+    BACKLOG_ITEM_PART_RESOURCE_NAME
 } from "../../../resourceNames";
 
 // data access
@@ -132,16 +133,20 @@ export const fetchSprintBacklogItemPartWithLinks = async (
 
 export const buildBacklogItemPartForResponse = (
     sprintId: string,
-    sprintBacklog: ApiBacklogItemInSprint
+    sprintBacklogItem: ApiBacklogItemInSprint
 ): ApiBacklogItemInSprint => {
     return {
-        ...sprintBacklog,
+        ...sprintBacklogItem,
         links: [
             buildSelfLink(
-                sprintBacklog,
+                sprintBacklogItem,
                 `/api/v1/${SPRINT_BACKLOG_PARENT_RESOURCE_NAME}/${sprintId}/${SPRINT_BACKLOG_CHILD_RESOURCE_NAME}`
             ),
-            buildSimpleLink(`/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/${sprintBacklog.id}`, "related:backlog-item")
+            buildSimpleLink(`/api/v1/${BACKLOG_ITEM_RESOURCE_NAME}/${sprintBacklogItem.id}`, "related:backlog-item"),
+            buildSimpleLink(
+                `/api/v1/${BACKLOG_ITEM_PART_RESOURCE_NAME}/${sprintBacklogItem.backlogItemPartId}`,
+                "related:backlog-item-part"
+            )
         ]
     };
 };
