@@ -3,12 +3,12 @@ import type { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 
 // libraries
-import { ApiSprint, DateOnly, determineSprintStatus, mapApiItemsToSprints, SprintStatus } from "@atoll/shared";
+import { ApiProject, ApiSprint, DateOnly, determineSprintStatus, mapApiItemsToSprints, SprintStatus } from "@atoll/shared";
 
 // interfaces/types
 import type { UserPreferencesItemResult } from "../fetchers/userPreferencesFetcher";
 import type { SprintBacklogItemsResult } from "../fetchers/sprintBacklogItemFetcher";
-import { isRestApiErrorResult, RestApiCollectionResult, RestApiErrorResult } from "../../utils/responseBuilder";
+import { isRestApiErrorResult, RestApiCollectionResult, RestApiErrorResult, RestApiItemResult } from "../../utils/responseBuilder";
 
 // utils
 import { fetchBacklogItems } from "../fetchers/backlogItemFetcher";
@@ -24,6 +24,7 @@ import { fetchSprintBacklogItemsWithLinks } from "../fetchers/sprintBacklogItemF
 import { getLoggedInAppUserId } from "../../utils/authUtils";
 import { getUserPreferences } from "../fetchers/userPreferencesFetcher";
 import { logError } from "../utils/serverLogger";
+import { fetchProject } from "../fetchers/projectFetcher";
 
 export const planViewBffGetHandler = async (req: Request, res: Response) => {
     try {
@@ -31,7 +32,8 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
         const selectedProjectId = (userPreferencesResult as UserPreferencesItemResult).data.item.settings.selectedProject;
 
         const archived = "N";
-        let [backlogItemsResult, sprintsResult] = await Promise.all([
+        const [projectResult, backlogItemsResult, sprintsResult] = await Promise.all([
+            fetchProject(selectedProjectId),
             fetchBacklogItems(selectedProjectId),
             fetchSprints(selectedProjectId, archived)
         ]);
@@ -71,7 +73,8 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
             isRestApiCollectionResult(backlogItemsResult) &&
             isRestApiCollectionResult(sprintsResult) &&
             isRestApiItemResult(userPreferencesResult) &&
-            isRestApiCollectionResult(sprintBacklogItemsResult)
+            isRestApiCollectionResult(sprintBacklogItemsResult) &&
+            isRestApiItemResult(projectResult)
         ) {
             res.json(
                 buildResponseWithData({
@@ -79,7 +82,8 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
                     sprints,
                     sprintBacklogItems: sprintBacklogItemsResult?.data?.items || [],
                     userPreferences: (userPreferencesResult as UserPreferencesItemResult).data?.item,
-                    expandedSprintId: expandedSprintId ?? null
+                    expandedSprintId: expandedSprintId ?? null,
+                    project: projectResult.data?.item
                 })
             );
         } else {
