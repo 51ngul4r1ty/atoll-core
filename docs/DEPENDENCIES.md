@@ -104,7 +104,6 @@ Dev Dependencies (needed for storybook build)
 `@storybook/react`
 `storybook-addon-root-attribute`
 `storybook-dark-mode`
-`awesome-typescript-loader`
 
 Dev Dependencies (needed for analysis)
 --------------------------------------

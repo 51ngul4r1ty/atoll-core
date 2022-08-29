@@ -4,19 +4,19 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Checks
-      run: |
-        echo checking files...
-        npm run check
-    - name: Install NPM packages
-      run: npm ci
-    - name: Transpile
-      run: |
-        echo transpiling...
-        npm run build
-    
+      - uses: actions/checkout@v1
+      - name: Checks
+        run: |
+          echo checking files...
+          npm run check
+      - name: Show NPM version
+        run: npm --version
+      - name: Install NPM packages
+        run: npm ci
+      - name: Transpile
+        run: |
+          echo transpiling...
+          npm run build
