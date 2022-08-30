@@ -50,6 +50,7 @@ const buildApiItemFromDbItemWithParts = (dbItemWithParts: BacklogItemDataModel):
 export type BacklogItemParams = {
     projectId?: string;
     externalId?: string;
+    friendlyId?: string;
 };
 
 export const buildBacklogItemFindOptionsForNested = (params: BacklogItemParams, transaction?: Transaction): FindOptions => {
@@ -91,12 +92,12 @@ export const fetchBacklogItemsByDisplayId = async (
     backlogItemDisplayId: string
 ): Promise<BacklogItemsResult | RestApiErrorResult> => {
     try {
-        const backlogItemsOptions = buildBacklogItemFindOptionsForNested({ projectId, externalId: backlogItemDisplayId });
-        const dbBacklogItemsByExternalId = await BacklogItemDataModel.findAll(backlogItemsOptions);
+        const backlogItemsOptions1 = buildBacklogItemFindOptionsForNested({ projectId, externalId: backlogItemDisplayId });
+        const dbBacklogItemsByExternalId = await BacklogItemDataModel.findAll(backlogItemsOptions1);
         if (dbBacklogItemsByExternalId.length >= 1) {
             return buildBacklogItemsResult(dbBacklogItemsByExternalId);
         }
-        const options = buildOptionsFromParams({ projectId, friendlyId: backlogItemDisplayId });
+        const options = buildBacklogItemFindOptionsForNested({ projectId, friendlyId: backlogItemDisplayId });
         const dbBacklogItemsByFriendlyId = await BacklogItemDataModel.findAll(options);
         return buildBacklogItemsResult(dbBacklogItemsByFriendlyId);
     } catch (error) {

@@ -1,6 +1,6 @@
 {
   "name": "atoll",
-  "version": "0.60.0",
+  "version": "0.60.1",
   "author": {
     "name": "Kevin Berry",
     "email": "41717340+51ngul4r1ty@users.noreply.github.com"
@@ -123,7 +123,6 @@
     "@types/websocket": "1.0.0",
     "@types/ws": "7.2.2",
     "autoprefixer": "9.7.6",
-    "awesome-typescript-loader": "5.2.1",
     "babel-loader": "8.1.0",
     "babel-plugin-named-asset-import": "0.3.7",
     "babel-preset-react-app": "9.1.2",
