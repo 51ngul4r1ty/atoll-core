@@ -46,10 +46,10 @@ export const setupRoutes = (router: Router, path: string, handlers: RouteHandler
 
 export const setupNotFoundRoutes = (router: Router) => {
     router.all("*", (req, res, next) => {
-        res.json({
+        res.status(StatusCodes.NOT_FOUND).send({
             status: 404,
             message: `Cannot ${req.method} ${req.originalUrl}`
-        }).status(StatusCodes.NOT_FOUND);
+        });
     });
 };
 

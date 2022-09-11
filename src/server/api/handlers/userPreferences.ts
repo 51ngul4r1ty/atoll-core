@@ -45,7 +45,7 @@ export const userPreferencesGetHandler = async function (req: Request, res: Resp
 };
 
 export const userPreferencesPatchHandler = async function (req: Request, res: Response) {
-    const handlerContext = start("backlogItemPartPatchHandler", res);
+    const handlerContext = start("userPreferencesPatchHandler", res);
     try {
         const userId = req.params.userId || "";
         if (userId !== "--self--") {
