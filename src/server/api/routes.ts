@@ -42,7 +42,7 @@ import {
 import { productBacklogItemsGetHandler, productBacklogItemGetHandler } from "./handlers/productBacklogItems";
 import { featureTogglesHandler } from "./handlers/featureToggles";
 import { rootHandler } from "./handlers/root";
-import { userPreferencesHandler } from "./handlers/userPreferences";
+import { userPreferencesGetHandler, userPreferencesPatchHandler } from "./handlers/userPreferences";
 import { loginPostHandler, refreshTokenPostHandler } from "./handlers/auth";
 import { sprintBacklogItemPartGetHandler, sprintBacklogItemPartsPostHandler } from "./handlers/sprintBacklogItemParts";
 import { planViewBffGetHandler } from "./handlers/views/planViewBff";
@@ -73,7 +73,7 @@ router.options("/*", (req, res, next) => {
 
 setupNoAuthRoutes(router, "/", { get: rootHandler });
 
-setupRoutes(router, "/users/:userId/preferences", { get: userPreferencesHandler });
+setupRoutes(router, "/users/:userId/preferences", { get: userPreferencesGetHandler, patch: userPreferencesPatchHandler });
 
 setupRoutes(router, "/users/:userId/feature-toggles", { get: featureTogglesHandler });
 

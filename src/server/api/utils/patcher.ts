@@ -17,7 +17,15 @@ export const validateBaseKeys = (targetNode: any, sourceNode: any): PatchValidat
     };
 };
 
-export const validatePatchObjects = (targetNode: any, sourceNode: any): PatchValidationResult => {
+export type ValidatePatchObjectsOptions = {
+    allowExtraFields: boolean;
+};
+
+export const validatePatchObjects = (
+    targetNode: any,
+    sourceNode: any,
+    options: ValidatePatchObjectsOptions = { allowExtraFields: false }
+): PatchValidationResult => {
     const validationResult = validateBaseKeys(targetNode, sourceNode);
     const sourceKeys = Object.keys(sourceNode || {});
     sourceKeys.forEach((key) => {
@@ -33,7 +41,7 @@ export const validatePatchObjects = (targetNode: any, sourceNode: any): PatchVal
         }
     });
     return {
-        valid: validationResult.extraFields.length === 0,
+        valid: validationResult.extraFields.length === 0 || options.allowExtraFields,
         extraFields: validationResult.extraFields
     };
 };
@@ -53,10 +61,59 @@ export const getInvalidPatchMessage = (obj: any, fields: any) => {
     return null;
 };
 
-export const getPatchedItem = <T>(obj: T, fields: any): T => {
-    const validationResult = validatePatchObjects(obj, fields);
+export type GetPatchedItemOptions = {
+    preserveNestedFields: boolean;
+    allowExtraFields: boolean;
+};
+
+const getPatchedItemInternal = <T>(obj: T, fields: any, basePropertyPath: string, options: GetPatchedItemOptions): T => {
+    if (options.allowExtraFields && !options.preserveNestedFields) {
+        throw new Error("getPatchedItem may not work properly when allowExtraFields is used without preserveNestedFields");
+    }
+    const validationResult = validatePatchObjects(obj, fields, { allowExtraFields: options.allowExtraFields });
     if (!validationResult.valid) {
         throw new Error(getValidationFailureMessage(validationResult));
     }
+    if (options.preserveNestedFields) {
+        const result: any = {};
+        const sourceFieldSet = new Set();
+        Object.keys(obj).forEach((fieldName) => {
+            sourceFieldSet.add(fieldName);
+            const propertyPath = basePropertyPath ? `${basePropertyPath}.${fieldName}` : fieldName;
+            const sourceFieldValue = obj[fieldName];
+            if (!fields.hasOwnProperty(fieldName)) {
+                result[fieldName] = sourceFieldValue;
+            } else if (typeof sourceFieldValue === "object") {
+                const targetFieldObjectValue = fields[fieldName];
+                if (targetFieldObjectValue === null) {
+                    result[fieldName] = null;
+                } else if (typeof targetFieldObjectValue !== "object") {
+                    throw new Error(
+                        `Unable to patch object- nested target property "${propertyPath}"` +
+                            " is not an object, but source property is"
+                    );
+                } else {
+                    result[fieldName] = getPatchedItemInternal(sourceFieldValue, targetFieldObjectValue, propertyPath, options);
+                }
+            } else {
+                const targetFieldValue = fields[fieldName];
+                result[fieldName] = targetFieldValue;
+            }
+        });
+        Object.keys(fields).forEach((fieldName) => {
+            if (!sourceFieldSet.has(fieldName)) {
+                result[fieldName] = fields[fieldName];
+            }
+        });
+        return result;
+    }
     return { ...obj, ...fields };
+};
+
+export const getPatchedItem = <T>(
+    obj: T,
+    fields: any,
+    options: GetPatchedItemOptions = { preserveNestedFields: false, allowExtraFields: false }
+): T => {
+    return getPatchedItemInternal(obj, fields, "", options);
 };

@@ -4,15 +4,7 @@ import { StatusCodes } from "http-status-codes";
 import { Op } from "sequelize";
 
 // libraries
-import {
-    ApiSprint,
-    ApiSprintBacklogItem,
-    DateOnly,
-    determineSprintStatus,
-    isoDateStringToDate,
-    logger,
-    SprintStatus
-} from "@atoll/shared";
+import { ApiSprint, DateOnly, determineSprintStatus, logger, SprintStatus } from "@atoll/shared";
 
 // data access
 import { sequelize } from "../../dataaccess/connection";
