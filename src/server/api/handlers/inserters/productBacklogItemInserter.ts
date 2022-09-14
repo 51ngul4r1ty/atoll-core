@@ -17,10 +17,14 @@ export const productBacklogItemFirstItemInserter = async (
     bodyWithId,
     transaction: Transaction
 ): Promise<ProductBacklogItemFirstItemInserterResult> => {
+    const projectId = bodyWithId.projectId;
+    if (!projectId) {
+        throw new Error("Unable to update the product backlog without a projectId");
+    }
     // inserting first item means one of 2 scenarios:
     //   1) no items in database yet (add prev = null, next = this new item + add prev = new item, next = null)
     //   2) insert before first item (update item's prev to this item, add prev = null, next = this new item)
-    const firstItems = await ProductBacklogItemDataModel.findAll({ where: { backlogitemId: null }, transaction });
+    const firstItems = await ProductBacklogItemDataModel.findAll({ where: { backlogitemId: null, projectId }, transaction });
     if (!firstItems.length) {
         // scenario 1, insert head and tail
         await ProductBacklogItemDataModel.create(

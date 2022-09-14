@@ -194,51 +194,58 @@ export const backlogItemsDeleteHandler = async (req: Request, res: Response) => 
     }
 };
 
-const getNewCounterValue = async (projectId: string, backlogItemType: string) => {
+/**
+ * Get a new counter value - caller is responsible for managing the transaction.
+ */
+const getNewCounterValue = async (projectId: string, backlogItemType: string, transaction: Transaction) => {
     let result: string;
+    let stage = "init";
     const entitySubtype = backlogItemType === "story" ? "story" : "issue";
-    let transaction: Transaction;
     try {
-        let rolledBack = false;
-        transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
-        let projectSettingsItem: any = await ProjectSettingsDataModel.findOne({
-            where: { projectId: projectId },
-            transaction
-        });
+        const projectSettingsFindOptions: FindOptions = {
+            where: { projectId: projectId }
+        };
+        if (transaction) {
+            projectSettingsFindOptions.transaction = transaction;
+        }
+        stage = "retrieve project settings";
+        let projectSettingsItem: any = await ProjectSettingsDataModel.findOne(projectSettingsFindOptions);
         if (!projectSettingsItem) {
+            stage = "retrieve global project settings";
             projectSettingsItem = await ProjectSettingsDataModel.findOne({
                 where: { projectId: null },
                 transaction
             });
         }
         if (projectSettingsItem) {
+            stage = "process project settings item";
             const projectSettingsItemTyped = mapDbToApiProjectSettings(projectSettingsItem);
             const counterSettings = projectSettingsItemTyped.settings.counters[entitySubtype];
             const entityNumberPrefix = counterSettings.prefix;
             const entityNumberSuffix = counterSettings.suffix;
-            const counterItem: any = await CounterDataModel.findOne({
-                where: { entity: "project", entityId: projectId, entitySubtype },
-                transaction
-            });
+            const counterFindOptions: FindOptions = {
+                where: { entity: "project", entityId: projectId, entitySubtype }
+            };
+            if (transaction) {
+                counterFindOptions.transaction = transaction;
+            }
+            stage = "retrieve counter data for project";
+            const counterItem: any = await CounterDataModel.findOne(counterFindOptions);
             if (counterItem) {
+                stage = "process counter item";
                 const counterItemTyped = mapDbToApiCounter(counterItem);
                 counterItemTyped.lastNumber++;
                 let counterValue = entityNumberPrefix || "";
                 counterValue += formatNumber(counterItemTyped.lastNumber, counterSettings.totalFixedLength);
                 counterValue += entityNumberSuffix || "";
                 counterItemTyped.lastCounterValue = counterValue;
+                stage = "store new counter value";
                 await counterItem.update(counterItemTyped);
                 result = counterItem.lastCounterValue;
             }
         }
-        if (!rolledBack) {
-            await transaction.commit();
-        }
     } catch (err) {
-        if (transaction) {
-            await transaction.rollback();
-        }
-        throw new Error(`Unable to get new ID value, ${err}`);
+        throw new Error(`Unable to get new ID value (stage "${stage}"), ${err}`);
     }
     if (!result) {
         throw new Error("Unable to get new ID value - could not retrieve counter item");
@@ -247,17 +254,17 @@ const getNewCounterValue = async (projectId: string, backlogItemType: string) =>
 };
 
 export const backlogItemsPostHandler = async (req: Request, res: Response) => {
-    const bodyWithId = { ...addIdToBody(req.body) };
-    if (!bodyWithId.friendlyId) {
-        const friendlyIdValue = await getNewCounterValue(req.body.projectId, req.body.type);
-        bodyWithId.friendlyId = friendlyIdValue;
-    }
-    const prevBacklogItemId = bodyWithId.prevBacklogItemId;
-    delete bodyWithId.prevBacklogItemId;
     let transaction: Transaction;
     try {
         let rolledBack = false;
         transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE });
+        const bodyWithId = { ...addIdToBody(req.body) };
+        if (!bodyWithId.friendlyId) {
+            const friendlyIdValue = await getNewCounterValue(req.body.projectId, req.body.type, transaction);
+            bodyWithId.friendlyId = friendlyIdValue;
+        }
+        const prevBacklogItemId = bodyWithId.prevBacklogItemId;
+        delete bodyWithId.prevBacklogItemId;
         await sequelize.query('SET CONSTRAINTS "productbacklogitem_backlogitemId_fkey" DEFERRED;', { transaction });
         await sequelize.query('SET CONSTRAINTS "productbacklogitem_nextbacklogitemId_fkey" DEFERRED;', { transaction });
         const updateBacklogItemPartResult = getUpdatedBacklogItemWhenStatusChanges(null, bodyWithId);

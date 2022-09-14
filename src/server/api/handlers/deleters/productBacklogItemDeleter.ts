@@ -11,6 +11,9 @@ import { buildResponseFromCatchError, buildResponseWithItem } from "../../utils/
 import { mapDbToApiProductBacklogItem } from "../../../dataaccess/mappers/dataAccessToApiMappers";
 
 export const removeFromProductBacklog = async (backlogitemId: string, transaction?: Transaction) => {
+    if (!backlogitemId) {
+        throw new Error("Unable to remove product backlog item entries using a null/undefined ID");
+    }
     try {
         const findItemOptions: FindOptions = buildOptionsWithTransaction({ where: { backlogitemId } }, transaction);
         const item = await ProductBacklogItemDataModel.findOne(findItemOptions);
