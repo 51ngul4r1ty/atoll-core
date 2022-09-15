@@ -87,14 +87,15 @@ export const sprintPatchHandler = async (req: Request, res: Response) => {
         if (!sprint) {
             respondWithNotFound(res, `Unable to find sprint to patch with ID ${queryParamItemId}`);
         } else {
-            const originalSprint = mapDbToApiSprint(sprint);
-            const invalidPatchMessage = getInvalidPatchMessage(originalSprint, body);
+            const invalidPatchMessage = getInvalidPatchMessage(sprint, body);
             if (invalidPatchMessage) {
                 respondWithFailedValidation(res, `Unable to patch: ${invalidPatchMessage}`);
             } else {
-                const newItem = getPatchedItem(originalSprint, body);
-                await sprint.update(mapApiToDbSprint(newItem));
-                respondWithItem(res, sprint, originalSprint);
+                const originalSprint = mapDbToApiSprint(sprint);
+                const newItem = getPatchedItem(sprint, body);
+                await sprint.update(newItem);
+                const apiSprint = mapDbToApiSprint(sprint);
+                respondWithItem(res, apiSprint, originalSprint);
             }
         }
     } catch (err) {
