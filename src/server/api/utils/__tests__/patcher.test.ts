@@ -278,5 +278,22 @@ describe("Patcher", () => {
                 missingField: "keep-this"
             });
         });
+        it("should preserve nested fields when preserveNestedFields option is set", () => {
+            // arrange
+            const obj = {
+                settings: { selectedProject: "69a9288264964568beb5dd243dc29008", detectBrowserDarkMode: true }
+            };
+            const fields = {
+                settings: { selectedProject: "8220723fed61402abb8ee5170be741cb" }
+            };
+
+            // act
+            const actual = getPatchedItem(obj, fields, { preserveNestedFields: true });
+
+            // assert
+            expect(actual).toStrictEqual({
+                settings: { selectedProject: "8220723fed61402abb8ee5170be741cb", detectBrowserDarkMode: true }
+            });
+        });
     });
 });

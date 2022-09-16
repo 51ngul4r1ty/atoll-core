@@ -105,7 +105,10 @@ export const fetchBacklogItemsByDisplayId = async (
     }
 };
 
-export const fetchBacklogItems = async (projectId: string | null): Promise<BacklogItemsResult | RestApiErrorResult> => {
+export const fetchBacklogItems = async (projectId: string): Promise<BacklogItemsResult | RestApiErrorResult> => {
+    if (!projectId) {
+        throw new Error("Unable to retrieve backlog items without specifying a projectId");
+    }
     try {
         const params = { projectId };
         const options = buildOptionsFromParams(params);

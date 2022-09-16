@@ -89,3 +89,42 @@ export default connect(
     mapDispatchToProps
 )(withTranslation()<any>(App));
 ```
+
+Generating React Components from SVG Files
+==========================================
+
+This app relies on fast rendering of images so they're all in-lined.  This should also make it easier for code-splitting,
+lazy-loading, etc.
+
+Steps to Generate SVG Files (if using Affinity Designer)
+--------------------------------------------------------
+
+1. The `atoll-shared` repo contains all the SVG assets and generated components.
+   Use terminal and `cd atoll-shared` to execute all commands below in this folder.
+2. The original SVG file should be stored in the `/assets` folder.
+3. Make sure to name components using the convention: `{lowercase-component-name}-icon.svg`,
+   for example `menu-caret-down-icon.svg`
+4. Use `npm run gen:react-svg -- menu-caret-down-icon` to generate the basic React component `MenuCareDownIcon.tsx`.
+5. The file will be placed in the `/components/atoms/icons` folder.
+6. Affinity places additional SVG elements that aren't needed so you should remove them:
+   - remove the line with `xmlnsSerif=`
+   - remove the attribute `serifId="{component-title}"` (for example, `serifId="Menu Caret"`)
+   - change `const classNameToUse = buildClassName(props.className);`
+     to `const classNameToUse = buildClassName(strokeClass, props.className);`
+   - add `fill="none"` and `className={classNameToUse}` attributes to the top of the `svg` element.
+   - remove `id` attribute from the `g` element and replace it with `className={fillClass}`,
+     for example, `<g id="Menu-Caret" transform=...`
+       becomes `<g className={fillClass} transform...`
+7. Make sure you sort the `index.ts` file (it should have the new component added to it).
+8. Make sure you follow the steps to add this icon component to storybook.
+
+Adding Icon Component to Storybook
+----------------------------------
+
+1. In all cases before, make sure to add new entries in alphabetical order.
+2. Find the `allicons.stories.tsx` file (it should be in the `/stories/atoms/icons` folder).
+3. Add component by name to the import list under `// components` section.
+4. Add component to `invertableIcons`, `icons` object definitions.
+5. Add component to `iconNames` list.
+6. Make sure to build the package (`npm run build`) and then use `npm run storybook` to view
+   the component to ensure that it displays correctly.

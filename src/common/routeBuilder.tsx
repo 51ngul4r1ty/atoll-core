@@ -14,23 +14,25 @@ import {
     PlanViewContainer,
     ReviewViewContainer,
     SprintViewContainer,
-    layouts
+    layouts,
+    HOME_VIEW_ROUTE,
+    PLAN_VIEW_ROUTE,
+    SPRINT_VIEW_ROUTE,
+    REVIEW_VIEW_ROUTE,
+    DEBUG_PBI_VIEW_ROUTE,
+    BACKLOGITEM_VIEW_ROUTE
 } from "@atoll/shared";
 
 const appRoutes = (
     <layouts.MainLayout>
         <AppContainer>
             <Switch>
-                <Route path="/" exact component={LoginViewContainer} />
-                <Route path="/plan" exact component={PlanViewContainer} />
-                <Route path="/sprint" exact component={SprintViewContainer} />
-                <Route path="/review" exact component={ReviewViewContainer} />
-                <Route path="/debug/product-backlog-items" exact component={ProductBacklogItemViewContainer} />
-                <Route
-                    path="/project/:projectDisplayId/backlog-item/:backlogItemDisplayId"
-                    exact
-                    component={BacklogItemViewContainer}
-                />
+                <Route path={HOME_VIEW_ROUTE} exact component={LoginViewContainer} />
+                <Route path={PLAN_VIEW_ROUTE} exact component={PlanViewContainer} />
+                <Route path={SPRINT_VIEW_ROUTE} exact component={SprintViewContainer} />
+                <Route path={REVIEW_VIEW_ROUTE} exact component={ReviewViewContainer} />
+                <Route path={DEBUG_PBI_VIEW_ROUTE} exact component={ProductBacklogItemViewContainer} />
+                <Route path={BACKLOGITEM_VIEW_ROUTE} exact component={BacklogItemViewContainer} />
             </Switch>
         </AppContainer>
     </layouts.MainLayout>

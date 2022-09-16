@@ -129,6 +129,9 @@ export const rollbackWithMessageAndStatus = async (handlerContext: HandlerContex
 
 const handleTransactionRollback = async (handlerContext: HandlerContext, logContext: LoggingContext) => {
     const context = handlerContext.transactionContext;
+    if (!context) {
+        return;
+    }
     if (context.transaction && !context.rolledBack) {
         logger.info("rolling back transaction", [handlerContext.functionTag], logContext);
         try {

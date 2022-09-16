@@ -13,7 +13,7 @@ section.
 
 Everyone contributing to this repo should read this document before doing anything: [IMPORTANT.md](docs/IMPORTANT.md)
 
-For specialized instructions (to save you time trying to do various things): [HOWTO.md](docs/HOWTO.md)
+For specialized instructions (to save you time trying to do various things): [DEV_HOWTO.md](docs/DEV_HOWTO.md)
 
 Many code standards and conventions can be picked up from existing patterns in the code but it is advisable to use this resource as
 well: [CODE_STANDARDS.md](docs/CODE_STANDARDS.md)

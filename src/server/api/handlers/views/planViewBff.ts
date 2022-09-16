@@ -31,14 +31,14 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
         const userPreferencesResult = await getUserPreferences("--self--", () => getLoggedInAppUserId(req));
         const selectedProjectId = (userPreferencesResult as UserPreferencesItemResult).data.item.settings.selectedProject;
 
-        const archived = "N";
         const [projectResult, backlogItemsResult, sprintsResult] = await Promise.all([
             fetchProject(selectedProjectId),
             fetchBacklogItems(selectedProjectId),
-            fetchSprints(selectedProjectId, archived)
+            fetchSprints(selectedProjectId)
         ]);
         const sprintsSuccessResult = sprintsResult as RestApiCollectionResult<any>;
         let sprints = sprintsSuccessResult.data ? sprintsSuccessResult.data?.items : [];
+        const archivedSprints = sprints.filter((sprint) => sprint.archived === true);
         let sprintBacklogItemsResult: SprintBacklogItemsResult | RestApiErrorResult;
         let sprintBacklogItemsStatus = StatusCodes.OK;
         let sprintBacklogItemsMessage = "";
@@ -76,6 +76,10 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
             isRestApiCollectionResult(sprintBacklogItemsResult) &&
             isRestApiItemResult(projectResult)
         ) {
+            const projectStats = {
+                totalSprintCount: sprints.length,
+                archivedSprintCount: archivedSprints.length
+            };
             res.json(
                 buildResponseWithData({
                     backlogItems: backlogItemsResult.data?.items,
@@ -83,7 +87,8 @@ export const planViewBffGetHandler = async (req: Request, res: Response) => {
                     sprintBacklogItems: sprintBacklogItemsResult?.data?.items || [],
                     userPreferences: (userPreferencesResult as UserPreferencesItemResult).data?.item,
                     expandedSprintId: expandedSprintId ?? null,
-                    project: projectResult.data?.item
+                    project: projectResult.data?.item,
+                    projectStats
                 })
             );
         } else {
