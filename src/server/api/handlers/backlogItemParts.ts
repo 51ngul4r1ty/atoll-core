@@ -191,7 +191,6 @@ const handleResponseWithUpdatedStatsAndCommit = async (
     }
     if (transaction) {
         await transaction.commit();
-        // TODO: Is this supposed to set the transaction object in handlerContext to null? Not sure it does that.
         transaction = null;
     }
     const extra = sprintStats ? { sprintStats, backlogItem: newApiBacklogItem } : { backlogItem: newApiBacklogItem };
