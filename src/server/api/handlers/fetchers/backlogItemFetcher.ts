@@ -121,7 +121,7 @@ export const fetchBacklogItems = async (projectId: string | undefined): Promise<
                 productBacklogItemsByProjectId[item.projectId].push(item);
             });
         }
-        const combinedRankedLists = [];
+        let combinedRankedLists: ApiBacklogItem[] = [];
         await asyncForEach(Object.keys(productBacklogItemsByProjectId), async (projectId: string) => {
             const projectBacklogItems = productBacklogItemsByProjectId[projectId];
             const rankList = new LinkedList<ApiBacklogItem>();
@@ -134,7 +134,7 @@ export const fetchBacklogItems = async (projectId: string | undefined): Promise<
                 const result = buildApiItemFromDbItemWithParts(dbBacklogItemWithParts);
                 rankList.addItemData(result.id, result);
             });
-            combinedRankedLists.push(rankList.toArray());
+            combinedRankedLists = combinedRankedLists.concat(rankList.toArray());
         });
         return buildResponseWithItems(combinedRankedLists);
     } catch (error) {
