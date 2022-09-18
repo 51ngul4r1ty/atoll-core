@@ -2,7 +2,8 @@
 import { FindOptions, Transaction } from "sequelize";
 
 // libraries
-import { ApiBacklogItem, LinkedList } from "@atoll/shared";
+import type { ApiBacklogItem, ApiProductBacklogItem } from "@atoll/shared";
+import { asyncForEach, LinkedList } from "@atoll/shared";
 
 // data access
 import { DB_INCLUDE_ALIAS_BACKLOGITEMPARTS } from "../../../dataaccess/models/dataModelConsts";
@@ -105,28 +106,37 @@ export const fetchBacklogItemsByDisplayId = async (
     }
 };
 
-export const fetchBacklogItems = async (projectId: string): Promise<BacklogItemsResult | RestApiErrorResult> => {
-    if (!projectId) {
-        throw new Error("Unable to retrieve backlog items without specifying a projectId");
-    }
+export const fetchBacklogItems = async (projectId: string | undefined): Promise<BacklogItemsResult | RestApiErrorResult> => {
     try {
         const params = { projectId };
         const options = buildOptionsFromParams(params);
         const dbProductBacklogItems = await ProductBacklogItemDataModel.findAll(options);
-        const rankList = new LinkedList<ApiBacklogItem>();
+        const productBacklogItemsByProjectId: { [projectId: string]: ApiProductBacklogItem[] } = {};
         if (dbProductBacklogItems.length) {
             const productBacklogItemsMapped = dbProductBacklogItems.map((item) => mapDbToApiProductBacklogItem(item));
             productBacklogItemsMapped.forEach((item) => {
-                rankList.addInitialLink(item.backlogitemId, item.nextbacklogitemId);
+                if (!productBacklogItemsByProjectId[item.projectId]) {
+                    productBacklogItemsByProjectId[item.projectId] = [];
+                }
+                productBacklogItemsByProjectId[item.projectId].push(item);
             });
         }
-        const backlogItemsOptions = buildBacklogItemFindOptionsForNested(params);
-        const dbBacklogItemsWithParts = await BacklogItemDataModel.findAll(backlogItemsOptions);
-        dbBacklogItemsWithParts.forEach((dbBacklogItemWithParts) => {
-            const result = buildApiItemFromDbItemWithParts(dbBacklogItemWithParts);
-            rankList.addItemData(result.id, result);
+        let combinedRankedLists: ApiBacklogItem[] = [];
+        await asyncForEach(Object.keys(productBacklogItemsByProjectId), async (projectId: string) => {
+            const projectBacklogItems = productBacklogItemsByProjectId[projectId];
+            const rankList = new LinkedList<ApiBacklogItem>();
+            projectBacklogItems.forEach((item) => {
+                rankList.addInitialLink(item.backlogitemId, item.nextbacklogitemId);
+            });
+            const backlogItemsOptions = buildBacklogItemFindOptionsForNested(params);
+            const dbBacklogItemsWithParts = await BacklogItemDataModel.findAll(backlogItemsOptions);
+            dbBacklogItemsWithParts.forEach((dbBacklogItemWithParts) => {
+                const result = buildApiItemFromDbItemWithParts(dbBacklogItemWithParts);
+                rankList.addItemData(result.id, result);
+            });
+            combinedRankedLists = combinedRankedLists.concat(rankList.toArray());
         });
-        return buildResponseWithItems(rankList.toArray());
+        return buildResponseWithItems(combinedRankedLists);
     } catch (error) {
         return buildResponseFromCatchError(error, { includeStack: true });
     }

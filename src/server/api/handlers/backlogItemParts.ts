@@ -117,7 +117,7 @@ export const backlogItemPartPatchHandler = async (req: Request, res: Response) =
                         newDataItem,
                         originalApiBacklogItem,
                         res,
-                        handlerContext.transactionContext.transaction
+                        handlerContext
                     );
                 }
             }
@@ -166,8 +166,9 @@ const handleResponseWithUpdatedStatsAndCommit = async (
     newApiBacklogItem: ApiBacklogItem,
     originalApiBacklogItem: ApiBacklogItem,
     res: Response,
-    transaction: Transaction
+    handlerContext: HandlerContext
 ): Promise<void> => {
+    const transaction = handlerContext.transactionContext.transaction;
     let sprintStats: ApiSprintStats;
     const newBacklogItemPart = mapApiItemToBacklogItemPart(newApiBacklogItemPart);
     const originalBacklogItemPart = mapApiItemToBacklogItemPart(originalApiBacklogItemPart);
@@ -191,7 +192,7 @@ const handleResponseWithUpdatedStatsAndCommit = async (
     }
     if (transaction) {
         await transaction.commit();
-        transaction = null;
+        handlerContext.transactionContext.transaction = null;
     }
     const extra = sprintStats ? { sprintStats, backlogItem: newApiBacklogItem } : { backlogItem: newApiBacklogItem };
     const meta = originalBacklogItemPart ? { original: originalBacklogItemPart } : undefined;

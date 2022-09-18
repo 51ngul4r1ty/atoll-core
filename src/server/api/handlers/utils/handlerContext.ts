@@ -1,7 +1,7 @@
 // externals
 import { StatusCodes } from "http-status-codes";
 import { Transaction } from "sequelize";
-import { Response } from "express";
+import type { Response } from "express";
 
 // libraries
 import { logger, LoggingContext } from "@atoll/shared";
@@ -19,22 +19,22 @@ import {
 } from "../../utils/responder";
 import { RestApiCollectionResult, RestApiErrorResult, RestApiItemResult } from "../../utils/responseBuilder";
 
-export interface HandlerTransactionContext {
+export type HandlerTransactionContext = {
     transaction: Transaction;
     aborted: boolean; // no further operations will be executed, but transaction has not been rolled back
     rolledBack: boolean; // transaction has been rolled back, do not attempt to rollback again
-}
+};
 
-export interface HandlerExpressContext {
+export type HandlerExpressContext = {
     res: Response;
-}
+};
 
-export interface HandlerContext {
+export type HandlerContext = {
     logContext: LoggingContext;
     functionTag: string;
     expressContext: HandlerExpressContext;
     transactionContext?: HandlerTransactionContext;
-}
+};
 
 export const start = (functionTag: string, res: Response): HandlerContext => {
     const logContext = logger.info("starting call", [functionTag]);
