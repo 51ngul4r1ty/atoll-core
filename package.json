@@ -90,7 +90,7 @@
     "redux-devtools-extension": "2.13.8",
     "redux-thunk": "2.3.0",
     "reselect": "4.0.0",
-    "sequelize": "6.19.0",
+    "sequelize": "6.23.0",
     "text-encoding-polyfill": "0.6.7",
     "url-parse": "1.5.10",
     "uuid": "8.3.2",
