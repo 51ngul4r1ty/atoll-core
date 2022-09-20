@@ -22,6 +22,7 @@ import {
     DEBUG_PBI_VIEW_ROUTE,
     BACKLOGITEM_VIEW_ROUTE
 } from "@atoll/shared";
+import { ErrorBoundary } from "../client/errorBoundary";
 
 const appRoutes = (
     <layouts.MainLayout>
@@ -46,15 +47,17 @@ const getDefaultFlags = (windowObj: any, forSsr: boolean) => {
 };
 
 export const buildRoutes = (windowObj: any, forSsr: boolean) => (
-    <IntlProvider>
-        <ConfigureFlopFlip
-            adapter={adapter as any}
-            adapterArgs={{ clientSideId: null, user: null }}
-            defaultFlags={getDefaultFlags(windowObj, forSsr)}
-        >
-            {({ isAdapterReady }) => (isAdapterReady ? appRoutes : <div>LOADING...</div>)}
-        </ConfigureFlopFlip>
-    </IntlProvider>
+    <ErrorBoundary>
+        <IntlProvider>
+            <ConfigureFlopFlip
+                adapter={adapter as any}
+                adapterArgs={{ clientSideId: null, user: null }}
+                defaultFlags={getDefaultFlags(windowObj, forSsr)}
+            >
+                {({ isAdapterReady }) => (isAdapterReady ? appRoutes : <div>LOADING...</div>)}
+            </ConfigureFlopFlip>
+        </IntlProvider>
+    </ErrorBoundary>
 );
 
 export const buildRoutesForServer = () => buildRoutes({}, true);
