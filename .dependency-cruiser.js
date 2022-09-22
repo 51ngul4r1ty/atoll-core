@@ -1,5 +1,5 @@
 module.exports = {
-    extends: 'dependency-cruiser/configs/recommended-warn-only',
+    extends: "dependency-cruiser/configs/recommended-warn-only",
     /*
        the 'dependency-cruiser/configs/recommended-warn-only' preset
        contains these rules:
@@ -25,62 +25,60 @@ module.exports = {
      */
     forbidden: [
         {
-            name: 'not-to-test',
+            name: "not-to-test",
             comment: "Don't allow dependencies from outside the test folder to test",
-            severity: 'error',
+            severity: "error",
             from: {
-                pathNot: '^(test|spec)',
+                pathNot: "^(test|spec)"
             },
             to: {
-                path: '^(test|spec)',
-            },
+                path: "^(test|spec)"
+            }
         },
         {
-            name: 'not-to-spec',
-            comment:
-                "Don't allow dependencies to (typescript/ javascript/ coffeescript) spec files",
-            severity: 'error',
+            name: "not-to-spec",
+            comment: "Don't allow dependencies to (typescript/ javascript/ coffeescript) spec files",
+            severity: "error",
             from: {},
             to: {
-                path: '\\.spec\\.(js|ts|ls|coffee|litcoffee|coffee\\.md)$',
-            },
+                path: "\\.spec\\.(js|ts|ls|coffee|litcoffee|coffee\\.md)$"
+            }
         },
         {
-            name: 'not-to-dev-dep',
-            severity: 'error',
+            name: "not-to-dev-dep",
+            severity: "error",
             comment: "Don't allow dependencies from src/app/lib to a development only package",
             from: {
-                path: '^(src|app|lib)',
-                pathNot: '\\.spec\\.(js|ts|ls|coffee|litcoffee|coffee\\.md)$',
+                path: "^(src|app|lib)",
+                pathNot: "\\.spec\\.(js|ts|ls|coffee|litcoffee|coffee\\.md)$"
             },
             to: {
-                dependencyTypes: ['npm-dev'],
-            },
+                dependencyTypes: ["npm-dev"]
+            }
         },
         {
-            name: 'optional-deps-used',
-            severity: 'info',
-            comment:
-                "Inform when using an optional dependency. It might not be wrong - but it's not typicaly either",
+            name: "optional-deps-used",
+            severity: "info",
+            comment: "Inform when using an optional dependency. It might not be wrong - but it's not typicaly either",
             from: {},
             to: {
-                dependencyTypes: ['npm-optional'],
-            },
+                dependencyTypes: ["npm-optional"]
+            }
         },
         {
-            name: 'peer-deps-used',
-            comment:
-                "Warn when using a peer dependency - which might not be wrong - but it's not typicaly either",
-            severity: 'warn',
+            name: "peer-deps-used",
+            comment: "Warn when using a peer dependency - which might not be wrong - but it's not typicaly either",
+            severity: "warn",
             from: {},
             to: {
-                dependencyTypes: ['npm-peer'],
-            },
-        },
+                dependencyTypes: ["npm-peer"]
+            }
+        }
     ],
     options: {
+        maxDepth: 1,
         tsConfig: {
-            fileName: 'tsconfig.json',
+            fileName: "tsconfig.json"
         },
         /* conditions specifying which files not to follow further when encountered:
            - path: a regular expression to match
@@ -89,18 +87,11 @@ module.exports = {
         */
         doNotFollow: {
             // path: 'node_modules',
-            dependencyTypes: [
-                'npm',
-                'npm-dev',
-                'npm-optional',
-                'npm-peer',
-                'npm-bundled',
-                'npm-no-pkg',
-            ],
+            dependencyTypes: ["npm", "npm-dev", "npm-optional", "npm-peer", "npm-bundled", "npm-no-pkg"]
         },
 
         /* pattern specifying which files to exclude (regular expression) */
-        // , exclude : ''
+        exclude: "(^node_modules|__tests__)",
 
         /* pattern specifying which files to include (regular expression)
            dependency-cruiser will skip everything not matching this pattern
@@ -114,7 +105,7 @@ module.exports = {
         // , prefix: ''
 
         /* if true detect dependencies that only exist before typescript-to-javascript compilation */
-        tsPreCompilationDeps: true,
+        tsPreCompilationDeps: true
 
         /* if true combines the package.jsons found from the module up to the base
            folder the cruise is initiated from. Useful for how (some) mono-repos
@@ -156,6 +147,6 @@ module.exports = {
            otherwise leave it out (or set to the default, which is 'node_modules')
         */
         // , externalModuleResolutionStrategy: 'node_modules'
-    },
+    }
 };
 // generated: dependency-cruiser@4.16.0 on 2019-04-28T13:33:22.188Z
