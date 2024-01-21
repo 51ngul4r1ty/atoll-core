@@ -1,3 +1,24 @@
+IMPORTANT
+=========
+
+This repo and the other related ones (atoll-shared etc.) are being transitioned to the `atoll-mono` monorepo.  The only thing that
+will be retained (at least for now) is the issue list that's being maintained in the Github `Issues` tab for this repo.  Everything
+else, including this README.md and other documentation has been duplicated in `atoll-mono` and will be maintained there going forward,
+so this documentation will become out-of-date and should not be used for reference!
+
+
+
+----------------------------
+
+
+
+
+
+
+
+
+
+
 Overview
 ========
 
